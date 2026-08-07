@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "../styles/themes.css";
 import { HealthProvider } from "@/context/HealthContext";
+import { PrivacyProvider, PrivacyGate } from "@/components/auth/PrivacyLock";
+import { SessionProvider } from "@/components/auth/SessionProvider";
 import ThemeManager from "@/components/ThemeManager";
 
 const geistSans = Geist({
@@ -48,7 +50,11 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          {children}
+          <PrivacyProvider>
+            <SessionProvider>
+              <PrivacyGate>{children}</PrivacyGate>
+            </SessionProvider>
+          </PrivacyProvider>
         </HealthProvider>
       </body>
     </html>

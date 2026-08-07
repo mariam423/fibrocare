@@ -113,8 +113,8 @@
 - Consumes: `HealthContext`
 - Produces: `isLocked: boolean`, `unlock()`
 
-- [ ] **Step 1: Implement the `PrivacyLock` screen (PIN entry).**
-- [ ] **Step 2: Add a global guard in `layout.tsx` that shows the lock screen if enabled.**
-- [ ] **Step 3: Configure NextAuth.js for Social Logins (Google/GitHub).**
-- [ ] **Step 4: Verify that logs are inaccessible until the PIN is entered.**
-- [ ] **Step 5: Commit.**
+- [x] **Step 1: Implement the `PrivacyLock` screen (PIN entry).**
+- [x] **Step 2: Add a global guard in `layout.tsx` that shows the lock screen if enabled.**
+- [x] **Step 3: Configure NextAuth.js for Social Logins (Google/GitHub).**
+- [x] **Step 4: Verify that logs are inaccessible until the PIN is entered.**
+- [x] **Step 5: Commit.**

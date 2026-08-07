@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Save, Loader2, User, Zap, FileText } from "lucide-react";
+import { Save, Loader2, User, Zap, FileText, Lock, ShieldCheck, LogOut } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,10 +12,13 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { usePrivacy } from "@/components/auth/PrivacyLock";
 import { getCurrentUser, updateUserName, getStreak, getAllHealthLogs } from "../actions";
 import AppHeader from "@/components/layout/AppHeader";
 
 export default function ProfilePage() {
+  const { data: session } = useSession();
+  const { isEnabled, lock, disable, setPin } = usePrivacy();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [streak, setStreak] = useState(0);
@@ -22,6 +26,8 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [newPin, setNewPin] = useState("");
+  const [pinBusy, setPinBusy] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -184,6 +190,161 @@ export default function ProfilePage() {
                 )}
               </div>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Privacy Lock Card */}
+        <Card className="border-none shadow-sm bg-card ring-1 ring-border">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" aria-hidden="true" />
+              Privacy Lock
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              {isEnabled
+                ? "A 4-digit PIN protects your logs. The app locks automatically when you leave the tab."
+                : "Protect your sensitive health data with a 4-digit PIN."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!isEnabled ? (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex-1 space-y-2">
+                  <label
+                    htmlFor="privacy-pin"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    New 4-digit PIN
+                  </label>
+                  <Input
+                    id="privacy-pin"
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={4}
+                    pattern="\d{4}"
+                    value={newPin}
+                    onChange={(e) =>
+                      setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))
+                    }
+                    placeholder="••••"
+                    className="bg-muted border-border"
+                  />
+                </div>
+                <Button
+                  onClick={async () => {
+                    if (newPin.length !== 4) return;
+                    setPinBusy(true);
+                    await setPin(newPin);
+                    setNewPin("");
+                    setPinBusy(false);
+                  }}
+                  disabled={newPin.length !== 4 || pinBusy}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  {pinBusy ? (
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Lock className="mr-2 h-5 w-5" aria-hidden="true" />
+                  )}
+                  Enable Lock
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex-1 space-y-2">
+                  <label
+                    htmlFor="change-pin"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Change PIN
+                  </label>
+                  <Input
+                    id="change-pin"
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={4}
+                    pattern="\d{4}"
+                    value={newPin}
+                    onChange={(e) =>
+                      setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))
+                    }
+                    placeholder="New 4-digit PIN"
+                    className="bg-muted border-border"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={async () => {
+                      if (newPin.length !== 4) return;
+                      setPinBusy(true);
+                      await setPin(newPin);
+                      setNewPin("");
+                      setPinBusy(false);
+                    }}
+                    disabled={newPin.length !== 4 || pinBusy}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    <Lock className="mr-2 h-5 w-5" aria-hidden="true" />
+                    Update
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => disable()}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <ShieldCheck className="mr-2 h-5 w-5" aria-hidden="true" />
+                    Disable Lock
+                  </Button>
+                  <Button variant="ghost" onClick={lock}>
+                    Lock Now
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Social Sign-in Card */}
+        <Card className="border-none shadow-sm bg-card ring-1 ring-border">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-primary" aria-hidden="true" />
+              Account Sign-in
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Sign in with a social provider to access FibroCare across devices.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {session?.user ? (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-muted-foreground">
+                  Signed in as{" "}
+                  <span className="font-semibold text-foreground">
+                    {session.user.name || session.user.email}
+                  </span>
+                </p>
+                <Button variant="outline" onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-5 w-5" aria-hidden="true" />
+                  Sign out
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  onClick={() => signIn("google")}
+                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted"
+                >
+                  Sign in with Google
+                </Button>
+                <Button
+                  onClick={() => signIn("github")}
+                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted"
+                >
+                  Sign in with GitHub
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>

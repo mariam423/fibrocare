@@ -2,6 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import {
+  analyzeHealthPatterns,
+  getTopSymptoms,
+} from "@/lib/insightEngine";
 
 function toIsoDateKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -216,6 +220,48 @@ export async function getLatestLogs() {
   } catch (error) {
     console.error("Error fetching logs:", error);
     return [];
+  }
+}
+
+export async function getDashboardInsights() {
+  try {
+    const user = await getOrCreateDefaultUser();
+    const insights = await analyzeHealthPatterns(user.id, 30);
+    return insights;
+  } catch (error) {
+    console.error("Error fetching insights:", error);
+    return [];
+  }
+}
+
+export async function getReportData() {
+  try {
+    const user = await getOrCreateDefaultUser();
+    const [logs, insights, topSymptoms] = await Promise.all([
+      prisma.painLog.findMany({
+        where: { userId: user.id },
+        orderBy: { loggedAt: "desc" },
+      }),
+      analyzeHealthPatterns(user.id, 90),
+      getTopSymptoms(user.id, 90),
+    ]);
+
+    const avgPain = logs.length
+      ? logs.reduce((sum, l) => sum + l.painLevel, 0) / logs.length
+      : 0;
+    const flareUpDays = logs.filter((l) => l.painLevel >= 7).length;
+
+    return {
+      user: { id: user.id, name: user.name },
+      logs,
+      insights,
+      topSymptoms,
+      avgPain,
+      flareUpDays,
+    };
+  } catch (error) {
+    console.error("Error building report data:", error);
+    return null;
   }
 }
 

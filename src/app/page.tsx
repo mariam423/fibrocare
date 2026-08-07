@@ -41,6 +41,7 @@ import { EmpatheticToast } from "@/components/ui/EmpatheticToast";
 import { RecoveryPanel } from "@/components/support/RecoveryCards";
 import AppHeader from "@/components/layout/AppHeader";
 import { useDashboard } from "@/hooks/useDashboard";
+import { cn } from "@/lib/utils";
 
 const WELLNESS_TIPS = {
   low: [
@@ -168,6 +169,7 @@ export default function Home() {
     hydrationCount,
     streak,
     weeklyTrend,
+    insights,
     symptoms,
     lastLogDate,
     painLevel,
@@ -417,6 +419,49 @@ export default function Home() {
                 <p className="text-center text-xs text-muted-foreground">
                   Tracking your daily peaks helps identify triggers.
                 </p>
+              </CardContent>
+            </Card>
+
+            {/* AI Insights */}
+            <Card className="border-none shadow-sm bg-card">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2 font-semibold">
+                  <Zap className="h-6 w-6" />
+                  <CardTitle className="text-base">AI Insights</CardTitle>
+                </div>
+                <CardDescription className="text-sm">
+                  Patterns detected from your recent logs.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {insights.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Log at least 5 days of pain and symptoms to unlock personalized insights.
+                  </p>
+                ) : (
+                  insights.slice(0, 3).map((insight) => (
+                    <div
+                      key={insight.id}
+                      className={cn(
+                        "rounded-xl border p-3",
+                        insight.severity === "critical" &&
+                          "bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900",
+                        insight.severity === "warning" &&
+                          "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-900",
+                        insight.severity === "info" &&
+                          "bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900"
+                      )}
+                    >
+                      <p className="text-sm font-semibold">{insight.title}</p>
+                      <p className="mt-1 text-xs opacity-80">{insight.message}</p>
+                    </div>
+                  ))
+                )}
+                <Link href="/reports" className="block">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Full Report
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 

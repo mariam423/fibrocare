@@ -7,11 +7,13 @@ import {
   getLatestLogs,
   getWeeklyPainTrend,
   getSymptomsForDate,
+  getDashboardInsights,
   savePainLog,
   updateHydration,
   toggleSymptom as toggleSymptomAction,
 } from "@/app/actions";
 import type { PainTrendPoint } from "@/lib/types";
+import type { Insight } from "@/lib/insightEngine";
 
 function toIsoKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -34,6 +36,7 @@ interface DashboardData {
   streak: number;
   weeklyTrend: PainTrendPoint[];
   symptoms: string[];
+  insights: Insight[];
   lastLogDate: string;
   painLevel: number;
   mood: string;
@@ -41,11 +44,12 @@ interface DashboardData {
 
 async function fetchDashboardData(): Promise<DashboardData> {
   const user = await getCurrentUser();
-  const [currentStreak, trend, todaySymptoms, logs] = await Promise.all([
+  const [currentStreak, trend, todaySymptoms, logs, insights] = await Promise.all([
     getStreak(),
     getWeeklyPainTrend(),
     getSymptomsForDate(toIsoKey(new Date())),
     getLatestLogs(),
+    getDashboardInsights(),
   ]);
 
   const lastLog = logs[0];
@@ -55,6 +59,7 @@ async function fetchDashboardData(): Promise<DashboardData> {
     streak: currentStreak,
     weeklyTrend: trend,
     symptoms: todaySymptoms,
+    insights,
     lastLogDate: lastLog ? formatLogDate(lastLog.loggedAt) : "Never",
     painLevel: lastLog ? lastLog.painLevel : 3,
     mood: lastLog ? lastLog.moodTag : "Good Day",
@@ -74,6 +79,7 @@ export interface DashboardState {
   hydrationCount: number;
   streak: number;
   weeklyTrend: PainTrendPoint[];
+  insights: Insight[];
   symptoms: string[];
   lastLogDate: string;
   painLevel: number[];
@@ -98,6 +104,7 @@ export function useDashboard(): DashboardState {
   const [streak, setStreak] = useState(0);
   const [weeklyTrend, setWeeklyTrend] = useState<PainTrendPoint[]>([]);
   const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [insights, setInsights] = useState<Insight[]>([]);
   const [lastLogDate, setLastLogDate] = useState("Never");
 
   const [painLevel, setPainLevel] = useState([3]);
@@ -121,6 +128,7 @@ export function useDashboard(): DashboardState {
     setStreak(data.streak);
     setWeeklyTrend(data.weeklyTrend);
     setSymptoms(data.symptoms);
+    setInsights(data.insights);
     setLastLogDate(data.lastLogDate);
     setPainLevel([data.painLevel]);
     setMood(data.mood);
@@ -207,6 +215,7 @@ export function useDashboard(): DashboardState {
     hydrationCount,
     streak,
     weeklyTrend,
+    insights,
     symptoms,
     lastLogDate,
     painLevel,

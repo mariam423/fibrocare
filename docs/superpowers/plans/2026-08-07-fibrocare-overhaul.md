@@ -96,12 +96,12 @@
 - Consumes: `PrismaClient`
 - Produces: `getInsights(): Insight[]`, `generatePDF(): Promise<Blob>`
 
-- [ ] **Step 1: Implement `insightEngine.ts` to correlate hydration/sleep with pain spikes.**
-- [ ] **Step 2: Implement `pdfGenerator.ts` using `jspdf` to create the clinical summary.**
-- [ ] **Step 3: Create the `/reports` page to preview and download the PDF.**
-- [ ] **Step 4: Integrate "AI Insight" cards on the main dashboard.**
-- [ ] **Step 5: Verify that the PDF contains the 30-day summary and correlation data.**
-- [ ] **Step 6: Commit.**
+- [x] **Step 1: Implement `insightEngine.ts` to correlate hydration/sleep with pain spikes.**
+- [x] **Step 2: Implement `pdfGenerator.ts` using `jspdf` to create the clinical summary.**
+- [x] **Step 3: Create the `/reports` page to preview and download the PDF.**
+- [x] **Step 4: Integrate "AI Insight" cards on the main dashboard.**
+- [x] **Step 5: Verify that the PDF contains the 30-day summary and correlation data.**
+- [x] **Step 6: Commit.**
 
 ### Task 6: Security & Privacy Lock
 **Files:**

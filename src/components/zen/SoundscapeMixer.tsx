@@ -85,51 +85,65 @@ export function SoundscapeMixer({ disabled = false }: { disabled?: boolean }) {
     return { source, filter };
   };
 
+type SoundConnections = {
+  source: AudioScheduledSourceNode;
+  nodes: AudioNode[];
+}[];
+
+function buildRain(ctx: AudioContext, gain: GainNode): SoundConnections {
+  const { source, filter } = connectNoise(ctx, "white", "lowpass", 5000);
+  gain.gain.value = 0.12;
+  filter.connect(gain);
+  return [{ source, nodes: [filter] }];
+}
+
+function buildForest(ctx: AudioContext, gain: GainNode): SoundConnections {
+  const { source, filter } = connectNoise(ctx, "brown", "lowpass", 800);
+  gain.gain.value = 0.2;
+  filter.connect(gain);
+  return [{ source, nodes: [filter] }];
+}
+
+function buildWhiteNoise(ctx: AudioContext, gain: GainNode): SoundConnections {
+  const { source, filter } = connectNoise(ctx, "white", "highpass", 400);
+  gain.gain.value = 0.1;
+  filter.connect(gain);
+  return [{ source, nodes: [filter] }];
+}
+
+function buildDeepHum(ctx: AudioContext, gain: GainNode): SoundConnections {
+  const osc55 = ctx.createOscillator();
+  osc55.frequency.value = 55;
+  osc55.type = "sine";
+  const osc110 = ctx.createOscillator();
+  osc110.frequency.value = 110;
+  osc110.type = "sine";
+  const gain110 = ctx.createGain();
+  gain110.gain.value = 0.35;
+  osc55.connect(gain);
+  osc110.connect(gain110);
+  gain110.connect(gain);
+  gain.gain.value = 0.16;
+  return [
+    { source: osc55, nodes: [] },
+    { source: osc110, nodes: [gain110] },
+  ];
+}
+
+const SOUND_BUILDERS: Record<
+  SoundId,
+  (ctx: AudioContext, gain: GainNode) => SoundConnections
+> = {
+  rain: buildRain,
+  forest: buildForest,
+  whiteNoise: buildWhiteNoise,
+  deepHum: buildDeepHum,
+};
+
   const startSound = (id: SoundId) => {
     const ctx = getContext();
     const gain = ctx.createGain();
-    const connections: { source: AudioScheduledSourceNode; nodes: AudioNode[] }[] = [];
-
-    switch (id) {
-      case "rain": {
-        const { source, filter } = connectNoise(ctx, "white", "lowpass", 5000);
-        gain.gain.value = 0.12;
-        filter.connect(gain);
-        connections.push({ source, nodes: [filter] });
-        break;
-      }
-      case "forest": {
-        const { source, filter } = connectNoise(ctx, "brown", "lowpass", 800);
-        gain.gain.value = 0.2;
-        filter.connect(gain);
-        connections.push({ source, nodes: [filter] });
-        break;
-      }
-      case "whiteNoise": {
-        const { source, filter } = connectNoise(ctx, "white", "highpass", 400);
-        gain.gain.value = 0.1;
-        filter.connect(gain);
-        connections.push({ source, nodes: [filter] });
-        break;
-      }
-      case "deepHum": {
-        const osc55 = ctx.createOscillator();
-        osc55.frequency.value = 55;
-        osc55.type = "sine";
-        const osc110 = ctx.createOscillator();
-        osc110.frequency.value = 110;
-        osc110.type = "sine";
-        const gain110 = ctx.createGain();
-        gain110.gain.value = 0.35;
-        osc55.connect(gain);
-        osc110.connect(gain110);
-        gain110.connect(gain);
-        gain.gain.value = 0.16;
-        connections.push({ source: osc55, nodes: [] });
-        connections.push({ source: osc110, nodes: [gain110] });
-        break;
-      }
-    }
+    const connections = SOUND_BUILDERS[id](ctx, gain);
 
     gain.connect(ctx.destination);
     connections.forEach(({ source }) => source.start());

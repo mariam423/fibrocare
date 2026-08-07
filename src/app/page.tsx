@@ -70,6 +70,27 @@ function getWellnessTip(level: number) {
   return tips[Math.floor(Math.random() * tips.length)];
 }
 
+const MOOD_OPTIONS = [
+  {
+    label: "Good Day",
+    icon: <Smile className="w-5 h-5" aria-hidden="true" />,
+    color:
+      "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800",
+  },
+  {
+    label: "Low Energy",
+    icon: <Zap className="w-5 h-5" aria-hidden="true" />,
+    color:
+      "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800",
+  },
+  {
+    label: "Flare-up",
+    icon: <Frown className="w-5 h-5" aria-hidden="true" />,
+    color:
+      "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
+  },
+];
+
 function PainTrendChart({ data }: { data: { date: string; level: number }[] }) {
   const chartData = useMemo(() => {
     const levelByDate = new Map(data.map((d) => [d.date, d.level]));
@@ -215,27 +236,6 @@ export default function Home() {
     setLocalPainLevel(value);
     setPainLevel(value[0]);
   };
-
-  const MOOD_OPTIONS = [
-    {
-      label: "Good Day",
-      icon: <Smile className="w-5 h-5" aria-hidden="true" />,
-      color:
-        "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800",
-    },
-    {
-      label: "Low Energy",
-      icon: <Zap className="w-5 h-5" aria-hidden="true" />,
-      color:
-        "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800",
-    },
-    {
-      label: "Flare-up",
-      icon: <Frown className="w-5 h-5" aria-hidden="true" />,
-      color:
-        "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-500">

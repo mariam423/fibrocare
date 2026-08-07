@@ -50,6 +50,21 @@ export default function ZenPage() {
         </header>
       )}
 
+      {isUltraDark && (
+        <header className="absolute top-0 w-full p-6 flex justify-end text-slate-500">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleUltraDark}
+            aria-pressed={isUltraDark}
+            className="rounded-full hover:bg-slate-800"
+          >
+            <X className="h-4 w-4 mr-2" aria-hidden="true" />
+            Exit Ultra Dark
+          </Button>
+        </header>
+      )}
+
       <div className="relative flex flex-col items-center justify-center space-y-12">
         <BreathingBubble ultraDark={isUltraDark} />
 
@@ -69,11 +84,10 @@ export default function ZenPage() {
         {isUltraDark && (
           <Button
             variant="ghost"
-            onClick={toggleUltraDark}
-            className="absolute bottom-10 text-slate-600 hover:text-slate-400"
+            onClick={() => router.back()}
+            className="text-slate-600 hover:text-slate-400"
           >
-            <X className="h-4 w-4 mr-2" aria-hidden="true" />
-            Exit Ultra Dark
+            Back to Dashboard
           </Button>
         )}
       </div>

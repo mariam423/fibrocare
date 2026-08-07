@@ -11,6 +11,7 @@ interface EmpatheticToastProps {
 }
 
 export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -24,7 +25,35 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const container = containerRef.current;
+      if (!container) return;
+      const focusable = Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("disabled"));
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -34,8 +63,10 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
 
   return (
     <div
+      ref={containerRef}
       className="fixed bottom-6 right-6 z-[100] max-w-sm animate-in slide-in-from-bottom-full fade-in duration-500"
       role="alertdialog"
+      aria-modal="true"
       aria-labelledby="empathic-toast-title"
       aria-describedby="empathic-toast-message"
     >

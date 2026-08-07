@@ -15,6 +15,8 @@ import {
 import type { PainTrendPoint } from "@/lib/types";
 import type { Insight } from "@/lib/insightEngine";
 
+const FLARE_TOAST_THRESHOLD = 7;
+
 function toIsoKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
     d.getDate()
@@ -116,6 +118,10 @@ export function useDashboard(): DashboardState {
 
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const triggerFlareToast = useCallback((level: number) => {
+    if (level >= FLARE_TOAST_THRESHOLD) setShowToast(true);
+  }, []);
+
   useEffect(() => {
     return () => {
       if (successTimer.current) clearTimeout(successTimer.current);
@@ -140,7 +146,7 @@ export function useDashboard(): DashboardState {
       .then((data) => {
         if (!cancelled) {
           applyData(data);
-          if (data.painLevel >= 7) setShowToast(true);
+          triggerFlareToast(data.painLevel);
         }
       })
       .catch((error) => {
@@ -152,7 +158,7 @@ export function useDashboard(): DashboardState {
     return () => {
       cancelled = true;
     };
-  }, [applyData]);
+  }, [applyData, triggerFlareToast]);
 
   const logEntry = useCallback(
     async (overrides?: LogOverrides) => {
@@ -171,7 +177,7 @@ export function useDashboard(): DashboardState {
         const data = await fetchDashboardData();
         applyData(data);
 
-        if (level >= 7) setShowToast(true);
+        triggerFlareToast(level);
 
         setShowSuccess(true);
         if (successTimer.current) clearTimeout(successTimer.current);
@@ -183,7 +189,7 @@ export function useDashboard(): DashboardState {
         setIsSaving(false);
       }
     },
-    [painLevel, mood, notes, applyData]
+    [painLevel, mood, notes, applyData, triggerFlareToast]
   );
 
   const incrementHydration = useCallback(async (delta: number) => {

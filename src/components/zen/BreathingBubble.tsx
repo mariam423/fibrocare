@@ -37,11 +37,12 @@ export function BreathingBubble({ ultraDark = false }: BreathingBubbleProps) {
     : "Breathe";
 
   return (
-    <div
-      role="img"
-      aria-label="Breathing exercise. Breathe in for four seconds, then breathe out for six seconds."
-      className="relative flex flex-col items-center justify-center"
-    >
+    <div className="relative flex flex-col items-center justify-center">
+      <p className="sr-only">
+        Breathing exercise. Breathe in for four seconds, then breathe out for
+        six seconds.
+      </p>
+
       {!ultraDark && (
         <motion.div
           aria-hidden="true"
@@ -63,15 +64,12 @@ export function BreathingBubble({ ultraDark = false }: BreathingBubbleProps) {
         }}
         className="absolute w-48 h-48 rounded-full border-4 border-white/20 flex items-center justify-center bg-white/10 backdrop-blur-sm"
       >
-        <span className="text-2xl font-light tracking-widest text-white">
+        <span aria-hidden="true" className="text-2xl font-light tracking-widest text-white">
           {label}
         </span>
       </motion.div>
 
-      <p
-        className="sr-only"
-        aria-live="polite"
-      >
+      <p className="sr-only" aria-live="polite">
         {label}
       </p>
     </div>

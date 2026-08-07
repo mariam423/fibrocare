@@ -130,7 +130,10 @@ export function useDashboard(): DashboardState {
     let cancelled = false;
     fetchDashboardData()
       .then((data) => {
-        if (!cancelled) applyData(data);
+        if (!cancelled) {
+          applyData(data);
+          if (data.painLevel >= 7) setShowToast(true);
+        }
       })
       .catch((error) => {
         console.error("Failed to load dashboard data", error);

@@ -78,12 +78,12 @@
 - Consumes: `HealthContext`
 - Produces: `triggerSupport(type: 'sensitive' | 'zen')`
 
-- [ ] **Step 1: Implement `EmpatheticToast` for non-intrusive suggestions.**
-- [ ] **Step 2: Create `RecoveryCards` with specific advice (Cold compress, etc.).**
-- [ ] **Step 3: Add logic to `page.tsx` to trigger the toast when `painLevel >= 7`.**
-- [ ] **Step 4: Link the toast actions to the Sensitive Mode toggle and Zen Portal.**
-- [ ] **Step 5: Verify that logging high pain triggers the empathetic support flow.**
-- [ ] **Step 6: Commit.**
+- [x] **Step 1: Implement `EmpatheticToast` for non-intrusive suggestions.**
+- [x] **Step 2: Create `RecoveryCards` with specific advice (Cold compress, etc.).**
+- [x] **Step 3: Add logic to `page.tsx` to trigger the toast when `painLevel >= 7`.**
+- [x] **Step 4: Link the toast actions to the Sensitive Mode toggle and Zen Portal.**
+- [x] **Step 5: Verify that logging high pain triggers the empathetic support flow.**
+- [x] **Step 6: Commit.**
 
 ### Task 5: Insight Engine & Medical Reporting
 **Files:**

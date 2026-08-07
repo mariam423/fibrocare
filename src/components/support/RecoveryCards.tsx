@@ -22,7 +22,7 @@ const colorMap = {
 
 export function RecoveryCard({ title, description, icon: Icon, actionLabel, onAction, color }: RecoveryCardProps) {
   return (
-    <div className={cn(
+    <article className={cn(
       "p-4 rounded-2xl border transition-all hover:ring-2 hover:ring-purple-400",
       colorMap[color]
     )}>
@@ -31,7 +31,7 @@ export function RecoveryCard({ title, description, icon: Icon, actionLabel, onAc
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="flex-1">
-          <h4 className="font-semibold text-sm">{title}</h4>
+          <h3 className="font-semibold text-sm">{title}</h3>
           <p className="text-xs opacity-80 mb-3">{description}</p>
           <Button
             size="sm"
@@ -43,7 +43,7 @@ export function RecoveryCard({ title, description, icon: Icon, actionLabel, onAc
           </Button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 

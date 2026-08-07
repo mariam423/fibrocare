@@ -61,12 +61,12 @@
 - Consumes: `HealthContext` (for motion settings)
 - Produces: `startZenSession()`
 
-- [ ] **Step 1: Create `/zen` route and basic page layout.**
-- [ ] **Step 2: Implement `BreathingBubble` using Framer Motion with organic sine-wave scaling.**
-- [ ] **Step 3: Implement `SoundscapeMixer` with looping audio assets (Rain, Forest, White Noise).**
-- [ ] **Step 4: Implement "Ultra-Dark" mode toggle within the Zen page.**
-- [ ] **Step 5: Verify that the breathing animation is smooth and sound toggles work.**
-- [ ] **Step 6: Commit.**
+- [x] **Step 1: Create `/zen` route and basic page layout.**
+- [x] **Step 2: Implement `BreathingBubble` using Framer Motion with organic sine-wave scaling.**
+- [x] **Step 3: Implement `SoundscapeMixer` with looping audio assets (Rain, Forest, White Noise).**
+- [x] **Step 4: Implement "Ultra-Dark" mode toggle within the Zen page.**
+- [x] **Step 5: Verify that the breathing animation is smooth and sound toggles work.**
+- [x] **Step 6: Commit.**
 
 ### Task 4: Smart Support & Flare-up Triggers
 **Files:**

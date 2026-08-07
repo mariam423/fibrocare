@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String        @id @default(cuid())
+  name           String
+  email          String        @unique
+  hydrationCount Int           @default(0)
+  logs           PainLog[]
+  symptomLogs    SymptomLog[]
+}
+
+model PainLog {
+  id        String   @id @default(cuid())
+  painLevel Int
+  moodTag   String
+  notes     String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  loggedAt  DateTime @default(now())
+}
+
+model SymptomLog {
+  id        String   @id @default(cuid())
+  symptom   String
+  date      String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, symptom, date])
+  @@index([userId, date])
+}

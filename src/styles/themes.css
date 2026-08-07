@@ -1,0 +1,98 @@
+/* ============================================================
+   FibroCare Design Tokens
+   Semantic tokens drive every shadcn/Tailwind utility (bg-card,
+   text-foreground, bg-primary, ...). Theme classes flip the whole
+   app: .dark = color scheme, .theme-sensitive = soothing palette.
+   ============================================================ */
+
+:root {
+  /* Standard Palette — Productive Pastels (Lavender / Teal) */
+  --bg-main: #fdfaff;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent-primary: #a855f7; /* Purple */
+  --accent-secondary: #0d9488; /* Teal */
+  --border-color: #f3e8ff;
+  --ring-color: #e9d5ff;
+  --transition-speed: 0.3s;
+}
+
+/* Standard (dark) */
+.dark {
+  --bg-main: #020617;
+  --bg-card: #0f172a;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent-primary: #c084fc;
+  --accent-secondary: #2dd4bf;
+  --border-color: #1e293b;
+  --ring-color: #334155;
+}
+
+/* ------------------------------------------------------------
+   Sensitive Mode — Soothing Palette (Sage Green / Deep Navy)
+   Overrides the semantic tokens consumed by all components.
+   ------------------------------------------------------------ */
+.theme-sensitive {
+  --background: oklch(0.96 0.015 160);
+  --foreground: oklch(0.24 0.02 160);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.02 160);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.02 160);
+  --primary: oklch(0.42 0.1 160);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.93 0.02 160);
+  --secondary-foreground: oklch(0.24 0.02 160);
+  --muted: oklch(0.93 0.02 160);
+  --muted-foreground: oklch(0.4 0.03 160);
+  --accent: oklch(0.93 0.01 220);
+  --accent-foreground: oklch(0.24 0.02 160);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.86 0.02 160);
+  --input: oklch(0.86 0.02 160);
+  --ring: oklch(0.6 0.09 160);
+
+  /* Backwards-compatible design tokens */
+  --bg-main: oklch(0.96 0.015 160);
+  --bg-card: oklch(1 0 0);
+  --text-main: oklch(0.24 0.02 160);
+  --text-muted: oklch(0.4 0.03 160);
+  --accent-primary: oklch(0.42 0.1 160); /* Sage Green */
+  --accent-secondary: oklch(0.6 0.12 280); /* Soft Lavender */
+  --border-color: oklch(0.88 0.02 160);
+  --ring-color: oklch(0.75 0.05 160);
+  --transition-speed: 0.8s; /* Slower, more organic transitions */
+}
+
+/* Sensitive Mode + Dark — Deep Navy sanctuary */
+.theme-sensitive.dark {
+  --background: oklch(0.16 0.02 255);
+  --foreground: oklch(0.93 0.01 220);
+  --card: oklch(0.2 0.02 255);
+  --card-foreground: oklch(0.93 0.01 220);
+  --popover: oklch(0.2 0.02 255);
+  --popover-foreground: oklch(0.93 0.01 220);
+  --primary: oklch(0.84 0.12 150); /* Sage Green */
+  --primary-foreground: oklch(0.2 0.04 150);
+  --secondary: oklch(0.25 0.02 255);
+  --secondary-foreground: oklch(0.93 0.01 220);
+  --muted: oklch(0.24 0.02 255);
+  --muted-foreground: oklch(0.72 0.02 220);
+  --accent: oklch(0.25 0.02 255);
+  --accent-foreground: oklch(0.93 0.01 220);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.28 0.02 255);
+  --input: oklch(0.28 0.02 255);
+  --ring: oklch(0.6 0.08 160);
+
+  --bg-main: oklch(0.16 0.02 255); /* Deep Navy */
+  --bg-card: oklch(0.2 0.02 255);
+  --text-main: oklch(0.93 0.01 220);
+  --text-muted: oklch(0.72 0.02 220);
+  --accent-primary: oklch(0.84 0.12 150); /* Sage Green */
+  --accent-secondary: oklch(0.8 0.12 290); /* Soft Lavender */
+  --border-color: oklch(0.28 0.02 255);
+  --ring-color: oklch(0.4 0.02 255);
+}

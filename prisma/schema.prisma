@@ -18,6 +18,7 @@ model User {
   logs           PainLog[]
   symptomLogs    SymptomLog[]
   sessions       Session[]
+  resetTokens     PasswordResetToken[]
 }
 
 model Session {
@@ -26,6 +27,17 @@ model Session {
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires   DateTime
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }

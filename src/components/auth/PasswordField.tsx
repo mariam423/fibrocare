@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { EyeIcon, EyeOffIcon } from "@hugeicons/core-free-icons";
 import { Input } from "@/components/ui/input";
 
 interface PasswordFieldProps {
@@ -60,9 +61,9 @@ export function PasswordField({
           className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {visible ? (
-            <EyeOff className="h-5 w-5" aria-hidden="true" />
+            <HugeiconsIcon icon={EyeOffIcon} className="h-5 w-5" aria-hidden="true" />
           ) : (
-            <Eye className="h-5 w-5" aria-hidden="true" />
+            <HugeiconsIcon icon={EyeIcon} className="h-5 w-5" aria-hidden="true" />
           )}
         </button>
       </div>

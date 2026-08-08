@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { HeartIcon } from "@hugeicons/core-free-icons";
 
 interface AuthShellProps {
   title: string;
@@ -26,7 +27,7 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
           className="mb-8 flex items-center justify-center gap-2 rounded-2xl bg-primary/15 p-3 text-primary transition-colors hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="flex items-center gap-2">
-            <Heart className="h-6 w-6" aria-hidden="true" />
+            <HugeiconsIcon icon={HeartIcon} className="h-6 w-6" aria-hidden="true" />
             <span className="text-2xl font-semibold tracking-tight">
               FibroCare
             </span>

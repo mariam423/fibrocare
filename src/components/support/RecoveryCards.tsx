@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
-import { Wind, Moon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type { IconSvgElement } from "@hugeicons/react";
+import { FastWindIcon, Moon02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface RecoveryCardProps {
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: IconSvgElement;
   actionLabel: string;
   onAction: () => void;
   color: "purple" | "teal" | "orange";
@@ -20,7 +21,7 @@ const colorMap = {
   orange: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
 };
 
-export function RecoveryCard({ title, description, icon: Icon, actionLabel, onAction, color }: RecoveryCardProps) {
+export function RecoveryCard({ title, description, icon, actionLabel, onAction, color }: RecoveryCardProps) {
   return (
     <article className={cn(
       "p-4 rounded-2xl border transition-all hover:ring-2 hover:ring-purple-400",
@@ -28,7 +29,7 @@ export function RecoveryCard({ title, description, icon: Icon, actionLabel, onAc
     )}>
       <div className="flex items-start gap-3">
         <div className="p-2 rounded-lg bg-white/50 dark:bg-slate-900/50">
-          <Icon className="h-5 w-5" aria-hidden="true" />
+          <HugeiconsIcon icon={icon} className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-sm">{title}</h3>
@@ -53,7 +54,7 @@ export function RecoveryPanel({ onZen, onSensitive }: { onZen: () => void, onSen
       <RecoveryCard
         title="Sensory Rest"
         description="Dim the screen and disable animations for a moment."
-        icon={Moon}
+        icon={Moon02Icon}
         actionLabel="Activate Sensitive Mode"
         onAction={onSensitive}
         color="purple"
@@ -61,7 +62,7 @@ export function RecoveryPanel({ onZen, onSensitive }: { onZen: () => void, onSen
       <RecoveryCard
         title="Mindful Breath"
         description="A 3-minute guided breathing session to lower stress."
-        icon={Wind}
+        icon={FastWindIcon}
         actionLabel="Open Zen Portal"
         onAction={onZen}
         color="teal"

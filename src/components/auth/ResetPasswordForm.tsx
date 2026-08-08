@@ -2,7 +2,8 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { Loader2, KeyRound } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading01Icon, Key01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { resetPassword } from "@/app/actions";
@@ -65,7 +66,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     return (
       <div className="space-y-6" role="status" aria-live="polite">
         <div className="flex items-start gap-3 rounded-2xl bg-primary/10 px-4 py-4 text-primary">
-          <KeyRound className="mt-0.5 h-6 w-6 shrink-0" aria-hidden="true" />
+          <HugeiconsIcon
+            icon={Key01Icon}
+            className="mt-0.5 h-6 w-6 shrink-0"
+            aria-hidden="true"
+          />
           <div className="space-y-1">
             <p className="font-semibold text-foreground">
               Your password has been updated
@@ -130,7 +135,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       >
         {isPending ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+            <HugeiconsIcon
+              icon={Loading01Icon}
+              className="mr-2 h-5 w-5 animate-spin"
+              aria-hidden="true"
+            />
             Updating...
           </>
         ) : (

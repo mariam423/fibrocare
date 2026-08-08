@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { useHealth } from "@/context/HealthContext";
 import { cn } from "@/lib/utils";
@@ -56,14 +57,18 @@ export function QuickPresets({ onSelect, isLogging = false, loggingPreset = null
             aria-pressed={isActive}
             aria-busy={isSavingThis}
             className={cn(
-              "flex items-center gap-2 px-6 py-6 text-lg transition-all rounded-full",
+              "flex items-center gap-2 min-h-14 px-6 text-lg transition-all rounded-full",
               isActive
                 ? "bg-purple-100 border-purple-400 text-purple-700 ring-2 ring-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-800"
                 : "bg-card border-border hover:bg-muted"
             )}
           >
             {isSavingThis ? (
-              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+              <HugeiconsIcon
+                icon={Loading01Icon}
+                className="h-5 w-5 animate-spin"
+                aria-hidden="true"
+              />
             ) : (
               <span className="text-xl" aria-hidden="true">
                 {preset.emoji}

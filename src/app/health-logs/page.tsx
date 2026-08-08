@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Calendar, Trash2, Loader2, ClipboardList } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Calendar01Icon,
+  Delete01Icon,
+  Loading01Icon,
+  ClipboardListIcon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -87,7 +93,7 @@ export default function HealthLogsPage() {
       <main id="main-content" className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-4xl">
         <section className="space-y-2">
           <div className="flex items-center gap-3">
-            <ClipboardList className="h-8 w-8 text-primary" />
+            <HugeiconsIcon icon={ClipboardListIcon} className="h-8 w-8 text-primary" aria-hidden="true" />
             <h1 className="text-3xl font-bold tracking-tight">
               Health Logs
             </h1>
@@ -99,14 +105,14 @@ export default function HealthLogsPage() {
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <HugeiconsIcon icon={Loading01Icon} className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
             <p className="text-muted-foreground">Loading your health records...</p>
           </div>
         ) : logs.length === 0 ? (
           <Card className="border-none shadow-sm bg-card ring-1 ring-border text-center py-12">
             <CardContent className="flex flex-col items-center gap-4">
               <div className="p-4 rounded-full bg-muted">
-                <Calendar className="h-8 w-8 text-muted-foreground" />
+                <HugeiconsIcon icon={Calendar01Icon} className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="space-y-1">
                 <p className="text-lg font-medium text-foreground">No logs found</p>
@@ -170,9 +176,9 @@ export default function HealthLogsPage() {
                             className="text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                           >
                             {isDeleting === log.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <HugeiconsIcon icon={Loading01Icon} className="h-4 w-4 animate-spin" aria-hidden="true" />
                             ) : (
-                              <Trash2 className="h-4 w-4" />
+                              <HugeiconsIcon icon={Delete01Icon} className="h-4 w-4" aria-hidden="true" />
                             )}
                           </Button>
                         </TableCell>

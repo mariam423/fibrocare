@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useHealth } from "@/context/HealthContext";
 import { Button } from "@/components/ui/button";
-import { Moon, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Moon02Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { BreathingBubble } from "@/components/zen/BreathingBubble";
 import { SoundscapeMixer } from "@/components/zen/SoundscapeMixer";
@@ -44,7 +45,12 @@ export default function ZenPage() {
               aria-pressed={isUltraDark}
               className="rounded-full border-slate-700 text-slate-400 hover:bg-slate-800"
             >
-              <Moon className="h-4 w-4 mr-2" aria-hidden="true" /> Ultra Dark
+              <HugeiconsIcon
+                icon={Moon02Icon}
+                className="h-4 w-4 mr-2"
+                aria-hidden="true"
+              />{" "}
+              Ultra Dark
             </Button>
           </div>
         </header>
@@ -59,7 +65,11 @@ export default function ZenPage() {
             aria-pressed={isUltraDark}
             className="rounded-full hover:bg-slate-800"
           >
-            <X className="h-4 w-4 mr-2" aria-hidden="true" />
+            <HugeiconsIcon
+              icon={Cancel01Icon}
+              className="h-4 w-4 mr-2"
+              aria-hidden="true"
+            />
             Exit Ultra Dark
           </Button>
         </header>

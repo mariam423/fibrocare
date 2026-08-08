@@ -4,7 +4,8 @@ import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Loader2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordField } from "@/components/auth/PasswordField";
@@ -106,7 +107,11 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
       >
         {isPending ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+            <HugeiconsIcon
+              icon={Loading01Icon}
+              className="mr-2 h-5 w-5 animate-spin"
+              aria-hidden="true"
+            />
             Signing in...
           </>
         ) : (

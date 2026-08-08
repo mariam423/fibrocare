@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Save, Loader2, User, Zap, FileText, Lock, ShieldCheck, LogOut } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  SaveIcon,
+  Loading01Icon,
+  UserIcon,
+  ZapIcon,
+  File01Icon,
+  LockIcon,
+  Shield01Icon,
+  Logout01Icon,
+} from "@hugeicons/core-free-icons";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +88,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <HugeiconsIcon icon={Loading01Icon} className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
           <p>Loading profile...</p>
         </div>
       </div>
@@ -106,7 +116,7 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center -mt-12 pb-6 text-center">
               <div className="h-24 w-24 rounded-full bg-card p-1 shadow-md ring-4 ring-border">
                 <div className="h-full w-full rounded-full bg-primary/15 flex items-center justify-center">
-                  <User className="h-12 w-12 text-primary" />
+                  <HugeiconsIcon icon={UserIcon} className="h-12 w-12 text-primary" aria-hidden="true" />
                 </div>
               </div>
               <h2 className="mt-4 text-2xl font-bold">{name}</h2>
@@ -116,7 +126,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4 pt-6 border-t border-border">
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-primary/10 text-primary">
                 <div className="p-2 rounded-lg bg-primary/15">
-                  <Zap className="h-5 w-5" />
+                  <HugeiconsIcon icon={ZapIcon} className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-medium uppercase tracking-wider opacity-70">Streak</p>
@@ -125,7 +135,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300">
                 <div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-800">
-                  <FileText className="h-5 w-5" />
+                  <HugeiconsIcon icon={File01Icon} className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-medium uppercase tracking-wider opacity-70">Total Logs</p>
@@ -168,16 +178,16 @@ export default function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-6 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-xl shadow-md"
+                  className="w-full min-h-14 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-xl shadow-md"
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <HugeiconsIcon icon={Loading01Icon} className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save className="mr-2 h-5 w-5" />
+                      <HugeiconsIcon icon={SaveIcon} className="mr-2 h-5 w-5" aria-hidden="true" />
                       Save Changes
                     </>
                   )}
@@ -201,7 +211,7 @@ export default function ProfilePage() {
         <Card className="border-none shadow-sm bg-card ring-1 ring-border">
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" aria-hidden="true" />
+              <HugeiconsIcon icon={Shield01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
               Privacy Lock
             </CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -246,9 +256,9 @@ export default function ProfilePage() {
                   className="bg-primary hover:bg-primary/90"
                 >
                   {pinBusy ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                    <HugeiconsIcon icon={Loading01Icon} className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
                   ) : (
-                    <Lock className="mr-2 h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={LockIcon} className="mr-2 h-5 w-5" aria-hidden="true" />
                   )}
                   Enable Lock
                 </Button>
@@ -288,7 +298,7 @@ export default function ProfilePage() {
                     disabled={newPin.length !== 4 || pinBusy}
                     className="bg-primary hover:bg-primary/90"
                   >
-                    <Lock className="mr-2 h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={LockIcon} className="mr-2 h-5 w-5" aria-hidden="true" />
                     Update
                   </Button>
                   <Button
@@ -296,7 +306,7 @@ export default function ProfilePage() {
                     onClick={() => disable()}
                     className="text-destructive hover:text-destructive"
                   >
-                    <ShieldCheck className="mr-2 h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={Shield01Icon} className="mr-2 h-5 w-5" aria-hidden="true" />
                     Disable Lock
                   </Button>
                   <Button variant="ghost" onClick={lock}>
@@ -312,7 +322,7 @@ export default function ProfilePage() {
         <Card className="border-none shadow-sm bg-card ring-1 ring-border">
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
-              <LogOut className="h-5 w-5 text-primary" aria-hidden="true" />
+              <HugeiconsIcon icon={Logout01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
               Account Sign-in
             </CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -329,7 +339,7 @@ export default function ProfilePage() {
                   </span>
                 </p>
                 <Button variant="outline" onClick={() => signOut()}>
-                  <LogOut className="mr-2 h-5 w-5" aria-hidden="true" />
+                  <HugeiconsIcon icon={Logout01Icon} className="mr-2 h-5 w-5" aria-hidden="true" />
                   Sign out
                 </Button>
               </div>

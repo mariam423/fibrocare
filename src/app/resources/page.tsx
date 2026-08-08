@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, BookOpen, Flame, Apple, Activity, Brain } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Search01Icon,
+  Book01Icon,
+  FlameIcon,
+  AppleIcon,
+  Activity01Icon,
+  Brain01Icon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,7 +53,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Pacing Techniques',
     description: 'Learn how to balance activity and rest to prevent crashes.',
     category: 'Managing Flares',
-    icon: <Flame className="h-6 w-6 text-purple-600 dark:text-purple-300" />,
+    icon: <HugeiconsIcon icon={FlameIcon} className="h-6 w-6 text-purple-600 dark:text-purple-300" aria-hidden="true" />,
     image: '/images/resources/flare-pacing.svg',
     bannerGradient: 'from-purple-200 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-950/50',
     color: {
@@ -64,7 +72,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Gentle Heat Therapy',
     description: 'Using warmth to soothe stiff joints and relax muscles.',
     category: 'Managing Flares',
-    icon: <Flame className="h-6 w-6 text-purple-600 dark:text-purple-300" />,
+    icon: <HugeiconsIcon icon={FlameIcon} className="h-6 w-6 text-purple-600 dark:text-purple-300" aria-hidden="true" />,
     image: '/images/resources/flare-heat.svg',
     bannerGradient: 'from-purple-200 to-pink-100 dark:from-purple-900/50 dark:to-pink-950/50',
     color: {
@@ -83,7 +91,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Anti-Inflammatory Diet',
     description: 'Foods that may help reduce inflammation and joint pain.',
     category: 'Nutrition & Hydration',
-    icon: <Apple className="h-6 w-6 text-teal-600 dark:text-teal-300" />,
+    icon: <HugeiconsIcon icon={AppleIcon} className="h-6 w-6 text-teal-600 dark:text-teal-300" aria-hidden="true" />,
     image: '/images/resources/nutri-antiinflam.svg',
     bannerGradient: 'from-teal-200 to-emerald-100 dark:from-teal-900/50 dark:to-emerald-950/50',
     color: {
@@ -102,7 +110,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Hydration Strategies',
     description: 'Tips for staying hydrated even when water feels like a chore.',
     category: 'Nutrition & Hydration',
-    icon: <Apple className="h-6 w-6 text-teal-600 dark:text-teal-300" />,
+    icon: <HugeiconsIcon icon={AppleIcon} className="h-6 w-6 text-teal-600 dark:text-teal-300" aria-hidden="true" />,
     image: '/images/resources/nutri-hydration.svg',
     bannerGradient: 'from-cyan-200 to-teal-100 dark:from-cyan-900/50 dark:to-teal-950/50',
     color: {
@@ -121,7 +129,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Gentle Stretching',
     description: 'Low-impact ways to maintain flexibility without overexertion.',
     category: 'Gentle Movement',
-    icon: <Activity className="h-6 w-6 text-green-600 dark:text-green-300" />,
+    icon: <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6 text-green-600 dark:text-green-300" aria-hidden="true" />,
     image: '/images/resources/move-stretching.svg',
     bannerGradient: 'from-green-200 to-emerald-100 dark:from-green-900/50 dark:to-emerald-950/50',
     color: {
@@ -140,7 +148,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Low-Impact Walking',
     description: 'Ways to incorporate walking into your routine safely.',
     category: 'Gentle Movement',
-    icon: <Activity className="h-6 w-6 text-green-600 dark:text-green-300" />,
+    icon: <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6 text-green-600 dark:text-green-300" aria-hidden="true" />,
     image: '/images/resources/move-walking.svg',
     bannerGradient: 'from-emerald-200 to-teal-100 dark:from-emerald-900/50 dark:to-teal-950/50',
     color: {
@@ -159,7 +167,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Mindfulness Practices',
     description: 'Calming the mind to better manage the emotional toll of pain.',
     category: 'Mental Support',
-    icon: <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />,
+    icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
     image: '/images/resources/mental-mindfulness.svg',
     bannerGradient: 'from-indigo-200 to-purple-100 dark:from-indigo-900/50 dark:to-purple-950/50',
     color: {
@@ -178,7 +186,7 @@ const RESOURCES_DATA: Resource[] = [
     title: 'Sleep Hygiene',
     description: 'Building a routine for deeper, more restorative sleep.',
     category: 'Mental Support',
-    icon: <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />,
+    icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
     image: '/images/resources/mental-sleep.svg',
     bannerGradient: 'from-slate-200 to-indigo-100 dark:from-slate-900/50 dark:to-indigo-950/50',
     color: {
@@ -232,7 +240,7 @@ export default function ResourcesPage() {
         {/* Search & Filters */}
         <div className="flex flex-col items-center gap-6">
           <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
               type="search"
               placeholder="Search resources..."
@@ -301,7 +309,7 @@ export default function ResourcesPage() {
                         variant="outline"
                         className="w-full rounded-xl border-border hover:bg-muted"
                       >
-                        <BookOpen className="mr-2 h-4 w-4" />
+                        <HugeiconsIcon icon={Book01Icon} className="mr-2 h-4 w-4" aria-hidden="true" />
                         Read Tips
                       </Button>
                     }

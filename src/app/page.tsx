@@ -4,18 +4,19 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Heart,
-  Wind,
-  Droplets,
-  ClipboardList,
-  ChevronRight,
-  Smile,
-  Frown,
-  Zap,
-  Loader2,
-  Activity,
-} from "lucide-react";
+  HeartIcon,
+  FastWindIcon,
+  DropletIcon,
+  ClipboardListIcon,
+  ChevronRightIcon,
+  SmileIcon,
+  FrownIcon,
+  ZapIcon,
+  Loading01Icon,
+  Activity01Icon,
+} from "@hugeicons/core-free-icons";
 import {
   AreaChart,
   Area,
@@ -73,19 +74,19 @@ function getWellnessTip(level: number) {
 const MOOD_OPTIONS = [
   {
     label: "Good Day",
-    icon: <Smile className="w-5 h-5" aria-hidden="true" />,
+    icon: <HugeiconsIcon icon={SmileIcon} className="w-5 h-5" aria-hidden="true" />,
     color:
       "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800",
   },
   {
     label: "Low Energy",
-    icon: <Zap className="w-5 h-5" aria-hidden="true" />,
+    icon: <HugeiconsIcon icon={ZapIcon} className="w-5 h-5" aria-hidden="true" />,
     color:
       "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800",
   },
   {
     label: "Flare-up",
-    icon: <Frown className="w-5 h-5" aria-hidden="true" />,
+    icon: <HugeiconsIcon icon={FrownIcon} className="w-5 h-5" aria-hidden="true" />,
     color:
       "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
   },
@@ -117,7 +118,7 @@ function PainTrendChart({ data }: { data: { date: string; level: number }[] }) {
         className="flex flex-col items-center justify-center h-40 text-center space-y-2 text-muted-foreground"
         aria-live="polite"
       >
-        <ClipboardList className="h-8 w-8 opacity-60" />
+        <HugeiconsIcon icon={ClipboardListIcon} className="h-8 w-8 opacity-60" aria-hidden="true" />
         <p className="text-sm font-medium">No pain entries in the last 7 days.</p>
         <p className="text-xs">Log your pain above to start your trend.</p>
       </div>
@@ -133,8 +134,8 @@ function PainTrendChart({ data }: { data: { date: string; level: number }[] }) {
         >
           <defs>
             <linearGradient id="colorPain" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -165,12 +166,12 @@ function PainTrendChart({ data }: { data: { date: string; level: number }[] }) {
               fontSize: "12px",
             }}
             labelStyle={{ color: "#64748b", fontWeight: "bold" }}
-            itemStyle={{ color: "#a855f7", fontWeight: "600" }}
+            itemStyle={{ color: "#7c3aed", fontWeight: "600" }}
           />
           <Area
             type="monotone"
             dataKey="level"
-            stroke="#a855f7"
+            stroke="#7c3aed"
             strokeWidth={3}
             fillOpacity={1}
             fill="url(#colorPain)"
@@ -284,7 +285,7 @@ export default function Home() {
                 <div className="relative group overflow-hidden rounded-2xl border border-border bg-muted p-4 transition-all hover:ring-2 hover:ring-primary/50">
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2 text-primary font-semibold text-sm">
-                      <Heart className="h-4 w-4" />
+                      <HugeiconsIcon icon={HeartIcon} className="h-4 w-4" aria-hidden="true" />
                       Flare-up Support
                     </div>
                     <div className="relative h-32 w-full rounded-lg overflow-hidden shadow-sm">
@@ -317,7 +318,7 @@ export default function Home() {
                       variant="outline"
                       onClick={() => setMood(item.label)}
                       aria-pressed={mood === item.label}
-                      className={`flex items-center justify-center gap-3 py-8 text-lg transition-all ${
+                      className={`flex items-center justify-center gap-3 min-h-16 text-lg transition-all ${
                         mood === item.label
                           ? `${item.color} ring-2 ring-offset-2 ring-primary font-semibold`
                           : "bg-card hover:bg-muted"
@@ -357,11 +358,11 @@ export default function Home() {
                 <Button
                   onClick={() => logEntry()}
                   disabled={isSaving}
-                  className="w-full py-8 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all rounded-xl shadow-md hover:shadow-lg"
+                  className="w-full min-h-16 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all rounded-xl shadow-md hover:shadow-lg"
                 >
                   {isSaving ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <HugeiconsIcon icon={Loading01Icon} className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
                       Saving...
                     </>
                   ) : (
@@ -387,7 +388,7 @@ export default function Home() {
             <Card className="border-none shadow-sm bg-muted">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 text-primary font-semibold">
-                  <Wind className="h-6 w-6" />
+                  <HugeiconsIcon icon={FastWindIcon} className="h-6 w-6" aria-hidden="true" />
                   <CardTitle className="text-base">Daily Wellness Tip</CardTitle>
                 </div>
               </CardHeader>
@@ -400,7 +401,7 @@ export default function Home() {
                     variant="link"
                     className="p-0 h-auto text-primary flex items-center gap-1 text-base"
                   >
-                    Explore More <ChevronRight className="h-5 w-5" />
+                    Explore More <HugeiconsIcon icon={ChevronRightIcon} className="h-5 w-5" aria-hidden="true" />
                   </Button>
                 </Link>
               </CardContent>
@@ -410,7 +411,7 @@ export default function Home() {
             <Card className="border-none shadow-sm bg-card">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 font-semibold">
-                  <ClipboardList className="h-6 w-6" />
+                  <HugeiconsIcon icon={ClipboardListIcon} className="h-6 w-6" aria-hidden="true" />
                   <CardTitle className="text-base">Pain Trend (7 Days)</CardTitle>
                 </div>
               </CardHeader>
@@ -426,7 +427,7 @@ export default function Home() {
             <Card className="border-none shadow-sm bg-card">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 font-semibold">
-                  <Zap className="h-6 w-6" />
+                  <HugeiconsIcon icon={ZapIcon} className="h-6 w-6" aria-hidden="true" />
                   <CardTitle className="text-base">AI Insights</CardTitle>
                 </div>
                 <CardDescription className="text-sm">
@@ -469,7 +470,7 @@ export default function Home() {
             <Card className="border-none shadow-sm bg-muted">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 text-teal-700 dark:text-teal-300 font-semibold">
-                  <Droplets className="h-6 w-6" />
+                  <HugeiconsIcon icon={DropletIcon} className="h-6 w-6" aria-hidden="true" />
                   <CardTitle className="text-base">Hydration</CardTitle>
                 </div>
               </CardHeader>
@@ -544,7 +545,7 @@ export default function Home() {
             <Card className="border-none shadow-sm bg-card">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 font-semibold">
-                  <Activity className="h-6 w-6" />
+                  <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6" aria-hidden="true" />
                   <CardTitle className="text-base">Log Summary</CardTitle>
                 </div>
                 <CardDescription className="text-sm">
@@ -563,7 +564,7 @@ export default function Home() {
                 <Link href="/health-logs">
                   <Button
                     variant="outline"
-                    className="w-full mt-2 text-base py-6"
+                    className="w-full mt-2 text-base min-h-14"
                   >
                     View All Logs
                   </Button>

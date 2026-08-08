@@ -3,16 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  FileText,
-  Download,
-  Loader2,
-  TrendingUp,
-  Flame,
-  ClipboardList,
-  AlertTriangle,
-  Info,
-} from "lucide-react";
+  File01Icon,
+  Download01Icon,
+  Loading01Icon,
+  Chart01Icon,
+  FlameIcon,
+  ClipboardListIcon,
+  Alert01Icon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { generateMedicalReport } from "@/lib/pdfGenerator";
 import { getReportData } from "@/app/actions";
 import type { Insight } from "@/lib/insightEngine";
@@ -114,7 +115,7 @@ export default function ReportsPage() {
         {isLoading && (
           <Card className="border-none shadow-lg ring-1 ring-border bg-card">
             <CardContent className="flex items-center justify-center py-16 gap-3">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <HugeiconsIcon icon={Loading01Icon} className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
               <p className="text-muted-foreground">Analyzing your health data…</p>
             </CardContent>
           </Card>
@@ -133,7 +134,7 @@ export default function ReportsPage() {
               <Card className="border-none shadow-sm ring-1 ring-border bg-card">
                 <CardContent className="flex items-center gap-3 pt-6">
                   <div className="p-2 rounded-lg bg-primary/15 text-primary">
-                    <TrendingUp className="h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={Chart01Icon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Avg Pain · 90 days</p>
@@ -146,7 +147,7 @@ export default function ReportsPage() {
               <Card className="border-none shadow-sm ring-1 ring-border bg-card">
                 <CardContent className="flex items-center gap-3 pt-6">
                   <div className="p-2 rounded-lg bg-orange-100 text-orange-700">
-                    <Flame className="h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={FlameIcon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Flare-up days</p>
@@ -157,7 +158,7 @@ export default function ReportsPage() {
               <Card className="border-none shadow-sm ring-1 ring-border bg-card">
                 <CardContent className="flex items-center gap-3 pt-6">
                   <div className="p-2 rounded-lg bg-teal-100 text-teal-700">
-                    <ClipboardList className="h-5 w-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={ClipboardListIcon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Top symptoms</p>
@@ -173,7 +174,7 @@ export default function ReportsPage() {
             <Card className="border-none shadow-lg ring-1 ring-border bg-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <HugeiconsIcon icon={Alert01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
                   Key Insights
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
@@ -185,7 +186,7 @@ export default function ReportsPage() {
               <CardContent className="space-y-3">
                 {snapshot.insights.length === 0 ? (
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                    <Info className="h-4 w-4" aria-hidden="true" />
+                    <HugeiconsIcon icon={InformationCircleIcon} className="h-4 w-4" aria-hidden="true" />
                     <span>No insights yet — keep logging consistently.</span>
                   </div>
                 ) : (
@@ -211,7 +212,7 @@ export default function ReportsPage() {
             <Card className="border-none shadow-lg ring-1 ring-border bg-card">
               <CardHeader className="text-center space-y-4">
                 <div className="mx-auto p-4 rounded-full bg-primary/15 w-fit">
-                  <FileText className="h-12 w-12 text-primary" aria-hidden="true" />
+                  <HugeiconsIcon icon={File01Icon} className="h-12 w-12 text-primary" aria-hidden="true" />
                 </div>
                 <CardTitle className="text-2xl">Clinical Summary PDF</CardTitle>
                 <CardDescription className="text-base">
@@ -223,16 +224,16 @@ export default function ReportsPage() {
                 <Button
                   onClick={handleExport}
                   disabled={isGenerating || snapshot.logs.length === 0}
-                  className="px-8 py-6 text-lg bg-primary hover:bg-primary/90 rounded-xl"
+                  className="px-8 min-h-16 text-lg bg-primary hover:bg-primary/90 rounded-xl"
                 >
                   {isGenerating ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                      <HugeiconsIcon icon={Loading01Icon} className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
                       Generating Report…
                     </>
                   ) : (
                     <>
-                      <Download className="mr-2 h-5 w-5" aria-hidden="true" />
+                      <HugeiconsIcon icon={Download01Icon} className="mr-2 h-5 w-5" aria-hidden="true" />
                       Download PDF Report
                     </>
                   )}

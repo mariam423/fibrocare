@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { VolumeUpIcon, VolumeMute01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -204,9 +205,17 @@ const SOUND_BUILDERS: Record<
           >
             <span className="flex items-center gap-2">
               {active ? (
-                <Volume2 className="h-4 w-4" aria-hidden="true" />
+                <HugeiconsIcon
+                  icon={VolumeUpIcon}
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
               ) : (
-                <VolumeX className="h-4 w-4" aria-hidden="true" />
+                <HugeiconsIcon
+                  icon={VolumeMute01Icon}
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
               )}
               {sound.label}
             </span>

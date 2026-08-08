@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Lock, Delete, ShieldCheck } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { LockIcon, Delete01Icon, Shield01Icon } from "@hugeicons/core-free-icons";
 import { usePrivacy } from "./PrivacyLock";
 import { cn } from "@/lib/utils";
 
@@ -104,7 +105,7 @@ export function PrivacyKeypad() {
 
       <div className="flex flex-col items-center gap-3">
         <div className="p-4 rounded-2xl bg-primary/15 text-primary">
-          <Lock className="h-8 w-8" aria-hidden="true" />
+          <HugeiconsIcon icon={LockIcon} className="h-8 w-8" aria-hidden="true" />
         </div>
         <h1 className="text-xl font-semibold">Your space is locked</h1>
         <p className="text-sm text-muted-foreground">Enter your 4-digit PIN</p>
@@ -129,7 +130,11 @@ export function PrivacyKeypad() {
           aria-label="Delete last digit"
           className="h-16 w-16 rounded-full bg-card ring-1 ring-border transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Delete className="mx-auto h-6 w-6" aria-hidden="true" />
+          <HugeiconsIcon
+            icon={Delete01Icon}
+            className="mx-auto h-6 w-6"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>
@@ -195,7 +200,7 @@ export function PrivacySetup() {
     >
       <div className="flex flex-col items-center gap-3">
         <div className="p-4 rounded-2xl bg-primary/15 text-primary">
-          <ShieldCheck className="h-8 w-8" aria-hidden="true" />
+          <HugeiconsIcon icon={Shield01Icon} className="h-8 w-8" aria-hidden="true" />
         </div>
         <h1 className="text-xl font-semibold">Protect your health data</h1>
         <p className="text-sm text-muted-foreground">
@@ -227,7 +232,11 @@ export function PrivacySetup() {
           aria-label="Delete last digit"
           className="h-16 w-16 rounded-full bg-card ring-1 ring-border transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Delete className="mx-auto h-6 w-6" aria-hidden="true" />
+          <HugeiconsIcon
+            icon={Delete01Icon}
+            className="mx-auto h-6 w-6"
+            aria-hidden="true"
+          />
         </button>
       </div>
     </div>

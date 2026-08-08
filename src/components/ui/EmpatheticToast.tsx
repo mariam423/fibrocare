@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { X, Heart } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, HeartIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 
 interface EmpatheticToastProps {
@@ -74,7 +75,7 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
         <div className="flex justify-between items-start gap-3">
           <div className="flex gap-3">
             <div className="p-2 rounded-full bg-primary/15 shrink-0">
-              <Heart className="h-5 w-5 text-primary" />
+              <HugeiconsIcon icon={HeartIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <div className="space-y-1">
               <p id="empathic-toast-title" className="text-sm font-semibold">
@@ -95,7 +96,7 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
             aria-label="Dismiss message"
             className="rounded-md p-1 text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring outline-none"
           >
-            <X className="h-4 w-4" />
+            <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 

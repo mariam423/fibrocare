@@ -8,25 +8,25 @@ datasource db {
 }
 
 model User {
-  id             String        @id @default(cuid())
+  id             String               @id @default(cuid())
   name           String
-  email          String        @unique
+  email          String               @unique
+  hydrationCount Int                  @default(0)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @default(now()) @updatedAt
   passwordHash   String?
-  hydrationCount Int           @default(0)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt @default(now())
   logs           PainLog[]
-  symptomLogs    SymptomLog[]
+  resetTokens    PasswordResetToken[]
   sessions       Session[]
-  resetTokens     PasswordResetToken[]
+  symptomLogs    SymptomLog[]
 }
 
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -35,9 +35,9 @@ model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires   DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -48,8 +48,8 @@ model PainLog {
   moodTag   String
   notes     String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   loggedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, loggedAt])
 }
@@ -59,8 +59,8 @@ model SymptomLog {
   symptom   String
   date      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, symptom, date])
   @@index([userId, date])

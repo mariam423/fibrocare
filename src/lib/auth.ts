@@ -63,7 +63,9 @@ export const authOptions: NextAuthOptions = {
         ]
       : []),
   ],
-  pages: {},
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token.sub = user.id;

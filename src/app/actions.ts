@@ -1,11 +1,133 @@
 "use server";
 
+import crypto from "crypto";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
+import { authOptions } from "@/lib/auth";
 import {
   analyzeHealthPatterns,
   getTopSymptoms,
 } from "@/lib/insightEngine";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 60 minutes
+
+export type RegisterResult =
+  | { success: true }
+  | { success: false; error: string };
+
+export type ResetResult =
+  | { success: true; resetLink?: string }
+  | { success: false; error: string };
+
+export async function registerUser(input: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<RegisterResult> {
+  const name = input.name.trim();
+  const email = input.email.trim().toLowerCase();
+  const password = input.password;
+
+  if (name.length < 2) {
+    return { success: false, error: "Please enter your name." };
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return { success: false, error: "Please enter a valid email address." };
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return {
+      success: false,
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
+    };
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    return { success: false, error: "An account with this email already exists." };
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.create({ data: { name, email, passwordHash } });
+
+  return { success: true };
+}
+
+export async function requestPasswordReset(
+  emailInput: string
+): Promise<ResetResult> {
+  const email = emailInput.trim().toLowerCase();
+  if (!EMAIL_REGEX.test(email)) {
+    return { success: false, error: "Please enter a valid email address." };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    // Generic response: do not reveal whether the account exists.
+    return { success: true };
+  }
+
+  // Invalidate any previous reset tokens for this user.
+  await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
+
+  const token = crypto.randomBytes(32).toString("hex");
+  await prisma.passwordResetToken.create({
+    data: {
+      token,
+      userId: user.id,
+      expires: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+    },
+  });
+
+  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const resetLink = `${baseUrl}/reset-password?token=${token}`;
+  console.log(`[auth] Password reset requested for ${email}: ${resetLink}`);
+
+  // In non-production the link is returned so the flow can be tested
+  // end-to-end without an email provider. Production must send it by email.
+  return process.env.NODE_ENV === "production"
+    ? { success: true }
+    : { success: true, resetLink };
+}
+
+export async function resetPassword(
+  token: string,
+  password: string
+): Promise<ResetResult> {
+  if (!token) {
+    return { success: false, error: "This reset link is invalid." };
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return {
+      success: false,
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
+    };
+  }
+
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { token },
+  });
+  if (!resetToken || resetToken.expires < new Date()) {
+    return {
+      success: false,
+      error: "This reset link is invalid or has expired. Please request a new one.",
+    };
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.update({
+    where: { id: resetToken.userId },
+    data: { passwordHash },
+  });
+  await prisma.passwordResetToken.deleteMany({
+    where: { userId: resetToken.userId },
+  });
+
+  return { success: true };
+}
 
 function toIsoDateKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -13,30 +135,28 @@ function toIsoDateKey(d: Date) {
   ).padStart(2, "0")}`;
 }
 
-async function getOrCreateDefaultUser() {
-  try {
-    const user = await prisma.user.findFirst();
-    if (user) return user;
+async function getSessionUser() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return null;
 
-    return await prisma.user.create({
-      data: {
-        name: "Default User",
-        email: "default@fibrocare.com",
-      },
-    });
-  } catch (error) {
-    console.error("Error getting or creating default user:", error);
-    throw error;
-  }
+  return prisma.user.findUnique({ where: { id: session.user.id } });
 }
 
 export async function getCurrentUser() {
-  return await getOrCreateDefaultUser();
+  try {
+    return await getSessionUser();
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 }
 
 export async function updateUserName(newName: string) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -63,7 +183,11 @@ export async function savePainLog(
   symptoms: string[] = []
 ) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
+
     const finalPainLevel = Number.isInteger(painLevel)
       ? Math.min(10, Math.max(0, painLevel))
       : 3;
@@ -104,7 +228,10 @@ export async function savePainLog(
 
 export async function updateUserProfile(name: string, email: string) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -126,7 +253,10 @@ export async function updateUserProfile(name: string, email: string) {
 
 export async function updateHydration(amount: number) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
@@ -147,12 +277,16 @@ export async function updateHydration(amount: number) {
 
 export async function getWeeklyPainTrend() {
   try {
+    const user = await getSessionUser();
+    if (!user) return [];
+
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
     const logs = await prisma.painLog.findMany({
       where: {
+        userId: user.id,
         loggedAt: {
           gte: sevenDaysAgo,
         },
@@ -182,7 +316,9 @@ export async function getWeeklyPainTrend() {
 
 export async function getAllHealthLogs() {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) return [];
+
     const logs = await prisma.painLog.findMany({
       where: { userId: user.id },
       orderBy: { loggedAt: 'desc' },
@@ -196,6 +332,16 @@ export async function getAllHealthLogs() {
 
 export async function deletePainLog(id: string) {
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
+
+    const log = await prisma.painLog.findUnique({ where: { id } });
+    if (!log || log.userId !== user.id) {
+      return { success: false, error: "Log entry not found." };
+    }
+
     await prisma.painLog.delete({
       where: { id },
     });
@@ -210,7 +356,11 @@ export async function deletePainLog(id: string) {
 
 export async function getLatestLogs() {
   try {
+    const user = await getSessionUser();
+    if (!user) return [];
+
     const logs = await prisma.painLog.findMany({
+      where: { userId: user.id },
       orderBy: {
         loggedAt: 'desc'
       },
@@ -225,7 +375,9 @@ export async function getLatestLogs() {
 
 export async function getDashboardInsights() {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) return [];
+
     const insights = await analyzeHealthPatterns(user.id, 30);
     return insights;
   } catch (error) {
@@ -236,7 +388,9 @@ export async function getDashboardInsights() {
 
 export async function getReportData() {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) return null;
+
     const [logs, insights, topSymptoms] = await Promise.all([
       prisma.painLog.findMany({
         where: { userId: user.id },
@@ -267,7 +421,9 @@ export async function getReportData() {
 
 export async function getSymptomsForDate(date: string) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) return [];
+
     const entries = await prisma.symptomLog.findMany({
       where: { userId: user.id, date },
     });
@@ -280,7 +436,10 @@ export async function getSymptomsForDate(date: string) {
 
 export async function toggleSymptom(symptom: string, date: string, active: boolean) {
   try {
-    const user = await getOrCreateDefaultUser();
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
 
     if (active) {
       await prisma.symptomLog.create({
@@ -302,7 +461,11 @@ export async function toggleSymptom(symptom: string, date: string, active: boole
 
 export async function getStreak() {
   try {
+    const user = await getSessionUser();
+    if (!user) return 0;
+
     const logs = await prisma.painLog.findMany({
+      where: { userId: user.id },
       orderBy: {
         loggedAt: 'desc'
       },

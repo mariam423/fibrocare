@@ -8,9 +8,24 @@ import React, {
   useState,
   useSyncExternalStore,
 } from "react";
-import { PrivacyKeypad, PrivacySetup } from "./PrivacyKeypad";
+import { usePathname } from "next/navigation";
+import { PrivacyKeypad } from "./PrivacyKeypad";
 
 const STORAGE_KEY = "fibrocare-privacy-pin";
+
+/** Routes that must stay accessible before sign-in (no privacy gate). */
+const PUBLIC_AUTH_PATHS = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+];
+
+function isPublicAuthPath(pathname: string): boolean {
+  return PUBLIC_AUTH_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+}
 
 export interface PrivacyContextValue {
   /** True while the app content is hidden behind the lock screen. */
@@ -141,19 +156,21 @@ export function usePrivacy(): PrivacyContextValue {
 }
 
 /**
- * Gates the app behind the privacy lock. Renders children only once the PIN
- * has been set up and correctly entered for this session.
+ * Gates the app behind the privacy lock. The lock is optional: it only kicks
+ * in once a PIN has been configured. Public auth routes (/login, /signup,
+ * /forgot-password, /reset-password) are always accessible.
  */
 export function PrivacyGate({ children }: { children: React.ReactNode }) {
   const { isLocked, isConfigured } = usePrivacy();
+  const pathname = usePathname();
 
-  if (!isLocked) return <>{children}</>;
-
-  const LockView = isConfigured ? PrivacyKeypad : PrivacySetup;
+  if (!isLocked || !isConfigured || isPublicAuthPath(pathname)) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background p-4 overflow-y-auto">
-      <LockView />
+      <PrivacyKeypad />
     </div>
   );
 }

@@ -46,6 +46,10 @@ interface DashboardData {
 
 async function fetchDashboardData(): Promise<DashboardData> {
   const user = await getCurrentUser();
+  if (!user) {
+    if (typeof window !== "undefined") window.location.assign("/login");
+    throw new Error("Not signed in");
+  }
   const [currentStreak, trend, todaySymptoms, logs, insights] = await Promise.all([
     getStreak(),
     getWeeklyPainTrend(),

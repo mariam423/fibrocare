@@ -37,6 +37,10 @@ export default function ProfilePage() {
           getStreak(),
           getAllHealthLogs(),
         ]);
+        if (!user) {
+          window.location.assign("/login");
+          return;
+        }
         setName(user.name);
         setEmail(user.email);
         setStreak(currentStreak);

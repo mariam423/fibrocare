@@ -10,9 +10,15 @@ import { getToken } from "next-auth/jwt";
  * the route renders. It is an optimistic check: the server actions and route
  * handlers must also verify the session (see src/app/actions.ts).
  *
- * Protected: the dashboard (`/`) and the health-log viewer (`/health-logs`).
+ * Protected: the dashboard (`/`), health-log viewer (`/health-logs`), Zen
+ * portal (`/zen`), reports (`/reports`), and profile (`/profile`).
  */
-const PROTECTED_PREFIXES = ["/health-logs"];
+const PROTECTED_PREFIXES = [
+  "/health-logs",
+  "/zen",
+  "/reports",
+  "/profile",
+];
 
 function isProtectedPath(pathname: string): boolean {
   return (
@@ -36,7 +42,7 @@ export async function proxy(request: NextRequest) {
   });
 
   if (!token?.sub) {
-    const signInUrl = new URL("/api/auth/signin", request.url);
+    const signInUrl = new URL("/login", request.url);
     signInUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
     return NextResponse.redirect(signInUrl);
   }

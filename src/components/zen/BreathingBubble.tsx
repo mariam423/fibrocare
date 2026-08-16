@@ -1,76 +1,68 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import { useHealth } from "@/context/HealthContext";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
-const INHALE_SECONDS = 4;
-const EXHALE_SECONDS = 6;
+const INHALE = 4;
+const EXHALE = 6;
+const TOTAL = INHALE + EXHALE;
 
-type Phase = "in" | "out";
-
-interface BreathingBubbleProps {
-  /** Ultra-dark mode: hide decorative glow and show only the minimal bubble. */
+export function BreathingBubble({
+  ultraDark = false,
+}: {
   ultraDark?: boolean;
-}
-
-export function BreathingBubble({ ultraDark = false }: BreathingBubbleProps) {
-  const { motionEnabled } = useHealth();
-  const prefersReducedMotion = useReducedMotion();
-  const animate = motionEnabled && !prefersReducedMotion;
-
-  const [phase, setPhase] = useState<Phase>("in");
+}) {
+  const { t, locale } = useLanguage();
+  const [sec, setSec] = useState(0);
 
   useEffect(() => {
-    if (!animate) return;
-    const timer = setTimeout(() => {
-      setPhase((prev) => (prev === "in" ? "out" : "in"));
-    }, (phase === "in" ? INHALE_SECONDS : EXHALE_SECONDS) * 1000);
-    return () => clearTimeout(timer);
-  }, [phase, animate]);
+    const timer = setInterval(() => setSec((s) => (s + 1) % TOTAL), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  const phaseDuration = phase === "in" ? INHALE_SECONDS : EXHALE_SECONDS;
-  const label = animate
-    ? phase === "in"
-      ? "Breathe in"
-      : "Breathe out"
-    : "Breathe";
+  const inhaling = sec < INHALE;
+  const left = inhaling ? INHALE - sec : TOTAL - sec;
+
+  const text = inhaling
+    ? t("zen.breatheIn", { seconds: left })
+    : t("zen.breatheOut", { seconds: left });
 
   return (
-    <div className="relative flex flex-col items-center justify-center">
-      <p className="sr-only">
-        Breathing exercise. Breathe in for four seconds, then breathe out for
-        six seconds.
-      </p>
-
+    <div className="relative flex items-center justify-center w-64 h-64">
+      {/* Glow */}
       {!ultraDark && (
-        <motion.div
-          aria-hidden="true"
-          animate={animate ? { scale: phase === "in" ? 1.55 : 1 } : {}}
-          transition={{
-            duration: animate ? phaseDuration : 0,
-            ease: "easeInOut",
-          }}
-          className="w-64 h-64 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 blur-3xl opacity-50"
+        <div
+          className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 blur-3xl opacity-50 breathe-glow"
         />
       )}
 
-      <motion.div
-        aria-hidden="true"
-        animate={animate ? { scale: phase === "in" ? 1.25 : 1 } : {}}
-        transition={{
-          duration: animate ? phaseDuration : 0,
-          ease: "easeInOut",
-        }}
-        className="absolute w-48 h-48 rounded-full border-4 border-white/20 flex items-center justify-center bg-white/10 backdrop-blur-sm"
+      {ultraDark && (
+        <div className="absolute inset-0 rounded-full bg-white/[0.06] blur-2xl" />
+      )}
+
+      {/* Circle */}
+      <div
+        className={cn(
+          "relative w-48 h-48 rounded-full border-4 border-white/20 flex items-center justify-center bg-white/10 backdrop-blur-sm animate-breathe",
+          ultraDark &&
+            "bg-white/[0.06] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]"
+        )}
       >
-        <span aria-hidden="true" className="text-2xl font-light tracking-widest text-white">
-          {label}
+        <span
+          className={cn(
+            "text-2xl font-light text-white select-none z-10",
+            // Letter-spacing breaks the joined Arabic script, so keep the
+            // airy tracking only for Latin text.
+            locale === "en" && "tracking-widest"
+          )}
+        >
+          {text}
         </span>
-      </motion.div>
+      </div>
 
       <p className="sr-only" aria-live="polite">
-        {label}
+        {text}
       </p>
     </div>
   );

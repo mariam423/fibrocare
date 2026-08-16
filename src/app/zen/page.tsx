@@ -9,10 +9,38 @@ import { Moon02Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { BreathingBubble } from "@/components/zen/BreathingBubble";
 import { SoundscapeMixer } from "@/components/zen/SoundscapeMixer";
+import { RouteTransition } from "@/components/ui/RouteTransition";
+import { useMotionEnabled } from "@/hooks/useMotionEnabled";
+import { useLanguage } from "@/context/LanguageContext";
+
+function ZenPointerGlow() {
+  const motionEnabled = useMotionEnabled();
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  const handlePointerMove = (event: React.PointerEvent) => {
+    if (!motionEnabled || event.pointerType !== "mouse") return;
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--glow-x", `${event.clientX}px`);
+    el.style.setProperty("--glow-y", `${event.clientY}px`);
+  };
+
+  return (
+    <div
+      ref={ref}
+      onPointerMove={handlePointerMove}
+      className="pointer-events-none fixed inset-0 z-0"
+      aria-hidden="true"
+    >
+      <div className="zen-pointer-glow" />
+    </div>
+  );
+}
 
 export default function ZenPage() {
   const router = useRouter();
   const { setTheme } = useHealth();
+  const { t } = useLanguage();
   const [isUltraDark, setIsUltraDark] = useState(false);
 
   const toggleUltraDark = () => {
@@ -20,13 +48,17 @@ export default function ZenPage() {
   };
 
   return (
+    <RouteTransition>
     <div
       id="main-content"
       className={cn(
-        "min-h-screen flex flex-col items-center justify-center transition-colors duration-1000 p-4",
-        isUltraDark ? "bg-black text-white" : "bg-slate-900 text-slate-200"
+        "relative min-h-[100dvh] flex flex-col items-center justify-center transition-colors duration-1000 p-4",
+        isUltraDark
+          ? "zen-backdrop-ultra text-white"
+          : "zen-backdrop text-slate-200"
       )}
     >
+      {!isUltraDark && <ZenPointerGlow />}
       {!isUltraDark && (
         <header className="absolute top-0 w-full p-6 flex justify-between items-center text-slate-400">
           <Button
@@ -34,10 +66,10 @@ export default function ZenPage() {
             onClick={() => router.back()}
             className="text-slate-400 hover:text-white"
           >
-            Back to Dashboard
+            {t("nav.backToDashboard")}
           </Button>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Focus on your breath</span>
+            <span className="text-sm font-medium">{t("zen.focusBreath")}</span>
             <Button
               variant="outline"
               size="sm"
@@ -47,10 +79,10 @@ export default function ZenPage() {
             >
               <HugeiconsIcon
                 icon={Moon02Icon}
-                className="h-4 w-4 mr-2"
+                className="h-4 w-4 me-2"
                 aria-hidden="true"
-              />{" "}
-              Ultra Dark
+              />
+              {t("zen.ultraDark")}
             </Button>
           </div>
         </header>
@@ -63,14 +95,14 @@ export default function ZenPage() {
             size="sm"
             onClick={toggleUltraDark}
             aria-pressed={isUltraDark}
-            className="rounded-full hover:bg-slate-800"
+            className="rounded-full bg-white/[0.06] ring-1 ring-white/10 backdrop-blur-md text-slate-400 hover:bg-white/10 hover:text-slate-200"
           >
             <HugeiconsIcon
               icon={Cancel01Icon}
-              className="h-4 w-4 mr-2"
+              className="h-4 w-4 me-2"
               aria-hidden="true"
             />
-            Exit Ultra Dark
+            {t("zen.exitUltraDark")}
           </Button>
         </header>
       )}
@@ -86,7 +118,7 @@ export default function ZenPage() {
               onClick={() => setTheme("Sensitive")}
               className="text-slate-500 hover:text-white"
             >
-              Switch to Calming Mode
+              {t("zen.switchCalming")}
             </Button>
           </>
         )}
@@ -97,10 +129,11 @@ export default function ZenPage() {
             onClick={() => router.back()}
             className="text-slate-600 hover:text-slate-400"
           >
-            Back to Dashboard
+            {t("nav.backToDashboard")}
           </Button>
         )}
       </div>
     </div>
+    </RouteTransition>
   );
 }

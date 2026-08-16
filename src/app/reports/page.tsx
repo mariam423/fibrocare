@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DepthCard } from "@/components/ui/DepthCard";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { RouteTransition } from "@/components/ui/RouteTransition";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   File01Icon,
@@ -18,6 +21,10 @@ import { generateMedicalReport } from "@/lib/pdfGenerator";
 import { getReportData } from "@/app/actions";
 import type { Insight } from "@/lib/insightEngine";
 import AppHeader from "@/components/layout/AppHeader";
+import { SegmentedFilter, type SegmentedFilterOption } from "@/components/ui/SegmentedFilter";
+import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
+import { localizeInsight } from "@/lib/insightLocalization";
 import { cn } from "@/lib/utils";
 
 interface ReportSnapshot {
@@ -30,22 +37,41 @@ interface ReportSnapshot {
 }
 
 const severityStyle: Record<Insight["severity"], string> = {
-  critical: "bg-red-50 text-red-700 border-red-200",
-  warning: "bg-amber-50 text-amber-700 border-amber-200",
-  info: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  critical: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900",
+  warning: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-900",
+  info: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900",
 };
 
-const severityLabel: Record<Insight["severity"], string> = {
-  critical: "Critical",
-  warning: "Watch",
-  info: "Note",
+const severityLabelKey: Record<Insight["severity"], TranslationKey> = {
+  critical: "reports.severity.critical",
+  warning: "reports.severity.warning",
+  info: "reports.severity.info",
 };
 
 export default function ReportsPage() {
+  const { t, locale } = useLanguage();
   const [snapshot, setSnapshot] = useState<ReportSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
+  const [insightFilter, setInsightFilter] = useState<string>("all");
+
+  const insightFilters = useMemo<SegmentedFilterOption[]>(
+    () => [
+      { value: "all", label: t("reports.filter.all"), tone: "neutral" },
+      { value: "critical", label: t("reports.severity.critical"), tone: "rose" },
+      { value: "warning", label: t("reports.severity.warning"), tone: "amber" },
+      { value: "info", label: t("reports.severity.info"), tone: "emerald" },
+    ],
+    [t]
+  );
+
+  const visibleInsights =
+    insightFilter === "all"
+      ? snapshot?.insights ?? []
+      : (snapshot?.insights ?? []).filter(
+          (insight) => insight.severity === insightFilter
+        );
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +89,7 @@ export default function ReportsPage() {
       })
       .catch((e) => {
         console.error(e);
-        if (!cancelled) setError("Could not load report data.");
+        if (!cancelled) setHasError(true);
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -94,130 +120,169 @@ export default function ReportsPage() {
       window.URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-      alert("Failed to generate report");
+      alert(t("reports.exportError"));
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-500">
-      <AppHeader backHref="/" backLabel="Back to Dashboard" />
+    <RouteTransition>
+    <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
+      <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main id="main-content" className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-3xl">
-        <section className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Medical Reports</h1>
+      <main id="main-content" className="container mx-auto px-5 sm:px-8 lg:px-10 py-8 lg:py-10 space-y-8 max-w-4xl">
+        <ScrollReveal as="section" className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">{t("reports.pageTitle")}</h1>
           <p className="text-lg text-muted-foreground">
-            A 90-day summary of your pain, flares, symptoms, and patterns — ready for your specialist.
+            {t("reports.pageSubtitle")}
           </p>
-        </section>
+        </ScrollReveal>
 
         {isLoading && (
-          <Card className="border-none shadow-lg ring-1 ring-border bg-card">
-            <CardContent className="flex items-center justify-center py-16 gap-3">
-              <HugeiconsIcon icon={Loading01Icon} className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
-              <p className="text-muted-foreground">Analyzing your health data…</p>
-            </CardContent>
-          </Card>
+          <DepthCard animateIn delay={0}>
+            <Card className="border-none shadow-depth-sm ring-1 ring-border">
+              <CardContent className="flex items-center justify-center py-16 gap-3">
+                <HugeiconsIcon icon={Loading01Icon} className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
+                <p className="text-muted-foreground">{t("reports.loading")}</p>
+              </CardContent>
+            </Card>
+          </DepthCard>
         )}
 
-        {error && !isLoading && (
+        {hasError && !isLoading && (
           <p role="alert" className="text-center text-red-600 font-medium">
-            {error}
+            {t("reports.loadError")}
           </p>
         )}
 
         {!isLoading && snapshot && (
           <>
             {/* Preview stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="Report snapshot">
-              <Card className="border-none shadow-sm ring-1 ring-border bg-card">
+            <ScrollReveal as="section" delay={0.1} className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label={t("reports.snapshotAria")}>
+              <DepthCard tilt={4} animateIn={false}>
+              <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="p-2 rounded-lg bg-primary/15 text-primary">
+                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
                     <HugeiconsIcon icon={Chart01Icon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground">Avg Pain · 90 days</p>
+                    <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.avgPain")}</p>
                     <p className="text-2xl font-bold">
                       {snapshot.avgPain.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ 10</span>
                     </p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-none shadow-sm ring-1 ring-border bg-card">
+              </DepthCard>
+              <DepthCard tilt={4} animateIn={false}>
+              <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="p-2 rounded-lg bg-orange-100 text-orange-700">
+                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
                     <HugeiconsIcon icon={FlameIcon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground">Flare-up days</p>
+                    <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.flareDays")}</p>
                     <p className="text-2xl font-bold">{snapshot.flareUpDays}</p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-none shadow-sm ring-1 ring-border bg-card">
+              </DepthCard>
+              <DepthCard tilt={4} animateIn={false}>
+              <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="p-2 rounded-lg bg-teal-100 text-teal-700">
+                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
                     <HugeiconsIcon icon={ClipboardListIcon} className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground">Top symptoms</p>
+                    <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.topSymptoms")}</p>
                     <p className="text-sm font-semibold leading-snug">
-                      {snapshot.topSymptoms.join(", ") || "None recorded"}
+                      {snapshot.topSymptoms.length > 0
+                        ? snapshot.topSymptoms.join(locale === "ar" ? "، " : ", ")
+                        : t("reports.stat.noneRecorded")}
                     </p>
                   </div>
                 </CardContent>
               </Card>
-            </section>
+              </DepthCard>
+            </ScrollReveal>
 
             {/* Insights preview */}
-            <Card className="border-none shadow-lg ring-1 ring-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HugeiconsIcon icon={Alert01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
-                  Key Insights
-                </CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  {snapshot.insights.length > 0
-                    ? "Data-driven observations from your logs."
-                    : "Log at least 5 days of pain + symptoms to unlock personalized insights."}
-                </CardDescription>
+            <ScrollReveal delay={0.2}>
+            <DepthCard tilt={3} delay={0.05}>
+            <Card className="border-none shadow-depth-sm ring-1 ring-border">
+              <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <HugeiconsIcon icon={Alert01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
+                    {t("medical.keyInsights")}
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    {snapshot.insights.length > 0
+                      ? t("reports.insights.subtitle")
+                      : t("reports.insights.empty")}
+                  </CardDescription>
+                </div>
+                {snapshot.insights.length > 0 && (
+                  <SegmentedFilter
+                    options={insightFilters}
+                    value={insightFilter}
+                    onChange={setInsightFilter}
+                    label={t("reports.insights.filterLabel")}
+                    className="sm:max-w-md"
+                  />
+                )}
               </CardHeader>
               <CardContent className="space-y-3">
                 {snapshot.insights.length === 0 ? (
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                    <HugeiconsIcon icon={InformationCircleIcon} className="h-4 w-4" aria-hidden="true" />
-                    <span>No insights yet — keep logging consistently.</span>
+                    <HugeiconsIcon icon={InformationCircleIcon} className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{t("reports.insights.none")}</span>
+                  </div>
+                ) : visibleInsights.length === 0 ? (
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                    <HugeiconsIcon icon={InformationCircleIcon} className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>
+                      {t("reports.insights.noneFor", {
+                        filter: t(severityLabelKey[insightFilter as Insight["severity"]]),
+                      })}
+                    </span>
                   </div>
                 ) : (
-                  snapshot.insights.map((insight) => (
+                  visibleInsights.map((insight) => {
+                    const copy = localizeInsight(insight, locale, t);
+                    return (
                     <div
                       key={insight.id}
                       className={cn("rounded-xl border p-4", severityStyle[insight.severity])}
                     >
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold">{insight.title}</p>
-                        <span className="text-[11px] font-bold uppercase tracking-wide">
-                          {severityLabel[insight.severity]}
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="font-semibold">{copy.title}</p>
+                        <span className="shrink-0 text-[11px] font-medium">
+                          {t(severityLabelKey[insight.severity])}
                         </span>
                       </div>
-                      <p className="mt-1 text-sm opacity-80">{insight.message}</p>
+                      <p className="mt-1 text-sm opacity-80">{copy.message}</p>
                     </div>
-                  ))
+                    );
+                  })
                 )}
               </CardContent>
             </Card>
+            </DepthCard>
+            </ScrollReveal>
 
             {/* Download */}
-            <Card className="border-none shadow-lg ring-1 ring-border bg-card">
+            <ScrollReveal delay={0.3}>
+            <DepthCard tilt={3} delay={0.1}>
+            <Card className="border-none shadow-depth-sm ring-1 ring-border">
               <CardHeader className="text-center space-y-4">
-                <div className="mx-auto p-4 rounded-full bg-primary/15 w-fit">
-                  <HugeiconsIcon icon={File01Icon} className="h-12 w-12 text-primary" aria-hidden="true" />
+                <div className="icon-badge mx-auto h-20 w-20 rounded-full">
+                  <HugeiconsIcon icon={File01Icon} className="h-9 w-9" aria-hidden="true" />
                 </div>
-                <CardTitle className="text-2xl">Clinical Summary PDF</CardTitle>
+                <CardTitle className="text-2xl">{t("reports.download.title")}</CardTitle>
                 <CardDescription className="text-base">
-                  Includes the 30-day pain trend chart, correlation summary, key insights, and the full
-                  log annex.
+                  {t("reports.download.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center pb-8">
@@ -228,21 +293,24 @@ export default function ReportsPage() {
                 >
                   {isGenerating ? (
                     <>
-                      <HugeiconsIcon icon={Loading01Icon} className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-                      Generating Report…
+                      <HugeiconsIcon icon={Loading01Icon} className="me-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                      {t("reports.download.generating")}
                     </>
                   ) : (
                     <>
-                      <HugeiconsIcon icon={Download01Icon} className="mr-2 h-5 w-5" aria-hidden="true" />
-                      Download PDF Report
+                      <HugeiconsIcon icon={Download01Icon} className="me-2 h-5 w-5" aria-hidden="true" />
+                      {t("reports.download.button")}
                     </>
                   )}
                 </Button>
               </CardContent>
             </Card>
+            </DepthCard>
+            </ScrollReveal>
           </>
         )}
       </main>
     </div>
+    </RouteTransition>
   );
 }

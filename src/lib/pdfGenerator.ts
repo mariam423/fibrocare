@@ -178,7 +178,7 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   doc.text("Reporting period", margin, y);
   doc.setFont("helvetica", "normal");
   doc.text(
-    `${periodStart.toLocaleDateString()}  –  ${periodEnd.toLocaleDateString()}`,
+    `${periodStart.toLocaleDateString()} to ${periodEnd.toLocaleDateString()}`,
     margin + 60,
     y
   );
@@ -248,7 +248,7 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
     y += wrapped.length * 12;
   } else {
     doc.text(
-      "No statistically meaningful symptom–pain relationships were detected with the current data. Continue logging symptoms for sharper correlations.",
+      "No statistically meaningful symptom-pain relationships were detected with the current data. Continue logging symptoms for sharper correlations.",
       margin + 12,
       y
     );
@@ -317,7 +317,7 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   doc.setTextColor(255);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("Annex A — Full Log History", margin, 34);
+  doc.text("Annex A: Full Log History", margin, 34);
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.text(

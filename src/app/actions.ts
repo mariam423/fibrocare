@@ -10,6 +10,12 @@ import {
   analyzeHealthPatterns,
   getTopSymptoms,
 } from "@/lib/insightEngine";
+import {
+  buildMedicalSummary,
+  medicalSummarySchema,
+  type MedicalSummary,
+} from "@/lib/medicalSummary";
+import { getAiRuntime } from "@/lib/ai/provider";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -163,7 +169,7 @@ export async function updateUserName(newName: string) {
       data: { name: newName },
     });
 
-    revalidatePath("/");
+    revalidatePath("/dashboard");
     revalidatePath("/profile");
 
     return { success: true, data: updatedUser };
@@ -192,11 +198,13 @@ export async function savePainLog(
       ? Math.min(10, Math.max(0, painLevel))
       : 3;
 
+    const encryptedNotes = notes ? await encryptSensitiveData(notes) : undefined;
+
     await prisma.painLog.create({
       data: {
         painLevel: finalPainLevel,
         moodTag,
-        notes,
+        notes: encryptedNotes,
         userId: user.id,
       },
     });
@@ -213,7 +221,7 @@ export async function savePainLog(
       });
     }
 
-    revalidatePath("/");
+    revalidatePath("/dashboard");
 
     const logs = await getLatestLogs();
     return { success: true, data: logs };
@@ -238,7 +246,7 @@ export async function updateUserProfile(name: string, email: string) {
       data: { name, email },
     });
 
-    revalidatePath("/");
+    revalidatePath("/dashboard");
     revalidatePath("/profile");
 
     return { success: true, data: updatedUser };
@@ -267,7 +275,7 @@ export async function updateHydration(amount: number) {
       }
     });
 
-    revalidatePath("/");
+    revalidatePath("/dashboard");
     return { success: true, data: updatedUser };
   } catch (error) {
     console.error("Error updating hydration:", error);
@@ -345,7 +353,7 @@ export async function deletePainLog(id: string) {
     await prisma.painLog.delete({
       where: { id },
     });
-    revalidatePath("/");
+    revalidatePath("/dashboard");
     revalidatePath("/health-logs");
     return { success: true };
   } catch (error) {
@@ -451,11 +459,116 @@ export async function toggleSymptom(symptom: string, date: string, active: boole
       });
     }
 
-    revalidatePath("/");
+    revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
     console.error("Error toggling symptom:", error);
     return { success: false, error: "Failed to update symptom" };
+  }
+}
+
+/**
+ * Cost/rate-limit readiness: the summary builder is deterministic for a given
+ * set of logs, so re-clicks within a short window are served from an
+ * in-memory TTL cache instead of re-querying + recomputing. The fingerprint
+ * captures (user, log count, latest log, calendar day) so the cache is
+ * invalidated automatically as soon as the underlying data changes.
+ */
+const SUMMARY_CACHE_TTL_MS = 10 * 60 * 1000;
+const SUMMARY_CACHE_MAX_ENTRIES = 200;
+interface SummaryCacheEntry {
+  fingerprint: string;
+  data: MedicalSummary;
+  expiresAt: number;
+}
+const summaryCache = new Map<string, SummaryCacheEntry>();
+
+function summaryFingerprint(
+  userId: string,
+  logs: Array<{ id: string; loggedAt: Date }>
+): string {
+  const latest = logs[0];
+  return [
+    userId,
+    logs.length,
+    latest?.id ?? "none",
+    latest ? latest.loggedAt.getTime() : 0,
+    new Date().toDateString(),
+  ].join(":");
+}
+
+function evictSummaryCache() {
+  const now = Date.now();
+  for (const [key, entry] of summaryCache) {
+    if (entry.expiresAt <= now) summaryCache.delete(key);
+  }
+  if (summaryCache.size > SUMMARY_CACHE_MAX_ENTRIES) {
+    const keys = [...summaryCache.keys()].slice(
+      0,
+      summaryCache.size - SUMMARY_CACHE_MAX_ENTRIES
+    );
+    for (const key of keys) summaryCache.delete(key);
+  }
+}
+
+export async function generateMedicalSummary(): Promise<
+  { success: true; data: MedicalSummary } | { success: false; error: string }
+> {
+  try {
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false, error: "You must be signed in." };
+    }
+
+    evictSummaryCache();
+    const cacheKey = `medical-summary:${user.id}`;
+    const cached = summaryCache.get(cacheKey);
+
+    const [logs, insights, topSymptoms] = await Promise.all([
+      prisma.painLog.findMany({
+        where: { userId: user.id },
+        orderBy: { loggedAt: "desc" },
+        take: 30,
+      }),
+      analyzeHealthPatterns(user.id, 30),
+      getTopSymptoms(user.id, 30),
+    ]);
+
+    const fingerprint = summaryFingerprint(user.id, logs);
+    if (cached && cached.fingerprint === fingerprint && cached.expiresAt > Date.now()) {
+      return { success: true, data: cached.data };
+    }
+
+    const summary = buildMedicalSummary({
+      patientName: user.name,
+      logs,
+      insights,
+      topSymptoms,
+    });
+
+    // Validate the structured output before it ever reaches the client.
+    const parsed = medicalSummarySchema.safeParse(summary);
+    if (!parsed.success) {
+      console.error("Medical summary failed validation", parsed.error);
+      return { success: false, error: "The summary could not be validated." };
+    }
+
+    summaryCache.set(cacheKey, {
+      fingerprint,
+      data: parsed.data,
+      expiresAt: Date.now() + SUMMARY_CACHE_TTL_MS,
+    });
+
+    return { success: true, data: parsed.data };
+  } catch (error) {
+    console.error("Error generating medical summary:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to generate medical summary",
+    };
   }
 }
 
@@ -488,10 +601,7 @@ export async function getStreak() {
 
     if (diffDays > 1) return 0;
 
-    // This is a simplified streak calculation
-    // In a real app, we'd iterate through the dates and ensure there are no gaps
-
-    // For the purpose of this demo, let's just count unique days in the last N logs
+    // Simplified streak: count unique logged days (demo-grade logic).
     const uniqueDays = new Set(logs.map(log => {
       const d = new Date(log.loggedAt);
       return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
@@ -502,4 +612,32 @@ export async function getStreak() {
     console.error("Error calculating streak:", error);
     return 0;
   }
+}
+
+/**
+ * The AI runtime mode, used by the UI to show the AI Care Companion as
+ * live (real provider), mock (simulated — no key needed) or offline.
+ * Never exposes keys.
+ */
+export async function getAiStatus() {
+  const { mode, provider } = getAiRuntime();
+  return {
+    configured: mode !== "offline",
+    provider,
+    mock: mode === "mock",
+  };
+}
+
+/** Encrypt sensitive health data using AES-256-GCM */
+async function encryptSensitiveData(text: string): Promise<string> {
+  const key = process.env.HEALTH_DATA_ENCRYPTION_KEY;
+  if (!key) {
+    // Fallback: return base64-encoded plaintext if no key configured (dev only)
+    return Buffer.from(text).toString("base64");
+  }
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
+  const encrypted = Buffer.concat([cipher.update(text, "utf8"), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  return Buffer.concat([iv, authTag, encrypted]).toString("base64");
 }

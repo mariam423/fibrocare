@@ -1,0 +1,20 @@
+{
+  "testId": "efd1b89a-7bad-485d-b263-dab9c2597b58",
+  "status": "blocked",
+  "startedAt": null,
+  "finishedAt": "2026-08-13T02:28:38.199Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/20260813-022835-e6b0772d.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_03baa26a9a9662ef",
+  "runIdIfAvailable": "73542ddd-8f6c-402f-a366-50270ec25f85",
+  "codeVersion": "v1.0",
+  "targetUrl": null,
+  "targetUrlSource": null,
+  "failedStepIndex": 2,
+  "failureKind": null,
+  "verdict": "blocked",
+  "executionStatus": "completed",
+  "summary": "Blocked before a verdict could be produced: The domain is likely not configured to the fibrocare application on the hosting side and is falling back to the provider’s default placeholder page (Example Domain). This can happen if DNS is pointed to the wrong host, the app was not deployed or published to the correct environment, the web server virtual host/site binding is incorrect, or the origin/site content has not been replaced with the project’s build. Underlying error: TEST BLOCKED\n\nThe fibr…",
+  "apiOutput": null,
+  "trace": null
+}

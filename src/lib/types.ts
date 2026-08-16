@@ -4,6 +4,7 @@ export interface HealthLog {
   moodTag: string;
   notes: string | null;
   loggedAt: string | Date;
+  encryptedNotes?: string; // encrypted for sensitive data protection
 }
 
 export interface PainTrendPoint {

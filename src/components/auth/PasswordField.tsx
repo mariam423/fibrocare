@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { EyeIcon, EyeOffIcon } from "@hugeicons/core-free-icons";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface PasswordFieldProps {
   id: string;
@@ -31,6 +32,7 @@ export function PasswordField({
   invalid = false,
 }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-2">
@@ -57,8 +59,12 @@ export function PasswordField({
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-pressed={visible}
-          aria-label={visible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
-          className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={
+            visible
+              ? t("auth.passwordHide", { label: label.toLowerCase() })
+              : t("auth.passwordShow", { label: label.toLowerCase() })
+          }
+          className="absolute end-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           {visible ? (
             <HugeiconsIcon icon={EyeOffIcon} className="h-5 w-5" aria-hidden="true" />

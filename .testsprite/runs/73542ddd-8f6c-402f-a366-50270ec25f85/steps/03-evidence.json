@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 3,
+    "summary": "Step 3 'The browser is on example.com rather than the expected fibrocare site.' failed. Error: TEST BLOCKED\n\nThe fibrocare project homepage could not be reached — the current page is a placeholder Example Domain page, so the project's features are not available for testing.\n\nObservations:\n- The page heading shows 'Example Domain'.\n- Only a single link labeled 'Learn more' is present; no fibrocare branding or main features are visible.",
+    "path": "steps/03-snapshot.html"
+  }
+]

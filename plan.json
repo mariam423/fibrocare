@@ -1,0 +1,21 @@
+{
+  "projectId": "4a5e710e-727c-451c-8394-515bb8c0e5f3",
+  "type": "frontend",
+  "name": "fibrocare smoke test",
+  "description": "Smoke test for fibrocare project",
+  "priority": "p2",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Navigate to the homepage and verify page loads"
+    },
+    {
+      "type": "action",
+      "description": "Interact with main features"
+    },
+    {
+      "type": "assertion",
+      "description": "Verify page elements are present"
+    }
+  ]
+}

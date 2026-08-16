@@ -25,9 +25,22 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# next.js
+# next.js (any build dir — Tailwind scans non-ignored files for class candidates,
+# so a stray .next-* copy with corrupted compiled CSS can poison the dev build)
 .next
+.next-live
+.next-pwa
+.next-*
 out
+
+# test/build artifacts (also scanned by Tailwind's auto source detection)
+coverage/
+playwright-report/
+test-results/
+
+# generated at build time by scripts/build-sw.mjs
+public/sw.js
+public/workbox/
 
 # database
 *.db

@@ -6,28 +6,28 @@
    ============================================================ */
 
 :root {
-  /* Standard Palette — Productive Pastels (Lavender / Teal) */
-  --bg-main: #fdfaff;
-  --bg-card: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --accent-primary: #a855f7; /* Purple */
-  --accent-secondary: #0d9488; /* Teal */
-  --border-color: #f3e8ff;
-  --ring-color: #e9d5ff;
+  /* Standard Palette — Crisp White / Obsidian Slate */
+  --bg-main: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --text-main: #0F172A;
+  --text-muted: #5B6575;
+  --accent-primary: #3B6B48; /* Refined Sage Green */
+  --accent-secondary: #8F83B8; /* Soft Lavender */
+  --border-color: rgba(15, 23, 42, 0.08);
+  --ring-color: #3B6B48;
   --transition-speed: 0.3s;
 }
 
-/* Standard (dark) */
+/* Standard (dark) — Deep Teal/Emerald Obsidian */
 .dark {
-  --bg-main: #020617;
-  --bg-card: #0f172a;
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --accent-primary: #c084fc;
-  --accent-secondary: #2dd4bf;
-  --border-color: #1e293b;
-  --ring-color: #334155;
+  --bg-main: #060D0C;
+  --bg-card: #0E1817;
+  --text-main: #E8F0EB;
+  --text-muted: #A5B8AC;
+  --accent-primary: #8FBF9B;
+  --accent-secondary: #7FB5A5;
+  --border-color: rgba(255, 255, 255, 0.09);
+  --ring-color: #9CC6A4;
 }
 
 /* ------------------------------------------------------------

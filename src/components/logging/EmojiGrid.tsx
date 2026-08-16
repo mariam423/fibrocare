@@ -13,22 +13,24 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 
 export interface Symptom {
   id: string;
-  label: string;
+  tKey: TranslationKey;
   icon: IconSvgElement;
 }
 
 export const FIBRO_SYMPTOMS: Symptom[] = [
-  { id: "widespread-pain", label: "Widespread Pain", icon: Activity01Icon },
-  { id: "fatigue", label: "Fatigue", icon: BatteryLowIcon },
-  { id: "sleep-problems", label: "Sleep Problems", icon: Moon01Icon },
-  { id: "fibro-fog", label: "Fibro Fog", icon: BrainIcon },
-  { id: "headache", label: "Headache / Migraine", icon: WaveIcon },
-  { id: "tender-points", label: "Tender Points", icon: MapPinIcon },
-  { id: "stiffness", label: "Stiffness", icon: FlowConnectionIcon },
-  { id: "sensitivity", label: "Light / Noise Sensitivity", icon: SparklesIcon },
+  { id: "widespread-pain", tKey: "logging.symptoms.widespreadPain", icon: Activity01Icon },
+  { id: "fatigue", tKey: "logging.symptoms.fatigue", icon: BatteryLowIcon },
+  { id: "sleep-problems", tKey: "logging.symptoms.sleepProblems", icon: Moon01Icon },
+  { id: "fibro-fog", tKey: "logging.symptoms.fibroFog", icon: BrainIcon },
+  { id: "headache", tKey: "logging.symptoms.headache", icon: WaveIcon },
+  { id: "tender-points", tKey: "logging.symptoms.tenderPoints", icon: MapPinIcon },
+  { id: "stiffness", tKey: "logging.symptoms.stiffness", icon: FlowConnectionIcon },
+  { id: "sensitivity", tKey: "logging.symptoms.sensitivity", icon: SparklesIcon },
 ];
 
 interface EmojiGridProps {
@@ -37,8 +39,9 @@ interface EmojiGridProps {
 }
 
 export function EmojiGrid({ selectedSymptoms, onToggle }: EmojiGridProps) {
+  const { t } = useLanguage();
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {FIBRO_SYMPTOMS.map((s) => {
         const isActive = selectedSymptoms.includes(s.id);
         return (
@@ -47,22 +50,25 @@ export function EmojiGrid({ selectedSymptoms, onToggle }: EmojiGridProps) {
             type="button"
             onClick={() => onToggle(s.id)}
             aria-pressed={isActive}
-            aria-label={`${s.label}${isActive ? " (selected)" : ""}`}
+            aria-label={`${t(s.tKey)}${isActive ? t("logging.symptoms.selected") : ""}`}
             className={cn(
-              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all group",
-              "aspect-square text-center",
+              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 group",
+              "aspect-square text-center cursor-pointer",
+              "active:scale-[0.96]",
               isActive
-                ? "bg-purple-50 border-purple-400 text-purple-700 shadow-md scale-105"
-                : "bg-white border-slate-100 text-slate-500 hover:border-purple-200 hover:bg-purple-50/30"
+                ? "bg-primary/10 border-primary/60 text-primary shadow-depth-md scale-105 dark:bg-primary/20 dark:border-primary/50"
+                : "border border-border bg-card/70 text-muted-foreground backdrop-blur-md hover:border-primary/40 hover:bg-primary/5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:hover:bg-primary/10 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
             )}
           >
             <div className={cn(
-              "p-3 rounded-full mb-2 transition-colors",
-              isActive ? "bg-purple-200 text-purple-700" : "bg-slate-100 text-slate-400 group-hover:bg-purple-100"
+              "icon-badge flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300",
+              isActive
+                ? "ring-1 ring-primary/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_10px_rgba(15,23,42,0.08)]"
+                : "opacity-90 group-hover:opacity-100"
             )}>
               <HugeiconsIcon icon={s.icon} className="h-6 w-6" aria-hidden="true" />
             </div>
-            <span className="text-xs font-medium leading-tight">{s.label}</span>
+            <span className="text-xs font-medium leading-tight">{t(s.tKey)}</span>
           </button>
         );
       })}

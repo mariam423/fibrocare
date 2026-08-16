@@ -10,10 +10,11 @@ import { getToken } from "next-auth/jwt";
  * the route renders. It is an optimistic check: the server actions and route
  * handlers must also verify the session (see src/app/actions.ts).
  *
- * Protected: the dashboard (`/`), health-log viewer (`/health-logs`), Zen
- * portal (`/zen`), reports (`/reports`), and profile (`/profile`).
+ * Protected: the dashboard (`/dashboard`), health-log viewer (`/health-logs`),
+ * Zen portal (`/zen`), reports (`/reports`), and profile (`/profile`).
  */
 const PROTECTED_PREFIXES = [
+  "/dashboard",
   "/health-logs",
   "/zen",
   "/reports",
@@ -22,7 +23,6 @@ const PROTECTED_PREFIXES = [
 
 function isProtectedPath(pathname: string): boolean {
   return (
-    pathname === "/" ||
     PROTECTED_PREFIXES.some(
       (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
     )
@@ -58,7 +58,19 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     *
+     * Prefetch requests (Link prefetches send `next-router-prefetch` and/or
+     * `purpose: prefetch`) are deliberately excluded. Otherwise a logged-out
+     * prefetch of a protected route would cache a redirect in the router
+     * cache, and a later back/forward navigation could be served that stale
+     * redirect, trapping the user instead of restoring the previous page.
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };

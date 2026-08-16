@@ -1,18 +1,25 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { VolumeUpIcon, VolumeMute01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 
 export type SoundId = "rain" | "forest" | "whiteNoise" | "deepHum";
 
-const SOUND_OPTIONS: { id: SoundId; label: string; description: string }[] = [
-  { id: "rain", label: "Rain", description: "Soft falling rain" },
-  { id: "forest", label: "Forest", description: "Deep woodland ambience" },
-  { id: "whiteNoise", label: "White Noise", description: "Steady static" },
-  { id: "deepHum", label: "Deep Hum", description: "Low grounding tone" },
+const SOUND_OPTIONS: {
+  id: SoundId;
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
+}[] = [
+  { id: "rain", labelKey: "zen.sound.rain.label", descriptionKey: "zen.sound.rain.description" },
+  { id: "forest", labelKey: "zen.sound.forest.label", descriptionKey: "zen.sound.forest.description" },
+  { id: "whiteNoise", labelKey: "zen.sound.whiteNoise.label", descriptionKey: "zen.sound.whiteNoise.description" },
+  { id: "deepHum", labelKey: "zen.sound.deepHum.label", descriptionKey: "zen.sound.deepHum.description" },
 ];
 
 function createNoiseBuffer(ctx: AudioContext, type: "white" | "brown", seconds = 4) {
@@ -39,12 +46,23 @@ function createNoiseBuffer(ctx: AudioContext, type: "white" | "brown", seconds =
  * and the loops are gapless.
  */
 export function SoundscapeMixer({ disabled = false }: { disabled?: boolean }) {
+  const { t } = useLanguage();
   const [activeSounds, setActiveSounds] = useState<Record<SoundId, boolean>>({
     rain: false,
     forest: false,
     whiteNoise: false,
     deepHum: false,
   });
+
+  const sounds = useMemo(
+    () =>
+      SOUND_OPTIONS.map((s) => ({
+        id: s.id,
+        label: t(s.labelKey),
+        description: t(s.descriptionKey),
+      })),
+    [t]
+  );
 
   const ctxRef = useRef<AudioContext | null>(null);
   const stopHandlers = useRef<Map<SoundId, () => void>>(new Map());
@@ -184,45 +202,46 @@ const SOUND_BUILDERS: Record<
     <div
       className="grid grid-cols-2 gap-4 w-full max-w-xs"
       role="group"
-      aria-label="Soundscape mixer"
+      aria-label={t("zen.soundscapeAria")}
     >
-      {SOUND_OPTIONS.map((sound) => {
+      {sounds.map((sound) => {
         const active = activeSounds[sound.id];
         return (
-          <Button
-            key={sound.id}
-            variant="outline"
-            onClick={() => toggleSound(sound.id)}
-            disabled={disabled}
-            aria-pressed={active}
-            title={sound.description}
-            className={cn(
-              "flex-col gap-1 rounded-xl py-6 transition-all",
-              active
-                ? "bg-white/20 border-white/40 text-white"
-                : "bg-transparent border-white/10 text-slate-400"
-            )}
-          >
-            <span className="flex items-center gap-2">
-              {active ? (
-                <HugeiconsIcon
-                  icon={VolumeUpIcon}
-                  className="h-4 w-4"
-                  aria-hidden="true"
-                />
-              ) : (
-                <HugeiconsIcon
-                  icon={VolumeMute01Icon}
-                  className="h-4 w-4"
-                  aria-hidden="true"
-                />
+          <SpotlightCard key={sound.id} className="w-full rounded-xl">
+            <Button
+              variant="outline"
+              onClick={() => toggleSound(sound.id)}
+              disabled={disabled}
+              aria-pressed={active}
+              title={sound.description}
+              className={cn(
+                "w-full flex-col gap-1 rounded-xl py-6 transition-all",
+                active
+                  ? "bg-white/20 border-white/40 text-white"
+                  : "bg-transparent border-white/10 text-slate-400"
               )}
-              {sound.label}
-            </span>
-            <span className="text-[10px] font-normal opacity-70">
-              {sound.description}
-            </span>
-          </Button>
+            >
+              <span className="flex items-center gap-2">
+                {active ? (
+                  <HugeiconsIcon
+                    icon={VolumeUpIcon}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <HugeiconsIcon
+                    icon={VolumeMute01Icon}
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  />
+                )}
+                {sound.label}
+              </span>
+              <span className="text-[10px] font-normal opacity-70">
+                {sound.description}
+              </span>
+            </Button>
+          </SpotlightCard>
         );
       })}
     </div>

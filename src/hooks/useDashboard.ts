@@ -17,14 +17,14 @@ import type { Insight } from "@/lib/insightEngine";
 
 const FLARE_TOAST_THRESHOLD = 7;
 
-function toIsoKey(d: Date) {
+export function toIsoKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
     d.getDate()
   ).padStart(2, "0")}`;
 }
 
-function formatLogDate(value: string | Date) {
-  return new Date(value).toLocaleDateString(undefined, {
+export function formatLogDate(value: string | Date, locale?: string) {
+  return new Date(value).toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -42,6 +42,7 @@ interface DashboardData {
   lastLogDate: string;
   painLevel: number;
   mood: string;
+  recentLogs: Array<{ painLevel: number; moodTag: string; loggedAt: string | Date }>;
 }
 
 async function fetchDashboardData(): Promise<DashboardData> {
@@ -69,6 +70,7 @@ async function fetchDashboardData(): Promise<DashboardData> {
     lastLogDate: lastLog ? formatLogDate(lastLog.loggedAt) : "Never",
     painLevel: lastLog ? lastLog.painLevel : 3,
     mood: lastLog ? lastLog.moodTag : "Good Day",
+    recentLogs: logs.slice(0, 2),
   };
 }
 
@@ -101,6 +103,7 @@ export interface DashboardState {
   logEntry: (overrides?: LogOverrides) => Promise<void>;
   incrementHydration: (delta: number) => Promise<void>;
   toggleSymptom: (id: string) => Promise<void>;
+  recentLogs: Array<{ painLevel: number; moodTag: string; loggedAt: string | Date }>;
 }
 
 export function useDashboard(): DashboardState {
@@ -112,6 +115,7 @@ export function useDashboard(): DashboardState {
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [lastLogDate, setLastLogDate] = useState("Never");
+  const [recentLogs, setRecentLogs] = useState<Array<{ painLevel: number; moodTag: string; loggedAt: string | Date }>>([]);
 
   const [painLevel, setPainLevel] = useState([3]);
   const [mood, setMood] = useState("Good Day");
@@ -142,6 +146,7 @@ export function useDashboard(): DashboardState {
     setLastLogDate(data.lastLogDate);
     setPainLevel([data.painLevel]);
     setMood(data.mood);
+    setRecentLogs(data.recentLogs);
   }, []);
 
   useEffect(() => {
@@ -241,5 +246,6 @@ export function useDashboard(): DashboardState {
     logEntry,
     incrementHydration,
     toggleSymptom,
+    recentLogs,
   };
 }

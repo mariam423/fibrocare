@@ -7,9 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-app-sans);
+  --font-heading: var(--font-app-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,74 +48,113 @@
 }
 
 :root {
-  /* Standard · Light — Productive Pastels (Lavender / Teal) */
-  --background: oklch(0.985 0.012 310);
-  --foreground: oklch(0.27 0.05 285);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.27 0.05 285);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.27 0.05 285);
-  --primary: oklch(0.47 0.19 285);
-  --primary-foreground: oklch(0.985 0.015 310);
-  --secondary: oklch(0.955 0.02 300);
-  --secondary-foreground: oklch(0.3 0.06 285);
-  --muted: oklch(0.96 0.015 300);
-  --muted-foreground: oklch(0.44 0.03 285);
-  --accent: oklch(0.94 0.03 200);
-  --accent-foreground: oklch(0.3 0.06 200);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.02 300);
-  --input: oklch(0.89 0.02 300);
-  --ring: oklch(0.62 0.15 285);
-  --chart-1: oklch(0.55 0.2 285);
-  --chart-2: oklch(0.55 0.12 195);
-  --chart-3: oklch(0.58 0.13 240);
-  --chart-4: oklch(0.62 0.15 150);
-  --chart-5: oklch(0.64 0.14 60);
+  /* Typography: Readex Pro is the single app-wide typeface (Arabic + Latin).
+     Routed through --font-app-sans so every surface (--font-sans and
+     --font-heading) inherits it. */
+  --font-app-sans: var(--font-readex);
+
+  /* Standard · Light — Crisp Canvas / Obsidian
+     High-end interactive product palette (Linear / Vercel direction):
+     flat near-white canvas (#FAFAFA), deep obsidian-slate text
+     (#0F172A), refined sage accent. Hairline borders read as
+     rgba(obsidian, 0.10) for a crisp, defined edge. */
+  --background: #FAFAFA;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #3B6B48;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #5B6575;
+  --accent: #EEF3EF;
+  --accent-foreground: #16301E;
+  --destructive: #C0392B;
+  --border: rgba(15, 23, 42, 0.1);
+  --input: rgba(15, 23, 42, 0.14);
+  --ring: #3B6B48;
+  --chart-1: #3B6B48;
+  --chart-2: #8F83B8;
+  --chart-3: #B08A3E;
+  --chart-4: #C9683C;
+  --chart-5: #64748B;
   --radius: 0.625rem;
-  --sidebar: oklch(0.97 0.015 300);
-  --sidebar-foreground: oklch(0.27 0.05 285);
-  --sidebar-primary: oklch(0.47 0.19 285);
-  --sidebar-primary-foreground: oklch(0.985 0.015 310);
-  --sidebar-accent: oklch(0.94 0.03 200);
-  --sidebar-accent-foreground: oklch(0.3 0.06 200);
-  --sidebar-border: oklch(0.9 0.02 300);
-  --sidebar-ring: oklch(0.62 0.15 285);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #3B6B48;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EEF3EF;
+  --sidebar-accent-foreground: #16301E;
+  --sidebar-border: rgba(15, 23, 42, 0.1);
+  --sidebar-ring: #3B6B48;
 }
 
 .dark {
-  /* Standard · Dark — Deep Indigo-Navy */
-  --background: oklch(0.17 0.02 285);
-  --foreground: oklch(0.95 0.01 300);
-  --card: oklch(0.21 0.02 285);
-  --card-foreground: oklch(0.95 0.01 300);
-  --popover: oklch(0.21 0.02 285);
-  --popover-foreground: oklch(0.95 0.01 300);
-  --primary: oklch(0.8 0.11 300);
-  --primary-foreground: oklch(0.19 0.03 285);
-  --secondary: oklch(0.26 0.025 285);
-  --secondary-foreground: oklch(0.95 0.01 300);
-  --muted: oklch(0.25 0.025 285);
-  --muted-foreground: oklch(0.78 0.02 290);
-  --accent: oklch(0.3 0.04 195);
-  --accent-foreground: oklch(0.9 0.05 195);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.75 0.1 300);
-  --chart-1: oklch(0.8 0.11 300);
-  --chart-2: oklch(0.78 0.09 195);
-  --chart-3: oklch(0.75 0.1 240);
-  --chart-4: oklch(0.78 0.12 150);
-  --chart-5: oklch(0.8 0.11 70);
-  --sidebar: oklch(0.21 0.02 285);
-  --sidebar-foreground: oklch(0.95 0.01 300);
-  --sidebar-primary: oklch(0.8 0.11 300);
-  --sidebar-primary-foreground: oklch(0.19 0.03 285);
-  --sidebar-accent: oklch(0.3 0.04 195);
-  --sidebar-accent-foreground: oklch(0.9 0.05 195);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.75 0.1 300);
+  /* Standard · Dark — Deep Teal/Emerald Obsidian
+     Near-black teal base with translucent glass cards; off-white
+     text with a cool emerald cast (never pure white) to prevent
+     eye strain; hairline white borders, refined sage accents. */
+  --background: #060D0C;
+  --foreground: #E8F0EB;
+  --card: #0E1817;
+  --card-foreground: #E8F0EB;
+  --popover: #101B19;
+  --popover-foreground: #E8F0EB;
+  --primary: #8FBF9B;
+  --primary-foreground: #0C1F12;
+  --secondary: #16201E;
+  --secondary-foreground: #DCEBE0;
+  --muted: #131E1C;
+  --muted-foreground: #A5B8AC;
+  --accent: #16231F;
+  --accent-foreground: #D4E8D6;
+  --destructive: #E06B5E;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.11);
+  --ring: #9CC6A4;
+  --chart-1: #8FBF9B;
+  --chart-2: #7FB5A5;
+  --chart-3: #C9AE7C;
+  --chart-4: #D19A87;
+  --chart-5: #97A09A;
+  --sidebar: #0C1513;
+  --sidebar-foreground: #E8F0EB;
+  --sidebar-primary: #8FBF9B;
+  --sidebar-primary-foreground: #0C1F12;
+  --sidebar-accent: #16231F;
+  --sidebar-accent-foreground: #D4E8D6;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #9CC6A4;
+}
+
+/* Arabic typography: Readex Pro already carries both scripts, so the family
+   is shared app-wide. What still needs correcting for Arabic is tracking —
+   the connected script opens visible gaps under letter-spacing — and leading
+   for headings, whose tight 1.2 rhythm clips Readex Pro's tall ascenders,
+   descenders and diacritic stacks. Kept unlayered so these resets out-rank
+   the layered :root definition AND Tailwind tracking/leading utilities
+   (html[lang="ar"] * beats .tracking-* by cascade). */
+html[lang="ar"] {
+  --font-app-sans: var(--font-readex);
+  letter-spacing: 0;
+}
+
+html[lang="ar"] * {
+  letter-spacing: 0;
+}
+
+/* Arabic headings get a taller leading than the Latin 1.2–1.33 rhythm so the
+   glyphs (and their diacritics) never clip. */
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] h4,
+html[lang="ar"] h5,
+html[lang="ar"] h6 {
+  line-height: 1.45;
 }
 
 @layer base {
@@ -125,9 +163,35 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.6;
   }
   html {
     @apply font-sans;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+  body {
+    overflow-x: clip;
+  }
+
+  /* Heading rhythm: bold/semibold weight, tighter leading + a hint of
+     negative tracking gives a hand-set feel; text-wrap: balance keeps
+     single-line titles whole. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-weight: 700;
   }
 
   /* Manual motion kill-switch (Sensitive Control Center) */
@@ -151,4 +215,1237 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* ============================================================
+   Layered Shadow System
+   Neutral obsidian-tinted, multi-layered soft shadows — the
+   premium "crisp product" look (0_4px_20px rgba(0,0,0,0.03)-style).
+   All use subtle neutral obsidian instead of pure black so they
+   stay soft and calm.
+   ============================================================ */
+
+/* --- Layered neutral shadows (beautiful-shadows) --- */
+@utility shadow-beautiful-sm {
+  box-shadow:
+    0px 2px 3px -1px rgba(15, 23, 42, 0.1),
+    0px 1px 0px 0px rgba(25, 28, 33, 0.02),
+    0px 0px 0px 1px rgba(25, 28, 33, 0.08);
+}
+
+@utility shadow-beautiful-md {
+  box-shadow:
+    0px 0px 0px 1px rgba(15, 23, 42, 0.06),
+    0px 1px 1px -0.5px rgba(15, 23, 42, 0.06),
+    0px 3px 3px -1.5px rgba(15, 23, 42, 0.06),
+    0px 6px 6px -3px rgba(15, 23, 42, 0.06),
+    0px 12px 12px -6px rgba(15, 23, 42, 0.06),
+    0px 24px 24px -12px rgba(15, 23, 42, 0.06);
+}
+
+@utility shadow-beautiful-lg {
+  box-shadow:
+    0 2.8px 2.2px rgba(15, 23, 42, 0.034),
+    0 6.7px 5.3px rgba(15, 23, 42, 0.048),
+    0 12.5px 10px rgba(15, 23, 42, 0.06),
+    0 22.3px 17.9px rgba(15, 23, 42, 0.072),
+    0 41.8px 33.4px rgba(15, 23, 42, 0.086),
+    0 100px 80px rgba(15, 23, 42, 0.12);
+}
+
+/* --- Crisp depth shadows (neutral obsidian) --- */
+@utility shadow-depth-sm {
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 5%, transparent),
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 1px 2px -1px rgba(15, 23, 42, 0.05),
+    0 3px 6px -2px rgba(15, 23, 42, 0.06);
+}
+
+@utility shadow-depth-md {
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 6%, transparent),
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 1px 2px -1px rgba(15, 23, 42, 0.04),
+    0 4px 8px -2px rgba(15, 23, 42, 0.06),
+    0 12px 20px -6px rgba(15, 23, 42, 0.08);
+}
+
+@utility shadow-depth-lg {
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 7%, transparent),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 2px 4px -1px rgba(15, 23, 42, 0.05),
+    0 8px 16px -4px rgba(15, 23, 42, 0.08),
+    0 20px 40px -8px rgba(15, 23, 42, 0.1),
+    0 40px 80px -16px rgba(15, 23, 42, 0.12);
+}
+
+/* --- 2.5D layered card surface ---
+   NOTE: no `position` is set here on purpose — this class is also
+   applied to fixed-position surfaces (dialog popups), and an
+   unlayered `position: relative` would override Tailwind's layered
+   `fixed`/`absolute` utilities in the cascade. */
+.card-depth {
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 7%, transparent),
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 1px 2px -1px rgba(15, 23, 42, 0.05),
+    0 4px 8px -2px rgba(15, 23, 42, 0.06),
+    0 12px 24px -6px rgba(15, 23, 42, 0.08),
+    0 24px 48px -12px rgba(15, 23, 42, 0.1);
+}
+
+/* Gentle hover lift: translate + deepened shadows (calm, GPU-friendly). */
+.card-depth-hover {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-depth-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 8%, transparent),
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 2px 4px -1px rgba(15, 23, 42, 0.07),
+    0 10px 20px -4px rgba(15, 23, 42, 0.1),
+    0 24px 48px -12px rgba(15, 23, 42, 0.14),
+    0 48px 96px -24px rgba(15, 23, 42, 0.16);
+}
+
+/* --- Gentle idle float (calm breathing motion) --- */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+/* --- Breathing bubble: 10s cycle (4s inhale → 6s exhale) --- */
+@keyframes breatheCycle {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes breathe-glow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+.animate-breathe {
+  animation: breatheCycle 10s ease-in-out infinite;
+}
+
+.breathe-glow {
+  animation: breathe-glow 10s ease-in-out infinite;
+}
+
+/* --- Progressive blur strip (mengto/progressive-blur) ---
+   Softens content as it approaches the sticky header, reinforcing
+   layered depth. Hidden under reduced motion. */
+.gradient-blur-top {
+  position: fixed;
+  top: 64px;
+  inset-inline: 0;
+  height: 72px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.gradient-blur-top > div {
+  position: absolute;
+  inset: 0;
+}
+
+.gradient-blur-top > div:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1) 35%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.gradient-blur-top > div:nth-child(2) {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1) 65%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.gradient-blur-top > div:nth-child(3) {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 100%);
+}
+
+/* Reduced motion: disable float + progressive blur layers entirely */
+html.motion-reduce .animate-float-soft,
+html.motion-reduce .gradient-blur-top {
+  animation: none !important;
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-soft,
+  .gradient-blur-top,
+  .animate-breathe,
+  .breathe-glow {
+    animation: none !important;
+  }
+  .gradient-blur-top {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   Route View Transitions (seamless crossfade on navigation)
+   Each page root is wrapped in a <ViewTransition> via the
+   RouteTransition component. Old content fades out quickly;
+   new content fades in with a gentle blur + rise, echoing the
+   ScrollReveal entrance language below. Disabled under reduced
+   motion (system preference or the in-app Sensitive Mode switch).
+   ============================================================ */
+
+:root {
+  --vt-duration-exit: 160ms;
+  --vt-duration-enter: 300ms;
+}
+
+/* Keep the page interactive while transitions run: the ::view-transition
+   overlay otherwise captures all pointer events during the animation. */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.fade-out) {
+  animation:
+    var(--vt-duration-exit) ease-in both vt-fade reverse,
+    var(--vt-duration-exit) ease-in both vt-rise reverse;
+}
+
+::view-transition-new(.fade-in) {
+  animation:
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-fade,
+    var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-rise;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes vt-rise {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Kill-switch (Sensitive Mode): zero-duration keeps the swap correct while
+   removing all motion. The generic `*` rules above cannot reach the
+   view-transition pseudo-elements, so they need explicit coverage. */
+html.motion-reduce ::view-transition-old(*),
+html.motion-reduce ::view-transition-new(*),
+html.motion-reduce ::view-transition-group(*) {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ============================================================
+   Scroll Reveal (mengto/animation-on-scroll)
+   Elements start paused at the 0% keyframe (hidden, softly
+   blurred + lowered) and the ScrollReveal component flips them
+   to `running` once they enter the viewport. Runs once.
+   ============================================================ */
+
+@keyframes animationIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-on-scroll {
+  animation: animationIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused !important;
+}
+
+.animate-on-scroll.animate {
+  animation-play-state: running !important;
+}
+
+/* Never strand content hidden when motion is reduced — system or manual. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll,
+  .animate-on-scroll.animate {
+    animation: none !important;
+  }
+}
+
+html.motion-reduce .animate-on-scroll,
+html.motion-reduce .animate-on-scroll.animate {
+  animation: none !important;
+}
+
+/* ============================================================
+   Ambient background & glass surfaces (calm visual identity)
+   Soft lavender / sky-blue wash fixed behind the app. Pure
+   radial gradients (no filter blur) so mobile GPU cost is near
+   zero. Cards float above it using translucent glass fills.
+   ============================================================ */
+
+/* ============================================================
+   Ambient background & glass surfaces (crisp premium identity)
+   Clean flat canvas: the page base is a single crisp tone (#F8FAFC)
+   with an ultra-subtle dot-matrix / micro-grid overlay for texture.
+   No gradient washes. Cards float above it using translucent glass
+   fills. Pure radial dot patterns, no filter blur, so mobile GPU
+   cost stays near zero.
+   ============================================================ */
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--background);
+}
+
+/* Dot-matrix overlay: crisp micro-grid that reads as texture, not gradient. */
+.ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: center;
+  mask-image: radial-gradient(120% 90% at 50% 20%, rgba(0, 0, 0, 0.85), transparent 100%);
+  pointer-events: none;
+}
+
+/* Dark mode: deep teal/emerald obsidian gradient with a lighter dot-matrix */
+.dark .ambient {
+  background-color: var(--background);
+  background-image: radial-gradient(
+      140% 120% at 12% 0%,
+      rgba(13, 44, 44, 0.55) 0%,
+      rgba(7, 18, 22, 0) 46%
+    ),
+    radial-gradient(
+      120% 110% at 88% 100%,
+      rgba(6, 42, 36, 0.5) 0%,
+      rgba(7, 18, 22, 0) 52%
+    );
+}
+
+.dark .ambient::after {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+}
+
+/* --- Ambient accent glow trail (sage, pointer-following) --------------
+   A restrained glow pair follows fine pointers (rendered by
+   AmbientAurora.tsx). Only transform/opacity animate, so the work is
+   GPU-composited with no layout thrash or per-frame blur. The trail is
+   subtle — a quiet premium accent, not a neon gradient.
+   ------------------------------------------------------------------- */
+
+.aurora-glow-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.aurora-trail-primary {
+  width: 440px;
+  height: 440px;
+  margin: -220px 0 0 -220px;
+  opacity: 0.3;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #3b6b48 14%, transparent),
+    transparent 66%
+  );
+}
+
+.aurora-trail-echo {
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  opacity: 0.18;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #8f83b8 12%, transparent),
+    transparent 66%
+  );
+}
+
+.dark .aurora-trail-primary {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #86ac8c 18%, transparent),
+    transparent 66%
+  );
+}
+.dark .aurora-trail-echo {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #a79acf 15%, transparent),
+    transparent 66%
+  );
+}
+
+/* Reduced transparency / high contrast: drop the ambient wash entirely.
+   Must cover the dark variant too — .dark .ambient is more specific than
+   .ambient and would otherwise win even inside this media query. The
+   aurora layers are decorative, so they go with it. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .ambient,
+  .dark .ambient {
+    background: none;
+  }
+  .ambient .ambient-aurora,
+  .ambient .aurora-glow-trail {
+    display: none;
+  }
+}
+
+/* --- Zen Portal backdrop ------------------------------------------------
+   Deep indigo/slate surface with faint lavender + sky glows. Stays
+   near-black for sensory focus while matching the app's gradient
+   identity. Defined as a class (not an arbitrary utility) because
+   multi-layer gradients with hex stops are not reliably generated by
+   the Tailwind arbitrary-value parser. Pure radial gradients, no blur.
+   ------------------------------------------------------------------- */
+.zen-backdrop {
+  background:
+    radial-gradient(55% 45% at 50% -5%, rgba(139, 92, 246, 0.16), transparent 70%),
+    radial-gradient(45% 40% at 85% 90%, rgba(56, 189, 248, 0.1), transparent 70%),
+    #0f172a;
+}
+
+/* Ultra-dark variant: near-black indigo-tinted base with just a whisper of
+   lavender + sky so the surface keeps depth without breaking sensory focus. */
+.zen-backdrop-ultra {
+  background:
+    radial-gradient(50% 40% at 50% -5%, rgba(139, 92, 246, 0.07), transparent 70%),
+    radial-gradient(40% 35% at 85% 95%, rgba(56, 189, 248, 0.05), transparent 70%),
+    #070812;
+}
+
+/* --- Glass surface ----------------------------------------------------
+   Translucent card fill + backdrop blur over the ambient wash, paired
+   with .card-depth (layered 2.5D shadows) on the Card base. Lives in the
+   components layer so semantic tint utilities (e.g. severity chips,
+   category tints) can override the fill while keeping the blur.
+   Enhanced with subtle inner border for realistic glass refraction.
+   ------------------------------------------------------------------- */
+@layer components {
+  .glass-surface {
+    background: color-mix(in srgb, var(--card) 74%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 5%, transparent),
+      0 1px 2px rgba(15, 23, 42, 0.02),
+      0 4px 20px rgba(15, 23, 42, 0.03);
+  }
+  .dark .glass-surface {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, var(--card) 45%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 32px rgba(0, 0, 0, 0.37);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-surface {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid var(--border);
+  }
+}
+
+/* ============================================================
+   Premium surface system (crisp white / obsidian)
+   Shared building blocks for the high-end interactive product
+   look: crisp hairline-bordered cards, layered soft shadows and
+   a uniform glassmorphism icon badge. Replace mismatched pastel
+   blocks and flat surfaces across the app.
+   ============================================================ */
+
+/* --- Crisp elevated card ------------------------------------
+   Hairline border (obsidian at 8%), translucent glass fill,
+   multi-layered soft drop shadow. The `@supports` guard drops to
+   a solid card when backdrop-filter is unavailable. */
+.surface-crisp {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.02),
+    0 4px 20px rgba(15, 23, 42, 0.03),
+    0 12px 40px rgba(15, 23, 42, 0.04);
+}
+
+.dark .surface-crisp {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--card) 40%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    0 24px 80px rgba(0, 0, 0, 0.3);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .surface-crisp {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .surface-crisp {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid var(--border);
+  }
+}
+
+/* --- Responsive spring hover lift ----------------------------
+   Smooth translate + shadow deepen on hover, GPU-friendly and
+   gated for reduced motion via the global kill-switch below. */
+.hover-lift {
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms ease,
+    background-color 300ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.surface-crisp.hover-lift:hover {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.03),
+    0 10px 30px rgba(15, 23, 42, 0.06),
+    0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+.dark .surface-crisp.hover-lift:hover {
+  border-color: rgba(52, 211, 153, 0.28);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.24),
+    0 10px 30px rgba(0, 0, 0, 0.32),
+    0 24px 60px rgba(0, 0, 0, 0.42),
+    0 0 24px rgba(16, 185, 129, 0.16);
+}
+
+/* --- Uniform glassmorphism icon badge -------------------------
+   Standardized badge for every icon container — replaces the
+   mismatched pastel blocks. Primary-tinted translucent glass,
+   frosted blur, hairline sage border and icon.
+   `bg-primary/10 backdrop-blur-sm border-primary/20` equivalent. */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--primary) 10%, transparent),
+    0 2px 8px rgba(15, 23, 42, 0.04);
+  color: var(--primary);
+}
+
+.dark .icon-badge {
+  border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--primary) 20%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 16px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .icon-badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .icon-badge {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid var(--border);
+  }
+}
+
+/* Raw Tailwind backdrop-blur-* utilities (bg-white/70 + backdrop-blur-md
+   cards, frosted chips, the toast) must degrade exactly like the semantic
+   glass classes under reduced transparency: opaque fill, no blur. The
+   attribute selector covers every generated variant (sm/md/lg/xl/2xl).
+   The decorative progressive-blur strip is dropped as well. */
+@media (prefers-reduced-transparency: reduce) {
+  [class*="backdrop-blur"] {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .gradient-blur-top {
+    display: none;
+  }
+}
+
+/* Reduced motion: disable the hover lift entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift {
+    transition: none;
+  }
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+html.motion-reduce .hover-lift {
+  transition: none;
+}
+html.motion-reduce .hover-lift:hover {
+  transform: none;
+}
+
+/* --- Ambient hover glow + crisp gradient border ----------------
+   `glow-card` pairs an ultra-soft primary radial wash (fades in on
+   hover, GPU-friendly transform/opacity only) with a border that
+   warms to primary on hover. Pairs with `surface-crisp` / group
+   cards. The wash sits above the card fill but below content.
+   ------------------------------------------------------------------ */
+
+.glow-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    120% 100% at 50% -20%,
+    color-mix(in oklab, var(--primary) 18%, transparent) 0%,
+    transparent 62%
+  );
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glow-card:hover::before,
+.glow-card:focus-visible::before {
+  opacity: 1;
+}
+
+.surface-crisp.glow-card,
+.glow-card {
+  transition: border-color 400ms ease;
+}
+.surface-crisp.glow-card:hover,
+.glow-card:hover {
+  border-color: color-mix(in oklab, var(--primary) 34%, transparent);
+}
+
+/* Dark mode: glow-card hover also gets a soft emerald outer glow. */
+.dark .surface-crisp.glow-card:hover,
+.dark .glow-card:hover {
+  border-color: color-mix(in oklab, var(--primary) 46%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    0 0 24px color-mix(in oklab, var(--primary) 18%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-card::before {
+    transition: none;
+    opacity: 0;
+  }
+}
+
+html.motion-reduce .glow-card::before {
+  transition: none;
+  opacity: 0;
+}
+
+/* ============================================================
+   Sensitive Mode (Sensory Rest)
+   The "Activate Sensitive Mode" card in Gentle Support toggles
+   three coordinated effects:
+     1. `html.motion-reduce` — all animations/transitions off
+        (ThemeManager applies it from motionEnabled=false).
+     2. `.theme-sensitive` — the sage, low-contrast palette
+        (ThemeManager applies it from activeTheme).
+     3. `body.sensitive-mode` (this file) — a gentle brightness
+        dim. It is a fixed, click-through overlay rather than a
+        `filter` on <body>: a filter would create a containing
+        block and break the fixed positioning of .ambient, the
+        sticky header and dialogs.
+   The overlay is dropped under reduced-transparency / high
+   contrast, mirroring the .ambient wash treatment.
+   ============================================================ */
+body.sensitive-mode::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body.sensitive-mode::after {
+    background: none;
+  }
+}
+
+/* ============================================================
+   Flare Emergency Mode
+   "Flare Emergency Mode" toggle in the dashboard arms a stronger
+   sensory-rest overlay (a soft rose dim on top of the Standard/
+   Sensitive theme switch + motion kill applied from context). It
+   stays click-through and is dropped under reduced-transparency /
+   high contrast, exactly like body.sensitive-mode.
+   ============================================================ */
+body.emergency-mode::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: rgba(190, 24, 93, 0.08);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body.emergency-mode::after {
+    background: none;
+  }
+}
+
+/* ============================================================
+   Smooth in-page scrolling (anchor links like #how / #features)
+   Only when the user has NOT requested reduced motion.
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* --- Text selection: soft primary tint ---------------------- */
+::selection {
+  background: color-mix(in oklab, var(--primary) 22%, transparent);
+  color: var(--foreground);
+}
+
+/* ============================================================
+   Cursor spotlight (SpotlightCard)
+   A soft primary radial highlight that follows the fine pointer
+   inside a card. The component writes --spot-x / --spot-y custom
+   properties directly on the element (no React state per frame),
+   and the ::after layer (below content via z-index) fades in on
+   hover / focus-within. Deliberately uses ::after so it never
+   clashes with .glow-card's ::before wash on the same element.
+   Decorative only, pointer-events none, and dropped for reduced
+   motion + reduced transparency so it never fights the
+   accessibility escapes.
+   ============================================================ */
+.spotlight-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    460px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in oklab, var(--primary) 9%, transparent),
+    transparent 68%
+  );
+  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.spotlight-card:hover::after,
+.spotlight-card:focus-within::after {
+  opacity: 1;
+}
+
+/* Keep card content above the highlight layer. */
+.spotlight-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  .spotlight-card::after {
+    opacity: 0 !important;
+    transition: none;
+  }
+}
+
+html.motion-reduce .spotlight-card::after {
+  opacity: 0 !important;
+  transition: none;
+}
+
+/* Dark variant: the spotlight reads a touch brighter on obsidian. */
+.dark .spotlight-card::after {
+  background: radial-gradient(
+    460px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in oklab, var(--primary) 14%, transparent),
+    transparent 68%
+  );
+}
+
+/* Zen backdrop: the spotlight reads softer lavender on the portal. */
+.zen-backdrop .spotlight-card::after {
+  background: radial-gradient(
+    460px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(139, 92, 246, 0.14),
+    transparent 68%
+  );
+}
+
+/* ============================================================
+   Hero aurora (HeroAurora)
+   Scroll-reactive aurora blobs behind the hero copy. Pure radial
+   gradients (no filter blur) so GPU cost stays near zero, echoing
+   the .zen-backdrop technique. Each blob is a soft sage / lavender
+   wash. Decorative only, pointer-events none, and dropped under
+   reduced transparency / high contrast and the motion kill-switch
+   (animation is also fully gated in JS via useMotionEnabled).
+   ============================================================ */
+.hero-aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+
+.hero-aurora-blob-sage {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #3b6b48 16%, transparent),
+    transparent 72%
+  );
+}
+
+.hero-aurora-blob-lavender {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #8f83b8 15%, transparent),
+    transparent 72%
+  );
+}
+
+.dark .hero-aurora-blob-sage {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #86ac8c 18%, transparent),
+    transparent 72%
+  );
+}
+
+.dark .hero-aurora-blob-lavender {
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in oklab, #a79acf 17%, transparent),
+    transparent 72%
+  );
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .hero-aurora {
+    display: none;
+  }
+}
+
+html.motion-reduce .hero-aurora {
+  display: none;
+}
+
+/* ============================================================
+   Zen pointer glow (calm, lavender-tinted)
+   A soft radial glow that trails the fine pointer across the Zen
+   portal. The component writes --glow-x / --glow-y custom props
+   on pointermove (no React state per frame) and a CSS transition
+   on transform smooths the trail. Decorative only; hidden under
+   reduced motion, reduced transparency, and touch devices.
+   ============================================================ */
+.zen-pointer-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 520px;
+  height: 520px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(139, 92, 246, 0.1),
+    rgba(56, 189, 248, 0.05) 45%,
+    transparent 70%
+  );
+  transform: translate(
+    calc(var(--glow-x, -100vw) - 260px),
+    calc(var(--glow-y, -100vh) - 260px)
+  );
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  .zen-pointer-glow {
+    display: none;
+  }
+}
+
+html.motion-reduce .zen-pointer-glow {
+  display: none;
+}
+
+/* ============================================================
+   Hero scenery — calm horizon (Freebuff-style scenic depth)
+   A layered dawn landscape behind the hero, softened for the
+   FibroCare calm identity: a warm sky wash, two rolling-hill
+   silhouettes, a breathing sun, and slow drifting mist. The
+   scenic mood is the page's signature — the one place a
+   background gradient is used deliberately (the rest of the
+   system stays flat). Decorative only: aria-hidden, pointer
+   events none. Animation stops under the global motion
+   kill-switch; the static landscape remains.
+   ============================================================ */
+
+:root {
+  --scenery-hill-back: #8fb18f;
+  --scenery-hill-front: #4f7d5c;
+  --scenery-sun-glow: rgba(255, 235, 199, 0.85);
+  --scenery-sun-core: rgba(255, 247, 224, 0.92);
+}
+
+.dark {
+  --scenery-hill-back: #1c2836;
+  --scenery-hill-front: #0f1a26;
+  --scenery-sun-glow: rgba(255, 240, 214, 0.16);
+  --scenery-sun-core: rgba(255, 240, 214, 0.26);
+}
+
+.hero-scenery {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(90% 60% at 50% -12%, rgba(172, 172, 214, 0.38), transparent 68%),
+    radial-gradient(75% 50% at 8% 108%, rgba(205, 171, 134, 0.3), transparent 68%),
+    radial-gradient(75% 50% at 92% 108%, rgba(157, 190, 164, 0.34), transparent 68%),
+    linear-gradient(
+      to bottom,
+      #eae5f6 0%,
+      #dfe7ec 36%,
+      #f0e2d3 64%,
+      #f6ead4 82%,
+      #efdfcb 100%
+    );
+}
+
+.dark .hero-scenery {
+  background:
+    radial-gradient(90% 60% at 50% -12%, rgba(116, 120, 190, 0.16), transparent 68%),
+    radial-gradient(75% 50% at 8% 108%, rgba(90, 100, 120, 0.12), transparent 68%),
+    radial-gradient(75% 50% at 92% 108%, rgba(90, 110, 100, 0.14), transparent 68%),
+    linear-gradient(
+      to bottom,
+      #0b101b 0%,
+      #101827 45%,
+      #1a2231 74%,
+      #212b3a 100%
+    );
+}
+
+.hero-scenery-hills {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.hero-scenery-hills-back {
+  z-index: 1;
+}
+
+.hero-scenery-hills-front {
+  z-index: 2;
+}
+
+.hero-scenery-hills-back path {
+  fill: var(--scenery-hill-back);
+}
+
+.hero-scenery-hills-front path {
+  fill: var(--scenery-hill-front);
+}
+
+.hero-scenery-haze {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  height: 9rem;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--scenery-hill-back) 55%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+.hero-scenery-sun {
+  position: absolute;
+  top: 17%;
+  left: 50%;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 9999px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    58% 58% at 50% 52%,
+    var(--scenery-sun-glow),
+    transparent 72%
+  );
+}
+
+.hero-scenery-sun-core {
+  position: absolute;
+  inset: 40%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    58% 58% at 50% 46%,
+    var(--scenery-sun-core),
+    transparent 78%
+  );
+}
+
+.hero-scenery-mist {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(44px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-scenery-mist-a {
+  top: 36%;
+  left: -12%;
+  width: 40rem;
+  height: 17rem;
+  background: color-mix(in srgb, #a79acf 16%, transparent);
+  animation: hero-mist-drift 30s ease-in-out infinite alternate;
+}
+
+.hero-scenery-mist-b {
+  top: 50%;
+  right: -14%;
+  width: 44rem;
+  height: 19rem;
+  background: color-mix(in srgb, #7fa88b 16%, transparent);
+  animation: hero-mist-drift 38s ease-in-out infinite alternate-reverse;
+}
+
+.dark .hero-scenery-mist-a {
+  background: color-mix(in srgb, #a79acf 9%, transparent);
+}
+
+.dark .hero-scenery-mist-b {
+  background: color-mix(in srgb, #7fa88b 9%, transparent);
+}
+
+@keyframes hero-mist-drift {
+  from {
+    transform: translateX(-3.5%);
+  }
+  to {
+    transform: translateX(3.5%);
+  }
+}
+
+/* Hero headline: a restrained ink → sage gradient, clipped to the text.
+   This is the other sanctioned gradient use (heading text only). Uses
+   plain literal colors (light + dark variants) so it never depends on
+   color-mix, and falls back to a solid ink when background-clip is not
+   supported or the user prefers high contrast — the heading can never
+   become invisible. */
+.hero-heading-gradient {
+  background-image: linear-gradient(
+    120deg,
+    #0f172a 0%,
+    #3d5c46 52%,
+    #4f6d55 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .hero-heading-gradient {
+  background-image: linear-gradient(
+    120deg,
+    #e7eaee 0%,
+    #8fae93 52%,
+    #86ac8c 100%
+  );
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-heading-gradient {
+    background-image: none;
+    color: var(--foreground);
+  }
+}
+
+@media (prefers-contrast: more) {
+  .hero-heading-gradient {
+    background-image: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: var(--foreground);
+  }
+}
+
+/* Decorative scenic extras are dropped under reduced transparency /
+   contrast and the motion kill-switch (the static sky + hills stay). */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .hero-scenery-mist,
+  .hero-scenery-sun,
+  .hero-scenery-haze {
+    display: none;
+  }
+}
+
+html.motion-reduce .hero-scenery-mist,
+html.motion-reduce .hero-scenery-sun,
+html.motion-reduce .hero-scenery-haze {
+  display: none;
+}
+
+/* Reduced motion: stop the drifting mist entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scenery-mist {
+    animation: none;
+  }
+}
+
+html.motion-reduce .hero-scenery-mist {
+  animation: none;
 }

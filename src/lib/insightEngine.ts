@@ -6,6 +6,27 @@ export interface Insight {
   message: string;
   type: "correlation" | "pattern" | "tip";
   severity: "info" | "warning" | "critical";
+  /**
+   * Raw values used to build `title`/`message`, so clients can localize
+   * the same insight into other languages. Absent for engines that emit
+   * language-neutral content.
+   */
+  params?: Record<string, string | number>;
+}
+
+/** Minimal shape of a pain log the analysis needs (subset of the Prisma PainLog). */
+export interface PainPatternLog {
+  id: string;
+  painLevel: number;
+  moodTag: string;
+  notes: string | null;
+  loggedAt: Date;
+}
+
+/** Minimal shape of a symptom log the analysis needs (subset of the Prisma SymptomLog). */
+export interface SymptomPatternLog {
+  symptom: string;
+  date: string;
 }
 
 const FLARE_THRESHOLD = 7;
@@ -28,26 +49,18 @@ const WEEKDAY_NAMES = [
 ];
 
 /**
- * Data-driven health pattern analysis.
- * Every insight is derived from the user's actual logs — no hard-coded tips.
+ * Pure, data-driven health pattern analysis.
+ * Every insight is derived from the actual logs — no hard-coded tips.
  * Returns an empty array until at least 5 logs exist in the period.
+ *
+ * Extracted from the Prisma-coupled `analyzeHealthPatterns` so the analysis
+ * can be unit-tested in isolation (TDD).
  */
-export async function analyzeHealthPatterns(
-  userId: string,
+export function analyzePainPatterns(
+  logs: PainPatternLog[],
+  symptomLogs: SymptomPatternLog[],
   days = 30
-): Promise<Insight[]> {
-  const since = new Date(Date.now() - days * DAY_MS);
-
-  const [logs, symptomLogs] = await Promise.all([
-    prisma.painLog.findMany({
-      where: { userId, loggedAt: { gte: since } },
-      orderBy: { loggedAt: "asc" },
-    }),
-    prisma.symptomLog.findMany({
-      where: { userId, date: { gte: toDateKey(since) } },
-    }),
-  ]);
-
+): Insight[] {
   const insights: Insight[] = [];
   if (logs.length < 5) return insights;
 
@@ -73,9 +86,10 @@ export async function analyzeHealthPatterns(
       title: "Elevated Pain Levels",
       message: `Your average pain over the last ${days} days is ${avgPain.toFixed(
         1
-      )}/10 — in the high range. Consider discussing your current plan with your care team.`,
+      )}/10, in the high range. Consider discussing your current plan with your care team.`,
       type: "pattern",
       severity: "warning",
+      params: { avg: Number(avgPain.toFixed(1)), days },
     });
   } else if (avgPain <= 3) {
     insights.push({
@@ -83,9 +97,10 @@ export async function analyzeHealthPatterns(
       title: "Pain Is Well Managed",
       message: `Your average pain is ${avgPain.toFixed(
         1
-      )}/10. Whatever you're doing is working — keep it up.`,
+      )}/10. Whatever you're doing is working. Keep it up.`,
       type: "pattern",
       severity: "info",
+      params: { avg: Number(avgPain.toFixed(1)) },
     });
   }
 
@@ -97,6 +112,7 @@ export async function analyzeHealthPatterns(
       message: `You logged ${flareDays} flare-level days (pain ≥ 7) in the last ${days} days. Frequent flares may signal a need for a treatment review.`,
       type: "correlation",
       severity: "critical",
+      params: { count: flareDays, days },
     });
   } else if (flareDays >= 3) {
     insights.push({
@@ -105,6 +121,7 @@ export async function analyzeHealthPatterns(
       message: `You've had ${flareDays} flare-level days recently. Patterns of flares often follow sleep, stress, or activity changes.`,
       type: "pattern",
       severity: "warning",
+      params: { count: flareDays },
     });
   }
 
@@ -125,6 +142,7 @@ export async function analyzeHealthPatterns(
         )} points between the first and second half of this period.`,
         type: "pattern",
         severity: "warning",
+        params: { delta: Number(delta.toFixed(1)) },
       });
     } else if (delta <= -0.7) {
       insights.push({
@@ -135,6 +153,7 @@ export async function analyzeHealthPatterns(
         )} points across this period. Keep following what helps.`,
         type: "pattern",
         severity: "info",
+        params: { delta: Number(Math.abs(delta).toFixed(1)) },
       });
     }
   }
@@ -148,16 +167,17 @@ export async function analyzeHealthPatterns(
     entry.count += 1;
     weekdayAccum.set(dow, entry);
   }
-  let peakDow: { day: string; avg: number; count: number } | null = null;
+  let peakDow: { dow: number; day: string; avg: number; count: number } | null =
+    null;
   weekdayAccum.forEach((entry, dow) => {
     if (entry.count >= 3) {
       const avg = entry.sum / entry.count;
       if (!peakDow || avg > peakDow.avg) {
-        peakDow = { day: WEEKDAY_NAMES[dow], avg, count: entry.count };
+        peakDow = { dow, day: WEEKDAY_NAMES[dow], avg, count: entry.count };
       }
     }
   });
-  const peak = peakDow as { day: string; avg: number; count: number } | null;
+  const peak = peakDow as { dow: number; day: string; avg: number; count: number } | null;
   if (peak && peak.avg >= 6 && peak.avg > avgPain + 0.8) {
     insights.push({
       id: "weekday-pattern",
@@ -167,6 +187,13 @@ export async function analyzeHealthPatterns(
       )}/10 across ${peak.count} logs). Planning lighter on that day may help.`,
       type: "pattern",
       severity: "info",
+      // `dayOfWeek` (0–6) lets clients format the day in their own locale.
+      params: {
+        day: peak.day,
+        dayOfWeek: peak.dow,
+        avg: Number(peak.avg.toFixed(1)),
+        count: peak.count,
+      },
     });
   }
 
@@ -228,7 +255,7 @@ export async function analyzeHealthPatterns(
     const { symptom, delta, count } = correlation;
     insights.push({
       id: "symptom-correlation",
-      title: delta > 0 ? "Symptom–Pain Link Detected" : "Symptom Seen on Easier Days",
+      title: delta > 0 ? "Symptom-Pain Link Detected" : "Symptom Seen on Easier Days",
       message:
         delta > 0
           ? `Days with "${symptom}" average ${delta.toFixed(
@@ -239,12 +266,40 @@ export async function analyzeHealthPatterns(
             )} lower pain). It may be more of an outcome than a trigger.`,
       type: "correlation",
       severity: delta > 0 ? "warning" : "info",
+      params: {
+        symptom,
+        delta: Number(delta.toFixed(1)),
+        count,
+      },
     });
   }
 
   const severityRank = { critical: 0, warning: 1, info: 2 } as const;
   insights.sort((a, b) => severityRank[a.severity] - severityRank[b.severity]);
   return insights;
+}
+
+/**
+ * Data-driven health pattern analysis for a user's logs in the last `days`.
+ * Fetches the data, then delegates to the pure `analyzePainPatterns`.
+ */
+export async function analyzeHealthPatterns(
+  userId: string,
+  days = 30
+): Promise<Insight[]> {
+  const since = new Date(Date.now() - days * DAY_MS);
+
+  const [logs, symptomLogs] = await Promise.all([
+    prisma.painLog.findMany({
+      where: { userId, loggedAt: { gte: since } },
+      orderBy: { loggedAt: "asc" },
+    }),
+    prisma.symptomLog.findMany({
+      where: { userId, date: { gte: toDateKey(since) } },
+    }),
+  ]);
+
+  return analyzePainPatterns(logs, symptomLogs, days);
 }
 
 /** Most frequently logged symptoms in the last `days`, descending. */

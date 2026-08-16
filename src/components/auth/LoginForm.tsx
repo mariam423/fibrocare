@@ -8,6 +8,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { PasswordField } from "@/components/auth/PasswordField";
 
 interface LoginFormProps {
@@ -100,24 +101,26 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         </Link>
       </div>
 
-      <Button
-        type="submit"
-        disabled={isPending}
-        className="h-12 w-full rounded-xl text-base font-semibold"
-      >
-        {isPending ? (
-          <>
-            <HugeiconsIcon
-              icon={Loading01Icon}
-              className="mr-2 h-5 w-5 animate-spin"
-              aria-hidden="true"
-            />
-            Signing in...
-          </>
-        ) : (
-          "Sign in"
-        )}
-      </Button>
+      <Magnetic strength={0.12}>
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="h-12 w-full rounded-xl text-base font-semibold"
+        >
+          {isPending ? (
+            <>
+              <HugeiconsIcon
+                icon={Loading01Icon}
+                className="mr-2 h-5 w-5 animate-spin"
+                aria-hidden="true"
+              />
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
+        </Button>
+        </Magnetic>
 
       <p className="text-center text-base text-muted-foreground">
         New to FibroCare?{" "}

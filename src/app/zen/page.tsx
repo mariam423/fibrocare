@@ -50,11 +50,10 @@ export default function ZenPage() {
   return (
     <RouteTransition>
     <div
+      data-testid="zen-portal"
       className={cn(
-        "relative min-h-[100dvh] flex flex-col items-center justify-center transition-colors duration-1000 p-4",
-        isUltraDark
-          ? "zen-backdrop-ultra text-white"
-          : "zen-backdrop text-slate-200"
+        "fixed inset-0 z-50 isolate w-screen h-screen overflow-hidden bg-slate-950 flex flex-col items-center justify-center transition-colors duration-1000 p-4",
+        isUltraDark ? "bg-[#070812] text-white" : "text-slate-200"
       )}
     >
       {!isUltraDark && <ZenPointerGlow />}
@@ -106,7 +105,10 @@ export default function ZenPage() {
         </header>
       )}
 
-      <div className="relative flex flex-col items-center justify-center space-y-12">
+      <div
+        data-testid="zen-content"
+        className="relative z-10 flex flex-col items-center justify-center space-y-12"
+      >
         <BreathingBubble ultraDark={isUltraDark} />
 
         {!isUltraDark && (

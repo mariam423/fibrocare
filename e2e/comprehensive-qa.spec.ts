@@ -271,6 +271,63 @@ test.describe("Zen Portal QA", () => {
       page.getByRole("button", { name: "Exit dark mode" })
     ).toBeVisible();
   });
+
+  test("zen portal covers the viewport and centers calming controls", async ({ page }) => {
+    await page.goto("/zen", { waitUntil: "domcontentloaded" });
+
+    const portal = page.getByTestId("zen-portal");
+    await expect(portal).toBeVisible();
+    await expect(portal).toHaveCSS("position", "fixed");
+    await expect(portal).toHaveCSS("z-index", "50");
+    await expect(portal).toHaveCSS("overflow", "hidden");
+
+    await expect(portal).toHaveClass(/fixed/);
+    await expect(portal).toHaveClass(/inset-0/);
+    await expect(portal).toHaveClass(/w-screen/);
+    await expect(portal).toHaveClass(/h-screen/);
+    await expect(portal).toHaveClass(/bg-slate-950/);
+
+    const viewport = await page.evaluate(() => ({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    }));
+    const portalBox = await portal.boundingBox();
+    expect(portalBox).not.toBeNull();
+    expect(portalBox?.x).toBe(0);
+    expect(portalBox?.y).toBe(0);
+    expect(portalBox?.width).toBe(viewport.width);
+    expect(portalBox?.height).toBe(viewport.height);
+
+    const content = page.getByTestId("zen-content");
+    const contentBox = await content.boundingBox();
+    expect(contentBox).not.toBeNull();
+    expect(Math.abs((contentBox?.x ?? 0) + (contentBox?.width ?? 0) / 2 - viewport.width / 2)).toBeLessThanOrEqual(2);
+    expect(Math.abs((contentBox?.y ?? 0) + (contentBox?.height ?? 0) / 2 - viewport.height / 2)).toBeLessThanOrEqual(2);
+
+    const mixer = page.getByRole("group", { name: "Ambient Sound Mixer" });
+    const mixerBox = await mixer.boundingBox();
+    expect(mixerBox).not.toBeNull();
+    expect(Math.abs((mixerBox?.x ?? 0) + (mixerBox?.width ?? 0) / 2 - viewport.width / 2)).toBeLessThanOrEqual(2);
+
+    const action = page.getByRole("button", { name: "Switch to Calming Mode" });
+    const actionBox = await action.boundingBox();
+    expect(actionBox).not.toBeNull();
+    expect(Math.abs((actionBox?.x ?? 0) + (actionBox?.width ?? 0) / 2 - viewport.width / 2)).toBeLessThanOrEqual(2);
+
+    const floatingAbovePortal = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>("body *")).some((element) => {
+        const styles = getComputedStyle(element);
+        return (
+          styles.position === "fixed" &&
+          Number(styles.zIndex) > 50 &&
+          styles.display !== "none" &&
+          styles.visibility !== "hidden" &&
+          element.getClientRects().length > 0
+        );
+      })
+    );
+    expect(floatingAbovePortal).toBe(false);
+  });
 });
 
 /* ─── Arabic RTL for Authenticated Pages ──────────────────────────── */

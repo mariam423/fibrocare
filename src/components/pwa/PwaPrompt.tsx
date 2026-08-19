@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 type BeforeInstallPromptEvent = Event & {
@@ -14,6 +15,7 @@ const isStandalone = () =>
     (navigator as unknown as { standalone?: boolean }).standalone === true);
 
 export function PwaPrompt() {
+  const pathname = usePathname();
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState<boolean>(() => isStandalone());
   const [offline, setOffline] = useState<boolean>(
@@ -68,7 +70,9 @@ export function PwaPrompt() {
     }
   }, [installEvent]);
 
-  if (installed || isStandalone()) return null;
+  // Zen is a full-screen focus mode. Keep global install/offline banners out
+  // of its visual field and prevent them from competing with its controls.
+  if (pathname === "/zen" || installed || isStandalone()) return null;
 
   if (offline) {
     return (

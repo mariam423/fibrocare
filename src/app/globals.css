@@ -1173,6 +1173,16 @@ html.motion-reduce .hero-aurora {
   display: none;
 }
 
+/* Global notifications must not survive above the Zen focus surface.
+   The portal is mounted below the root-layout Toaster, so a toast that was
+   already open during navigation could otherwise remain above z-50. The
+   Zen portal itself is the route marker; hidden notification roots do not
+   affect layout or pointer interaction. */
+body:has([data-testid="zen-portal"]) [data-sonner-toaster],
+body:has([data-testid="zen-portal"]) [data-sonner-toast] {
+  display: none !important;
+}
+
 /* ============================================================
    Zen pointer glow (calm, lavender-tinted)
    A soft radial glow that trails the fine pointer across the Zen

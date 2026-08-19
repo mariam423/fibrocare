@@ -9,7 +9,7 @@ export interface HealthLog {
 
 export interface PainTrendPoint {
   date: string;
-  level: number;
+  level: number | null;
 }
 
 export interface ServerActionResult<T = undefined> {

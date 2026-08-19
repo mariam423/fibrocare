@@ -83,14 +83,14 @@ function SkeletonRows() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-4 rounded-xl border border-border/70 bg-card/50 p-3"
+          className="flex items-center gap-4 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.03] p-3"
         >
-          <div className="h-10 w-10 animate-pulse rounded-full bg-slate-200/70 dark:bg-slate-800" />
+          <div className="h-10 w-10 animate-pulse rounded-full bg-zinc-200 dark:bg-white/5" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 w-1/3 animate-pulse rounded-full bg-slate-200/70 dark:bg-slate-800" />
-            <div className="h-2.5 w-1/2 animate-pulse rounded-full bg-slate-200/50 dark:bg-slate-800/70" />
+            <div className="h-3 w-1/3 animate-pulse rounded-full bg-zinc-200 dark:bg-white/5" />
+            <div className="h-2.5 w-1/2 animate-pulse rounded-full bg-zinc-100 dark:bg-white/[0.03]" />
           </div>
-          <div className="h-8 w-8 animate-pulse rounded-lg bg-slate-200/50 dark:bg-slate-800/70" />
+          <div className="h-8 w-8 animate-pulse rounded-lg bg-zinc-100 dark:bg-white/[0.03]" />
         </div>
       ))}
     </div>
@@ -225,7 +225,7 @@ export default function HealthLogsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" />
 
-      <main id="main-content" className="container mx-auto max-w-5xl px-6 py-10 lg:px-12 lg:py-12 sm:px-8 space-y-8">
+      <main className="pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
         {/* Page header */}
         <ScrollReveal as="section" className="space-y-2">
           <div className="flex items-center gap-3">
@@ -233,7 +233,7 @@ export default function HealthLogsPage() {
               <HugeiconsIcon icon={ClipboardListIcon} className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">
+              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
                 {t("logs.pageTitle")}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -245,37 +245,41 @@ export default function HealthLogsPage() {
 
         {/* Summary stats */}
         {!isLoading && stats.length > 0 && (
-          <section aria-label={t("logs.summaryAria")} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {stats.map((stat, index) => (
-              <DepthCard key={stat.label} delay={index * 0.05} className="h-full">
-                <div className="flex h-full items-center gap-4 rounded-2xl border border-border bg-card/70 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(15,23,42,0.14)]">
-                  <div className="icon-badge h-11 w-11 shrink-0 rounded-xl">
-                    <HugeiconsIcon icon={stat.icon} className={cn("h-5 w-5", stat.accent)} aria-hidden="true" />
+          <section aria-label={t("logs.summaryAria")} className="relative">
+            {/* Ambient glow orb behind stats */}
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-80 h-40 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" aria-hidden="true" />
+            <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {stats.map((stat, index) => (
+                <DepthCard key={stat.label} delay={index * 0.05} className="h-full">
+                  <div className="flex h-full items-center gap-4 rounded-2xl border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md p-6 shadow-xl transition-all duration-300 ease-out hover:border-emerald-500/20 hover:-translate-y-1">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 backdrop-blur-sm">
+                      <HugeiconsIcon icon={stat.icon} className={cn("h-5 w-5", stat.accent)} aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-2xl font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">
+                        {stat.value}
+                      </p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {stat.label}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-2xl font-bold leading-tight tracking-tight text-foreground">
-                      {stat.value}
-                    </p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {stat.label}
-                    </p>
-                  </div>
-                </div>
-              </DepthCard>
-            ))}
+                </DepthCard>
+              ))}
+            </div>
           </section>
         )}
 
         {isLoading ? (
           <DepthCard delay={0.05}>
-            <Card className="h-full overflow-hidden">
-              <CardHeader className="border-b border-border/70">
+            <Card className="h-full overflow-hidden border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md rounded-2xl shadow-xl">
+              <CardHeader className="border-b border-zinc-200/80 dark:border-white/5 pb-0">
                 <div className="flex items-center justify-between gap-4">
                   <div className="space-y-2">
-                    <div className="h-4 w-32 animate-pulse rounded-full bg-slate-200/70 dark:bg-slate-800" />
-                    <div className="h-3 w-44 animate-pulse rounded-full bg-slate-200/50 dark:bg-slate-800/70" />
+                    <div className="h-4 w-32 animate-pulse rounded-full bg-zinc-200 dark:bg-white/5" />
+                    <div className="h-3 w-44 animate-pulse rounded-full bg-zinc-100 dark:bg-white/[0.03]" />
                   </div>
-                  <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-200/50 dark:bg-slate-800/70" />
+                  <div className="h-9 w-24 animate-pulse rounded-xl bg-zinc-100 dark:bg-white/[0.03]" />
                 </div>
               </CardHeader>
               <SkeletonRows />
@@ -283,13 +287,13 @@ export default function HealthLogsPage() {
           </DepthCard>
         ) : logs.length === 0 ? (
           <DepthCard delay={0.05}>
-          <Card className="h-full text-center py-14">
+          <Card className="h-full text-center py-14 border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md rounded-2xl shadow-xl">
             <CardContent className="flex flex-col items-center gap-4">
-              <div className="icon-badge h-14 w-14 rounded-2xl">
-                <HugeiconsIcon icon={Calendar01Icon} className="h-7 w-7" aria-hidden="true" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 backdrop-blur-sm">
+                <HugeiconsIcon icon={Calendar01Icon} className="h-7 w-7 text-primary" aria-hidden="true" />
               </div>
               <div className="space-y-1">
-                <p className="text-lg font-medium text-foreground">{t("logs.empty.title")}</p>
+                <p className="text-lg font-medium text-zinc-900 dark:text-white">{t("logs.empty.title")}</p>
                 <p className="max-w-sm text-sm text-muted-foreground">
                   {t("logs.empty.description")}
                 </p>
@@ -304,11 +308,11 @@ export default function HealthLogsPage() {
           </DepthCard>
         ) : (
           <DepthCard delay={0.05}>
-          <Card className="h-full overflow-hidden">
-            <CardHeader className="border-b border-border/70 pb-0">
+          <Card className="h-full overflow-hidden border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md rounded-2xl shadow-xl">
+            <CardHeader className="border-b border-zinc-200/80 dark:border-white/5 pb-0">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <CardTitle className="text-xl text-foreground">{t("logs.tableTitle")}</CardTitle>
+                  <CardTitle className="text-xl text-zinc-900 dark:text-white font-semibold">{t("logs.tableTitle")}</CardTitle>
                   <CardDescription className="mt-1 text-sm text-muted-foreground">
                     {t("logs.showing", { shown: filteredLogs.length, total: logs.length })}
                   </CardDescription>
@@ -327,7 +331,7 @@ export default function HealthLogsPage() {
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t("logs.searchPlaceholder")}
                       aria-label={t("logs.searchAria")}
-                      className="h-10 w-full rounded-xl border border-border bg-card/70 ps-9 pe-8 text-sm text-foreground placeholder:text-muted-foreground outline-none backdrop-blur-md transition-all duration-200 focus:border-primary/40 focus:ring-2 focus:ring-primary/25"
+                      className="h-10 w-full rounded-xl border border-zinc-300 dark:border-white/10 bg-zinc-100/80 dark:bg-white/5 ps-9 pe-8 text-sm text-zinc-900 dark:text-foreground placeholder:text-muted-foreground outline-none backdrop-blur-md transition-all duration-200 focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/25"
                     />
                     {query.length > 0 && (
                       <button
@@ -354,7 +358,7 @@ export default function HealthLogsPage() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-border/70 bg-card/60">
+                    <TableRow className="border-zinc-200/80 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02]">
                       <TableHead className="px-5 font-medium text-xs text-muted-foreground">{t("logs.col.date")}</TableHead>
                       <TableHead className="px-3 font-medium text-xs text-muted-foreground">{t("logs.col.pain")}</TableHead>
                       <TableHead className="px-3 font-medium text-xs text-muted-foreground">{t("logs.col.mood")}</TableHead>
@@ -367,11 +371,11 @@ export default function HealthLogsPage() {
                       <TableRow className="border-0">
                         <TableCell colSpan={5} className="py-16 text-center">
                           <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
-                            <div className="icon-badge h-12 w-12 rounded-xl">
-                              <HugeiconsIcon icon={Search01Icon} className="h-5 w-5" aria-hidden="true" />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 backdrop-blur-sm">
+                              <HugeiconsIcon icon={Search01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm font-medium text-foreground">{t("logs.noMatch.title")}</p>
+                              <p className="text-sm font-medium text-zinc-900 dark:text-white">{t("logs.noMatch.title")}</p>
                               <p className="text-sm text-muted-foreground">
                                 {t("logs.noMatch.description")}
                               </p>
@@ -406,7 +410,7 @@ export default function HealthLogsPage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, x: dir === "rtl" ? 16 : -16 }}
                           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                          className="group border-border/70 transition-colors duration-200 hover:bg-card/60"
+                          className="group border-zinc-200/80 dark:border-white/5 transition-colors duration-200 hover:bg-zinc-100/50 dark:hover:bg-white/[0.03]"
                         >
                           <TableCell className="px-5 py-4">
                             <div className="flex items-center gap-3">

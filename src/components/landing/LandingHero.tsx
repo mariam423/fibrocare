@@ -159,7 +159,7 @@ export function LandingHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative z-0 overflow-hidden px-4 pb-16 pt-20 sm:px-6 md:pb-20 md:pt-24 lg:px-8"
+      className="relative z-0 overflow-hidden px-4 pb-16 pt-24 sm:px-6 md:pb-20 md:pt-28 lg:px-8"
       aria-labelledby="hero-heading"
     >
       <HeroAurora />

@@ -35,7 +35,7 @@ export function LandingNav() {
   ];
 
   return (
-    <header className="sticky top-3 z-50 px-3 sm:px-4">
+    <header className="fixed top-0 inset-x-0 z-50">
       <div className="mx-auto w-full max-w-7xl rounded-full surface-crisp hover-lift px-4 py-2.5 sm:px-5 sm:py-3">
         <div className="flex w-full items-center justify-between gap-3 sm:gap-4">
           {/* FIXED: شلت truncate واستبدلتها بـ whitespace-nowrap + min-w-0 */}
@@ -43,7 +43,7 @@ export function LandingNav() {
             href="/"
             className="flex shrink-0 items-center gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-0"
           >
-            <span className="icon-badge h-8 w-8 shrink-0 rounded-full text-sm">
+            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm text-primary">
               <HugeiconsIcon icon={HeartIcon} className="h-4 w-4" aria-hidden="true" />
             </span>
             <span className="whitespace-nowrap text-lg font-semibold tracking-tight text-foreground">

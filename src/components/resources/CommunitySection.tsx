@@ -120,7 +120,7 @@ export function CommunitySection() {
       {/* Post Input */}
       <DepthCard tilt={2} delay={0.05}>
               <SpotlightCard className="rounded-3xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
-          <CardContent className="p-4">
+          <CardContent className="p-6">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
                 <HugeiconsIcon
@@ -159,7 +159,7 @@ export function CommunitySection() {
           <ScrollReveal key={post.id} delay={index * 0.05}>
             <DepthCard tilt={2} delay={index * 0.05}>
         <SpotlightCard className="rounded-3xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
-                <CardContent className="p-4">
+                <CardContent className="p-6">
                   <div className="space-y-3">
                     {/* Header */}
                     <div className="flex items-center justify-between">

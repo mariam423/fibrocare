@@ -53,7 +53,7 @@ export default function NutritionPage() {
     <RouteTransition>
     <div className="min-h-[100dvh]">
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main id="main-content" className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pt-20 pb-48 mb-20">
+      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-48 mb-20">
         <ContentPageLayout
           titleKey="nutrition.title"
           subtitleKey="nutrition.subtitle"

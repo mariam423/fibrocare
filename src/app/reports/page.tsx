@@ -131,7 +131,7 @@ export default function ReportsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main id="main-content" className="container mx-auto px-5 sm:px-8 lg:px-10 py-8 lg:py-10 space-y-8 max-w-4xl">
+      <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-24 pb-8 lg:pb-10 space-y-8 max-w-4xl">
         <ScrollReveal as="section" className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t("reports.pageTitle")}</h1>
           <p className="text-lg text-muted-foreground">
@@ -163,8 +163,8 @@ export default function ReportsPage() {
               <DepthCard tilt={4} animateIn={false}>
               <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
-                    <HugeiconsIcon icon={Chart01Icon} className="h-5 w-5" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                    <HugeiconsIcon icon={Chart01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.avgPain")}</p>
@@ -178,8 +178,8 @@ export default function ReportsPage() {
               <DepthCard tilt={4} animateIn={false}>
               <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
-                    <HugeiconsIcon icon={FlameIcon} className="h-5 w-5" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                    <HugeiconsIcon icon={FlameIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.flareDays")}</p>
@@ -191,8 +191,8 @@ export default function ReportsPage() {
               <DepthCard tilt={4} animateIn={false}>
               <Card className="border-none shadow-depth-sm ring-1 ring-border h-full">
                 <CardContent className="flex items-center gap-3 pt-6">
-                  <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
-                    <HugeiconsIcon icon={ClipboardListIcon} className="h-5 w-5" aria-hidden="true" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+                    <HugeiconsIcon icon={ClipboardListIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.topSymptoms")}</p>
@@ -277,8 +277,8 @@ export default function ReportsPage() {
             <DepthCard tilt={3} delay={0.1}>
             <Card className="border-none shadow-depth-sm ring-1 ring-border">
               <CardHeader className="text-center space-y-4">
-                <div className="icon-badge mx-auto h-20 w-20 rounded-full">
-                  <HugeiconsIcon icon={File01Icon} className="h-9 w-9" aria-hidden="true" />
+                <div className="flex mx-auto h-20 w-20 items-center justify-center rounded-full border border-primary/20 bg-primary/10">
+                  <HugeiconsIcon icon={File01Icon} className="h-9 w-9 text-primary" aria-hidden="true" />
                 </div>
                 <CardTitle className="text-2xl">{t("reports.download.title")}</CardTitle>
                 <CardDescription className="text-base">

@@ -97,21 +97,23 @@ export function RecoveryCard({
               </p>
             </div>
           </div>
-          <div className="pt-3">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onAction}
-              aria-pressed={active}
-              className={cn(
-                "h-auto min-h-7 w-full whitespace-normal break-words leading-snug px-3 py-1.5 text-xs font-medium rounded-lg transition-colors duration-200",
-                active
-                  ? "bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
-                  : colors.button
-              )}
-            >
-              {actionLabel}
-            </Button>
+          <div className="mt-3 flex flex-1 flex-col min-h-0">
+            <div className="mt-auto pt-2 w-full">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={onAction}
+                aria-pressed={active}
+                className={cn(
+                  "h-auto min-h-7 w-full whitespace-normal break-words leading-snug px-3 py-1.5 text-xs font-medium rounded-lg transition-colors duration-200",
+                  active
+                    ? "bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
+                    : colors.button
+                )}
+              >
+                {actionLabel}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -262,33 +264,39 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch w-full mb-6">
-      <RecoveryCard
-        title={t("recovery.sensory.title")}
-        description={
-          isSensitiveMode
-            ? t("recovery.sensory.on")
-            : t("recovery.sensory.off")
-        }
-        icon={Moon02Icon}
-        actionLabel={
-          isSensitiveMode
-            ? t("recovery.sensory.deactivate")
-            : t("recovery.sensory.activate")
-        }
-        active={isSensitiveMode}
-        onAction={toggleSensitive}
-        color="purple"
-      />
-      <RecoveryCard
-        title={t("recovery.breath.title")}
-        description={t("recovery.breath.description")}
-        icon={FastWindIcon}
-        actionLabel={t("recovery.breath.openZen")}
-        onAction={onZen}
-        color="teal"
-      />
-      <GratitudeJournalCard />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full overflow-visible">
+      <div className="w-full self-start">
+        <RecoveryCard
+          title={t("recovery.sensory.title")}
+          description={
+            isSensitiveMode
+              ? t("recovery.sensory.on")
+              : t("recovery.sensory.off")
+          }
+          icon={Moon02Icon}
+          actionLabel={
+            isSensitiveMode
+              ? t("recovery.sensory.deactivate")
+              : t("recovery.sensory.activate")
+          }
+          active={isSensitiveMode}
+          onAction={toggleSensitive}
+          color="purple"
+        />
+      </div>
+      <div className="w-full self-start">
+        <RecoveryCard
+          title={t("recovery.breath.title")}
+          description={t("recovery.breath.description")}
+          icon={FastWindIcon}
+          actionLabel={t("recovery.breath.openZen")}
+          onAction={onZen}
+          color="teal"
+        />
+      </div>
+      <div className="w-full self-start">
+        <GratitudeJournalCard />
+      </div>
     </div>
   );
 }

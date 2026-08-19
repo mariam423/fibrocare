@@ -290,6 +290,12 @@ export type TranslationKey =
   | "medical.close"
   | "medical.error"
   | "medical.generatingAria"
+  | "medical.question.flare"
+  | "medical.question.highPain"
+  | "medical.question.fatigue"
+  | "medical.question.sensory"
+  | "medical.question.movement"
+  | "medical.question.tracking"
   | "reports.pageTitle"
   | "reports.pageSubtitle"
   | "reports.loading"
@@ -410,6 +416,12 @@ export type TranslationKey =
   | "narration.dismiss"
   | "narration.generatingAria"
   | "narration.offline"
+  | "narration.detailedAnalysisTitle"
+  | "narration.detailedAnalysisDesc"
+  | "narration.patternBody"
+  | "narration.aiObservationLabel"
+  | "narration.aiObservationText"
+  | "narration.missingLogsFallback"
   | "reflection.button"
   | "reflection.stop"
   | "reflection.generatingAria"
@@ -922,6 +934,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medical.close": "Close",
     "medical.error": "Could not generate your summary.",
     "medical.generatingAria": "Generating AI questions",
+    "medical.question.flare": "We logged {count} flare day{plural} in the last 30 days. Could we review what may be triggering them and adjust my plan?",
+    "medical.question.highPain": "My average pain has been high — are my current medications and doses still the right fit?",
+    "medical.question.fatigue": "Fatigue and sleep issues keep showing up in my logs — can we explore energy management and sleep strategies?",
+    "medical.question.sensory": "Sensory sensitivity appears in my pattern. Are there pacing or environmental changes that could reduce it?",
+    "medical.question.movement": "What movement or physiotherapy level is safe for me right now without worsening symptoms?",
+    "medical.question.tracking": "How should I track or log differently so our next review is even more useful?",
     "reports.pageTitle": "Medical Reports",
     "reports.pageSubtitle": "A 90-day summary of your pain, flares, symptoms, and patterns, ready for your specialist.",
     "reports.loading": "Analyzing your health data…",
@@ -1042,6 +1060,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "narration.dismiss": "Dismiss",
     "narration.generatingAria": "Generating explanation",
     "narration.offline": "The personalized explanation needs a live AI key. Your data-driven insights above already say a lot — add GEMINI_API_KEY to the server to unlock it.",
+    "narration.detailedAnalysisTitle": "Detailed Pattern Analysis",
+    "narration.detailedAnalysisDesc": "Deeper insights based on your health logs",
+    "narration.patternBody": "Your patterns show a strong correlation between sleep quality and pain levels the following morning.",
+    "narration.aiObservationLabel": "AI Observation",
+    "narration.aiObservationText": "Flare-ups typically occur 24-48 hours after high-stress events.",
+    "narration.missingLogsFallback": "Log at least 5 days of pain and symptoms to unlock a personalized narration of your patterns.",
     "reflection.button": "Reflect with AI",
     "reflection.stop": "Stop reflection",
     "reflection.generatingAria": "Reflecting on your note",
@@ -1554,6 +1578,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medical.keyInsights": "رؤى رئيسية",
     "medical.insightsEmpty": "واصل تسجيل الألم والأعراض لمدة 5 أيام على الأقل لفتح رؤى مخصصة.",
     "medical.questions": "أسئلة لطبيبك",
+    "medical.question.flare": "سجّلنا {count} يوم نوبات آخر 30 يومًا. هل يمكننا مراجعة ما قد يسببها وتعديل خطتي؟",
+    "medical.question.highPain": "متوسط ألمي مرتفع — هل الأدوية والجرعات الحالية لا تزال مناسبة؟",
+    "medical.question.fatigue": "الإرهاق ومشاكل النوم تظهر باستمرار في سجلاتي — هل يمكننا استكشاف استراتيجيات الطاقة والنوم؟",
+    "medical.question.sensory": "الحساسية الحسية تظهر في أنماطي. هل هناك تغييرات في الوتيرة أو البيئة يمكن أن تقللها؟",
+    "medical.question.movement": "ما مستوى الحركة أو العلاج الطبيعي الآمن لي الآن دون تفاقم الأعراض؟",
+    "medical.question.tracking": "كيف يمكنني تسجيل أو تدوين بشكل مختلف ليكون مراجعتنا القادمة أكثر فائدة؟",
     "medical.summaryFor": "الملخص الطبي للمريض {name}",
     "medical.generated": "تم الإنشاء في {date}",
     "medical.close": "إغلاق",
@@ -1679,6 +1709,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "narration.dismiss": "إغلاق",
     "narration.generatingAria": "جارٍ إنشاء الشرح",
     "narration.offline": "الشرح المخصص يحتاج مفتاح ذكاء اصطناعي مباشر. رؤىك المبنية على البيانات أعلاه تقول الكثير — أضف GEMINI_API_KEY إلى الخادم لفتحه.",
+    "narration.detailedAnalysisTitle": "تحليل الأنماط التفصيلي",
+    "narration.detailedAnalysisDesc": "رؤى أكثر تفصيلاً بناءً على سجلاتك الصحية",
+    "narration.patternBody": "تظهر أنماطك وجود ارتباط قوي بين جودة النوم ومستويات الألم في الصباح التالي.",
+    "narration.aiObservationLabel": "ملاحظة الذكاء الاصطناعي",
+    "narration.aiObservationText": "عادة ما تحدث نوبات الألم بعد ‎24-48‎ ساعة من الفترات عالية التوتر.",
+    "narration.missingLogsFallback": "سجّل الألم والأعراض لمدة 5 أيام على الأقل لفتح شرح مخصص لأنماطك.",
     "reflection.button": "تأمل مع الذكاء الاصطناعي",
     "reflection.stop": "إيقاف التأمل",
     "reflection.generatingAria": "جارٍ التأمل في ملاحظتك",

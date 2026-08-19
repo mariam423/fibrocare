@@ -56,12 +56,16 @@ export function useAiStream(): AiStreamState {
     setStatus("loading");
 
     try {
-      const res = await fetch(url, {
+      const options: RequestInit = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: body === undefined ? undefined : JSON.stringify(body),
         signal: controller.signal,
-      });
+      };
+      if (body !== undefined) {
+        options.body = JSON.stringify(body);
+      }
+
+      const res = await fetch(url, options);
 
       const contentType = res.headers.get("content-type") ?? "";
       if (contentType.includes("application/json") || !res.ok) {

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Readex_Pro } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import "../styles/themes.css";
 import { HealthProvider } from "@/context/HealthContext";
@@ -108,7 +109,7 @@ export default async function RootLayout({
       className={`${readexPro.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning={true}>
         <AmbientAurora />
         <PwaPrompt />
         <HealthProvider>
@@ -123,10 +124,15 @@ export default async function RootLayout({
             <PrivacyProvider>
               <SessionProvider>
                 <AiStatusProvider>
-                  <PrivacyGate>{children}</PrivacyGate>
+                  <PrivacyGate>
+                    <main id="main-content" className="pt-20 sm:pt-24 pb-16">
+                      {children}
+                    </main>
+                  </PrivacyGate>
                 </AiStatusProvider>
               </SessionProvider>
             </PrivacyProvider>
+            <Toaster richColors position="bottom-right" />
           </LanguageProvider>
         </HealthProvider>
       </body>

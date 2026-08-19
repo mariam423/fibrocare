@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <RouteTransition>
-      <main id="main-content" className="flex min-h-[100dvh] flex-col">
+      <main className="flex min-h-[100dvh] flex-col -mt-20 sm:-mt-24">
         <ScrollProgress />
         <LandingNav />
         <div className="flex-1">

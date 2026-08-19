@@ -143,7 +143,8 @@ export function mockChatReply(
 export function mockNarration(
   snapshot: HealthSnapshot,
   insights: Array<{ title: string; message: string; severity: string }>,
-  userName: string
+  userName: string,
+  missingLogsFallback?: string
 ): string {
   const name = firstName(userName);
   const headline =
@@ -156,7 +157,7 @@ export function mockNarration(
           .slice(0, 2)
           .map((i) => `One thing your data shows: ${i.title.toLowerCase()} — ${i.message}`)
           .join(" ")
-      : "There aren't enough logged days yet to spot firm patterns, and that's okay — every log adds to the picture.";
+      : (missingLogsFallback ?? "There aren't enough logged days yet to spot firm patterns, and that's okay — every log adds to the picture.");
 
   return `${headline}${name}, and here's what your last 30 days say in plain words. ${insightLines} ${
     snapshot.streakDays > 0

@@ -189,9 +189,9 @@ export default function Home() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
+    <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
 <AppHeader />
-      <main id="main-content" className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-10 lg:space-y-12 sm:px-8 pt-20 pb-48 mb-20">
+      <main className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-10 lg:space-y-12 sm:px-8 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
         <motion.div ref={welcomeRef} style={{ y: welcomeYSpring, opacity: welcomeOpacity }}>
         <ScrollReveal as="section" className="space-y-1">
@@ -384,7 +384,7 @@ export default function Home() {
         </div>
 
         {/* Gentle Support - full-width recovery tools */}
-        <ScrollReveal as="section" className="space-y-4" delay={0.05}>
+        <ScrollReveal as="section" className="space-y-4 overflow-visible" delay={0.05}>
           <div className="flex items-center gap-3">
             <div className="icon-badge h-9 w-9 rounded-xl">
               <HugeiconsIcon

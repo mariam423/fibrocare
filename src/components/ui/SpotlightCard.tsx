@@ -11,21 +11,6 @@ interface SpotlightCardProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
 }
 
-/**
- * Cursor spotlight wrapper (design-taste micro-interaction).
- *
- * Writes `--spot-x` / `--spot-y` CSS custom properties directly on the
- * element on pointermove, so there are zero re-renders while tracking.
- * The radial highlight itself is painted by the `.spotlight-card::after`
- * layer in globals.css (uses ::after so it never clashes with
- * `.glow-card::before` on the same element; positioned behind children
- * via `.spotlight-card > *`), which fades in on hover / focus-within.
- *
- * Accessibility:
- * - Reduced motion and reduced transparency disable the layer in CSS.
- * - The highlight is decorative (pointer-events: none, no aria).
- * - Fine pointers only; touch devices get the plain hover state.
- */
 export function SpotlightCard({
   children,
   className,
@@ -48,7 +33,10 @@ export function SpotlightCard({
     <Tag
       ref={ref as React.Ref<HTMLElement>}
       onPointerMove={handlePointerMove}
-      className={cn("spotlight-card", className)}
+      className={cn(
+        "spotlight-card h-auto min-h-fit !overflow-visible pb-4",
+        className
+      )}
       {...props}
     >
       {children}

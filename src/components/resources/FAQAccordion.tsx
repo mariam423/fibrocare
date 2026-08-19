@@ -93,7 +93,7 @@ export function FAQAccordion() {
 
       <DepthCard tilt={2} delay={0.05}>
         <Card className="border-none shadow-depth-sm">
-          <CardContent className="p-0">
+          <CardContent className="px-6">
             <div className="divide-y divide-border">
               {FAQ_ITEMS.map((item, index) => (
                 <AccordionItem

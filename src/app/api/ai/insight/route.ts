@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { streamText } from "ai";
 import { authOptions } from "@/lib/auth";
 import {
@@ -11,6 +12,8 @@ import { mockNarration, mockStreamResponse } from "@/lib/ai/mock";
 import { buildHealthSnapshot, getInsightSummaries } from "@/lib/ai/context";
 import { buildNarrationPrompt } from "@/lib/ai/prompts";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
+import { parseLocale, LOCALE_COOKIE } from "@/lib/locale";
+import { translations } from "@/lib/translations";
 
 export const maxDuration = 45;
 
@@ -44,7 +47,9 @@ export async function POST() {
 
   if (isMockMode()) {
     console.log(`[ai] insight · mode=mock`);
-    return mockStreamResponse(mockNarration(snapshot, insights, userName));
+    const locale = parseLocale((await cookies()).get(LOCALE_COOKIE)?.value);
+    const missingLogsFallback = translations[locale]["narration.missingLogsFallback"];
+    return mockStreamResponse(mockNarration(snapshot, insights, userName, missingLogsFallback));
   }
 
   const model = getModel();

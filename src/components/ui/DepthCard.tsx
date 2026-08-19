@@ -21,10 +21,7 @@ export interface DepthCardProps extends HTMLMotionProps<"div"> {
   delay?: number;
   /** Gentle idle float (calm breathing motion). Defaults to false. */
   float?: boolean;
-  /** Lifted hover state (translate + deeper shadow). Defaults to false —
-   *  the crisp Card surface ships its own spring lift, and enabling this
-   *  alongside it causes a double-translate. Turn it on only for raw
-   *  (non-Card) wrappers without their own hover transform. */
+  /** Lifted hover state (translate + deeper shadow). Defaults to false. */
   hover?: boolean;
 }
 
@@ -67,7 +64,7 @@ export function DepthCard({
 
   return (
     <motion.div
-      className={cn("group/depth relative", className)}
+      className={cn("group/depth relative h-auto min-h-fit", className)}
       initial={animateIn && !prefersReducedMotion ? { opacity: 0, y: 14 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: EASE_OUT }}
@@ -82,7 +79,7 @@ export function DepthCard({
     >
       <div
         className={cn(
-          "relative h-full w-full rounded-2xl",
+          "relative h-auto min-h-full w-full rounded-2xl pb-2",
           hoverEnabled &&
             "transition-transform duration-300 ease-out group-hover/depth:-translate-y-1",
           tiltEnabled && "will-change-transform"
@@ -98,7 +95,7 @@ export function DepthCard({
         )}
         <div
           className={cn(
-            "relative z-10 h-full",
+            "relative z-10 h-auto min-h-full",
             float && !prefersReducedMotion && "motion-safe:animate-float-soft"
           )}
         >

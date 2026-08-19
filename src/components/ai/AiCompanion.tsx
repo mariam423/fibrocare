@@ -90,8 +90,8 @@ export function AiCompanion() {
   // close. Close on Escape.
   useEffect(() => {
     if (open) {
-      const t = setTimeout(() => inputRef.current?.focus(), 120);
-      return () => clearTimeout(t);
+      const focusTimer = setTimeout(() => inputRef.current?.focus(), 120);
+      return () => clearTimeout(focusTimer);
     }
     launcherRef.current?.focus();
     return undefined;

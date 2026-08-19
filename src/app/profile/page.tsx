@@ -111,9 +111,10 @@ export default function ProfilePage() {
     <div className="min-h-[100dvh] text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" />
 
-      <main id="main-content" className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-2xl">
+      <main className="pb-16 px-4 sm:px-6 lg:px-8 space-y-8 max-w-2xl mx-auto">
+        {/* Hero Header */}
         <ScrollReveal as="section" className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
             {t("profile.pageTitle")}
           </h1>
           <p className="text-lg text-muted-foreground">
@@ -123,16 +124,21 @@ export default function ProfilePage() {
 
         {/* Profile Overview Card */}
         <DepthCard tilt={3} delay={0.05}>
-        <Card className="border-none shadow-depth-sm ring-1 ring-border overflow-hidden">
+        <Card className="border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md hover:border-emerald-500/20 transition-all duration-300 rounded-2xl shadow-xl overflow-hidden">
           <div className="h-24 bg-gradient-to-r from-primary/40 to-secondary/60" />
           <CardContent className="pt-0 relative">
             <div className="flex flex-col items-center -mt-12 pb-6 text-center">
-              <div className="h-24 w-24 rounded-full bg-card p-1 shadow-md ring-4 ring-border">
-                <div className="h-full w-full rounded-full bg-primary/15 flex items-center justify-center">
-                  <HugeiconsIcon icon={UserIcon} className="h-12 w-12 text-primary" aria-hidden="true" />
+              {/* Ambient glow orb behind avatar */}
+              <div className="relative">
+                <div className="absolute inset-0 -m-6 rounded-full bg-emerald-500/10 blur-[100px]" aria-hidden="true" />
+                {/* Gradient border ring */}
+                <div className="relative h-24 w-24 rounded-full p-[3px] bg-gradient-to-b from-emerald-500/30 to-transparent">
+                  <div className="h-full w-full rounded-full bg-card shadow-md flex items-center justify-center">
+                    <HugeiconsIcon icon={UserIcon} className="h-12 w-12 text-primary" aria-hidden="true" />
+                  </div>
                 </div>
               </div>
-              <h2 className="mt-4 text-2xl font-bold">{name}</h2>
+              <h2 className="mt-4 text-2xl font-bold text-zinc-900 dark:text-white">{name}</h2>
               <p className="text-muted-foreground">{email}</p>
             </div>
 
@@ -162,9 +168,9 @@ export default function ProfilePage() {
 
         {/* Update Name Card */}
         <DepthCard delay={0.1} hover={false}>
-        <Card className="border-none shadow-depth-sm ring-1 ring-border">
+        <Card className="border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md hover:border-emerald-500/20 transition-all duration-300 rounded-2xl shadow-xl">
           <CardHeader>
-            <CardTitle className="text-xl">{t("profile.accountTitle")}</CardTitle>
+            <CardTitle className="text-xl text-zinc-900 dark:text-white font-semibold">{t("profile.accountTitle")}</CardTitle>
             <CardDescription className="text-muted-foreground">
               {t("profile.accountDescription")}
             </CardDescription>
@@ -174,7 +180,7 @@ export default function ProfilePage() {
               <div className="space-y-2">
                 <label
                   htmlFor="display-name"
-                  className="text-sm font-medium text-foreground"
+                  className="text-sm font-medium text-zinc-900 dark:text-white"
                 >
                   {t("profile.displayNameLabel")}
                 </label>
@@ -184,7 +190,7 @@ export default function ProfilePage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t("profile.displayNamePlaceholder")}
-                  className="bg-muted border-border"
+                  className="bg-zinc-100/80 dark:bg-white/5 border border-zinc-300 dark:border-white/10 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50"
                   required
                 />
               </div>
@@ -193,7 +199,7 @@ export default function ProfilePage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full min-h-14 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all rounded-xl shadow-md"
+                  className="w-full min-h-14 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200 rounded-xl shadow-md hover:-translate-y-0.5 active:translate-y-0"
                 >
                   {isLoading ? (
                     <>
@@ -225,9 +231,9 @@ export default function ProfilePage() {
 
         {/* Motion & Comfort Card */}
         <DepthCard delay={0.15} hover={false}>
-        <Card className="border-none shadow-depth-sm ring-1 ring-border">
+        <Card className="border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md hover:border-emerald-500/20 transition-all duration-300 rounded-2xl shadow-xl">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
+            <CardTitle className="text-xl flex items-center gap-2 text-zinc-900 dark:text-white font-semibold">
               <HugeiconsIcon icon={FastWindIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
               {t("profile.motionTitle")}
             </CardTitle>
@@ -238,7 +244,7 @@ export default function ProfilePage() {
           <CardContent>
             <div className="flex items-start justify-between gap-6">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-medium text-zinc-900 dark:text-white">
                   {t("profile.gentleMotion")}
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -254,7 +260,7 @@ export default function ProfilePage() {
                 aria-label={t("profile.motionToggleAria")}
                 onClick={() => setMotionEnabled(!motionEnabled)}
                 className={cn(
-                  "relative h-8 w-14 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer",
+                  "relative h-8 w-14 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:ring-offset-2 cursor-pointer",
                   motionEnabled
                     ? "bg-primary"
                     : "bg-muted ring-1 ring-border"
@@ -275,9 +281,9 @@ export default function ProfilePage() {
 
         {/* Privacy Lock Card */}
         <DepthCard delay={0.2} hover={false}>
-        <Card className="border-none shadow-depth-sm ring-1 ring-border">
+        <Card className="border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md hover:border-emerald-500/20 transition-all duration-300 rounded-2xl shadow-xl">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
+            <CardTitle className="text-xl flex items-center gap-2 text-zinc-900 dark:text-white font-semibold">
               <HugeiconsIcon icon={Shield01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
               {t("profile.privacyTitle")}
             </CardTitle>
@@ -293,7 +299,7 @@ export default function ProfilePage() {
                 <div className="flex-1 space-y-2">
                   <label
                     htmlFor="privacy-pin"
-                    className="text-sm font-medium text-foreground"
+                    className="text-sm font-medium text-zinc-900 dark:text-white"
                   >
                     {t("profile.newPinLabel")}
                   </label>
@@ -308,7 +314,7 @@ export default function ProfilePage() {
                       setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))
                     }
                     placeholder="••••"
-                    className="bg-muted border-border"
+                    className="bg-zinc-100/80 dark:bg-white/5 border border-zinc-300 dark:border-white/10 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50"
                   />
                 </div>
                 <Button
@@ -320,7 +326,7 @@ export default function ProfilePage() {
                     setPinBusy(false);
                   }}
                   disabled={newPin.length !== 4 || pinBusy}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-primary hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                   {pinBusy ? (
                     <HugeiconsIcon icon={Loading01Icon} className="me-2 h-5 w-5 animate-spin" aria-hidden="true" />
@@ -335,7 +341,7 @@ export default function ProfilePage() {
                 <div className="flex-1 space-y-2">
                   <label
                     htmlFor="change-pin"
-                    className="text-sm font-medium text-foreground"
+                    className="text-sm font-medium text-zinc-900 dark:text-white"
                   >
                     {t("profile.changePinLabel")}
                   </label>
@@ -350,7 +356,7 @@ export default function ProfilePage() {
                       setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))
                     }
                     placeholder={t("profile.changePinPlaceholder")}
-                    className="bg-muted border-border"
+                    className="bg-zinc-100/80 dark:bg-white/5 border border-zinc-300 dark:border-white/10 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -363,7 +369,7 @@ export default function ProfilePage() {
                       setPinBusy(false);
                     }}
                     disabled={newPin.length !== 4 || pinBusy}
-                    className="bg-primary hover:bg-primary/90"
+                    className="bg-primary hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                   >
                     <HugeiconsIcon icon={LockIcon} className="me-2 h-5 w-5" aria-hidden="true" />
                     {t("profile.update")}
@@ -388,9 +394,9 @@ export default function ProfilePage() {
 
         {/* Social Sign-in Card */}
         <DepthCard delay={0.25} hover={false}>
-        <Card className="border-none shadow-depth-sm ring-1 ring-border">
+        <Card className="border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md hover:border-emerald-500/20 transition-all duration-300 rounded-2xl shadow-xl">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
+            <CardTitle className="text-xl flex items-center gap-2 text-zinc-900 dark:text-white font-semibold">
               <HugeiconsIcon icon={Logout01Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
               {t("profile.signinTitle")}
             </CardTitle>
@@ -415,13 +421,13 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={() => signIn("google")}
-                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted"
+                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                   {t("profile.signInGoogle")}
                 </Button>
                 <Button
                   onClick={() => signIn("github")}
-                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted"
+                  className="flex-1 bg-card text-foreground ring-1 ring-border hover:bg-muted hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
                 >
                   {t("profile.signInGithub")}
                 </Button>

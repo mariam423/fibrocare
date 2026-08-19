@@ -71,7 +71,7 @@ const SUGGESTION_KEYS: Record<FlareState, [TranslationKey, TranslationKey, Trans
 
 interface AiCareInsightCardProps {
   painLevel: number;
-  weeklyTrend: Array<{ level: number }>;
+  weeklyTrend: Array<{ level: number | null }>;
 }
 
 const FLARE_TONE: Record<
@@ -101,7 +101,10 @@ export function AiCareInsightCard({
 }: AiCareInsightCardProps) {
   const weather = useSimulatedWeather();
   const { t } = useLanguage();
-  const trend = useMemo(() => getPainTrend(weeklyTrend), [weeklyTrend]);
+  const trend = useMemo(() => {
+    const valid = weeklyTrend.filter((p): p is { level: number } => p.level !== null);
+    return getPainTrend(valid);
+  }, [weeklyTrend]);
   const insight = useMemo(
     () =>
       buildCareInsight({

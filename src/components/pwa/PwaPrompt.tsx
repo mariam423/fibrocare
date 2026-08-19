@@ -75,7 +75,7 @@ export function PwaPrompt() {
       <div
         role="status"
         aria-live="polite"
-        className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-[80] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 pointer-events-none"
+        className="fixed bottom-4 right-4 z-[80] w-[calc(100vw-2rem)] max-w-sm pointer-events-none"
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-lg pointer-events-auto">
           <span
@@ -93,7 +93,7 @@ export function PwaPrompt() {
   if (!installEvent) return null;
 
   return (
-    <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-[80] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-40 w-[calc(100vw-2rem)] max-w-sm pointer-events-none">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-lg pointer-events-auto">
         <span className="min-w-0 flex-1 text-foreground">
           Add <strong>FibroCare</strong> to your home screen for quick access.

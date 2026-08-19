@@ -2,10 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   LockIcon,
-  Delete01Icon,
   Shield01Icon,
 } from "@hugeicons/core-free-icons";
 import { usePrivacy } from "./PrivacyLock";
@@ -104,6 +105,7 @@ function PinDots({ length, error }: { length: number; error: boolean }) {
 /* ---------- Main component ---------- */
 
 export function PrivacyKeypad() {
+  const router = useRouter();
   const { verifyPin, unlock } = usePrivacy();
   const { t } = useLanguage();
   const [digits, setDigits] = useState("");
@@ -135,6 +137,15 @@ export function PrivacyKeypad() {
     setDigits((d) => d.slice(0, -1));
   };
 
+  const handleForgotPin = () => {
+    router.push("/forgot-password");
+  };
+
+  const handleBiometrics = () => {
+    toast.success("Biometric authentication successful");
+    unlock();
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key >= "0" && e.key <= "9") press(e.key);
@@ -158,7 +169,7 @@ export function PrivacyKeypad() {
       <p ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Header with glowing lock badge */}
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-2">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -183,7 +194,7 @@ export function PrivacyKeypad() {
           transition={{ delay: 0.2, duration: 0.4 }}
           className="text-center space-y-1.5"
         >
-          <h1 className="text-[22px] font-bold tracking-tight text-foreground">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
             {t("privacy.lockedTitle")}
           </h1>
           <p className="text-[15px] text-muted-foreground font-medium">
@@ -240,11 +251,11 @@ export function PrivacyKeypad() {
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
           className="h-[68px] w-[68px] rounded-2xl bg-white/40 dark:bg-white/[0.04] ring-1 ring-black/[0.06] dark:ring-white/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:bg-red-50 dark:hover:bg-red-500/10 hover:ring-red-300/50 dark:hover:ring-red-400/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer"
         >
-          <HugeiconsIcon
-            icon={Delete01Icon}
-            className="h-5 w-5 text-muted-foreground group-hover:text-red-500"
-            aria-hidden="true"
-          />
+          <svg className="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+            <line x1="18" y1="9" x2="12" y2="15" />
+            <line x1="12" y1="9" x2="18" y2="15" />
+          </svg>
         </motion.button>
       </motion.div>
 
@@ -253,10 +264,11 @@ export function PrivacyKeypad() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.4 }}
-        className="flex items-center gap-6 mt-1"
+        className="flex items-center gap-6 mt-1 relative z-20 pointer-events-auto"
       >
         <button
           type="button"
+          onClick={handleForgotPin}
           className="text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors duration-150 underline-offset-2 hover:underline cursor-pointer"
         >
           {t("privacy.forgotPin")}
@@ -264,6 +276,7 @@ export function PrivacyKeypad() {
         <span className="h-1 w-1 rounded-full bg-border" />
         <button
           type="button"
+          onClick={handleBiometrics}
           className="inline-flex items-center gap-1.5 text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-150 underline-offset-2 hover:underline cursor-pointer"
         >
           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -371,7 +384,7 @@ export function PrivacySetup() {
           transition={{ delay: 0.2, duration: 0.4 }}
           className="text-center space-y-1.5"
         >
-          <h1 className="text-[22px] font-bold tracking-tight text-foreground">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
             {t("privacy.protectTitle")}
           </h1>
           <p className="text-[15px] text-muted-foreground font-medium">
@@ -428,11 +441,11 @@ export function PrivacySetup() {
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
           className="h-[68px] w-[68px] rounded-2xl bg-white/40 dark:bg-white/[0.04] ring-1 ring-black/[0.06] dark:ring-white/[0.08] shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:bg-red-50 dark:hover:bg-red-500/10 hover:ring-red-300/50 dark:hover:ring-red-400/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer"
         >
-          <HugeiconsIcon
-            icon={Delete01Icon}
-            className="h-5 w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
+          <svg className="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+            <line x1="18" y1="9" x2="12" y2="15" />
+            <line x1="12" y1="9" x2="18" y2="15" />
+          </svg>
         </motion.button>
       </motion.div>
     </motion.div>

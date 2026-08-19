@@ -349,7 +349,7 @@ export default function ResourcesPage() {
     <div className="min-h-[100dvh] text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main id="main-content" className="container mx-auto p-4 sm:p-6 lg:p-8 space-y-8 max-w-6xl pt-20 pb-48 mb-20">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-24 space-y-8 max-w-6xl pb-48 mb-20">
         <ScrollReveal as="section" className="space-y-2 text-center max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold tracking-tight">
             {t("resources.title")}
@@ -370,7 +370,7 @@ export default function ResourcesPage() {
                 <Link key={item.href} href={item.href} className="group">
                   <DepthCard tilt={3} delay={0} hover={false} className="h-full">
                     <SpotlightCard className="h-full rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-depth-md dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:group-hover:border-emerald-400/30 dark:group-hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
-                      <CardContent className="p-4 flex items-center gap-3">
+                      <CardContent className="p-6 flex items-center gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.bg} transition-transform duration-300 group-hover:scale-110`}>
                           <HugeiconsIcon
                             icon={item.icon}
@@ -447,9 +447,9 @@ export default function ResourcesPage() {
                   sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60 dark:opacity-40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/30" />
               </div>
-              <CardHeader>
+              <CardHeader className="px-6 pt-6 pb-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-medium tracking-wide opacity-70">
                     {res.categoryLabel}
@@ -460,7 +460,7 @@ export default function ResourcesPage() {
                   {res.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <Dialog>
                   <DialogTrigger
                     render={

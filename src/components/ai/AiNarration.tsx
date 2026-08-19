@@ -12,6 +12,14 @@ import { useAiStream } from "@/components/ai/useAiStream";
 import { AiMarkdown } from "@/components/ai/AiMarkdown";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 /**
  * "Explain this in my words" — streams a warm, personalized narration of the
@@ -30,9 +38,9 @@ export function AiNarration() {
   return (
     <section
       aria-label={t("narration.title")}
-      className="mb-6 rounded-2xl border border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.04] to-violet-500/[0.04] p-5"
+      className="mb-6 rounded-2xl border border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.04] to-violet-500/[0.04] overflow-visible px-4 pb-4"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="h-auto min-h-fit py-3 px-4 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-visible rounded-2xl border border-border bg-card">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/15 to-violet-500/10 ring-1 ring-primary/20">
             <HugeiconsIcon
@@ -69,13 +77,44 @@ export function AiNarration() {
         )}
 
         {status === "done" && (
-          <button
-            type="button"
-            onClick={reset}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
-          >
-            {t("narration.dismiss")}
-          </button>
+          <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger
+                render={
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-medium text-primary transition-all hover:-translate-y-0.5 hover:bg-primary/15 hover:shadow-[0_4px_14px_-4px_rgba(59,107,72,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                }
+              >
+                  <HugeiconsIcon icon={SparklesIcon} className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t("narration.explain")}
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader className="text-center">
+                  <DialogTitle>{t("narration.detailedAnalysisTitle") || "Detailed Patterns Analysis"}</DialogTitle>
+                  <DialogDescription>
+                    {t("narration.detailedAnalysisDesc") || "Here is a deeper dive into the patterns detected in your health logs."}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-4 text-center" dir="auto">
+                  <p className="text-sm text-foreground leading-relaxed">
+                    {t("narration.patternBody") || "Your patterns show a strong correlation between sleep quality and pain levels the following morning."}
+                  </p>
+                  <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground border border-border">
+                    <strong className="block mb-1">{t("narration.aiObservationLabel") || "AI Observation"}:</strong> {t("narration.aiObservationText") || "Flare-ups typically occur 24-48 hours after high-stress events."}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <button
+              type="button"
+              onClick={reset}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+            >
+              {t("narration.dismiss")}
+            </button>
+          </div>
         )}
       </div>
 

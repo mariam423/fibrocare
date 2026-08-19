@@ -42,9 +42,9 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
   ];
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl dark:border-white/5 dark:bg-[#0a0f1a]/80">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 dark:bg-[#0a0d14]/80 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
       <div className="container mx-auto flex h-16 items-center justify-between px-6 sm:px-8 lg:px-12 max-w-6xl">
-        {/* Logo - FIXED: F is now visible */}
+        {/* Logo */}
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10">
             <HugeiconsIcon

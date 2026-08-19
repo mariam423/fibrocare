@@ -50,7 +50,6 @@ export default function ZenPage() {
   return (
     <RouteTransition>
     <div
-      id="main-content"
       className={cn(
         "relative min-h-[100dvh] flex flex-col items-center justify-center transition-colors duration-1000 p-4",
         isUltraDark

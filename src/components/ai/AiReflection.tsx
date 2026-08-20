@@ -60,13 +60,13 @@ export function AiReflection({ note }: { note: string }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mt-3 space-y-2 rounded-xl border border-border bg-card/60 p-4 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl"
+            className="mt-3 space-y-2 rounded-xl border border-slate-800 bg-slate-900/80 p-4 backdrop-blur-md"
             role="status"
             aria-label={t("reflection.generatingAria")}
           >
-            <div className="h-3.5 w-1/3 animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
-            <div className="h-3.5 w-full animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
-            <div className="h-3.5 w-[88%] animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
+            <div className="h-3.5 w-1/3 animate-pulse rounded bg-slate-700/50" />
+            <div className="h-3.5 w-full animate-pulse rounded bg-slate-700/50" />
+            <div className="h-3.5 w-[88%] animate-pulse rounded bg-slate-700/50" />
           </motion.div>
         )}
 

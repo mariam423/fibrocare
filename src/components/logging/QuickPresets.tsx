@@ -76,7 +76,7 @@ export function QuickPresets({ onSelect, isLogging = false, loggingPreset = null
 
   return (
     <div
-      className="flex w-full flex-col gap-1.5 rounded-2xl border border-border bg-card/60 p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md sm:flex-row"
+      className="flex w-full flex-col gap-1.5 rounded-2xl border border-slate-800 bg-slate-900/80 p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md sm:flex-row"
       role="group"
       aria-label={t("logging.presets.ariaLabel")}
     >

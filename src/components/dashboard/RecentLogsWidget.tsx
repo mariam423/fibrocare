@@ -85,7 +85,7 @@ export function RecentLogsWidget({ logs }: RecentLogsWidgetProps) {
               {logs.map((log, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 rounded-xl surface-crisp transition-colors hover:!bg-slate-100 dark:hover:!bg-slate-800/60"
+                  className="flex items-center gap-3 p-3 rounded-xl surface-crisp transition-colors hover:bg-slate-800/60"
                 >
                   {/* Pain level indicator */}
                   <div className="relative">

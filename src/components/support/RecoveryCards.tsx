@@ -52,7 +52,7 @@ const colorMap = {
 // Card's overflow-hidden) guarantees no titles, descriptions, or inputs are
 // ever clipped or hidden.
 const cardSurface =
-  "h-full flex flex-col justify-between p-4 rounded-2xl border border-border bg-card/70 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(15,23,42,0.14)] dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)]";
+  "h-full flex flex-col justify-between p-4 rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)] hover:border-emerald-400/30";
 
 export function RecoveryCard({
   title,
@@ -196,8 +196,8 @@ function GratitudeJournalCard() {
                     className={cn(
                       "inline-flex items-center gap-1 h-8 rounded-full border px-3 text-[11px] font-medium transition-all duration-200 active:scale-[0.97] cursor-pointer",
                       isSelected
-                        ? "border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800 dark:border-emerald-300 dark:bg-emerald-300 dark:text-emerald-950 dark:hover:bg-emerald-200"
-                        : "border-emerald-200 bg-white/60 text-emerald-800 hover:border-emerald-400 hover:bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/20 dark:text-emerald-200 dark:hover:border-emerald-600"
+                        ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
+                        : "border-emerald-800/60 bg-emerald-950/20 text-emerald-200 hover:border-emerald-600"
                     )}
                   >
                     {isSelected && (
@@ -221,7 +221,7 @@ function GratitudeJournalCard() {
               value={entry}
               onChange={(e) => setEntry(e.target.value)}
               placeholder={t("recovery.gratitude.placeholder")}
-              className="w-full h-24 min-h-[90px] p-2.5 text-xs rounded-xl border border-emerald-200 dark:border-emerald-800/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20 text-slate-800 dark:text-slate-100 placeholder:text-slate-600 dark:placeholder:text-slate-400 resize-none my-2 overflow-y-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-emerald-300/60 dark:[&::-webkit-scrollbar-thumb]:bg-emerald-700/40"
+              className="w-full h-24 min-h-[90px] p-2.5 text-xs rounded-xl border border-emerald-800/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-emerald-950/20 text-slate-100 placeholder:text-slate-400 resize-none my-2 overflow-y-auto [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-emerald-700/40"
             />
             <div className="mt-auto pt-2 w-full">
               <Button

@@ -40,7 +40,7 @@ export function AiNarration() {
       aria-label={t("narration.title")}
       className="mb-6 rounded-2xl border border-dashed border-primary/25 bg-gradient-to-br from-primary/[0.04] to-violet-500/[0.04] overflow-visible px-4 pb-4"
     >
-      <div className="h-auto min-h-fit py-3 px-4 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-visible rounded-2xl border border-border bg-card">
+      <div className="h-auto min-h-fit py-3 px-4 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-visible rounded-2xl border border-slate-800 bg-slate-900/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/15 to-violet-500/10 ring-1 ring-primary/20">
             <HugeiconsIcon
@@ -101,7 +101,7 @@ export function AiNarration() {
                   <p className="text-sm text-foreground leading-relaxed">
                     {t("narration.patternBody") || "Your patterns show a strong correlation between sleep quality and pain levels the following morning."}
                   </p>
-                  <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground border border-border">
+                   <div className="rounded-lg bg-slate-800/60 p-3 text-xs text-zinc-400 border border-slate-800">
                     <strong className="block mb-1">{t("narration.aiObservationLabel") || "AI Observation"}:</strong> {t("narration.aiObservationText") || "Flare-ups typically occur 24-48 hours after high-stress events."}
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export function AiNarration() {
             <button
               type="button"
               onClick={reset}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 px-3.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-slate-800"
             >
               {t("narration.dismiss")}
             </button>
@@ -129,10 +129,10 @@ export function AiNarration() {
             role="status"
             aria-label={t("narration.generatingAria")}
           >
-            <div className="h-3.5 w-full animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
-            <div className="h-3.5 w-[92%] animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
-            <div className="h-3.5 w-[78%] animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
-            <div className="h-3.5 w-[85%] animate-pulse rounded bg-slate-200/70 dark:bg-slate-700/50" />
+            <div className="h-3.5 w-full animate-pulse rounded bg-slate-700/50" />
+            <div className="h-3.5 w-[92%] animate-pulse rounded bg-slate-700/50" />
+            <div className="h-3.5 w-[78%] animate-pulse rounded bg-slate-700/50" />
+            <div className="h-3.5 w-[85%] animate-pulse rounded bg-slate-700/50" />
           </motion.div>
         )}
 
@@ -143,7 +143,7 @@ export function AiNarration() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className={cn(
-              "mt-4 rounded-xl border border-border bg-card/60 p-4 text-sm leading-relaxed text-foreground"
+              "mt-4 rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm leading-relaxed text-white"
             )}
           >
             <AiMarkdown text={text} />

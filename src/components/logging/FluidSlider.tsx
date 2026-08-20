@@ -30,7 +30,7 @@ export function FluidSlider({ value, onValueChange }: FluidSliderProps) {
   }[tone];
 
   return (
-    <div className="space-y-6 w-full max-w-md mx-auto rounded-2xl border border-border bg-card/70 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-6">
+    <div className="space-y-6 w-full max-w-md mx-auto rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-6">
       <div className="flex justify-between items-center">
         <span className="text-lg font-medium text-foreground">{t("logging.slider.label")}</span>
         <div

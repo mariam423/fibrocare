@@ -136,7 +136,7 @@ export function AiCareInsightCard({
   return (
     <section
       aria-label={t("careInsight.ariaLabel")}
-      className="backdrop-blur-md bg-card/70 border border-border rounded-2xl p-5 mb-6 dark:bg-background/40 dark:border-white/10 dark:backdrop-blur-xl dark:shadow-[0_8px_32px_rgba(0,0,0,0.37)]"
+      className="backdrop-blur-md bg-slate-900/80 border border-slate-800 rounded-2xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.37)]"
     >
       <div className="flex items-start gap-4">
         <div
@@ -171,7 +171,7 @@ export function AiCareInsightCard({
           </p>
         </div>
 
-        <div className="hidden shrink-0 items-center gap-2 rounded-lg border border-border bg-card/60 px-3 py-2 text-xs text-muted-foreground sm:flex dark:bg-background/40 dark:border-white/10 dark:backdrop-blur-xl">
+        <div className="hidden shrink-0 items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs text-zinc-400 sm:flex backdrop-blur-md">
           <span className="flex items-center gap-1">
             <HugeiconsIcon
               icon={ThermometerIcon}
@@ -220,7 +220,7 @@ export function AiCareInsightCard({
         {suggestions.map((suggestion, index) => (
           <li
             key={suggestion}
-            className="flex items-start gap-2 rounded-xl border border-border bg-card/60 p-3 text-xs leading-relaxed text-foreground dark:bg-background/40 dark:border-white/10 dark:backdrop-blur-xl"
+            className="flex items-start gap-2 rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-xs leading-relaxed text-white backdrop-blur-md"
           >
             <span
               className={cn(

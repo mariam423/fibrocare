@@ -395,6 +395,34 @@ export type TranslationKey =
   | "recovery.gratitude.chip1"
   | "recovery.gratitude.chip2"
   | "recovery.gratitude.chip3"
+  | "spoonTracker.title"
+  | "spoonTracker.subtitle"
+  | "spoonTracker.undoAria"
+  | "spoonTracker.aria"
+  | "spoonTracker.removeAria"
+  | "spoonTracker.addAria"
+  | "spoonTracker.preset.shower"
+  | "spoonTracker.preset.walk"
+  | "spoonTracker.preset.cooking"
+  | "spoonTracker.preset.groceries"
+  | "spoonTracker.preset.rest"
+  | "spoonTracker.preset.nap"
+  | "bodyMap.title"
+  | "bodyMap.subtitle"
+  | "bodyMap.emptyHint"
+  | "bodyMap.point.neck"
+  | "bodyMap.point.shoulders"
+  | "bodyMap.point.arms"
+  | "bodyMap.point.lowerBack"
+  | "bodyMap.point.knees"
+  | "medication.title"
+  | "medication.subtitle"
+  | "medication.morningSupplement"
+  | "medication.painRelief"
+  | "medication.eveningMag"
+  | "medication.taken"
+  | "medication.pending"
+  | "medication.nextDose"
   | "zen.focusBreath"
   | "zen.ultraDark"
   | "zen.exitUltraDark"
@@ -1039,6 +1067,34 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "recovery.gratitude.chip1": "Peaceful moment",
     "recovery.gratitude.chip2": "Good sleep",
     "recovery.gratitude.chip3": "A warm tea",
+    "spoonTracker.title": "Spoon Tracker",
+    "spoonTracker.subtitle": "Daily energy budget",
+    "spoonTracker.undoAria": "Undo last change",
+    "spoonTracker.aria": "{current} of {max} spoons remaining",
+    "spoonTracker.removeAria": "Remove one spoon",
+    "spoonTracker.addAria": "Add one spoon",
+    "spoonTracker.preset.shower": "Shower",
+    "spoonTracker.preset.walk": "Short Walk",
+    "spoonTracker.preset.cooking": "Cooking",
+    "spoonTracker.preset.groceries": "Groceries",
+    "spoonTracker.preset.rest": "Rest",
+    "spoonTracker.preset.nap": "Nap",
+    "bodyMap.title": "Pain Map",
+    "bodyMap.subtitle": "Tap areas where you feel pain",
+    "bodyMap.emptyHint": "Tap a body area to mark pain",
+    "bodyMap.point.neck": "Neck",
+    "bodyMap.point.shoulders": "Shoulders",
+    "bodyMap.point.arms": "Arms",
+    "bodyMap.point.lowerBack": "Lower Back",
+    "bodyMap.point.knees": "Knees",
+    "medication.title": "Today's Medications",
+    "medication.subtitle": "Track your doses",
+    "medication.morningSupplement": "Morning Supplement",
+    "medication.painRelief": "Pain Relief",
+    "medication.eveningMag": "Evening Magnesium",
+    "medication.taken": "Taken",
+    "medication.pending": "Pending",
+    "medication.nextDose": "Next dose in",
     "zen.focusBreath": "Focus on your breath",
     "zen.ultraDark": "Ultra Dark",
     "zen.exitUltraDark": "Exit Ultra Dark",
@@ -1688,6 +1744,34 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "recovery.gratitude.chip1": "لحظة سلام",
     "recovery.gratitude.chip2": "نوم جيد",
     "recovery.gratitude.chip3": "شاي دافئ",
+    "spoonTracker.title": "متتبع الملاعق",
+    "spoonTracker.subtitle": "ميزانية الطاقة اليومية",
+    "spoonTracker.undoAria": "التراجع عن آخر تغيير",
+    "spoonTracker.aria": "{current} من {max} ملاعق متبقية",
+    "spoonTracker.removeAria": "إزالة ملعقة",
+    "spoonTracker.addAria": "إضافة ملعقة",
+    "spoonTracker.preset.shower": "استحمام",
+    "spoonTracker.preset.walk": "مشية قصيرة",
+    "spoonTracker.preset.cooking": "طبخ",
+    "spoonTracker.preset.groceries": "مشتريات",
+    "spoonTracker.preset.rest": "راحة",
+    "spoonTracker.preset.nap": "قيلولة",
+    "bodyMap.title": "خريطة الألم",
+    "bodyMap.subtitle": "اضغط على المناطق التي تشعر فيها بالألم",
+    "bodyMap.emptyHint": "اضغط على منطقة في الجسم لتحديد الألم",
+    "bodyMap.point.neck": "الرقبة",
+    "bodyMap.point.shoulders": "الكتفان",
+    "bodyMap.point.arms": "الذراعان",
+    "bodyMap.point.lowerBack": "الظهر السفلي",
+    "bodyMap.point.knees": "الركبتان",
+    "medication.title": "أدوية اليوم",
+    "medication.subtitle": "تتبع جرعاتك",
+    "medication.morningSupplement": "مكمل الصباح",
+    "medication.painRelief": "مسكن الألم",
+    "medication.eveningMag": "مغنيسيوم المساء",
+    "medication.taken": "تم تناوله",
+    "medication.pending": "معلق",
+    "medication.nextDose": "الجرعة القادمة خلال",
     "zen.focusBreath": "ركّز على تنفسك",
     "zen.ultraDark": "داكن جدًا",
     "zen.exitUltraDark": "الخروج من الوضع الداكن",

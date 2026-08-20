@@ -68,8 +68,8 @@ export function QuickActions() {
               <DepthCard tilt={4} delay={index * 0.06} className="h-full">
                 <SpotlightCard
                   className={cn(
-                    "flex h-full flex-col gap-4 rounded-2xl border border-border bg-card/70 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-5 transition-all duration-300 ease-out dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)]",
-                    "hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(15,23,42,0.14)]",
+                    "flex h-full flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-5 transition-all duration-300 ease-out hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)]",
+                    "hover:-translate-y-1",
                     action.hoverBorder
                   )}
                 >

@@ -57,7 +57,7 @@ export function EmojiGrid({ selectedSymptoms, onToggle }: EmojiGridProps) {
               "active:scale-[0.96]",
               isActive
                 ? "bg-primary/10 border-primary/60 text-primary shadow-depth-md scale-105 dark:bg-primary/20 dark:border-primary/50"
-                : "border border-border bg-card/70 text-muted-foreground backdrop-blur-md hover:border-primary/40 hover:bg-primary/5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:hover:bg-primary/10 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                : "border border-slate-800 bg-slate-900/80 text-zinc-400 backdrop-blur-md hover:border-emerald-400/30 hover:bg-primary/5 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
             )}
           >
             <div className={cn(

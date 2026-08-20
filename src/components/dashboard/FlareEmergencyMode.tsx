@@ -117,7 +117,7 @@ export default function FlareEmergencyMode() {
                 "shrink-0 rounded-full text-xs font-medium gap-1.5",
                 isActive
                   ? "bg-rose-600 text-white hover:bg-rose-700"
-                  : "bg-muted hover:bg-muted/80 text-foreground"
+                  : "bg-slate-800/60 hover:bg-slate-800/80 text-white"
               )}
             >
               <HugeiconsIcon

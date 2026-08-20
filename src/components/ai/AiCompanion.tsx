@@ -182,7 +182,7 @@ export function AiCompanion() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
             transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 28 }}
-            className="fixed bottom-24 end-4 z-[70] flex h-[min(34rem,calc(100dvh-8.5rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card/85 shadow-2xl backdrop-blur-xl"
+            className="fixed bottom-24 end-4 z-[70] flex h-[min(34rem,calc(100dvh-8.5rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/85 shadow-2xl backdrop-blur-xl"
           >
             {/* Aurora wash */}
             <div
@@ -191,7 +191,7 @@ export function AiCompanion() {
             />
 
             {/* Header */}
-            <header className="relative flex items-center gap-3 border-b border-border px-4 py-3.5">
+            <header className="relative flex items-center gap-3 border-b border-slate-800 px-4 py-3.5">
               <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-violet-600 text-white shadow-[0_4px_16px_-4px_rgba(59,107,72,0.6)]">
                 <HugeiconsIcon icon={HeartPulseIcon} className="h-5 w-5" aria-hidden="true" />
                 <span
@@ -258,7 +258,7 @@ export function AiCompanion() {
                           type="button"
                           onClick={() => submitSuggestion(suggestion)}
                           disabled={isLoading}
-                          className="rounded-full border border-border bg-card/70 px-3.5 py-2 text-xs font-medium text-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
+                          className="rounded-full border border-slate-800 bg-slate-900/80 px-3.5 py-2 text-xs font-medium text-white transition-all hover:-translate-y-0.5 hover:border-emerald-400/30 hover:bg-primary/5 disabled:opacity-50"
                         >
                           {suggestion}
                         </button>
@@ -304,7 +304,7 @@ export function AiCompanion() {
                         "max-w-[86%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
                         isUser
                           ? "rounded-br-md bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-[0_4px_16px_-6px_rgba(59,107,72,0.5)]"
-                          : "rounded-bl-md border border-border bg-card/70 text-foreground"
+                          : "rounded-bl-md border border-slate-800 bg-slate-900/80 text-white"
                       )}
                     >
                       {hasToolResult(parts) && !text && (
@@ -341,7 +341,7 @@ export function AiCompanion() {
             </p>
 
             {/* Input */}
-            <footer className="relative border-t border-border p-3">
+            <footer className="relative border-t border-slate-800 p-3">
               {isOffline ? (
                 <p className="flex items-center justify-center gap-2 px-2 py-2.5 text-center text-xs text-muted-foreground">
                   <HugeiconsIcon
@@ -367,7 +367,7 @@ export function AiCompanion() {
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={t("companion.inputPlaceholder")}
                     disabled={isLoading || aiConfigured !== true}
-                    className="min-h-11 flex-1 rounded-2xl border border-border bg-card/70 px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
+                    className="min-h-11 flex-1 rounded-2xl border border-slate-800 bg-slate-900/80 px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-60"
                   />
                   {isLoading ? (
                     <button

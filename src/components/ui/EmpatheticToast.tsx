@@ -86,7 +86,7 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
       }}
       transition={motionEnabled ? { type: "spring", stiffness: 260, damping: 26, mass: 0.9 } : undefined}
     >
-      <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md flex flex-col gap-4 text-card-foreground">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md flex flex-col gap-4 text-white">
         <div className="flex justify-between items-start gap-3">
           <div className="flex gap-3">
             <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
@@ -124,7 +124,7 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
                 variant="ghost"
                 onClick={action.onClick}
                 className={cn(
-                  "rounded-full border border-border bg-card/70 px-4 text-xs font-semibold",
+                  "rounded-full border border-slate-800 bg-slate-900/80 px-4 text-xs font-semibold",
                   "transition-all duration-200 hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-[0.97]"
                 )}
               >

@@ -88,7 +88,7 @@ export function DepthCard({
         {float && !prefersReducedMotion && (
           <motion.div
             aria-hidden="true"
-            className="absolute -inset-1 -z-10 rounded-[inherit] bg-card/40 blur-md"
+            className="absolute -inset-1 -z-10 rounded-[inherit] bg-slate-900/40 blur-md"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />

@@ -12,7 +12,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card border border-border shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md bg-card/70 flex flex-col gap-(--card-spacing) overflow-hidden rounded-2xl py-(--card-spacing) text-sm text-card-foreground transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(15,23,42,0.14)] dark:border-white/10 dark:bg-background/40 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_2px_4px_rgba(0,0,0,0.2),0_8px_32px_rgba(0,0,0,0.37)] dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_8px_32px_rgba(0,0,0,0.37),0_0_24px_rgba(16,185,129,0.16)] [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card border border-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md bg-slate-900/80 flex flex-col gap-(--card-spacing) overflow-hidden rounded-2xl py-(--card-spacing) text-sm text-white transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(15,23,42,0.14)] [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         className
       )}
       {...props}
@@ -84,7 +84,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
+        "flex items-center rounded-b-xl border-t border-slate-800 bg-slate-900/80 p-(--card-spacing)",
         className
       )}
       {...props}

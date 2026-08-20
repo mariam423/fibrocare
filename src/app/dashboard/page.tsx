@@ -36,6 +36,9 @@ import { MedicalSummaryCard } from "@/components/dashboard/MedicalSummaryCard";
 import { TodayContextWidget } from "@/components/dashboard/TodayContextWidget";
 import { DailyQuoteWidget } from "@/components/dashboard/DailyQuoteWidget";
 import { RecentLogsWidget } from "@/components/dashboard/RecentLogsWidget";
+import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
+import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
+import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
 import { useHealth } from "@/context/HealthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
@@ -189,7 +192,7 @@ export default function Home() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
+    <div className="min-h-[100dvh] overflow-x-hidden bg-[#0f172a] text-white transition-colors duration-500">
 <AppHeader />
       <main className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-10 lg:space-y-12 sm:px-8 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
@@ -213,7 +216,7 @@ export default function Home() {
             </div>
             {streak > 0 && (
               <div
-                className="flex shrink-0 items-center gap-2 self-start rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm sm:self-auto"
+                className="flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400 backdrop-blur-sm sm:self-auto"
                 aria-label={t("dashboard.streakAria", { count: streak })}
               >
                 <HugeiconsIcon icon={FireIcon} className="h-4 w-4" aria-hidden="true" />
@@ -242,6 +245,37 @@ export default function Home() {
         {/* Smart AI Medical Summary */}
         <MedicalSummaryCard />
 
+        {/* Middle Row: Daily Energy, Pain Map, Medications */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="p-0">
+                  <SpoonTrackerBento />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0.05} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="p-0">
+                  <BodyMapBento />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0.1} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="p-0">
+                  <MedicationTrackerCard />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+        </div>
+
         {/* Daily Check-in + right rail */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full mb-8">
           <div id="daily-checkin" className="lg:col-span-2 scroll-mt-24">
@@ -266,7 +300,7 @@ export default function Home() {
                   </div>
 
                   {/* Pain Level */}
-                  <section className="border-t border-border pt-8">
+                  <section className="border-t border-white/10 pt-8">
                     <FluidSlider
                       value={painLevel}
                       onValueChange={handleSliderChange}
@@ -274,7 +308,7 @@ export default function Home() {
                   </section>
 
                   {/* Energy & Mood */}
-                  <div className="border-t border-border pt-8">
+                  <div className="border-t border-white/10 pt-8">
                     <fieldset className="border-0 p-0 m-0">
                       <legend className="text-lg font-medium mb-4">
                         {t("dashboard.energy.title")}
@@ -291,7 +325,7 @@ export default function Home() {
                                 "active:scale-[0.97]",
                                 mood === item.label
                                   ? cn(item.active, "font-semibold")
-                                  : "text-muted-foreground border border-border bg-card/70 backdrop-blur-md hover:bg-card/90 hover:text-foreground hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:bg-white/5 dark:hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                                  : "text-zinc-400 border border-white/10 bg-zinc-900/60 backdrop-blur-md hover:bg-zinc-800/60 hover:text-white hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                               )}
                             >
                               {item.icon}
@@ -313,7 +347,7 @@ export default function Home() {
                   </div>
 
                   {/* Symptoms & Notes */}
-                  <section className="border-t border-border pt-8 space-y-4">
+                  <section className="border-t border-white/10 pt-8 space-y-4">
                     <label htmlFor="notes" className="text-lg font-medium block">
                       {t("dashboard.symptoms.label")}
                     </label>
@@ -326,7 +360,7 @@ export default function Home() {
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder={t("dashboard.symptoms.placeholder")}
-                      className="w-full p-4 rounded-xl border border-border bg-card/60 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary outline-none transition-all duration-300 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:focus-visible:border-emerald-400/40"
+                      className="w-full p-4 rounded-xl border border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-emerald-500 outline-none transition-all duration-300 backdrop-blur-md"
                       rows={3}
                     />
 
@@ -335,7 +369,7 @@ export default function Home() {
                   </section>
 
                   {/* Save */}
-                  <div className="border-t border-border pt-8 space-y-4">
+                  <div className="border-t border-white/10 pt-8 space-y-4">
                     <Magnetic strength={0.12} tapScale={0.97}>
                       <Button
                         onClick={() => logEntry()}
@@ -428,30 +462,30 @@ export default function Home() {
               <CardContent className="space-y-4">
                 {/* Weekly stats: animated averages computed from the trend */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-2xl border border-border/60 bg-card/70 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
                       {t("dashboard.weekly.avgPain")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
                       <CountUp value={weeklyAvg} decimals={1} duration={1000} />
-                      <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
+                      <span className="ms-0.5 text-xs font-normal text-zinc-400">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-border/60 bg-card/70 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
                       {t("dashboard.weekly.daysLogged")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
                       <CountUp value={loggedDays} duration={800} />
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-border/60 bg-card/70 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
                       {t("dashboard.weekly.highest")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
                       <CountUp value={highestPain} duration={900} />
-                      <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
+                      <span className="ms-0.5 text-xs font-normal text-zinc-400">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>
                 </div>
@@ -486,11 +520,11 @@ export default function Home() {
                         className={cn(
                           "rounded-xl border p-3",
                           insight.severity === "critical" &&
-                            "bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900",
+                            "bg-red-950/40 border-red-900 text-red-200",
                           insight.severity === "warning" &&
-                            "bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-900",
+                            "bg-amber-950/40 border-amber-900 text-amber-200",
                           insight.severity === "info" &&
-                            "bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900"
+                            "bg-emerald-950/40 border-emerald-900 text-emerald-200"
                         )}
                       >
                         <p className="text-sm font-semibold">{copy.title}</p>

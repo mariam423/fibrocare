@@ -60,7 +60,7 @@ export function SegmentedFilter({
   return (
     <div
       className={cn(
-        "relative flex w-full flex-col gap-1.5 rounded-2xl border border-slate-800 bg-slate-900/80 p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md sm:w-auto sm:flex-row",
+        "relative flex w-full flex-col gap-1.5 rounded-2xl border border-border bg-card p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] backdrop-blur-md sm:w-auto sm:flex-row",
         className
       )}
       role="group"

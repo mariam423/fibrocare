@@ -112,16 +112,16 @@ export function BodyMapBento() {
   const activePoints = TRIGGER_POINTS.filter((p) => selected.has(p.id));
 
   return (
-    <div className="p-6">
+    <div className="flex flex-1 flex-col p-6">
       <div className="mb-3">
-        <h3 className="text-base font-semibold text-slate-100">
+        <h3 className="text-base font-semibold text-card-foreground">
           {t("bodyMap.title")}
         </h3>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           {t("bodyMap.subtitle")}
         </p>
       </div>
-      <div className="space-y-4">
+      <div className="flex flex-1 flex-col justify-between space-y-4">
           {/* Body map */}
           <div className="relative mx-auto w-44 h-64 select-none px-2 py-1">
             <BodySilhouette />
@@ -201,7 +201,7 @@ export function BodyMapBento() {
           )}
 
           {activePoints.length === 0 && (
-            <p className="text-xs text-center text-slate-400 py-1">
+            <p className="text-xs text-center text-muted-foreground py-1">
               {t("bodyMap.emptyHint")}
             </p>
           )}
@@ -211,7 +211,7 @@ export function BodyMapBento() {
             {PAIN_LEGEND.map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <span className={cn("h-2 w-2 rounded-full", item.color, item.shadow)} />
-                <span className="text-[11px] text-slate-400 font-medium">{item.label}</span>
+                <span className="text-[11px] text-muted-foreground font-medium">{item.label}</span>
               </div>
             ))}
           </div>

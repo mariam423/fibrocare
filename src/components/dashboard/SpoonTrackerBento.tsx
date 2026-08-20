@@ -35,7 +35,7 @@ function SpoonIcon({ active }: { active: boolean }) {
         "h-5 w-5 transition-all duration-300",
         active
           ? "text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
-          : "text-slate-400/60"
+          : "text-muted-foreground/60"
       )}
       fill="none"
       stroke="currentColor"
@@ -80,10 +80,10 @@ export function SpoonTrackerBento() {
   const percentage = Math.round((spoons / MAX_SPOONS) * 100);
 
   return (
-    <div className="p-6">
+    <div className="flex flex-1 flex-col p-6">
         <div className="mb-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-slate-100">
+            <h3 className="text-base font-semibold text-card-foreground">
               {t("spoonTracker.title")}
             </h3>
             <button
@@ -91,16 +91,16 @@ export function SpoonTrackerBento() {
               onClick={undo}
               disabled={history.length <= 1}
               aria-label={t("spoonTracker.undoAria")}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
             >
               <HugeiconsIcon icon={Undo02Icon} className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             {t("spoonTracker.subtitle")}
           </p>
         </div>
-        <div className="space-y-5">
+        <div className="flex flex-1 flex-col justify-between space-y-5">
           {/* Spoon visual grid */}
           <div className="flex items-center gap-1.5 flex-wrap" role="img" aria-label={t("spoonTracker.aria", { current: spoons, max: MAX_SPOONS })}>
             {Array.from({ length: MAX_SPOONS }).map((_, i) => (
@@ -125,12 +125,12 @@ export function SpoonTrackerBento() {
               onClick={() => applyDelta(-1)}
               disabled={spoons === 0}
               aria-label={t("spoonTracker.removeAria")}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-100 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-muted/60 text-card-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
             >
               <HugeiconsIcon icon={MinusSignCircleIcon} className="h-4 w-4" aria-hidden="true" />
             </button>
             <div className="flex-1">
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
                 <motion.div
                   className={cn(
                     "h-full rounded-full transition-colors duration-300",
@@ -146,7 +146,7 @@ export function SpoonTrackerBento() {
                 />
               </div>
             </div>
-            <span className="text-sm font-semibold tabular-nums min-w-[3ch] text-center text-slate-100">
+            <span className="text-sm font-semibold tabular-nums min-w-[3ch] text-center text-card-foreground">
               {spoons}
             </span>
             <button
@@ -154,7 +154,7 @@ export function SpoonTrackerBento() {
               onClick={() => applyDelta(1)}
               disabled={spoons === MAX_SPOONS}
               aria-label={t("spoonTracker.addAria")}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-100 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-muted/60 text-card-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-all active:scale-95"
             >
               <HugeiconsIcon icon={PlusSignCircleIcon} className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -174,7 +174,7 @@ export function SpoonTrackerBento() {
                     "flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-all duration-200 overflow-hidden",
                     preset.delta > 0
                       ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                      : "border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
+                      : "border border-border bg-muted/60 text-muted-foreground hover:bg-muted"
                   )}
                 >
                   <span className="text-[11px] opacity-70 leading-none">

@@ -81,7 +81,7 @@ export function MedicalSummaryCard() {
   };
 
   return (
-    <div className="backdrop-blur-md bg-slate-900/80 border border-slate-800 rounded-2xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.37)]">
+    <div className="backdrop-blur-md bg-card border border-border rounded-2xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.37)]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/15 to-violet-500/5 ring-1 ring-violet-500/25">
@@ -162,27 +162,27 @@ export function MedicalSummaryCard() {
           {summary && (
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-center backdrop-blur-md">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                <div className="rounded-xl border border-border bg-muted/60 p-3 text-center backdrop-blur-md">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                     {t("medical.avgPain")}
                   </p>
-                  <p className="mt-1 text-xl font-bold text-white">
+                  <p className="mt-1 text-xl font-bold text-foreground">
                     {summary.stats.avgPain.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-center backdrop-blur-md">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                <div className="rounded-xl border border-border bg-muted/60 p-3 text-center backdrop-blur-md">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                     {t("medical.flareDays")}
                   </p>
-                  <p className="mt-1 text-xl font-bold text-white">
+                  <p className="mt-1 text-xl font-bold text-foreground">
                     {summary.stats.flareUpDays}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-center backdrop-blur-md">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                <div className="rounded-xl border border-border bg-muted/60 p-3 text-center backdrop-blur-md">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                     {t("medical.logs")}
                   </p>
-                  <p className="mt-1 text-xl font-bold text-white">
+                  <p className="mt-1 text-xl font-bold text-foreground">
                     {summary.stats.totalLogs}
                   </p>
                 </div>
@@ -256,7 +256,7 @@ export function MedicalSummaryCard() {
                   {summary.recommendedQuestions.map((question) => (
                     <li
                       key={question}
-                      className="flex items-start gap-2 rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-sm text-white backdrop-blur-md"
+                      className="flex items-start gap-2 rounded-xl border border-border bg-muted/60 p-3 text-sm text-foreground backdrop-blur-md"
                     >
                       <HugeiconsIcon
                         icon={CheckmarkCircle01Icon}

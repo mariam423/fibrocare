@@ -52,7 +52,7 @@ const colorMap = {
 // Card's overflow-hidden) guarantees no titles, descriptions, or inputs are
 // ever clipped or hidden.
 const cardSurface =
-  "h-full flex flex-col justify-between p-4 rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)] hover:border-emerald-400/30";
+  "h-full flex flex-col justify-between p-4 rounded-2xl border border-border bg-card backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)] hover:border-emerald-400/30";
 
 export function RecoveryCard({
   title,
@@ -264,8 +264,8 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full overflow-visible">
-      <div className="w-full self-start">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch w-full overflow-visible">
+      <div className="w-full h-full">
         <RecoveryCard
           title={t("recovery.sensory.title")}
           description={
@@ -284,7 +284,7 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
           color="purple"
         />
       </div>
-      <div className="w-full self-start">
+      <div className="w-full h-full">
         <RecoveryCard
           title={t("recovery.breath.title")}
           description={t("recovery.breath.description")}
@@ -294,7 +294,7 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
           color="teal"
         />
       </div>
-      <div className="w-full self-start">
+      <div className="w-full h-full">
         <GratitudeJournalCard />
       </div>
     </div>

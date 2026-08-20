@@ -89,42 +89,42 @@ export function TodayContextWidget() {
         <CardContent className="space-y-3">
           {/* Weather stats row */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl border-slate-800 bg-slate-900/80 backdrop-blur-md transition-colors">
+            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl bg-muted/60 backdrop-blur-md transition-colors">
               <HugeiconsIcon
                 icon={ThermometerIcon}
                 className="h-4 w-4 text-orange-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-foreground">
                 {weather.temperature}°
               </span>
-              <span className="text-[10px] text-zinc-400 tracking-wide">
+              <span className="text-[10px] text-muted-foreground tracking-wide">
                 {t("today.temp")}
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl border-slate-800 bg-slate-900/80 backdrop-blur-md transition-colors">
+            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl bg-muted/60 backdrop-blur-md transition-colors">
               <HugeiconsIcon
                 icon={DropletIcon}
                 className="h-4 w-4 text-emerald-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-foreground">
                 {weather.humidity}%
               </span>
-              <span className="text-[10px] text-zinc-400 tracking-wide">
+              <span className="text-[10px] text-muted-foreground tracking-wide">
                 {t("today.humidity")}
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl border-slate-800 bg-slate-900/80 backdrop-blur-md transition-colors">
+            <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl bg-muted/60 backdrop-blur-md transition-colors">
               <HugeiconsIcon
                 icon={FastWindIcon}
                 className="h-4 w-4 text-violet-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-foreground">
                 {weather.pressure}
               </span>
-              <span className="text-[10px] text-zinc-400 tracking-wide">
+              <span className="text-[10px] text-muted-foreground tracking-wide">
                 {t("today.pressure")}
               </span>
             </div>
@@ -134,7 +134,7 @@ export function TodayContextWidget() {
           <div
             className={cn(
               "flex items-start gap-2 rounded-lg p-2.5 text-xs leading-relaxed",
-              "bg-slate-900/80 border border-slate-800 backdrop-blur-md"
+              "bg-muted/60 border border-border backdrop-blur-md"
             )}
           >
             {impact.icon}

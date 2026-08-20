@@ -22,7 +22,8 @@ const MEDICATIONS: Medication[] = [
 function getNextCountdown(nextDose: string): string {
   const now = new Date();
   const [time, period] = nextDose.split(" ");
-  let [hours, minutes] = time.split(":").map(Number);
+  const [hourPart, minutes] = time.split(":").map(Number);
+  let hours = hourPart;
   if (period === "PM" && hours !== 12) hours += 12;
   if (period === "AM" && hours === 12) hours = 0;
 
@@ -53,16 +54,16 @@ export function MedicationTrackerCard() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="flex flex-1 flex-col p-6">
       <div className="mb-3">
-        <h3 className="text-base font-semibold text-slate-100">
+        <h3 className="text-base font-semibold text-card-foreground">
           {t("medication.title")}
         </h3>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           {t("medication.subtitle")}
         </p>
       </div>
-      <div className="space-y-3">
+      <div className="flex flex-1 flex-col justify-between space-y-3">
         {MEDICATIONS.map((med) => {
           const isTaken = taken.has(med.id);
           return (
@@ -74,7 +75,7 @@ export function MedicationTrackerCard() {
                 "flex items-center gap-3 w-full rounded-xl py-3 px-4 text-left transition-all duration-200",
                 isTaken
                   ? "bg-emerald-500/10 border border-emerald-500/20"
-                  : "bg-white/5 border border-white/10 hover:bg-white/10"
+                  : "bg-muted/60 border border-border hover:bg-muted"
               )}
             >
               <HugeiconsIcon
@@ -83,7 +84,7 @@ export function MedicationTrackerCard() {
                   "h-5 w-5 shrink-0 transition-colors duration-200",
                   isTaken
                     ? "text-emerald-400"
-                    : "text-slate-400"
+                    : "text-muted-foreground"
                 )}
                 aria-hidden="true"
               />
@@ -93,7 +94,7 @@ export function MedicationTrackerCard() {
                     "text-sm font-medium transition-colors duration-200 truncate",
                     isTaken
                       ? "text-emerald-300 line-through"
-                      : "text-slate-100"
+                      : "text-card-foreground"
                   )}
                 >
                   {t(med.tKey)}
@@ -101,10 +102,10 @@ export function MedicationTrackerCard() {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <HugeiconsIcon
                     icon={Clock01Icon}
-                    className="h-3 w-3 text-slate-400 shrink-0"
+                    className="h-3 w-3 text-muted-foreground shrink-0"
                     aria-hidden="true"
                   />
-                  <span className="text-xs text-slate-400 truncate">
+                  <span className="text-xs text-muted-foreground truncate">
                     {med.nextDose}
                   </span>
                 </div>

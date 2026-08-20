@@ -192,8 +192,8 @@ export default function Home() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh] overflow-x-hidden bg-[#0f172a] text-white transition-colors duration-500">
-<AppHeader />
+    <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
+      <AppHeader />
       <main className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-10 lg:space-y-12 sm:px-8 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
         <motion.div ref={welcomeRef} style={{ y: welcomeYSpring, opacity: welcomeOpacity }}>
@@ -250,7 +250,7 @@ export default function Home() {
           <div className="min-h-0">
             <DepthCard className="h-full" delay={0} animateIn hover={false}>
               <Card className="h-full">
-                <CardContent className="p-0">
+                <CardContent className="flex flex-1 flex-col p-0">
                   <SpoonTrackerBento />
                 </CardContent>
               </Card>
@@ -259,7 +259,7 @@ export default function Home() {
           <div className="min-h-0">
             <DepthCard className="h-full" delay={0.05} animateIn hover={false}>
               <Card className="h-full">
-                <CardContent className="p-0">
+                <CardContent className="flex flex-1 flex-col p-0">
                   <BodyMapBento />
                 </CardContent>
               </Card>
@@ -268,7 +268,7 @@ export default function Home() {
           <div className="min-h-0">
             <DepthCard className="h-full" delay={0.1} animateIn hover={false}>
               <Card className="h-full">
-                <CardContent className="p-0">
+                <CardContent className="flex flex-1 flex-col p-0">
                   <MedicationTrackerCard />
                 </CardContent>
               </Card>
@@ -280,7 +280,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full mb-8">
           <div id="daily-checkin" className="lg:col-span-2 scroll-mt-24">
             <DepthCard className="h-full" animateIn delay={0} hover={false}>
-<Card className="h-full">
+              <Card className="h-full">
                 <CardHeader>
                   <CardTitle className="text-xl">
                     {t("dashboard.checkin.title")}
@@ -300,7 +300,7 @@ export default function Home() {
                   </div>
 
                   {/* Pain Level */}
-                  <section className="border-t border-white/10 pt-8">
+                  <section className="border-t border-border pt-8">
                     <FluidSlider
                       value={painLevel}
                       onValueChange={handleSliderChange}
@@ -308,7 +308,7 @@ export default function Home() {
                   </section>
 
                   {/* Energy & Mood */}
-                  <div className="border-t border-white/10 pt-8">
+                  <div className="border-t border-border pt-8">
                     <fieldset className="border-0 p-0 m-0">
                       <legend className="text-lg font-medium mb-4">
                         {t("dashboard.energy.title")}
@@ -325,7 +325,7 @@ export default function Home() {
                                 "active:scale-[0.97]",
                                 mood === item.label
                                   ? cn(item.active, "font-semibold")
-                                  : "text-zinc-400 border border-white/10 bg-zinc-900/60 backdrop-blur-md hover:bg-zinc-800/60 hover:text-white hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                                  : "text-muted-foreground border border-border bg-muted/60 backdrop-blur-md hover:bg-muted hover:text-foreground hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                               )}
                             >
                               {item.icon}
@@ -347,7 +347,7 @@ export default function Home() {
                   </div>
 
                   {/* Symptoms & Notes */}
-                  <section className="border-t border-white/10 pt-8 space-y-4">
+                  <section className="border-t border-border pt-8 space-y-4">
                     <label htmlFor="notes" className="text-lg font-medium block">
                       {t("dashboard.symptoms.label")}
                     </label>
@@ -360,7 +360,7 @@ export default function Home() {
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder={t("dashboard.symptoms.placeholder")}
-                      className="w-full p-4 rounded-xl border border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-emerald-500 outline-none transition-all duration-300 backdrop-blur-md"
+                      className="w-full p-4 rounded-xl border border-border bg-muted/60 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-emerald-500 outline-none transition-all duration-300 backdrop-blur-md"
                       rows={3}
                     />
 
@@ -369,7 +369,7 @@ export default function Home() {
                   </section>
 
                   {/* Save */}
-                  <div className="border-t border-white/10 pt-8 space-y-4">
+                  <div className="border-t border-border pt-8 space-y-4">
                     <Magnetic strength={0.12} tapScale={0.97}>
                       <Button
                         onClick={() => logEntry()}
@@ -414,6 +414,49 @@ export default function Home() {
 
             {/* Recent Logs Summary */}
             <RecentLogsWidget logs={recentLogs.slice(0, 2)} />
+
+            {/* AI Insights */}
+            <DepthCard tilt={4} delay={0.1}>
+              <Card className="h-full">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <HugeiconsIcon icon={ZapIcon} className="h-6 w-6" aria-hidden="true" />
+                    <CardTitle className="text-base">{t("dashboard.insights.title")}</CardTitle>
+                  </div>
+                  <CardDescription className="text-sm">
+                    {t("dashboard.insights.subtitle")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {insights.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      {t("dashboard.insights.empty")}
+                    </p>
+                  ) : (
+                    insights.slice(0, 3).map((insight) => {
+                      const copy = localizeInsight(insight, locale, t);
+                      return (
+                        <div
+                          key={insight.id}
+                          className={cn(
+                            "rounded-xl border p-3",
+                            insight.severity === "critical" &&
+                              "bg-red-50 border-red-200 text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-200",
+                            insight.severity === "warning" &&
+                              "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-200",
+                            insight.severity === "info" &&
+                              "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-200"
+                          )}
+                        >
+                          <p className="text-sm font-semibold">{copy.title}</p>
+                          <p className="mt-1 text-xs opacity-80">{copy.message}</p>
+                        </div>
+                      );
+                    })
+                  )}
+                </CardContent>
+              </Card>
+            </DepthCard>
           </div>
         </div>
 
@@ -446,9 +489,9 @@ export default function Home() {
           <RecoveryPanel onZen={() => router.push("/zen")} />
         </ScrollReveal>
 
-        {/* Weekly Progress + Insights */}
+        {/* Weekly Progress */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <DepthCard tilt={3} delay={0.05} className="lg:col-span-2">
+          <DepthCard tilt={3} delay={0.05} className="lg:col-span-3">
             <Card className="h-full">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2 font-semibold">
@@ -462,30 +505,30 @@ export default function Home() {
               <CardContent className="space-y-4">
                 {/* Weekly stats: animated averages computed from the trend */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  <div className="rounded-2xl border border-border bg-muted/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                       {t("dashboard.weekly.avgPain")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
                       <CountUp value={weeklyAvg} decimals={1} duration={1000} />
-                      <span className="ms-0.5 text-xs font-normal text-zinc-400">{t("dashboard.weekly.scale")}</span>
+                      <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  <div className="rounded-2xl border border-border bg-muted/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                       {t("dashboard.weekly.daysLogged")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
                       <CountUp value={loggedDays} duration={800} />
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 backdrop-blur-md">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  <div className="rounded-2xl border border-border bg-muted/60 p-3 backdrop-blur-md">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                       {t("dashboard.weekly.highest")}
                     </p>
-                    <p className="mt-1 text-2xl font-bold tracking-tight text-white">
+                    <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
                       <CountUp value={highestPain} duration={900} />
-                      <span className="ms-0.5 text-xs font-normal text-zinc-400">{t("dashboard.weekly.scale")}</span>
+                      <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>
                 </div>
@@ -493,50 +536,10 @@ export default function Home() {
               </CardContent>
             </Card>
           </DepthCard>
-
-          {/* AI Insights */}
-          <DepthCard tilt={4} delay={0.1}>
-            <Card className="h-full">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2 font-semibold">
-                  <HugeiconsIcon icon={ZapIcon} className="h-6 w-6" aria-hidden="true" />
-                  <CardTitle className="text-base">{t("dashboard.insights.title")}</CardTitle>
-                </div>
-                <CardDescription className="text-sm">
-                  {t("dashboard.insights.subtitle")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {insights.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    {t("dashboard.insights.empty")}
-                  </p>
-                ) : (
-                  insights.slice(0, 3).map((insight) => {
-                    const copy = localizeInsight(insight, locale, t);
-                    return (
-                      <div
-                        key={insight.id}
-                        className={cn(
-                          "rounded-xl border p-3",
-                          insight.severity === "critical" &&
-                            "bg-red-950/40 border-red-900 text-red-200",
-                          insight.severity === "warning" &&
-                            "bg-amber-950/40 border-amber-900 text-amber-200",
-                          insight.severity === "info" &&
-                            "bg-emerald-950/40 border-emerald-900 text-emerald-200"
-                        )}
-                      >
-                        <p className="text-sm font-semibold">{copy.title}</p>
-                        <p className="mt-1 text-xs opacity-80">{copy.message}</p>
-                      </div>
-                    );
-                  })
-                )}
-              </CardContent>
-            </Card>
-          </DepthCard>
         </div>
+
+        {/* Recent Logs - full activity list */}
+        <RecentLogsWidget logs={recentLogs} columns={3} />
       </main>
 
       <AnimatePresence>

@@ -56,9 +56,11 @@ function isToday(date: string | Date): boolean {
 
 interface RecentLogsWidgetProps {
   logs: LogEntry[];
+  /** When > 1, lays the log list out as a responsive grid (for full-width sections). */
+  columns?: 1 | 2 | 3;
 }
 
-export function RecentLogsWidget({ logs }: RecentLogsWidgetProps) {
+export function RecentLogsWidget({ logs, columns = 1 }: RecentLogsWidgetProps) {
   const { t, locale } = useLanguage();
   return (
     <DepthCard tilt={3} delay={0.15} float>
@@ -81,11 +83,17 @@ export function RecentLogsWidget({ logs }: RecentLogsWidgetProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div
+              className={cn(
+                columns > 1 ? "grid grid-cols-1 gap-2" : "space-y-2",
+                columns >= 2 && "sm:grid-cols-2",
+                columns >= 3 && "lg:grid-cols-3"
+              )}
+            >
               {logs.map((log, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 rounded-xl surface-crisp transition-colors hover:bg-slate-800/60"
+                  className="flex items-center gap-3 p-3 rounded-xl surface-crisp transition-colors hover:bg-muted"
                 >
                   {/* Pain level indicator */}
                   <div className="relative">

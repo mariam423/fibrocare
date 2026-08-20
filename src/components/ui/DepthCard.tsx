@@ -79,7 +79,7 @@ export function DepthCard({
     >
       <div
         className={cn(
-          "relative h-auto min-h-full w-full rounded-2xl pb-2",
+          "relative h-full w-full rounded-2xl pb-2",
           hoverEnabled &&
             "transition-transform duration-300 ease-out group-hover/depth:-translate-y-1",
           tiltEnabled && "will-change-transform"
@@ -88,14 +88,14 @@ export function DepthCard({
         {float && !prefersReducedMotion && (
           <motion.div
             aria-hidden="true"
-            className="absolute -inset-1 -z-10 rounded-[inherit] bg-slate-900/40 blur-md"
+            className="absolute -inset-1 -z-10 rounded-[inherit] bg-black/10 blur-md dark:bg-slate-900/40"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
         )}
         <div
           className={cn(
-            "relative z-10 h-auto min-h-full",
+            "relative z-10 h-full",
             float && !prefersReducedMotion && "motion-safe:animate-float-soft"
           )}
         >

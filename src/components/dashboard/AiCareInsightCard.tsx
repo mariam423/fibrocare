@@ -136,7 +136,7 @@ export function AiCareInsightCard({
   return (
     <section
       aria-label={t("careInsight.ariaLabel")}
-      className="backdrop-blur-md bg-slate-900/80 border border-slate-800 rounded-2xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.37)]"
+      className="backdrop-blur-md bg-card border border-border rounded-2xl p-5 mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.37)]"
     >
       <div className="flex items-start gap-4">
         <div
@@ -171,7 +171,7 @@ export function AiCareInsightCard({
           </p>
         </div>
 
-        <div className="hidden shrink-0 items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs text-zinc-400 sm:flex backdrop-blur-md">
+        <div className="hidden shrink-0 items-center gap-2 rounded-lg border border-border bg-muted/60 px-3 py-2 text-xs text-muted-foreground sm:flex backdrop-blur-md">
           <span className="flex items-center gap-1">
             <HugeiconsIcon
               icon={ThermometerIcon}
@@ -180,7 +180,7 @@ export function AiCareInsightCard({
             />
             {weather.temperature}°
           </span>
-          <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">•</span>
+          <span aria-hidden="true" className="text-muted-foreground">•</span>
           <span className="flex items-center gap-1">
             <HugeiconsIcon
               icon={DropletIcon}
@@ -189,7 +189,7 @@ export function AiCareInsightCard({
             />
             {weather.humidity}%
           </span>
-          <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">•</span>
+          <span aria-hidden="true" className="text-muted-foreground">•</span>
           {insight.flareState !== "severe" ? (
             <span className="flex items-center gap-0.5">
               <HugeiconsIcon
@@ -220,7 +220,7 @@ export function AiCareInsightCard({
         {suggestions.map((suggestion, index) => (
           <li
             key={suggestion}
-            className="flex items-start gap-2 rounded-xl border border-slate-800 bg-slate-900/80 p-3 text-xs leading-relaxed text-white backdrop-blur-md"
+            className="flex items-start gap-2 rounded-xl border border-border bg-muted/60 p-3 text-xs leading-relaxed text-foreground backdrop-blur-md"
           >
             <span
               className={cn(

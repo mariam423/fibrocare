@@ -10,11 +10,11 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_color-mix(in_oklab,var(--primary)_55%,transparent)] dark:hover:shadow-[0_8px_24px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)]",
         outline:
-          "border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-white hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)]",
+          "border-border bg-card hover:bg-muted text-foreground hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)]",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] hover:-translate-y-0.5 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground dark:bg-secondary/60 dark:backdrop-blur-md",
         ghost:
-          "hover:bg-slate-800 text-white aria-expanded:bg-slate-800",
+          "hover:bg-muted text-foreground aria-expanded:bg-muted",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",

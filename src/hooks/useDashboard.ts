@@ -70,7 +70,7 @@ async function fetchDashboardData(): Promise<DashboardData> {
     lastLogDate: lastLog ? formatLogDate(lastLog.loggedAt) : "Never",
     painLevel: lastLog ? lastLog.painLevel : 3,
     mood: lastLog ? lastLog.moodTag : "Good Day",
-    recentLogs: logs.slice(0, 2),
+    recentLogs: logs,
   };
 }
 

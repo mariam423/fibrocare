@@ -13,6 +13,7 @@ import { ResourcesSection } from "@/components/landing/ResourcesSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { FinalCta } from "@/components/landing/FinalCta";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import { ToolkitQuickAccess } from "@/components/landing/ToolkitQuickAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default function Home() {
         <LandingNav />
         <div className="flex-1">
           <LandingHero />
+          <ToolkitQuickAccess />
           <GentleMarquee />
           <TaglineReveal />
           <DayStory />

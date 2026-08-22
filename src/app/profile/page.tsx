@@ -12,6 +12,7 @@ import {
   Shield01Icon,
   Logout01Icon,
   FastWindIcon,
+  FlashIcon,
 } from "@hugeicons/core-free-icons";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -398,13 +399,15 @@ export default function ProfilePage() {
         {/* Privacy & Security Card */}
         <PrivacySecurityCard />
 
-        {/* Plans & pricing */}
+        {/* Plans & pricing — FibroCare Pro badge */}
         <div className="flex justify-center">
           <button
             type="button"
             onClick={() => setPricingOpen(true)}
-            className="rounded-xl border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            aria-haspopup="dialog"
+            className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-gradient-to-r from-primary/20 to-primary/5 px-6 py-3 text-sm font-bold text-primary transition-all hover:from-primary/30 hover:shadow-[0_0_24px_rgba(45,212,191,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
+            <HugeiconsIcon icon={FlashIcon} className="h-4 w-4" aria-hidden="true" />
             {t("profile.pricing")}
           </button>
         </div>

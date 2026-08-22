@@ -12,7 +12,9 @@ import {
   Moon02Icon,
   Sun02Icon,
   LanguageCircleIcon,
+  FlashIcon,
 } from "@hugeicons/core-free-icons";
+import { PricingModal } from "@/components/pricing/PricingModal";
 import { Button } from "@/components/ui/button";
 import { AiStatusBadge } from "@/components/ai/AiStatusBadge";
 import { useHealth } from "@/context/HealthContext";
@@ -29,6 +31,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
   const { locale, setLocale, t } = useLanguage();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -36,8 +39,8 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
 
   const NAV_LINKS = [
     { href: "/dashboard", label: t("nav.dashboard") },
+    { href: "/toolkit", label: t("nav.toolkit") },
     { href: "/health-logs", label: t("nav.healthLogs") },
-    { href: "/resources", label: t("nav.resources") },
     { href: "/profile", label: t("nav.profile") },
   ];
 
@@ -114,6 +117,22 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
               <span className="hidden sm:inline-flex">
                 <AiStatusBadge />
               </span>
+
+              {/* FibroCare Pro */}
+              <button
+                type="button"
+                onClick={() => setPricingOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                aria-haspopup="dialog"
+              >
+                <HugeiconsIcon icon={FlashIcon} className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("pricing.pro.badge")}
+              </button>
+              <PricingModal
+                open={pricingOpen}
+                onClose={() => setPricingOpen(false)}
+                checkoutUrl={process.env.NEXT_PUBLIC_CHECKOUT_URL}
+              />
 
               <Button
                 onClick={() => setLocale(locale === "en" ? "ar" : "en")}

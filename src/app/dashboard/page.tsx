@@ -11,6 +11,7 @@ import {
   Loading01Icon,
   FireIcon,
   HandHelpingIcon,
+  PlaySquareIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -28,6 +29,7 @@ import { WeeklyProgressChart } from "@/components/charts/WeeklyProgressChart";
 import { CountUp } from "@/components/ui/CountUp";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { QuickActions } from "@/components/dashboard/QuickActions";
+import Link from "next/link";
 import { AiCareInsightCard } from "@/components/dashboard/AiCareInsightCard";
 import { AiCompanion } from "@/components/ai/AiCompanion";
 import { AiNarration } from "@/components/ai/AiNarration";
@@ -194,7 +196,7 @@ export default function Home() {
     <RouteTransition>
     <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
       <AppHeader />
-      <main className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-10 lg:space-y-12 sm:px-8 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <main className="container mx-auto max-w-6xl px-6 py-10 lg:px-12 lg:py-12 space-y-8 lg:space-y-10 sm:px-8 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
         <motion.div ref={welcomeRef} style={{ y: welcomeYSpring, opacity: welcomeOpacity }}>
         <ScrollReveal as="section" className="space-y-1">
@@ -230,8 +232,16 @@ export default function Home() {
         </ScrollReveal>
         </motion.div>
 
+        {/* ── Today ──────────────────────────────────── */}
+        <ScrollReveal as="section" className="space-y-5">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            {t("dashboard.section.today")}
+          </h2>
+        </ScrollReveal>
+
         {/* Quick Actions */}
         <QuickActions />
+
 
         {/* Dynamic AI Care Insight */}
         <AiCareInsightCard
@@ -239,44 +249,9 @@ export default function Home() {
           weeklyTrend={weeklyTrend}
         />
 
-        {/* AI narration: your patterns, in plain words */}
-        <AiNarration />
 
-        {/* Smart AI Medical Summary */}
-        <MedicalSummaryCard />
 
-        {/* Middle Row: Daily Energy, Pain Map, Medications */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
-          <div className="min-h-0">
-            <DepthCard className="h-full" delay={0} animateIn hover={false}>
-              <Card className="h-full">
-                <CardContent className="flex flex-1 flex-col p-0">
-                  <SpoonTrackerBento />
-                </CardContent>
-              </Card>
-            </DepthCard>
-          </div>
-          <div className="min-h-0">
-            <DepthCard className="h-full" delay={0.05} animateIn hover={false}>
-              <Card className="h-full">
-                <CardContent className="flex flex-1 flex-col p-0">
-                  <BodyMapBento />
-                </CardContent>
-              </Card>
-            </DepthCard>
-          </div>
-          <div className="min-h-0">
-            <DepthCard className="h-full" delay={0.1} animateIn hover={false}>
-              <Card className="h-full">
-                <CardContent className="flex flex-1 flex-col p-0">
-                  <MedicationTrackerCard />
-                </CardContent>
-              </Card>
-            </DepthCard>
-          </div>
-        </div>
 
-        {/* Daily Check-in + right rail */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full mb-8">
           <div id="daily-checkin" className="lg:col-span-2 scroll-mt-24">
             <DepthCard className="h-full" animateIn delay={0} hover={false}>
@@ -460,6 +435,68 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ── Core Tools ─────────────────────────────── */}
+        <ScrollReveal as="section" className="space-y-5 pt-2">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            {t("dashboard.section.core")}
+          </h2>
+        </ScrollReveal>
+
+          <Link
+            href="/toolkit"
+            className="group block rounded-2xl border border-primary/25 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent p-5 transition-all hover:border-primary/50 hover:shadow-[0_0_28px_rgba(45,212,191,0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-start gap-3.5">
+                <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
+                  <HugeiconsIcon icon={PlaySquareIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-semibold text-foreground">
+                    {t("dashboard.toolkitCard.title")}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("dashboard.toolkitCard.desc")}
+                  </p>
+                </div>
+              </div>
+              <span className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform group-hover:-translate-y-0.5">
+                {t("dashboard.toolkitCard.cta")}
+              </span>
+            </div>
+          </Link>
+
+        {/* Middle Row: Daily Energy, Pain Map, Medications */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="flex flex-1 flex-col p-0">
+                  <SpoonTrackerBento />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0.05} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="flex flex-1 flex-col p-0">
+                  <BodyMapBento />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0.1} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="flex flex-1 flex-col p-0">
+                  <MedicationTrackerCard />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+        </div>
+
         {/* Gentle Support - full-width recovery tools */}
         <ScrollReveal as="section" className="space-y-4 overflow-visible" delay={0.05}>
           <div className="flex items-center gap-3">
@@ -488,6 +525,18 @@ export default function Home() {
           </div>
           <RecoveryPanel onZen={() => router.push("/zen")} />
         </ScrollReveal>
+
+        {/* ── Insights & Gentle Support ─────────────── */}
+        <ScrollReveal as="section" className="space-y-5 pt-2">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            {t("dashboard.section.insights")}
+          </h2>
+        </ScrollReveal>
+
+        {/* AI narration: your patterns, in plain words */}
+        <AiNarration />
+        {/* Smart AI Medical Summary */}
+        <MedicalSummaryCard />
 
         {/* Weekly Progress */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

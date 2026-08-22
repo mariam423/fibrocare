@@ -9,7 +9,8 @@ export type TranslationKey =
   | "nav.dashboard"
   | "nav.healthLogs"
   | "nav.resources"
-  | "nav.profile"
+  | "nav.profile"  | "nav.toolkit"
+
   | "nav.backToDashboard"
   | "nav.language"
   | "nav.switchToArabic"
@@ -156,6 +157,12 @@ export type TranslationKey =
   | "dashboard.greeting.evening"
   | "dashboard.todayMessage"
   | "dashboard.streakAria"
+  | "dashboard.section.today"
+  | "dashboard.section.core"
+  | "dashboard.section.insights"
+  | "dashboard.toolkitCard.title"
+  | "dashboard.toolkitCard.desc"
+  | "dashboard.toolkitCard.cta"
   | "dashboard.streakDays"
   | "dashboard.checkin.title"
   | "dashboard.checkin.subtitle"
@@ -862,6 +869,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.healthLogs": "Health Logs",
     "nav.resources": "Resources",
     "nav.profile": "Profile",
+    "nav.toolkit": "Toolkit (حقيبة العناية)",
     "nav.backToDashboard": "Back to Dashboard",
     "nav.language": "Language",
     "nav.switchToArabic": "Switch to Arabic",
@@ -1070,7 +1078,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pricing.footnote": "Cancel anytime. Your health data never leaves your device unless you export it yourself.",
     "pricing.previewTitle": "This is a Pro feature",
     "pricing.previewBody": "You can see a preview here. Pro unlocks the full version, and your logs stay free either way.",
-    "profile.pricing": "Plans & pricing",
+    "profile.pricing": "Upgrade · FibroCare Pro",
     "privacy.security.title": "Privacy & security",
     "privacy.security.subtitle": "Your health data stays on your device unless you export it yourself.",
     "privacy.security.encryption": "Local data encryption",
@@ -1457,6 +1465,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "video.badge": "Guide",
     "video.openExternal": "Open the guided video in a new tab",
     "video.unavailable": "The video guide is unavailable right now, so here are the steps instead.",
+    "dashboard.section.today": "Today",
+    "dashboard.section.core": "Core tools",
+    "dashboard.section.insights": "Insights & gentle support",
+    "dashboard.toolkitCard.title": "Somatic Toolkit & Exercises (حقيبة العناية والتمارين)",
+    "dashboard.toolkitCard.desc": "Gentle exercises matched to today's energy, calming offline audio, breathing guides, sleep & HRV, and medication safety.",
+    "dashboard.toolkitCard.cta": "Open the Somatic Toolkit",
     "toolkit.title": "Care Toolkit",
     "toolkit.subtitle": "Movement, sleep, medication safety, and community insights. All of it works offline.",
     "medications.title": "Medications & Safety",
@@ -1715,10 +1729,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "meta.ogImageAlt": "FibroCare - Your pain is real. Your pace is yours.",
   },
   ar: {
-    "nav.dashboard": "لوحة التحكم",
-    "nav.healthLogs": "سجلات الصحة",
+    "nav.dashboard": "اللوحة الرئيسية",
+    "nav.healthLogs": "السجلات",
     "nav.resources": "الموارد",
     "nav.profile": "الملف الشخصي",
+    "nav.toolkit": "حقيبة العناية",
     "nav.backToDashboard": "العودة للوحة التحكم",
     "nav.language": "اللغة",
     "nav.switchToArabic": "التبديل إلى العربية",
@@ -1927,7 +1942,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pricing.footnote": "يمكنك الإلغاء في أي وقت. بياناتك الصحية لا تغادر جهازك ما لم تصدّرها بنفسك.",
     "pricing.previewTitle": "هذه ميزة برو",
     "pricing.previewBody": "يمكنك رؤية معاينة هنا. برو يفتح النسخة الكاملة، وسجلاتك تبقى مجانية في كل الأحوال.",
-    "profile.pricing": "الخطط والأسعار",
+    "profile.pricing": "ترقية الحساب · FibroCare Pro",
     "privacy.security.title": "الخصوصية والأمان",
     "privacy.security.subtitle": "بياناتك الصحية تبقى على جهازك ما لم تصدّرها بنفسك.",
     "privacy.security.encryption": "تشفير البيانات المحلية",
@@ -2314,6 +2329,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "video.badge": "دليل",
     "video.openExternal": "افتح الفيديو الموجّه في تبويب جديد",
     "video.unavailable": "الفيديو الموجّه غير متاح الآن — إليك الخطوات بدلًا منه.",
+    "dashboard.section.today": "اليوم",
+    "dashboard.section.core": "الأدوات الأساسية",
+    "dashboard.section.insights": "الرؤى والدعم الهادئ",
+    "dashboard.toolkitCard.title": "حقيبة العناية والتمارين السوماتية",
+    "dashboard.toolkitCard.desc": "تمارين لطيفة تناسب طاقة اليوم، وصوت مهدّئ دون اتصال، وأدلة تنفس، والنوم وHRV، وسلامة الأدوية.",
+    "dashboard.toolkitCard.cta": "فتح حقيبة العناية والتمارين",
     "toolkit.title": "حقيبة العناية",
     "toolkit.subtitle": "حركة ونوم وسلامة الأدوية ورؤى المجتمع — كلها تعمل دون اتصال.",
     "medications.title": "الأدوية والسلامة",

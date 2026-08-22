@@ -20,6 +20,7 @@ import {
 import { generateMedicalReport } from "@/lib/pdfGenerator";
 import { getReportData } from "@/app/actions";
 import type { Insight } from "@/lib/insightEngine";
+import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
 import AppHeader from "@/components/layout/AppHeader";
 import { SegmentedFilter, type SegmentedFilterOption } from "@/components/ui/SegmentedFilter";
 import { useLanguage } from "@/context/LanguageContext";
@@ -55,6 +56,7 @@ export default function ReportsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [insightFilter, setInsightFilter] = useState<string>("all");
+  const [brief, setBrief] = useState<ClinicalBrief | null>(null);
 
   const insightFilters = useMemo<SegmentedFilterOption[]>(
     () => [
@@ -99,6 +101,23 @@ export default function ReportsPage() {
     };
   }, []);
 
+  // Clinical executive brief — optional enrichment; failures are silent
+  // (the PDF and page work fully without it).
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/ai/clinical-brief")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.brief) setBrief(data.brief as ClinicalBrief);
+      })
+      .catch(() => {
+        /* graceful: no brief */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleExport = async () => {
     if (!snapshot) return;
     setIsGenerating(true);
@@ -110,6 +129,7 @@ export default function ReportsPage() {
         topSymptoms: snapshot.topSymptoms,
         insights: snapshot.insights,
         logs: snapshot.logs,
+        brief: brief ?? undefined,
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -271,6 +291,70 @@ export default function ReportsPage() {
             </Card>
             </DepthCard>
             </ScrollReveal>
+
+            {/* AI Clinical Executive Brief */}
+            {brief && (
+              <ScrollReveal delay={0.25}>
+                <DepthCard tilt={3} delay={0.08}>
+                  <Card className="border-none shadow-depth-sm ring-1 ring-border">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <HugeiconsIcon icon={InformationCircleIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
+                        {t("reports.brief.title")}
+                      </CardTitle>
+                      <CardDescription>{t("reports.brief.subtitle")}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-sm">
+                      <p className="font-medium leading-relaxed">{brief.headline}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="rounded-xl border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.flareFrequency")}</p>
+                          <p className="mt-1">
+                            {brief.flareFrequency.flareDays} {t("reports.brief.flareDaysUnit")} · ~{brief.flareFrequency.perMonth}/mo · {brief.flareFrequency.trend}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.velocity")}</p>
+                          <p className="mt-1">
+                            {brief.painProfile.velocity}
+                            {brief.painProfile.velocityDelta !== null
+                              ? ` (Δ ${brief.painProfile.velocityDelta > 0 ? "+" : ""}${brief.painProfile.velocityDelta})`
+                              : ""}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.functional")}</p>
+                          <p className="mt-1">
+                            {brief.functionalCapacity.loggingAdherencePct}% {t("reports.brief.adherence")} · {brief.functionalCapacity.loggingStreakDays}-day streak
+                          </p>
+                        </div>
+                        <div className="rounded-xl border bg-muted/30 p-3">
+                          <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.medications")}</p>
+                          <p className="mt-1">
+                            {brief.patientReportedMedications.length > 0
+                              ? brief.patientReportedMedications.join(", ")
+                              : t("reports.stat.noneRecorded")}
+                          </p>
+                        </div>
+                      </div>
+                      {brief.suggestedDiscussionPoints.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold text-muted-foreground mb-1.5">
+                            {t("reports.brief.discussion")}
+                          </p>
+                          <ul className="list-disc space-y-1 ms-5">
+                            {brief.suggestedDiscussionPoints.map((point) => (
+                              <li key={point}>{point}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">{brief.dataCaveat}</p>
+                    </CardContent>
+                  </Card>
+                </DepthCard>
+              </ScrollReveal>
+            )}
 
             {/* Download */}
             <ScrollReveal delay={0.3}>

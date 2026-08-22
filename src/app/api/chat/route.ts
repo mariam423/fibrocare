@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { streamText, tool, type ModelMessage } from "ai";
+import { streamText, tool } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import {
@@ -12,17 +12,27 @@ import {
   mockChatReply,
   mockStreamResponse,
 } from "@/lib/ai/mock";
-import { buildHealthSnapshot } from "@/lib/ai/context";
+import { buildLongTermMemory, buildShortTermMemory } from "@/lib/ai/memory";
 import { buildCompanionSystemPrompt } from "@/lib/ai/prompts";
+import { routeQuery } from "@/lib/ai/rag/router";
+import { retrieveKnowledge } from "@/lib/ai/rag/retriever";
+import { buildRagContextBlock } from "@/lib/ai/rag/injector";
 import { checkChatRateLimit } from "@/lib/ai/ratelimit";
 
 export const maxDuration = 45;
 
 /**
- * AI Care Companion — streaming chat with live health context.
+ * AI Care Companion — streaming chat with a structured Memory Layer.
  *
- * The user's health snapshot is embedded in the system prompt and also
- * exposed as a tool so the model can pull fresher data mid-conversation.
+ * Short-term memory: the thread history the client sends is validated with
+ * Zod and compacted (role-filtered, per-message and whole-window character
+ * budgets) so long threads never bloat the prompt.
+ *
+ * Long-term memory: the user's 30-day health snapshot — pain averages, top
+ * symptoms, flare trend, streak, patient-reported medications and current
+ * weather — is built server-side from Prisma and embedded in the system
+ * prompt, and also exposed as a tool for fresher data mid-conversation.
+ *
  * When no provider key is configured the route reports `offline` and the
  * UI shows a graceful offline state instead of a broken chat — unless mock
  * mode is active, in which case deterministic, snapshot-grounded replies are
@@ -31,27 +41,6 @@ export const maxDuration = 45;
  * Lives at the AI SDK default path `/api/chat` so the client can use
  * `useChat()` with zero transport config.
  */
-
-/** Pull the latest user text from an array of UI messages (v7 `parts` shape or legacy `content`). */
-function extractLastUserText(raw: unknown[]): string {
-  for (let i = raw.length - 1; i >= 0; i--) {
-    const m = raw[i] as
-      | {
-          role?: string;
-          content?: unknown;
-          parts?: Array<{ type?: string; text?: string }>;
-        }
-      | null;
-    if (!m || m.role !== "user") continue;
-    if (typeof m.content === "string" && m.content.trim()) return m.content;
-    const partsText = (m.parts ?? [])
-      .filter((p) => p.type === "text" && typeof p.text === "string")
-      .map((p) => p.text as string)
-      .join("");
-    if (partsText.trim()) return partsText;
-  }
-  return "";
-}
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -71,31 +60,24 @@ export async function POST(req: Request) {
     );
   }
 
-  let messages: ModelMessage[];
-  let lastUserText = "";
+  let memory: ReturnType<typeof buildShortTermMemory>;
   let pendingMessageId: string | null = null;
   try {
     const body = await req.json();
     const raw = Array.isArray(body?.messages) ? body.messages : [];
-    // Bound per-payload token spend: only the last 20 turns travel.
-    messages = (raw.slice(-20) as ModelMessage[]).filter(
-      (m) =>
-        m &&
-        typeof m === "object" &&
-        (typeof (m as { role?: unknown }).role === "string" ||
-          typeof (m as { content?: unknown }).content === "string")
-    );
-    lastUserText = extractLastUserText(raw);
+    // Short-term memory: validate + compact the thread (token-bloat guard).
+    memory = buildShortTermMemory(raw);
     pendingMessageId = typeof body?.messageId === "string" ? body.messageId : null;
   } catch {
     return Response.json({ error: "Invalid request." }, { status: 400 });
   }
+  const { messages, lastUserText } = memory;
 
   const userName = session.user.name ?? "there";
 
   // Mock mode: deterministic, snapshot-grounded replies — no key required.
   if (isMockMode()) {
-    const snapshot = await buildHealthSnapshot(session.user.id);
+    const snapshot = await buildLongTermMemory(session.user.id);
     console.log(`[ai] chat · mode=mock`);
     return mockStreamResponse(
       mockChatReply(snapshot, userName, lastUserText || "hi"),
@@ -112,22 +94,40 @@ export async function POST(req: Request) {
     return Response.json({ offline: true, error: "offline" });
   }
 
-  const snapshot = await buildHealthSnapshot(session.user.id);
+  const longTerm = await buildLongTermMemory(session.user.id);
+
+  // RAG: only informational/medical queries hit the knowledge base; casual
+  // conversation skips retrieval. Local deterministic retriever — no keys,
+  // no network, degrades to an empty block if nothing is relevant.
+  const route = routeQuery(lastUserText);
+  let ragContext = "";
+  if (route.needsRetrieval && lastUserText) {
+    try {
+      const { chunks } = await retrieveKnowledge(lastUserText, {
+        domains: route.domains,
+        topK: 3,
+      });
+      ragContext = buildRagContextBlock(chunks);
+      console.log(`[ai] rag · ${route.reason} · ${chunks.length} chunk(s)`);
+    } catch (err) {
+      console.warn("[ai] rag retrieval failed — continuing without context:", err);
+    }
+  }
 
   const result = streamText({
     model,
-    system: buildCompanionSystemPrompt(snapshot, userName),
+    system: buildCompanionSystemPrompt(longTerm, userName, ragContext),
     messages,
     maxOutputTokens: 700,
     timeout: 30_000,
     tools: {
       getHealthSnapshot: tool({
         description:
-          "Fetch the user's latest health snapshot (current pain, averages, flares, top symptoms, streak, trend) when they ask about their data.",
+          "Fetch the user's latest health snapshot (current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
         // AI SDK v7 renamed `parameters` to `inputSchema`.
         inputSchema: z.object({}),
         execute: async () =>
-          JSON.stringify(await buildHealthSnapshot(session.user.id)),
+          JSON.stringify(await buildLongTermMemory(session.user.id)),
       }),
     },
     onFinish: async ({ usage }) => {

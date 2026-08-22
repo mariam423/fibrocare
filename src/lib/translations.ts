@@ -196,6 +196,16 @@ export type TranslationKey =
   | "privacy.digitsEnteredAria"
   | "privacy.forgotPin"
   | "privacy.useBiometrics"
+  | "privacy.biometricScanning"
+  | "privacy.biometricFailed"
+  | "privacy.resetPinTitle"
+  | "privacy.resetPinCloseAria"
+  | "privacy.resetPinPrompt"
+  | "privacy.resetPinNew"
+  | "privacy.resetPinConfirm"
+  | "privacy.resetPinAction"
+  | "privacy.resetPinNotSignedIn"
+  | "privacy.resetPinSignIn"
   | "privacy.setupDialogAria"
   | "privacy.protectTitle"
   | "privacy.choosePin"
@@ -313,6 +323,15 @@ export type TranslationKey =
   | "reports.severity.critical"
   | "reports.severity.warning"
   | "reports.severity.info"
+  | "reports.brief.title"
+  | "reports.brief.subtitle"
+  | "reports.brief.flareFrequency"
+  | "reports.brief.flareDaysUnit"
+  | "reports.brief.velocity"
+  | "reports.brief.functional"
+  | "reports.brief.adherence"
+  | "reports.brief.medications"
+  | "reports.brief.discussion"
   | "reports.filter.all"
   | "reports.download.title"
   | "reports.download.description"
@@ -534,6 +553,11 @@ export type TranslationKey =
   | "profile.gentleMotion"
   | "profile.motionOn"
   | "profile.motionOff"
+  | "profile.biometricTitle"
+  | "profile.biometricEnable"
+  | "profile.biometricEnabled"
+  | "profile.biometricDisable"
+  | "profile.biometricUnsupported"
   | "profile.motionToggleAria"
   | "profile.privacyTitle"
   | "profile.privacyDescOn"
@@ -592,6 +616,8 @@ export type TranslationKey =
   | "landing.hero.freeStart"
   | "landing.hero.noCard"
   | "landing.hero.private"
+  | "landing.trust.encrypted"
+  | "landing.trust.label"
   | "landing.tagline.eyebrow"
   | "landing.tagline.heading"
   | "landing.tagline.copy"
@@ -868,6 +894,16 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.digitsEnteredAria": "{length} of {total} digits entered",
     "privacy.forgotPin": "Forgot PIN?",
     "privacy.useBiometrics": "Use Biometrics",
+    "privacy.biometricScanning": "Waiting for biometric sensor…",
+    "privacy.biometricFailed": "Biometric unlock failed. Please try again.",
+    "privacy.resetPinTitle": "Reset privacy PIN",
+    "privacy.resetPinCloseAria": "Close reset PIN dialog",
+    "privacy.resetPinPrompt": "Choose a new 4-digit PIN for {email}.",
+    "privacy.resetPinNew": "New PIN",
+    "privacy.resetPinConfirm": "Confirm new PIN",
+    "privacy.resetPinAction": "Reset PIN",
+    "privacy.resetPinNotSignedIn": "You need to be signed in to reset your PIN.",
+    "privacy.resetPinSignIn": "Sign in",
     "privacy.setupDialogAria": "Set a privacy PIN",
     "privacy.protectTitle": "Protect your health data",
     "privacy.choosePin": "Choose a 4-digit PIN",
@@ -985,6 +1021,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.severity.critical": "Critical",
     "reports.severity.warning": "Watch",
     "reports.severity.info": "Note",
+    "reports.brief.title": "AI Clinical Executive Brief (30 days)",
+    "reports.brief.subtitle": "A one-page snapshot of your trends, prepared in clinical language for your care team.",
+    "reports.brief.flareFrequency": "Flare frequency",
+    "reports.brief.flareDaysUnit": "flare day(s)",
+    "reports.brief.velocity": "Symptom velocity",
+    "reports.brief.functional": "Functional capacity",
+    "reports.brief.adherence": "logging adherence",
+    "reports.brief.medications": "Patient-reported medications",
+    "reports.brief.discussion": "Suggested discussion points",
     "reports.filter.all": "All",
     "reports.download.title": "Clinical Summary PDF",
     "reports.download.description": "Includes the 30-day pain trend chart, correlation summary, key insights, and the full log annex.",
@@ -1206,6 +1251,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "profile.gentleMotion": "Gentle Motion",
     "profile.motionOn": "Cards gently float, tilt, and animate as you interact.",
     "profile.motionOff": "Motion is turned off for a calmer, steadier experience.",
+    "profile.biometricTitle": "Biometric Unlock",
+    "profile.biometricEnable": "Enable Biometric Unlock",
+    "profile.biometricEnabled": "Biometric unlock enabled.",
+    "profile.biometricDisable": "Disable Biometric Unlock",
+    "profile.biometricUnsupported": "Biometric unlock is not supported on this device or browser.",
     "profile.motionToggleAria": "Toggle gentle motion",
     "profile.privacyTitle": "Privacy Lock",
     "profile.privacyDescOn": "A 4-digit PIN protects your logs. The app locks automatically when you leave the tab.",
@@ -1263,6 +1313,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "landing.hero.freeStart": "Free to start",
     "landing.hero.noCard": "No credit card",
     "landing.hero.private": "Private by design",
+    "landing.trust.encrypted": "Encrypted & never sold",
+    "landing.trust.label": "Trust & privacy commitments",
     "landing.tagline.eyebrow": "The quiet part",
     "landing.tagline.heading": "Your body keeps its own score. FibroCare helps you read it.",
     "landing.tagline.copy": "People living with fibromyalgia are not believed enough: by doctors, by workplaces, sometimes by themselves. FibroCare starts from the opposite place: your experience is the data.",
@@ -1545,6 +1597,16 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.digitsEnteredAria": "تم إدخال {length} من {total} أرقام",
     "privacy.forgotPin": "نسيت رمز PIN؟",
     "privacy.useBiometrics": "استخدام البصمة",
+    "privacy.biometricScanning": "في انتظار مستشعر البصمة…",
+    "privacy.biometricFailed": "فشل الفتح بالبصمة. حاول مرة أخرى.",
+    "privacy.resetPinTitle": "إعادة تعيين رمز PIN",
+    "privacy.resetPinCloseAria": "إغلاق نافذة إعادة تعيين رمز PIN",
+    "privacy.resetPinPrompt": "اختر رمز PIN جديدًا من 4 أرقام لـ {email}.",
+    "privacy.resetPinNew": "رمز PIN الجديد",
+    "privacy.resetPinConfirm": "تأكيد رمز PIN الجديد",
+    "privacy.resetPinAction": "إعادة تعيين الرمز",
+    "privacy.resetPinNotSignedIn": "يجب تسجيل الدخول لإعادة تعيين رمز PIN.",
+    "privacy.resetPinSignIn": "تسجيل الدخول",
     "privacy.setupDialogAria": "تعيين رمز PIN للخصوصية",
     "privacy.protectTitle": "احمِ بياناتك الصحية",
     "privacy.choosePin": "اختر رمز PIN من 4 أرقام",
@@ -1662,6 +1724,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.severity.critical": "حرجة",
     "reports.severity.warning": "انتبه",
     "reports.severity.info": "ملاحظة",
+    "reports.brief.title": "الملخص التنفيذي السريري بالذكاء الاصطناعي (30 يومًا)",
+    "reports.brief.subtitle": "لمحة من صفحة واحدة عن اتجاهاتك، بصياغة سريرية لفريقك الطبي.",
+    "reports.brief.flareFrequency": "تكرار الاشتعال",
+    "reports.brief.flareDaysUnit": "يوم اشتعال",
+    "reports.brief.velocity": "سرعة تغيّر الأعراض",
+    "reports.brief.functional": "القدرة الوظيفية",
+    "reports.brief.adherence": "التزام بالتسجيل",
+    "reports.brief.medications": "أدوية ذكرها المريض",
+    "reports.brief.discussion": "نقاط مقترحة للمناقشة",
     "reports.filter.all": "الكل",
     "reports.download.title": "الملخّص السريري PDF",
     "reports.download.description": "يتضمّن مخطط اتجاه الألم لآخر 30 يومًا، وملخّص الارتباطات، والرؤى الرئيسية، وملحق السجلّ الكامل.",
@@ -1883,6 +1954,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "profile.gentleMotion": "حركة لطيفة",
     "profile.motionOn": "البطاقات تطفو وتنحني وتتحرك بلطف أثناء تفاعلك.",
     "profile.motionOff": "الحركة متوقفة لتجربة أهدأ وأكثر ثباتًا.",
+    "profile.biometricTitle": "الفتح بالبصمة",
+    "profile.biometricEnable": "تمكين الفتح بالبصمة",
+    "profile.biometricEnabled": "تم تمكين الفتح بالبصمة.",
+    "profile.biometricDisable": "تعطيل الفتح بالبصمة",
+    "profile.biometricUnsupported": "الفتح بالبصمة غير مدعوم على هذا الجهاز أو المتصفح.",
     "profile.motionToggleAria": "تبديل الحركة اللطيفة",
     "profile.privacyTitle": "قفل الخصوصية",
     "profile.privacyDescOn": "رمز PIN من 4 أرقام يحمي سجلاتك. يقفل التطبيق تلقائيًا عند مغادرة التبويب.",
@@ -1940,6 +2016,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "landing.hero.freeStart": "ابدأ مجانًا",
     "landing.hero.noCard": "بدون بطاقة ائتمان",
     "landing.hero.private": "خصوصيتك مصانة",
+    "landing.trust.encrypted": "مشفّر ولا يُشارك أبدًا",
+    "landing.trust.label": "التزامات الثقة والخصوصية",
     "landing.tagline.eyebrow": "الجزء الهادئ",
     "landing.tagline.heading": "جسدُك يسجِّل ما يتعرض له. فيبروكير يساعدك على قراءته.",
     "landing.tagline.copy": "تجربة الأشخاص المصابين بالفيبروميالجيا لا تُصدَّق بما يكفي: من الأطباء، ومن أماكن العمل، وأحيانًا من أنفسهم. فيبروكير يبدأ من الجهة المعاكسة: تجربتك هي البيانات.",

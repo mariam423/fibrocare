@@ -11,6 +11,11 @@
  */
 
 import type { HealthSnapshot } from "@/lib/ai/schemas";
+import type { LongTermMemory } from "@/lib/ai/memory";
+
+/** Snapshot plus the optional long-term extras (meds, weather). */
+export type CompanionMemory = HealthSnapshot &
+  Partial<Pick<LongTermMemory, "medications" | "weather">>;
 
 /** Phrases the companion must never use — they read as hollow. */
 export const EMPTY_EMPATHY_PHRASES = [
@@ -32,8 +37,8 @@ SAFETY (non-negotiable):
 - For severe flare-ups (pain 7+), advise rest, comfort measures, and checking in with their care team if it does not ease. Never tell someone to "push through".
 `;
 
-function snapshotBlock(snapshot: HealthSnapshot, userName: string): string {
-  return [
+function snapshotBlock(snapshot: CompanionMemory, userName: string): string {
+  const lines = [
     `USER HEALTH SNAPSHOT (user: ${userName}) — treat as private and current:`,
     `- Current pain: ${snapshot.currentPain ?? "not logged today"} / 10`,
     `- 7-day average pain: ${snapshot.avgPain7d ?? "no data"}`,
@@ -45,12 +50,27 @@ function snapshotBlock(snapshot: HealthSnapshot, userName: string): string {
     `- Latest mood: ${snapshot.mood ?? "unknown"}`,
     `- Latest log: ${snapshot.lastLogAt ?? "never"}`,
     `- 7-day pain trend: ${snapshot.trend ?? "unknown"}`,
-  ].join("\n");
+  ];
+
+  if (snapshot.medications?.length) {
+    lines.push(
+      `- Medications they mentioned in their own notes: ${snapshot.medications.join(", ")}`
+        + ` (patient-reported only — never confirm doses, suggest changes, or add medications)`
+    );
+  }
+  if (snapshot.weather) {
+    lines.push(
+      `- Local weather right now: ${snapshot.weather.summary}`
+        + (snapshot.weather.source === "estimated" ? " (estimated — no live feed configured)" : "")
+    );
+  }
+  return lines.join("\n");
 }
 
 export function buildCompanionSystemPrompt(
-  snapshot: HealthSnapshot,
-  userName: string
+  snapshot: CompanionMemory,
+  userName: string,
+  ragContext = ""
 ): string {
   const streakLine =
     snapshot.streakDays > 0
@@ -63,6 +83,11 @@ export function buildCompanionSystemPrompt(
     `Your voice: calm, specific, practical, and gently encouraging. Short sentences. Plain language.`,
     `Respond in the same language the user writes in. Keep answers under ~180 words unless the user asks for detail.`,
     ``,
+    `MEMORY USE:`,
+    `- You quietly know the user's health snapshot and the current thread below. Use this background to make replies specific — never recite it back unprompted, never list stats they didn't ask for.`,
+    `- Weave context in only where it changes what you'd say (e.g. skip exercise suggestions on a 8/10 day; mention weather only if it plausibly connects to what they describe).`,
+    `- Do not repeat the same acknowledgment or the same fact in consecutive replies; vary how you reference what you know.`,
+    ``,
     `EMPATHY RULES:`,
     `- Never use these phrases: ${EMPTY_EMPATHY_PHRASES.join("; ")}.`,
     `- Acknowledge the SPECIFIC thing the user said before offering advice. Paraphrase their situation, do not praise it generically.`,
@@ -73,6 +98,7 @@ export function buildCompanionSystemPrompt(
     ``,
     snapshotBlock(snapshot, userName),
     ``,
+    ...(ragContext ? [ragContext, ``] : []),
     SAFETY_RULES,
     ``,
     `If the user asks about their data, refer to the snapshot or ask them to check the dashboard. If you need fresher data, use the getHealthSnapshot tool.`,

@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { HealthLog } from "@/lib/types";
 import type { Insight } from "@/lib/insightEngine";
+import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
 
 export interface ReportData {
   userName: string;
@@ -10,6 +11,8 @@ export interface ReportData {
   topSymptoms: string[];
   insights: Insight[];
   logs: HealthLog[];
+  /** Optional 30-day AI clinical executive brief (deterministic analytics). */
+  brief?: ClinicalBrief;
 }
 
 const PERIOD_DAYS = 90;
@@ -214,6 +217,74 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   });
 
   y += 8;
+
+  // ---------- AI Clinical Executive Brief (optional) ----------
+  if (data.brief) {
+    const brief = data.brief;
+    doc.setTextColor(40);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("AI Clinical Executive Brief (30-day)", margin, y);
+    y += 15;
+
+    doc.setFontSize(9);
+    doc.setTextColor(70);
+    doc.setFont("helvetica", "normal");
+    const briefLines = doc.splitTextToSize(brief.headline, contentW) as string[];
+    doc.text(briefLines, margin, y);
+    y += briefLines.length * 11 + 4;
+
+    const briefRows: [string, string][] = [
+      [
+        "Flare frequency",
+        `${brief.flareFrequency.flareDays} flare day(s) · ~${brief.flareFrequency.perMonth}/month · trend: ${brief.flareFrequency.trend}`,
+      ],
+      [
+        "Symptom velocity",
+        `${brief.painProfile.velocity}${brief.painProfile.velocityDelta !== null ? ` (Δ ${brief.painProfile.velocityDelta > 0 ? "+" : ""}${brief.painProfile.velocityDelta})` : ""} · 7-day mean ${brief.painProfile.average7d ?? "n/a"} / 10`,
+      ],
+      [
+        "Functional capacity",
+        `${brief.functionalCapacity.loggingAdherencePct}% logging adherence · ${brief.functionalCapacity.loggingStreakDays}-day streak`,
+      ],
+      [
+        "Patient-reported medications",
+        brief.patientReportedMedications.length
+          ? brief.patientReportedMedications.join(", ")
+          : "None mentioned in logs",
+      ],
+    ];
+    if (brief.topTriggers.length > 0) {
+      briefRows.push([
+        "Detected triggers",
+        brief.topTriggers.map((t) => `${t.factor} (${t.evidence})`).join("; "),
+      ]);
+    }
+    briefRows.push([
+      "Suggested discussion points",
+      brief.suggestedDiscussionPoints.map((p, i) => `${i + 1}. ${p}`).join("  "),
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [],
+      body: briefRows,
+      theme: "plain",
+      styles: { fontSize: 8.5, cellPadding: 3, textColor: 60 },
+      columnStyles: {
+        0: { cellWidth: 130, fontStyle: "bold", textColor: 90 },
+        1: { cellWidth: contentW - 130 },
+      },
+      margin: { left: margin, right: margin },
+    });
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+
+    doc.setFontSize(7.5);
+    doc.setTextColor(130);
+    const caveatLines = doc.splitTextToSize(brief.dataCaveat, contentW) as string[];
+    doc.text(caveatLines, margin, y);
+    y += caveatLines.length * 9 + 10;
+  }
 
   // ---------- Pain trend chart ----------
   doc.setTextColor(40);

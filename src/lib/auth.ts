@@ -22,9 +22,22 @@ import { prisma } from "@/lib/prisma";
  *   GITHUB_CLIENT_ID=...
  *   GITHUB_CLIENT_SECRET=...
  */
+/**
+ * Dev-only fallback secret. Without NEXTAUTH_SECRET, NextAuth returns 500
+ * on /api/auth/session|providers, which surfaces client-side as
+ * [next-auth][error][CLIENT_FETCH_ERROR]. In development a deterministic
+ * fallback keeps those endpoints answering valid JSON so `useSession`
+ * degrades gracefully (an empty session object instead of a failed fetch).
+ * Production still refuses to run without a real secret — silently signing
+ * JWTs with a known value would be worse than a loud error.
+ */
+const DEV_FALLBACK_SECRET = "fibrocare-dev-only-fallback-secret-not-for-production";
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret:
+    process.env.NEXTAUTH_SECRET ??
+    (process.env.NODE_ENV === "production" ? undefined : DEV_FALLBACK_SECRET),
   providers: [
     CredentialsProvider({
       name: "Email",

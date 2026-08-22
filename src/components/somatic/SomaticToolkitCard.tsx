@@ -19,9 +19,19 @@ import { cn } from "@/lib/utils";
 import { selectExercises } from "@/lib/somatic/exercises";
 import { FlareAudioKit, type AudioPresetName } from "@/lib/somatic/audio";
 import { breathStateAt, cycleLength } from "@/lib/somatic/breathing";
-import { VideoPlayer } from "@/components/ui/VideoPlayer";
-import { BreathMotionCanvas } from "@/components/somatic/BreathMotionCanvas";
+import dynamic from "next/dynamic";
 import type { TranslationKey } from "@/lib/translations";
+
+// Heavy media/canvas components load only when their card renders, keeping
+// the toolkit's initial JS bundle lean. Audio kit (pure logic) stays static.
+const VideoPlayer = dynamic(
+  () => import("@/components/ui/VideoPlayer").then((m) => m.VideoPlayer),
+  { ssr: false, loading: () => <div className="aspect-video w-full animate-pulse rounded-2xl bg-muted/40" /> }
+);
+const BreathMotionCanvas = dynamic(
+  () => import("@/components/somatic/BreathMotionCanvas").then((m) => m.BreathMotionCanvas),
+  { ssr: false, loading: () => <div className="h-24 w-24 animate-pulse rounded-full bg-muted/40" /> }
+);
 import type { BreathPhase } from "@/types/extended-health";
 
 const AUDIO_PRESETS: Array<{ name: AudioPresetName; labelKey: TranslationKey }> = [

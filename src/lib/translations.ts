@@ -197,6 +197,28 @@ export type TranslationKey =
   | "privacy.forgotPin"
   | "privacy.useBiometrics"
   | "privacy.biometricScanning"
+  | "pricing.title"
+  | "pricing.subtitle"
+  | "pricing.free.name"
+  | "pricing.free.price"
+  | "pricing.free.perk1"
+  | "pricing.free.perk2"
+  | "pricing.free.perk3"
+  | "pricing.free.perk4"
+  | "pricing.pro.badge"
+  | "pricing.pro.name"
+  | "pricing.pro.price"
+  | "pricing.pro.period"
+  | "pricing.pro.perk1"
+  | "pricing.pro.perk2"
+  | "pricing.pro.perk3"
+  | "pricing.pro.perk4"
+  | "pricing.upgradeCta"
+  | "pricing.comingSoon"
+  | "pricing.footnote"
+  | "pricing.previewTitle"
+  | "pricing.previewBody"
+  | "profile.pricing"
   | "privacy.security.title"
   | "privacy.security.subtitle"
   | "privacy.security.encryption"
@@ -1027,6 +1049,28 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "Forgot PIN?",
     "privacy.useBiometrics": "Use Biometrics",
     "privacy.biometricScanning": "Waiting for biometric sensor…",
+    "pricing.title": "FibroCare plans",
+    "pricing.subtitle": "Your logs and data are always free. Pro adds the deeper AI work on top.",
+    "pricing.free.name": "Free",
+    "pricing.free.price": "$0",
+    "pricing.free.perk1": "Unlimited pain, symptom & spoon logging",
+    "pricing.free.perk2": "Body map, flare mode & somatic toolkit",
+    "pricing.free.perk3": "Offline install (PWA) with local encryption",
+    "pricing.free.perk4": "30/90-day PDF summary",
+    "pricing.pro.badge": "Pro",
+    "pricing.pro.name": "FibroCare Pro",
+    "pricing.pro.price": "$6",
+    "pricing.pro.period": "/ month",
+    "pricing.pro.perk1": "Empathic AI Companion with your health memory",
+    "pricing.pro.perk2": "Doctor-ready clinical brief & PDF export",
+    "pricing.pro.perk3": "Time-series flare & weather predictor",
+    "pricing.pro.perk4": "Guided video masterclasses",
+    "pricing.upgradeCta": "Upgrade to Pro",
+    "pricing.comingSoon": "Coming soon",
+    "pricing.footnote": "Cancel anytime. Your health data never leaves your device unless you export it yourself.",
+    "pricing.previewTitle": "This is a Pro feature",
+    "pricing.previewBody": "You can see a preview here. Pro unlocks the full version, and your logs stay free either way.",
+    "profile.pricing": "Plans & pricing",
     "privacy.security.title": "Privacy & security",
     "privacy.security.subtitle": "Your health data stays on your device unless you export it yourself.",
     "privacy.security.encryption": "Local data encryption",
@@ -1862,6 +1906,28 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "نسيت رمز PIN؟",
     "privacy.useBiometrics": "استخدام البصمة",
     "privacy.biometricScanning": "في انتظار مستشعر البصمة…",
+    "pricing.title": "خطط فيبروكير",
+    "pricing.subtitle": "سجلاتك وبياناتك مجانية دائمًا. Pro يضيف عمل الذكاء الاصطناعي الأعمق فوقها.",
+    "pricing.free.name": "مجاني",
+    "pricing.free.price": "$0",
+    "pricing.free.perk1": "تسجيل غير محدود للألم والأعراض والملاعق",
+    "pricing.free.perk2": "خريطة الجسم ووضع النوبات وأدوات الحركة",
+    "pricing.free.perk3": "تثبيت دون اتصال (PWA) مع تشفير محلي",
+    "pricing.free.perk4": "ملخص PDF لـ 30/90 يومًا",
+    "pricing.pro.badge": "برو",
+    "pricing.pro.name": "فيبروكير برو",
+    "pricing.pro.price": "$6",
+    "pricing.pro.period": "/ شهريًا",
+    "pricing.pro.perk1": "رفيق الذكاء الاصطناعي المتعاطف بذاكرة صحتك",
+    "pricing.pro.perk2": "الملخص السريري للطبيب وتصدير PDF",
+    "pricing.pro.perk3": "متوقع النوبات والطقس بالسلاسل الزمنية",
+    "pricing.pro.perk4": "ماجستركلاسات الفيديو الموجّهة",
+    "pricing.upgradeCta": "الترقية إلى برو",
+    "pricing.comingSoon": "قريبًا",
+    "pricing.footnote": "يمكنك الإلغاء في أي وقت. بياناتك الصحية لا تغادر جهازك ما لم تصدّرها بنفسك.",
+    "pricing.previewTitle": "هذه ميزة برو",
+    "pricing.previewBody": "يمكنك رؤية معاينة هنا. برو يفتح النسخة الكاملة، وسجلاتك تبقى مجانية في كل الأحوال.",
+    "profile.pricing": "الخطط والأسعار",
     "privacy.security.title": "الخصوصية والأمان",
     "privacy.security.subtitle": "بياناتك الصحية تبقى على جهازك ما لم تصدّرها بنفسك.",
     "privacy.security.encryption": "تشفير البيانات المحلية",

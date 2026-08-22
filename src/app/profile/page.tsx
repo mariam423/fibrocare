@@ -33,6 +33,7 @@ import { usePrivacy } from "@/components/auth/PrivacyLock";
 import { getCurrentUser, updateUserName, getStreak, getAllHealthLogs } from "../actions";
 import AppHeader from "@/components/layout/AppHeader";
 import { PrivacySecurityCard } from "@/components/settings/PrivacySecurityCard";
+import { PricingModal } from "@/components/pricing/PricingModal";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -40,6 +41,7 @@ export default function ProfilePage() {
   const { motionEnabled, setMotionEnabled } = useHealth();
   const { isEnabled, lock, disable, setPin } = usePrivacy();
   const [name, setName] = useState("");
+  const [pricingOpen, setPricingOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [streak, setStreak] = useState(0);
   const [totalLogs, setTotalLogs] = useState(0);
@@ -395,6 +397,22 @@ export default function ProfilePage() {
 
         {/* Privacy & Security Card */}
         <PrivacySecurityCard />
+
+        {/* Plans & pricing */}
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setPricingOpen(true)}
+            className="rounded-xl border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          >
+            {t("profile.pricing")}
+          </button>
+        </div>
+        <PricingModal
+          open={pricingOpen}
+          onClose={() => setPricingOpen(false)}
+          checkoutUrl={process.env.NEXT_PUBLIC_CHECKOUT_URL}
+        />
 
         {/* Social Sign-in Card */}
         <DepthCard delay={0.25} hover={false}>

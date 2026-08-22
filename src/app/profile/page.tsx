@@ -32,6 +32,7 @@ import { useHealth } from "@/context/HealthContext";
 import { usePrivacy } from "@/components/auth/PrivacyLock";
 import { getCurrentUser, updateUserName, getStreak, getAllHealthLogs } from "../actions";
 import AppHeader from "@/components/layout/AppHeader";
+import { PrivacySecurityCard } from "@/components/settings/PrivacySecurityCard";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -391,6 +392,9 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
         </DepthCard>
+
+        {/* Privacy & Security Card */}
+        <PrivacySecurityCard />
 
         {/* Social Sign-in Card */}
         <DepthCard delay={0.25} hover={false}>

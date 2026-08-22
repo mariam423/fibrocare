@@ -1,69 +1,50 @@
-# FibroCare 🌿 — Empathetic Health Companion for Fibromyalgia
+# FibroCare
 
-FibroCare is a specialized, accessibility-first web application and PWA designed to empower individuals with Fibromyalgia and bridge the gap between patients and their healthcare providers.
+FibroCare is a web app for people living with fibromyalgia. It helps track pain and energy day to day, and packages the results into something a doctor can actually use. It installs as a PWA and keeps working offline.
 
----
+## What it does
 
-## ✨ Key Features
+The daily check-in is built around Spoon Theory: you log your energy for the day alongside pain intensity and symptoms. A body map lets you mark where it hurts, front and back.
 
-- **Spoon Tracker & Daily Check-in:** Monitor energy levels using the Spoon Theory framework alongside physical symptoms and pain intensity.
-- **Interactive Body Pain Map:** Visual tracking of tender points and pain spread across 2.5D glass surfaces.
-- **Doctor Portal & Secure Clinical PDF:** Generate a 30/90-day clinical report or share a password/PIN-protected live dashboard link with specialists.
-- **Predictive Weather & Flare Insights:** Correlate local weather metrics (humidity, pressure, temp) with logged flares to anticipate tough days.
-- **Flare Emergency Mode:** Single-tap activation for sensory-dimmed overlays, breathing guides, and immediate calming protocols.
-- **AI Care Companion:** Empathy-driven, privacy-focused streaming AI assistant grounded in recent health snapshots (supports Gemini, OpenAI, Anthropic, or offline mock mode).
-- **PWA & Offline First:** Fully installable on iOS/Android/Desktop with Workbox service workers for uninterrupted offline logging.
+For doctor visits, the app generates a 30/90-day clinical report as a PDF, or you can share a PIN-protected live dashboard link with your specialist instead of printing anything.
 
----
+It also watches local weather (humidity, pressure, temperature) against your logged flares, so over time it can tell you things like "humidity is running 15% above your normal, maybe go easy today". When things get bad there's a flare mode: one tap dims the visuals, starts a paced breathing guide, and pulls up calming audio that plays offline.
 
-## 🛠️ Tech Stack
+The AI companion is optional. If you add a Gemini, OpenAI, or Anthropic key it becomes a chat that already knows your recent logs and answers in a grounded way, with your data staying on the server. With no key the app works fine without it: the deterministic insight engines still run, and the AI surfaces show a quiet offline hint instead of breaking.
 
-- **Framework:** Next.js (App Router, TypeScript)
-- **Styling:** Tailwind CSS, Framer Motion, Radix UI, Glassmorphism Design System
-- **State & Database:** Prisma, React Context
-- **AI Integration:** Vercel AI SDK
-- **Testing & Accessibility:** Playwright, Vitest, Custom Static CSS A11y Guard
+## Stack
 
----
+Next.js (App Router, TypeScript) with Tailwind, Framer Motion, and Radix UI on the frontend. Prisma over SQLite for data. The AI parts use the Vercel AI SDK. Tests are Playwright for e2e and Vitest for units, plus a homegrown static CSS check that fails the build if the accessibility fallbacks in `globals.css` get removed.
 
-## 🚀 Quick Start
+## Getting started
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/mariam423/fibrocare.git
-   cd fibrocare
-   ```
+```bash
+git clone https://github.com/mariam423/fibrocare.git
+cd fibrocare
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+The app runs at http://localhost:3000. No AI key is required to use it.
 
-3. **Configure environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   Add at least one AI provider key (or skip it — the app stays fully functional in offline mode):
-   ```bash
-   # Google Gemini (recommended, free tier usable, no card needed)
-   AI_PROVIDER=google
-   GEMINI_API_KEY=your_key
+If you want the companion live, add one of these to `.env.local`:
 
-   # …or OpenAI / Anthropic
-   # OPENAI_API_KEY=...      # default model gpt-4o-mini
-   # ANTHROPIC_API_KEY=...   # default model claude-haiku-4-5
-   # AI_MODEL=...            # optional override
-   ```
+```bash
+# Google Gemini (free tier, no card needed)
+AI_PROVIDER=google
+GEMINI_API_KEY=your_key
 
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
+# or OpenAI / Anthropic
+# OPENAI_API_KEY=...      # default model gpt-4o-mini
+# ANTHROPIC_API_KEY=...   # default model claude-haiku-4-5
+# AI_MODEL=...            # optional override
+```
 
-   Open [http://localhost:3000](http://localhost:3000) to see the app.
+## Notes
 
----
+- Arabic and English are both supported, with RTL layout for Arabic.
+- The service worker precaches the whole app shell, so a fresh install works with no prior visit.
+- The app is a self-tracking aid. It does not diagnose anything and does not replace a care team.
 
-## 📜 License
-
-This project is licensed under the MIT License.
+MIT licensed.

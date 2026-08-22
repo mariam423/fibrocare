@@ -197,6 +197,26 @@ export type TranslationKey =
   | "privacy.forgotPin"
   | "privacy.useBiometrics"
   | "privacy.biometricScanning"
+  | "privacy.security.title"
+  | "privacy.security.subtitle"
+  | "privacy.security.encryption"
+  | "privacy.security.encryptionDesc"
+  | "privacy.security.active"
+  | "privacy.security.unavailable"
+  | "privacy.security.analytics"
+  | "privacy.security.analyticsDesc"
+  | "privacy.security.export"
+  | "privacy.security.exportDesc"
+  | "privacy.security.passphrase"
+  | "privacy.security.exportBtn"
+  | "privacy.security.exportDone"
+  | "privacy.security.exportError"
+  | "privacy.security.purge"
+  | "privacy.security.purgeDesc"
+  | "privacy.security.purgeBtn"
+  | "privacy.security.purgeConfirmTitle"
+  | "privacy.security.purgeConfirmBody"
+  | "privacy.security.purged"
   | "privacy.biometricFailed"
   | "privacy.resetPinTitle"
   | "privacy.resetPinCloseAria"
@@ -558,6 +578,118 @@ export type TranslationKey =
   | "profile.biometricEnabled"
   | "profile.biometricDisable"
   | "profile.biometricUnsupported"
+  | "video.tab"
+  | "video.loading"
+  | "video.badge"
+  | "video.openExternal"
+  | "video.unavailable"
+  | "toolkit.title"
+  | "toolkit.subtitle"
+  | "medications.title"
+  | "medications.subtitle"
+  | "medications.namePlaceholder"
+  | "medications.dosePlaceholder"
+  | "medications.timingLabel"
+  | "medications.timing.morning"
+  | "medications.timing.evening"
+  | "medications.timing.bedtime"
+  | "medications.add"
+  | "medications.remove"
+  | "medications.empty"
+  | "medications.alerts"
+  | "medications.severity.critical"
+  | "medications.severity.warning"
+  | "medications.severity.caution"
+  | "medications.defaultDose"
+  | "medications.disclaimer"
+  | "somatic.title"
+  | "somatic.subtitle"
+  | "somatic.painToday"
+  | "somatic.spoonsLeft"
+  | "somatic.start"
+  | "somatic.stop"
+  | "somatic.noneSuitable"
+  | "somatic.ex.breathing.title"
+  | "somatic.ex.breathing.desc"
+  | "somatic.ex.humming.title"
+  | "somatic.ex.humming.desc"
+  | "somatic.ex.eyes.title"
+  | "somatic.ex.eyes.desc"
+  | "somatic.ex.neck.title"
+  | "somatic.ex.neck.desc"
+  | "somatic.ex.shoulders.title"
+  | "somatic.ex.shoulders.desc"
+  | "somatic.ex.catcow.title"
+  | "somatic.ex.catcow.desc"
+  | "somatic.ex.legs.title"
+  | "somatic.ex.legs.desc"
+  | "somatic.ex.bodyscan.title"
+  | "somatic.ex.bodyscan.desc"
+  | "somatic.audio.title"
+  | "somatic.audio.binaural432"
+  | "somatic.audio.binaural528"
+  | "somatic.audio.brown"
+  | "somatic.audio.headphonesNote"
+  | "somatic.breathing.title"
+  | "somatic.breathing.inhale"
+  | "somatic.breathing.hold"
+  | "somatic.breathing.exhale"
+  | "somatic.breathing.idle"
+  | "somatic.breathing.idleHint"
+  | "somatic.breathing.cycle"
+  | "sleep.title"
+  | "sleep.subtitle"
+  | "sleep.hours"
+  | "sleep.awakenings"
+  | "sleep.restLabel"
+  | "sleep.rest.1"
+  | "sleep.rest.2"
+  | "sleep.rest.3"
+  | "sleep.rest.4"
+  | "sleep.rest.5"
+  | "sleep.syncWearable"
+  | "sleep.deep"
+  | "sleep.hrv"
+  | "sleep.restingHr"
+  | "sleep.alphaDelta"
+  | "sleep.alphaDelta.likely"
+  | "sleep.alphaDelta.possible"
+  | "sleep.alphaDelta.unlikely"
+  | "sleep.alphaDelta.insufficient-data"
+  | "sleep.deepStatus"
+  | "sleep.deep.low"
+  | "sleep.deep.normal"
+  | "sleep.deep.high"
+  | "sleep.deep.unknown"
+  | "sleep.fogRisk"
+  | "sleep.fogLevel.low"
+  | "sleep.fogLevel.moderate"
+  | "sleep.fogLevel.high"
+  | "sleep.disclaimer"
+  | "communityInsights.title"
+  | "communityInsights.subtitle"
+  | "communityInsights.region"
+  | "communityInsights.trendLead"
+  | "communityInsights.dominantTrigger"
+  | "communityInsights.barometric.falling"
+  | "communityInsights.barometric.steady"
+  | "communityInsights.barometric.rising"
+  | "communityInsights.reportingUsers"
+  | "communityInsights.leaderboard"
+  | "communityInsights.votes"
+  | "communityInsights.disclaimer"
+  | "triggers.barometricDrop"
+  | "triggers.humidity"
+  | "triggers.poorSleep"
+  | "triggers.overexertion"
+  | "triggers.stress"
+  | "coping.pacedBreathing"
+  | "coping.warmWaterTherapy"
+  | "coping.gradedWalking"
+  | "coping.sleepHygiene"
+  | "coping.mindfulness"
+  | "coping.heatTherapy"
+  | "coping.taiChi"
   | "profile.motionToggleAria"
   | "profile.privacyTitle"
   | "profile.privacyDescOn"
@@ -805,7 +937,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "diagnosis.criteria": "Fibromyalgia is diagnosed based on symptoms and by ruling out other conditions. The American College of Rheumatology criteria include:\n\nWidespread pain index (WPI) and symptom severity scale (SSS) scoring\nPain and symptoms present for at least three months\nNo other disorder that would otherwise explain the pain\n\nDoctors may also use tender point testing, where specific areas of the body are pressed to assess sensitivity.",
     "diagnosis.exams": "While there is no single definitive test for fibromyalgia, your doctor may order tests to rule out other conditions:\n\nComplete Blood Count (CBC): Checks for signs of infection or anemia\nErythrocyte Sedimentation Rate (ESR): Measures inflammation levels\nThyroid Function Tests: Rules out thyroid disorders\nVitamin D Levels: Deficiency can mimic fibromyalgia symptoms\nRheumatoid Factor: Rules out rheumatoid arthritis\nSleep Studies: Identifies sleep disorders that may contribute to symptoms\n\nThese tests help ensure your symptoms are not caused by another treatable condition.",
     "treatment.title": "Treatment & Self-Care",
-    "treatment.subtitle": "A comprehensive approach combining medical treatment with lifestyle adjustments.",
+    "treatment.subtitle": "Medical treatment alongside day-to-day adjustments.",
     "treatment.medications": "Medications",
     "treatment.therapy": "Physical Therapy",
     "treatment.exercise": "Exercise",
@@ -876,7 +1008,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.weekly.scale": "/10",
     "dashboard.insights.title": "AI Insights",
     "dashboard.insights.subtitle": "Patterns detected from your recent logs.",
-    "dashboard.insights.empty": "Log at least 5 days of pain and symptoms to unlock personalized insights.",
+    "dashboard.insights.empty": "Log at least 5 days of pain and symptoms to get personalized insights.",
     "dashboard.toast.message": "It looks like a tough day. Would you like to switch to Calming Mode and take 3 minutes for yourself?",
     "dashboard.toast.title": "We're here with you",
     "dashboard.toast.dismissAria": "Dismiss message",
@@ -895,6 +1027,26 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "Forgot PIN?",
     "privacy.useBiometrics": "Use Biometrics",
     "privacy.biometricScanning": "Waiting for biometric sensor…",
+    "privacy.security.title": "Privacy & security",
+    "privacy.security.subtitle": "Your health data stays on your device unless you export it yourself.",
+    "privacy.security.encryption": "Local data encryption",
+    "privacy.security.encryptionDesc": "Sensitive local entries are encrypted with AES-GCM before they are stored in this browser.",
+    "privacy.security.active": "Active",
+    "privacy.security.unavailable": "Unavailable",
+    "privacy.security.analytics": "Opt out of analytics",
+    "privacy.security.analyticsDesc": "No analytics run today, and this preference is stored so any future analytics skips you.",
+    "privacy.security.export": "Export my data",
+    "privacy.security.exportDesc": "Downloads an encrypted JSON copy of everything stored locally. Choose a passphrase of at least 8 characters; it never leaves this device, and the file cannot be read without it.",
+    "privacy.security.passphrase": "Export passphrase (min 8 chars)",
+    "privacy.security.exportBtn": "Export",
+    "privacy.security.exportDone": "Encrypted export downloaded. Keep the passphrase safe; it cannot be recovered.",
+    "privacy.security.exportError": "Export failed. Check that the passphrase is at least 8 characters.",
+    "privacy.security.purge": "Purge all local health data",
+    "privacy.security.purgeDesc": "Removes every FibroCare entry from this browser: local caches, preferences, session state, and offline files. Your language preference and server data are not affected.",
+    "privacy.security.purgeBtn": "Purge now",
+    "privacy.security.purgeConfirmTitle": "Delete everything FibroCare stored in this browser?",
+    "privacy.security.purgeConfirmBody": "This cannot be undone. Local logs, preferences, and offline caches on this device will be gone. Your account data on the server stays.",
+    "privacy.security.purged": "Removed {count} local item(s){items}.",
     "privacy.biometricFailed": "Biometric unlock failed. Please try again.",
     "privacy.resetPinTitle": "Reset privacy PIN",
     "privacy.resetPinCloseAria": "Close reset PIN dialog",
@@ -941,11 +1093,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "flare.off": "Off",
     "flare.activateAria": "Activate Flare Emergency Mode",
     "flare.deactivateAria": "Deactivate Flare Emergency Mode",
-    "flare.dimmedMessage": "The screen is dimmed and motion stilled. You are not alone — here are the people who can help right now.",
+    "flare.dimmedMessage": "The screen is dimmed and motion stilled. You are not alone. Here are the people who can help right now.",
     "flare.armedDescription": "Tap to arm a calming, de-cluttered view with crisis resources for a severe flare.",
-    "flare.suggestion": " Your latest check-in looks like a flare-up — consider switching this on.",
+    "flare.suggestion": " Your latest check-in looks like a flare-up. Consider switching this on.",
     "flare.crisisOptionsAria": "Crisis support options",
-    "flare.crisis.emergencyLabel": "In immediate danger — call emergency services",
+    "flare.crisis.emergencyLabel": "In immediate danger? Call emergency services",
     "flare.crisis.emergencyValue": "911 (or local)",
     "flare.crisis.suicideLabel": "Crisis support for the US/Canada",
     "flare.crisis.suicideValue": "988 Suicide & Crisis Lifeline",
@@ -991,7 +1143,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medical.logs": "Logs",
     "medical.painTrend": "Pain Trend (last 7 days)",
     "medical.keyInsights": "Key Insights",
-    "medical.insightsEmpty": "Keep logging at least 5 days of pain and symptoms to unlock personalized insights.",
+    "medical.insightsEmpty": "Keep logging. After 5 days of pain and symptoms, personalized insights show up.",
     "medical.questions": "Questions for Your Doctor",
     "medical.summaryFor": "Medical Summary for {name}",
     "medical.generated": "Generated {date}",
@@ -999,8 +1151,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medical.error": "Could not generate your summary.",
     "medical.generatingAria": "Generating AI questions",
     "medical.question.flare": "We logged {count} flare day{plural} in the last 30 days. Could we review what may be triggering them and adjust my plan?",
-    "medical.question.highPain": "My average pain has been high — are my current medications and doses still the right fit?",
-    "medical.question.fatigue": "Fatigue and sleep issues keep showing up in my logs — can we explore energy management and sleep strategies?",
+    "medical.question.highPain": "My average pain has been high. Are my current medications and doses still the right fit?",
+    "medical.question.fatigue": "Fatigue and sleep issues keep showing up in my logs. Can we look at energy management and sleep strategies?",
     "medical.question.sensory": "Sensory sensitivity appears in my pattern. Are there pacing or environmental changes that could reduce it?",
     "medical.question.movement": "What movement or physiotherapy level is safe for me right now without worsening symptoms?",
     "medical.question.tracking": "How should I track or log differently so our next review is even more useful?",
@@ -1014,7 +1166,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.stat.topSymptoms": "Top symptoms",
     "reports.stat.noneRecorded": "None recorded",
     "reports.insights.subtitle": "Data-driven observations from your logs.",
-    "reports.insights.empty": "Log at least 5 days of pain + symptoms to unlock personalized insights.",
+    "reports.insights.empty": "Log at least 5 days of pain and symptoms to get personalized insights.",
     "reports.insights.filterLabel": "Filter insights by severity",
     "reports.insights.none": "No insights yet. Keep logging consistently.",
     "reports.insights.noneFor": "No {filter} insights right now.",
@@ -1043,21 +1195,21 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "careInsight.flareSevere": "severe flare",
     "careInsight.easing": "easing",
     "careInsight.watch": "watch",
-    "careInsight.title.severeHeat": "A flare day with heat — let's protect your calm",
-    "careInsight.title.severe": "A flare day — keep your support close",
-    "careInsight.title.mildHeat": "Mild discomfort with heat — small steps help",
-    "careInsight.title.mild": "Mild discomfort — gentle care goes a long way",
-    "careInsight.title.calmHeat": "Calm day, warm weather — maintain your rhythm",
-    "careInsight.title.calm": "A steady, calm day — nurture it",
+    "careInsight.title.severeHeat": "A flare day with heat. Let's protect your calm",
+    "careInsight.title.severe": "A flare day. Keep your support close",
+    "careInsight.title.mildHeat": "Mild discomfort with heat. Small steps help",
+    "careInsight.title.mild": "Mild discomfort, and gentle care goes a long way",
+    "careInsight.title.calmHeat": "Calm day, warm weather. Keep your rhythm",
+    "careInsight.title.calm": "A steady, calm day. Nurture it",
     "careInsight.heat.severe": "Heat and inflammation can make flare pain harder to manage. Keep the room cool and give your body extra rest.",
     "careInsight.heat.mild": "The heat can amplify achiness at your level. Staying cool and hydrated now can keep discomfort from climbing.",
-    "careInsight.heat.calm": "Today's warmth is mild enough to stay comfortable — just keep water close and avoid the midday sun.",
+    "careInsight.heat.calm": "Today's warmth is mild enough to stay comfortable. Keep water close and avoid the midday sun.",
     "careInsight.humidity.humidSevere": "High humidity can press on sensitive joints. A dehumidifier or fan in your space can make the room feel gentler.",
     "careInsight.humidity.humid": "The air is humid today, which can add a heavy feeling. Light layers and airflow help.",
     "careInsight.humidity.dry": "Very dry air can irritate skin and sinuses. A little extra water and a humidifier keep things comfortable.",
     "careInsight.humidity.moderate": "Humidity is in a comfortable range today.",
     "careInsight.trend.rising": "Your pain has been gently trending up this week, so pacing matters more than usual today.",
-    "careInsight.trend.falling": "Your pain has been easing over recent days — a good moment for light, careful movement.",
+    "careInsight.trend.falling": "Your pain has been easing over recent days. A good moment for light, careful movement.",
     "careInsight.trend.stable": "Your pain has been steady this week.",
     "careInsight.suggest.severe.1": "Rest in a cool, low-light room and limit activity to essential tasks.",
     "careInsight.suggest.severe.2": "Try a cool compress on tense areas and hydrate steadily.",
@@ -1067,8 +1219,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "careInsight.suggest.mild.3": "Note how your body responds so tomorrow's check-in is easier.",
     "careInsight.suggest.calm.1": "Keep your usual gentle routine and stay hydrated.",
     "careInsight.suggest.calm.2": "Spend a few quiet minutes outdoors while the weather supports it.",
-    "careInsight.suggest.calm.3": "Stay consistent with logging — patterns become clearer every day.",
-    "insight.highPainAvg.title": "Elevated Pain Levels",
+    "careInsight.suggest.calm.3": "Keep logging consistently. Patterns become clearer every day.",
+    "insight.highPainAvg.title": "High pain levels",
     "insight.highPainAvg.message": "Your average pain over the last {days} days is {avg}/10, in the high range. Consider discussing your current plan with your care team.",
     "insight.lowPainAvg.title": "Pain Is Well Managed",
     "insight.lowPainAvg.message": "Your average pain is {avg}/10. Whatever you're doing is working. Keep it up.",
@@ -1160,19 +1312,19 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "narration.stop": "Stop",
     "narration.dismiss": "Dismiss",
     "narration.generatingAria": "Generating explanation",
-    "narration.offline": "The personalized explanation needs a live AI key. Your data-driven insights above already say a lot — add GEMINI_API_KEY to the server to unlock it.",
-    "narration.detailedAnalysisTitle": "Detailed Pattern Analysis",
-    "narration.detailedAnalysisDesc": "Deeper insights based on your health logs",
+    "narration.offline": "The personalized explanation needs a live AI key. The data-driven insights above already say a lot. Add GEMINI_API_KEY to the server to turn it on.",
+    "narration.detailedAnalysisTitle": "Detailed pattern analysis",
+    "narration.detailedAnalysisDesc": "A closer look at your health logs",
     "narration.patternBody": "Your patterns show a strong correlation between sleep quality and pain levels the following morning.",
     "narration.aiObservationLabel": "AI Observation",
     "narration.aiObservationText": "Flare-ups typically occur 24-48 hours after high-stress events.",
-    "narration.missingLogsFallback": "Log at least 5 days of pain and symptoms to unlock a personalized narration of your patterns.",
+    "narration.missingLogsFallback": "Log at least 5 days of pain and symptoms to get a personalized narration of your patterns.",
     "reflection.button": "Reflect with AI",
     "reflection.stop": "Stop reflection",
     "reflection.generatingAria": "Reflecting on your note",
     "reflection.resultLabel": "A gentle reflection",
     "reflection.dismissAria": "Dismiss reflection",
-    "reflection.offline": "AI reflection needs a live key — your note is saved and stays private on this device.",
+    "reflection.offline": "AI reflection needs a live key. Your note is saved and stays private on this device.",
     "companion.openAria": "Open AI Care Companion",
     "companion.dialogAria": "AI Care Companion chat",
     "companion.title": "AI Care Companion",
@@ -1181,7 +1333,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.liveSimulated": "Live · simulated ({provider})",
     "companion.livePowered": "Live · powered by {provider}",
     "companion.closeAria": "Close chat",
-    "companion.hello": "I'm here with you. Ask me anything about managing fibromyalgia day to day — I already know your recent logs.",
+    "companion.hello": "I'm here with you. Ask me anything about managing fibromyalgia day to day. I already know your recent logs.",
     "companion.suggestion1": "What helps most during a flare-up?",
     "companion.suggestion2": "Any patterns in my logs this week?",
     "companion.suggestion3": "Help me plan a gentle, low-energy day",
@@ -1195,7 +1347,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.sendAria": "Send message",
     "companion.stopAria": "Stop generating",
     "companion.offlineHint": "The companion is resting. Set GEMINI_API_KEY (or another provider key) in your server environment to wake it up.",
-    "companion.mockHint": "Mock mode is on — replies are simulated locally. Add a real GEMINI_API_KEY and restart the dev server for live AI.",
+    "companion.mockHint": "Mock mode is on, so replies are simulated locally. Add a real GEMINI_API_KEY and restart the dev server for live AI.",
     "logs.pageTitle": "Health Logs",
     "logs.pageSubtitle": "Review, filter and manage your check-in history.",
     "logs.summaryAria": "Log summary",
@@ -1256,6 +1408,118 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "profile.biometricEnabled": "Biometric unlock enabled.",
     "profile.biometricDisable": "Disable Biometric Unlock",
     "profile.biometricUnsupported": "Biometric unlock is not supported on this device or browser.",
+    "video.tab": "Guided video",
+    "video.loading": "Loading guide…",
+    "video.badge": "Guide",
+    "video.openExternal": "Open the guided video in a new tab",
+    "video.unavailable": "The video guide is unavailable right now, so here are the steps instead.",
+    "toolkit.title": "Care Toolkit",
+    "toolkit.subtitle": "Movement, sleep, medication safety, and community insights. All of it works offline.",
+    "medications.title": "Medications & Safety",
+    "medications.subtitle": "Track your regimen and screen it for common fibromyalgia interactions.",
+    "medications.namePlaceholder": "Medication or supplement",
+    "medications.dosePlaceholder": "Dose",
+    "medications.timingLabel": "Timing",
+    "medications.timing.morning": "Morning",
+    "medications.timing.evening": "Evening",
+    "medications.timing.bedtime": "Bedtime",
+    "medications.add": "Add",
+    "medications.remove": "Remove",
+    "medications.empty": "No medications added yet. Start by adding one below.",
+    "medications.alerts": "Interaction alerts",
+    "medications.severity.critical": "Critical",
+    "medications.severity.warning": "Warning",
+    "medications.severity.caution": "Caution",
+    "medications.defaultDose": "as prescribed",
+    "medications.disclaimer": "This is a screening aid only. Always confirm interactions with your pharmacist or care team.",
+    "somatic.title": "Movement & Flare Toolkit",
+    "somatic.subtitle": "Somatic exercises, calming audio, and breathing, matched to your energy budget (ميزانية الطاقة) today.",
+    "somatic.painToday": "Pain today",
+    "somatic.spoonsLeft": "Spoons left",
+    "somatic.start": "Start",
+    "somatic.stop": "Stop",
+    "somatic.noneSuitable": "Rest is the exercise today. Nothing suits this pain level.",
+    "somatic.ex.breathing.title": "Diaphragmatic breathing",
+    "somatic.ex.breathing.desc": "Slow belly breathing to calm the nervous system.",
+    "somatic.ex.humming.title": "Vagus nerve humming",
+    "somatic.ex.humming.desc": "Gentle humming to stimulate the vagus nerve.",
+    "somatic.ex.eyes.title": "Slow eye-movement calm",
+    "somatic.ex.eyes.desc": "Slow side-to-side gaze to down-shift arousal.",
+    "somatic.ex.neck.title": "Neck micro-releases",
+    "somatic.ex.neck.desc": "Tiny, pain-free neck movements at your own pace.",
+    "somatic.ex.shoulders.title": "Shoulder circles",
+    "somatic.ex.shoulders.desc": "Small, slow circles to release the shoulder girdle.",
+    "somatic.ex.catcow.title": "Cat-cow",
+    "somatic.ex.catcow.desc": "Spine flexion cycles, only within comfort.",
+    "somatic.ex.legs.title": "Legs up the wall",
+    "somatic.ex.legs.desc": "Restorative inversion; drain and settle.",
+    "somatic.ex.bodyscan.title": "Guided body scan",
+    "somatic.ex.bodyscan.desc": "Progressive attention from head to toes.",
+    "somatic.audio.title": "Flare emergency audio",
+    "somatic.audio.binaural432": "Binaural 432 Hz",
+    "somatic.audio.binaural528": "Binaural 528 Hz",
+    "somatic.audio.brown": "Deep brown noise",
+    "somatic.audio.headphonesNote": "Use headphones for binaural beats. Works fully offline.",
+    "somatic.breathing.title": "4-7-8 breathing",
+    "somatic.breathing.inhale": "Inhale",
+    "somatic.breathing.hold": "Hold",
+    "somatic.breathing.exhale": "Exhale",
+    "somatic.breathing.idle": "Ready when you are",
+    "somatic.breathing.idleHint": "tap start to begin",
+    "somatic.breathing.cycle": "cycle",
+    "sleep.title": "Sleep Architecture & HRV",
+    "sleep.subtitle": "Screen for non-restorative sleep patterns and plan around fibro fog.",
+    "sleep.hours": "Hours slept",
+    "sleep.awakenings": "Awakenings",
+    "sleep.restLabel": "How rested do you feel?",
+    "sleep.rest.1": "Exhausted",
+    "sleep.rest.2": "Poorly rested",
+    "sleep.rest.3": "Okay",
+    "sleep.rest.4": "Well rested",
+    "sleep.rest.5": "Fully refreshed",
+    "sleep.syncWearable": "Sync wearable",
+    "sleep.deep": "Deep sleep",
+    "sleep.hrv": "HRV",
+    "sleep.restingHr": "Resting HR",
+    "sleep.alphaDelta": "Alpha-delta intrusion screen",
+    "sleep.alphaDelta.likely": "Pattern likely: sleep looks non-restorative",
+    "sleep.alphaDelta.possible": "Possible pattern. Keep tracking",
+    "sleep.alphaDelta.unlikely": "Pattern unlikely",
+    "sleep.alphaDelta.insufficient-data": "Not enough data yet",
+    "sleep.deepStatus": "Deep sleep",
+    "sleep.deep.low": "Low",
+    "sleep.deep.normal": "Normal",
+    "sleep.deep.high": "High",
+    "sleep.deep.unknown": "Unknown",
+    "sleep.fogRisk": "Fibro fog risk today",
+    "sleep.fogLevel.low": "Low",
+    "sleep.fogLevel.moderate": "Moderate",
+    "sleep.fogLevel.high": "High",
+    "sleep.disclaimer": "Self-tracking screening only, not a sleep study. Discuss persistent problems with your care team.",
+    "communityInsights.title": "Community Insights",
+    "communityInsights.subtitle": "Anonymized, region-level trends from the FibroCare community.",
+    "communityInsights.region": "Region",
+    "communityInsights.trendLead": "{pct}% of users in {region} report increased flare sensitivity right now",
+    "communityInsights.dominantTrigger": "Dominant trigger",
+    "communityInsights.barometric.falling": "pressure falling",
+    "communityInsights.barometric.steady": "pressure steady",
+    "communityInsights.barometric.rising": "pressure rising",
+    "communityInsights.reportingUsers": "{count} reporting users",
+    "communityInsights.leaderboard": "Top coping strategies (community-voted)",
+    "communityInsights.votes": "{count} votes",
+    "communityInsights.disclaimer": "Modeled anonymized aggregates. No individual data is ever shown.",
+    "triggers.barometricDrop": "barometric pressure drop",
+    "triggers.humidity": "humidity",
+    "triggers.poorSleep": "poor sleep",
+    "triggers.overexertion": "overexertion",
+    "triggers.stress": "stress",
+    "coping.pacedBreathing": "Paced breathing",
+    "coping.warmWaterTherapy": "Warm water therapy",
+    "coping.gradedWalking": "Graded walking",
+    "coping.sleepHygiene": "Sleep hygiene routine",
+    "coping.mindfulness": "Mindfulness practice",
+    "coping.heatTherapy": "Heat therapy",
+    "coping.taiChi": "Tai chi",
     "profile.motionToggleAria": "Toggle gentle motion",
     "profile.privacyTitle": "Privacy Lock",
     "profile.privacyDescOn": "A 4-digit PIN protects your logs. The app locks automatically when you leave the tab.",
@@ -1377,7 +1641,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "landing.faq.q4": "Can I really bring a report to my doctor?",
     "landing.faq.a4": "Yes. From the Reports area you can generate a clean, one-page PDF summary of your trends: pain patterns, flare frequency, sleep and energy averages, ready to share at your next appointment.",
     "landing.faq.q5": "What if I miss a day?",
-    "landing.faq.a5": "Nothing breaks. FibroCare is designed to meet you where you are. Missing days simply means your patterns grow a little slower, not that you've failed. Consistency is a pace, not a streak.",
+    "landing.faq.a5": "Nothing breaks. If you miss days, your patterns just grow a little slower; it doesn't mean you've failed. Log when you can.",
     "landing.faq.q6": "Is it free to start?",
     "landing.faq.a6": "Yes. Signing up and starting your check-ins is free, with no credit card required. You can explore the full daily flow before deciding anything else.",
     "landing.final.heading": "Start where you are. Not where the checklist says.",
@@ -1598,6 +1862,26 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "نسيت رمز PIN؟",
     "privacy.useBiometrics": "استخدام البصمة",
     "privacy.biometricScanning": "في انتظار مستشعر البصمة…",
+    "privacy.security.title": "الخصوصية والأمان",
+    "privacy.security.subtitle": "بياناتك الصحية تبقى على جهازك ما لم تصدّرها بنفسك.",
+    "privacy.security.encryption": "تشفير البيانات المحلية",
+    "privacy.security.encryptionDesc": "الإدخالات المحلية الحساسة تُشفَّر بخوارزمية AES-GCM قبل تخزينها في هذا المتصفح.",
+    "privacy.security.active": "مُفعّل",
+    "privacy.security.unavailable": "غير متاح",
+    "privacy.security.analytics": "إلغاء الاشتراك في التحليلات",
+    "privacy.security.analyticsDesc": "لا تعمل أي تحليلات اليوم، ويُحفَظ هذا التفضيل لتخطّاك في أي تحليلات مستقبلية.",
+    "privacy.security.export": "تصدير بياناتي",
+    "privacy.security.exportDesc": "ينزّل نسخة JSON مشفّرة لكل ما هو مخزّن محليًا. اختر عبارة مرور من 8 أحرف على الأقل؛ لا تغادر هذا الجهاز أبدًا، ولا يمكن قراءة الملف بدونها.",
+    "privacy.security.passphrase": "عبارة مرور التصدير (8 أحرف فأكثر)",
+    "privacy.security.exportBtn": "تصدير",
+    "privacy.security.exportDone": "تم تنزيل التصدير المشفّر. احفظ عبارة المرور؛ لا يمكن استعادتها.",
+    "privacy.security.exportError": "فشل التصدير. تأكد أن عبارة المرور 8 أحرف على الأقل.",
+    "privacy.security.purge": "محو كل البيانات الصحية المحلية",
+    "privacy.security.purgeDesc": "يزيل كل إدخالات FibroCare من هذا المتصفح: الذاكرات المؤقتة والتفضيلات وحالة الجلسة والملفات دون اتصال. تفضيل اللغة وبيانات الخادم لا يتأثران.",
+    "privacy.security.purgeBtn": "محو الآن",
+    "privacy.security.purgeConfirmTitle": "حذف كل ما خزّنه FibroCare في هذا المتصفح؟",
+    "privacy.security.purgeConfirmBody": "لا يمكن التراجع. السجلات والتفضيلات والذاكرات المؤقتة على هذا الجهاز ستُمحى. بيانات حسابك على الخادم تبقى كما هي.",
+    "privacy.security.purged": "تمت إزالة {count} عنصرًا محليًا{items}.",
     "privacy.biometricFailed": "فشل الفتح بالبصمة. حاول مرة أخرى.",
     "privacy.resetPinTitle": "إعادة تعيين رمز PIN",
     "privacy.resetPinCloseAria": "إغلاق نافذة إعادة تعيين رمز PIN",
@@ -1959,6 +2243,118 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "profile.biometricEnabled": "تم تمكين الفتح بالبصمة.",
     "profile.biometricDisable": "تعطيل الفتح بالبصمة",
     "profile.biometricUnsupported": "الفتح بالبصمة غير مدعوم على هذا الجهاز أو المتصفح.",
+    "video.tab": "فيديو موجّه",
+    "video.loading": "جارٍ تحميل الدليل…",
+    "video.badge": "دليل",
+    "video.openExternal": "افتح الفيديو الموجّه في تبويب جديد",
+    "video.unavailable": "الفيديو الموجّه غير متاح الآن — إليك الخطوات بدلًا منه.",
+    "toolkit.title": "حقيبة العناية",
+    "toolkit.subtitle": "حركة ونوم وسلامة الأدوية ورؤى المجتمع — كلها تعمل دون اتصال.",
+    "medications.title": "الأدوية والسلامة",
+    "medications.subtitle": "تابع أدويتك وافحصها من التداخلات الشائعة في الفيبروميالغيا.",
+    "medications.namePlaceholder": "دواء أو مكمّل",
+    "medications.dosePlaceholder": "الجرعة",
+    "medications.timingLabel": "التوقيت",
+    "medications.timing.morning": "صباحًا",
+    "medications.timing.evening": "مساءً",
+    "medications.timing.bedtime": "قبل النوم",
+    "medications.add": "إضافة",
+    "medications.remove": "إزالة",
+    "medications.empty": "لم تُضف أدوية بعد — ابدأ بإضافة دواء أدناه.",
+    "medications.alerts": "تنبيهات التداخل",
+    "medications.severity.critical": "خطير",
+    "medications.severity.warning": "تحذير",
+    "medications.severity.caution": "احتراس",
+    "medications.defaultDose": "حسب الوصفة",
+    "medications.disclaimer": "أداة فحص أولي فقط — أكّد التداخلات دائمًا مع طبيبك أو الصيدلي.",
+    "somatic.title": "أدوات الحركة والنوبات الحادة (ملاذ النوبات الحادة)",
+    "somatic.subtitle": "تمارين جسدية وصوت مهدّئ وتنفّس — بما يناسب ميزانية الطاقة اليوم.",
+    "somatic.painToday": "الألم اليوم",
+    "somatic.spoonsLeft": "الملاعق المتبقية",
+    "somatic.start": "ابدأ",
+    "somatic.stop": "إيقاف",
+    "somatic.noneSuitable": "الراحة هي التمرين اليوم — لا شيء يناسب هذا المستوى من الألم.",
+    "somatic.ex.breathing.title": "التنفس الحجابي",
+    "somatic.ex.breathing.desc": "تنفس بطيء من البطن لتهدئة الجهاز العصبي.",
+    "somatic.ex.humming.title": "الطنين العصب الحائر",
+    "somatic.ex.humming.desc": "طنين لطيف لتحفيز العصب الحائر.",
+    "somatic.ex.eyes.title": "تهدئة حركة العين",
+    "somatic.ex.eyes.desc": "نظرات جانبية بطيئة لخفض التوتر.",
+    "somatic.ex.neck.title": "تفريغات الرقبة الدقيقة",
+    "somatic.ex.neck.desc": "حركات رقبة صغيرة بلا ألم وبإيقاعك.",
+    "somatic.ex.shoulders.title": "دوائر الكتفين",
+    "somatic.ex.shoulders.desc": "دوائر صغيرة بطيئة لتفكيك شد الكتف.",
+    "somatic.ex.catcow.title": "القط والبقرة",
+    "somatic.ex.catcow.desc": "دورات ثني العمود الفقري ضمن الراحة فقط.",
+    "somatic.ex.legs.title": "الساقان على الحائط",
+    "somatic.ex.legs.desc": "وضعية استشفائية للاسترخاء والتهدئة.",
+    "somatic.ex.bodyscan.title": "مسح الجسد الموجّه",
+    "somatic.ex.bodyscan.desc": "انتباه متدرج من الرأس إلى القدمين.",
+    "somatic.audio.title": "صوت طوارئ النوبات",
+    "somatic.audio.binaural432": "نغمات ثنائية 432 هرتز",
+    "somatic.audio.binaural528": "نغمات ثنائية 528 هرتز",
+    "somatic.audio.brown": "ضجيج بني عميق",
+    "somatic.audio.headphonesNote": "استخدم سماعات الرأس للنغمات الثنائية. يعمل دون اتصال تمامًا.",
+    "somatic.breathing.title": "تنفس 4-7-8",
+    "somatic.breathing.inhale": "شهيق",
+    "somatic.breathing.hold": "حبس",
+    "somatic.breathing.exhale": "زفير",
+    "somatic.breathing.idle": "جاهز متى شئت",
+    "somatic.breathing.idleHint": "اضغط ابدأ للانطلاق",
+    "somatic.breathing.cycle": "دورة",
+    "sleep.title": "بنية النوم ومتغير معدل ضربات القلب",
+    "sleep.subtitle": "فحص أنماط النوم غير الاستشفائي والتخطيط حول ضباب الفيبرو.",
+    "sleep.hours": "ساعات النوم",
+    "sleep.awakenings": "مرات الاستيقاظ",
+    "sleep.restLabel": "ما مدى شعورك بالراحة؟",
+    "sleep.rest.1": "منهك",
+    "sleep.rest.2": "راحة سيئة",
+    "sleep.rest.3": "لا بأس",
+    "sleep.rest.4": "راحة جيدة",
+    "sleep.rest.5": "منتعش تمامًا",
+    "sleep.syncWearable": "مزامنة الساعة الذكية",
+    "sleep.deep": "النوم العميق",
+    "sleep.hrv": "HRV",
+    "sleep.restingHr": "نبض الراحة",
+    "sleep.alphaDelta": "فحص تسلل ألفا-دلتا",
+    "sleep.alphaDelta.likely": "النمط محتمل — يبدو النوم غير استشفائي",
+    "sleep.alphaDelta.possible": "نمط ممكن — واصل التتبع",
+    "sleep.alphaDelta.unlikely": "النمط غير محتمل",
+    "sleep.alphaDelta.insufficient-data": "لا تتوفر بيانات كافية بعد",
+    "sleep.deepStatus": "النوم العميق",
+    "sleep.deep.low": "منخفض",
+    "sleep.deep.normal": "طبيعي",
+    "sleep.deep.high": "مرتفع",
+    "sleep.deep.unknown": "غير معروف",
+    "sleep.fogRisk": "خطر ضباب الفيبرو اليوم",
+    "sleep.fogLevel.low": "منخفض",
+    "sleep.fogLevel.moderate": "متوسط",
+    "sleep.fogLevel.high": "مرتفع",
+    "sleep.disclaimer": "فحص تتبع ذاتي فقط — ليس دراسة نوم؛ ناقش المشكلات المستمرة مع فريقك الطبي.",
+    "communityInsights.title": "رؤى المجتمع",
+    "communityInsights.subtitle": "اتجاهات مجهولة الهوية على مستوى المنطقة من مجتمع FibroCare.",
+    "communityInsights.region": "المنطقة",
+    "communityInsights.trendLead": "{pct}% من المستخدمين في {region} يبلّغون عن ازدياد حساسية الاشتعال الآن",
+    "communityInsights.dominantTrigger": "المحفّز السائد",
+    "communityInsights.barometric.falling": "الضغط ينخفض",
+    "communityInsights.barometric.steady": "الضغط مستقر",
+    "communityInsights.barometric.rising": "الضغط يرتفع",
+    "communityInsights.reportingUsers": "{count} مستخدمًا يبلّغون",
+    "communityInsights.leaderboard": "أفضل استراتيجيات التأقلم (بتصويت المجتمع)",
+    "communityInsights.votes": "{count} صوتًا",
+    "communityInsights.disclaimer": "تجميعات مجهولة الهوية نموذجية — لا تُعرض أي بيانات فردية أبدًا.",
+    "triggers.barometricDrop": "انخفاض الضغط الجوي",
+    "triggers.humidity": "الرطوبة",
+    "triggers.poorSleep": "سوء النوم",
+    "triggers.overexertion": "الإجهاد المفرط",
+    "triggers.stress": "التوتر",
+    "coping.pacedBreathing": "التنفس المُتدرّج",
+    "coping.warmWaterTherapy": "العلاج بالماء الدافئ",
+    "coping.gradedWalking": "المشي المتدرج",
+    "coping.sleepHygiene": "روتين نظافة النوم",
+    "coping.mindfulness": "ممارسة اليقظة الذهنية",
+    "coping.heatTherapy": "العلاج بالحرارة",
+    "coping.taiChi": "تاي تشي",
     "profile.motionToggleAria": "تبديل الحركة اللطيفة",
     "profile.privacyTitle": "قفل الخصوصية",
     "profile.privacyDescOn": "رمز PIN من 4 أرقام يحمي سجلاتك. يقفل التطبيق تلقائيًا عند مغادرة التبويب.",

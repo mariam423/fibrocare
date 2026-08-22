@@ -19,6 +19,7 @@ const PROTECTED_PREFIXES = [
   "/zen",
   "/reports",
   "/profile",
+  "/toolkit",
 ];
 
 function isProtectedPath(pathname: string): boolean {

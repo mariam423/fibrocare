@@ -9,10 +9,15 @@
  * summarizer without an AI round-trip.
  */
 
+import { sanitizeWarmTherapy } from "@/lib/ai/guardrails";
+import type { PressureReading } from "@/lib/weather";
+
 export type FlareState = "calm" | "mild" | "severe";
 export type PainTrend = "rising" | "stable" | "falling";
 export type ComfortLevel = "hot" | "comfortable" | "cool";
 export type HumidityLevel = "humid" | "moderate" | "dry";
+/** Climate signal for pressure-sensitive patients. */
+export type BarometricState = "dropping" | "low" | "stable";
 
 export interface CareInsightInput {
   /** Latest pain level on the 0–10 scale. */
@@ -23,12 +28,17 @@ export interface CareInsightInput {
   humidity: number;
   /** 7-day pain trend derived from recent logs. */
   trend: PainTrend;
+  /** Current barometric pressure in hPa (optional climate context). */
+  pressure?: number;
+  /** Movement vs the previous reading, from /api/weather (optional). */
+  pressureTrend?: PressureReading;
 }
 
 export interface CareInsight {
   flareState: FlareState;
   comfort: ComfortLevel;
   humidity: HumidityLevel;
+  barometric: BarometricState;
   /** Empathetic headline shown in the card. */
   title: string;
   /** One-sentence, non-alarmist explanation. */
@@ -99,10 +109,25 @@ function humidityMessage(level: HumidityLevel, flare: FlareState): string {
   return "Humidity is in a comfortable range today.";
 }
 
+/**
+ * Barometric state for pressure-sensitive patients: a falling barometer or
+ * an absolute low (< 1005 hPa) is the climate signal most consistently
+ * linked to symptom upticks. Absent readings read as stable.
+ */
+export function getBarometricState(
+  pressure?: number,
+  pressureTrend?: PressureReading
+): BarometricState {
+  if (pressureTrend?.trend === "falling") return "dropping";
+  if (typeof pressure === "number" && pressure < 1005) return "low";
+  return "stable";
+}
+
 export function buildCareInsight(input: CareInsightInput): CareInsight {
   const flare = getFlareState(input.painLevel);
   const comfort = getComfort(input.temperature);
   const humidity = getHumidityLevel(input.humidity);
+  const barometric = getBarometricState(input.pressure, input.pressureTrend);
 
   const isHeatFactor = comfort === "hot" || humidity === "humid";
 
@@ -130,7 +155,7 @@ export function buildCareInsight(input: CareInsightInput): CareInsight {
   if (flare === "severe") {
     suggestions = [
       "Rest in a cool, low-light room and limit activity to essential tasks.",
-      "Try a cool compress on tense areas and hydrate steadily.",
+      "Try a warm compress or a warm bath on tense areas to ease muscle tension, and hydrate steadily.",
       "Switch on Calming Mode for 3 minutes of slow breathing.",
     ];
   } else if (flare === "mild") {
@@ -151,8 +176,9 @@ export function buildCareInsight(input: CareInsightInput): CareInsight {
     flareState: flare,
     comfort,
     humidity,
-    title,
-    message: messages.join(" "),
-    suggestions,
+    barometric,
+    title: sanitizeWarmTherapy(title),
+    message: sanitizeWarmTherapy(messages.join(" ")),
+    suggestions: suggestions.map(sanitizeWarmTherapy),
   };
 }

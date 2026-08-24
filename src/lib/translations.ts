@@ -310,6 +310,11 @@ export type TranslationKey =
   | "today.impact.low"
   | "today.impact.high"
   | "today.impact.normal"
+  | "today.status.stable"
+  | "today.status.pressureDrop"
+  | "today.trigger.humidityHigh"
+  | "today.trigger.heat"
+  | "today.trigger.cold"
   | "today.estimated"
   | "recent.title"
   | "recent.empty"
@@ -364,6 +369,14 @@ export type TranslationKey =
   | "reports.stat.flareDays"
   | "reports.stat.topSymptoms"
   | "reports.stat.noneRecorded"
+  | "reports.stat.symptom.widespreadPain"
+  | "reports.stat.symptom.fatigue"
+  | "reports.stat.symptom.sleepProblems"
+  | "reports.stat.symptom.fibroFog"
+  | "reports.stat.symptom.headache"
+  | "reports.stat.symptom.tenderPoints"
+  | "reports.stat.symptom.stiffness"
+  | "reports.stat.symptom.sensitivity"
   | "reports.insights.subtitle"
   | "reports.insights.empty"
   | "reports.insights.filterLabel"
@@ -381,6 +394,31 @@ export type TranslationKey =
   | "reports.brief.adherence"
   | "reports.brief.medications"
   | "reports.brief.discussion"
+  | "reports.brief.headline"
+  | "reports.brief.headline.noData"
+  | "reports.brief.flareDays.zero"
+  | "reports.brief.flareDays.one"
+  | "reports.brief.flareDays.two"
+  | "reports.brief.flareDays.few"
+  | "reports.brief.flareDays.many"
+  | "reports.brief.ratePerMonth"
+  | "reports.brief.velocity.improving"
+  | "reports.brief.velocity.stable"
+  | "reports.brief.velocity.worsening"
+  | "reports.brief.velocity.insufficientData"
+  | "reports.brief.trend.rising"
+  | "reports.brief.trend.falling"
+  | "reports.brief.trend.stable"
+  | "reports.brief.trend.insufficientData"
+  | "reports.brief.streakDays"
+  | "reports.brief.discussion.worsening"
+  | "reports.brief.discussion.painControl"
+  | "reports.brief.discussion.medicationsList"
+  | "reports.brief.discussion.noMedications"
+  | "reports.brief.discussion.sleep"
+  | "reports.brief.discussion.weather"
+  | "reports.brief.discussion.default"
+  | "reports.brief.caveat"
   | "reports.filter.all"
   | "reports.download.title"
   | "reports.download.description"
@@ -407,6 +445,8 @@ export type TranslationKey =
   | "careInsight.humidity.humid"
   | "careInsight.humidity.dry"
   | "careInsight.humidity.moderate"
+  | "careInsight.barometric.dropping"
+  | "careInsight.barometric.low"
   | "careInsight.trend.rising"
   | "careInsight.trend.falling"
   | "careInsight.trend.stable"
@@ -531,6 +571,8 @@ export type TranslationKey =
   | "companion.offlineBadge"
   | "companion.liveSimulated"
   | "companion.livePowered"
+  | "companion.liveRag"
+  | "companion.retrieving"
   | "companion.closeAria"
   | "companion.hello"
   | "companion.suggestion1"
@@ -869,7 +911,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.healthLogs": "Health Logs",
     "nav.resources": "Resources",
     "nav.profile": "Profile",
-    "nav.toolkit": "Toolkit (حقيبة العناية)",
+    "nav.toolkit": "Toolkit",
     "nav.backToDashboard": "Back to Dashboard",
     "nav.language": "Language",
     "nav.switchToArabic": "Switch to Arabic",
@@ -1159,10 +1201,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "today.liveWeather": "Live weather · {location}",
     "today.temp": "Temp",
     "today.humidity": "Humidity",
-    "today.pressure": "hPa",
+    "today.pressure": "Pressure",
     "today.impact.low": "Low pressure may increase pain sensitivity",
     "today.impact.high": "High pressure can trigger headaches",
     "today.impact.normal": "Pressure is within comfortable range",
+    "today.status.stable": "Barometric pressure is stable within the comfortable range.",
+    "today.status.pressureDrop": "Alert: a drop in barometric pressure may affect your joints.",
+    "today.trigger.humidityHigh": "High humidity may weigh on sensitive joints today.",
+    "today.trigger.heat": "Extreme heat — keep cool and stay hydrated.",
+    "today.trigger.cold": "Extreme cold may increase stiffness — keep warm.",
     "today.estimated": "Estimated values (weather API not configured).",
     "recent.title": "Recent Logs",
     "recent.empty": "No logs yet. Start tracking to see your history here.",
@@ -1217,6 +1264,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.stat.flareDays": "Flare-up days",
     "reports.stat.topSymptoms": "Top symptoms",
     "reports.stat.noneRecorded": "None recorded",
+    "reports.stat.symptom.widespreadPain": "Widespread pain",
+    "reports.stat.symptom.fatigue": "Fatigue",
+    "reports.stat.symptom.sleepProblems": "Sleep problems",
+    "reports.stat.symptom.fibroFog": "Fibro-fog",
+    "reports.stat.symptom.headache": "Headache / Migraine",
+    "reports.stat.symptom.tenderPoints": "Tender points",
+    "reports.stat.symptom.stiffness": "Stiffness",
+    "reports.stat.symptom.sensitivity": "Light / Noise sensitivity",
     "reports.insights.subtitle": "Data-driven observations from your logs.",
     "reports.insights.empty": "Log at least 5 days of pain and symptoms to get personalized insights.",
     "reports.insights.filterLabel": "Filter insights by severity",
@@ -1234,6 +1289,31 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.brief.adherence": "logging adherence",
     "reports.brief.medications": "Patient-reported medications",
     "reports.brief.discussion": "Suggested discussion points",
+    "reports.brief.headline": "30-day mean pain {avg}/10 with {flares}; {velocity}.",
+    "reports.brief.headline.noData": "No logged data in this period — brief cannot characterize current status.",
+    "reports.brief.flareDays.zero": "no flare days",
+    "reports.brief.flareDays.one": "1 flare day",
+    "reports.brief.flareDays.two": "2 flare days",
+    "reports.brief.flareDays.few": "{count} flare days",
+    "reports.brief.flareDays.many": "{count} flare days",
+    "reports.brief.ratePerMonth": "~{perMonth}/mo",
+    "reports.brief.velocity.improving": "improving",
+    "reports.brief.velocity.stable": "stable",
+    "reports.brief.velocity.worsening": "worsening",
+    "reports.brief.velocity.insufficientData": "insufficient data to characterize",
+    "reports.brief.trend.rising": "rising",
+    "reports.brief.trend.falling": "falling",
+    "reports.brief.trend.stable": "stable",
+    "reports.brief.trend.insufficientData": "insufficient-data",
+    "reports.brief.streakDays": "{count}-day streak",
+    "reports.brief.discussion.worsening": "Symptom trajectory is worsening — is the current management plan still appropriate?",
+    "reports.brief.discussion.painControl": "Mean pain {avg}/10 remains clinically significant — options for better control?",
+    "reports.brief.discussion.medicationsList": "Patient reports taking: {meds} — confirm regimen, adherence, and tolerability.",
+    "reports.brief.discussion.noMedications": "No medications mentioned in logs — is the patient on any current pharmacotherapy?",
+    "reports.brief.discussion.sleep": "Sleep disturbance is among the most-reported symptoms — evaluate sleep management.",
+    "reports.brief.discussion.weather": "Weather correlation detected ({factors}) — consider discussing environmental trigger management.",
+    "reports.brief.discussion.default": "Continue current plan; reinforce pacing, graded exercise, and sleep hygiene.",
+    "reports.brief.caveat": "Generated from {logged}/{total} patient-logged days ({adherence}% adherence). self-reported data; not a clinical assessment or diagnosis.",
     "reports.filter.all": "All",
     "reports.download.title": "Clinical Summary PDF",
     "reports.download.description": "Includes the 30-day pain trend chart, correlation summary, key insights, and the full log annex.",
@@ -1260,11 +1340,13 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "careInsight.humidity.humid": "The air is humid today, which can add a heavy feeling. Light layers and airflow help.",
     "careInsight.humidity.dry": "Very dry air can irritate skin and sinuses. A little extra water and a humidifier keep things comfortable.",
     "careInsight.humidity.moderate": "Humidity is in a comfortable range today.",
+    "careInsight.barometric.dropping": "The barometer is falling quickly, which can precede flare days for sensitive bodies.",
+    "careInsight.barometric.low": "Low barometric pressure can heighten pain sensitivity today.",
     "careInsight.trend.rising": "Your pain has been gently trending up this week, so pacing matters more than usual today.",
     "careInsight.trend.falling": "Your pain has been easing over recent days. A good moment for light, careful movement.",
     "careInsight.trend.stable": "Your pain has been steady this week.",
     "careInsight.suggest.severe.1": "Rest in a cool, low-light room and limit activity to essential tasks.",
-    "careInsight.suggest.severe.2": "Try a cool compress on tense areas and hydrate steadily.",
+    "careInsight.suggest.severe.2": "Try a warm compress or a warm bath on tense areas to ease muscle tension, and hydrate steadily.",
     "careInsight.suggest.severe.3": "Switch on Calming Mode for 3 minutes of slow breathing.",
     "careInsight.suggest.mild.1": "Take a short gentle walk or do light stretching to keep circulation moving.",
     "careInsight.suggest.mild.2": "Keep water nearby and pace tasks with a small break between them.",
@@ -1384,6 +1466,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.offlineBadge": "Offline · add an AI key to chat live",
     "companion.liveSimulated": "Live · simulated ({provider})",
     "companion.livePowered": "Live · powered by {provider}",
+    "companion.liveRag": "Live · RAG Active",
+    "companion.retrieving": "Searching medical references and gathering your data...",
     "companion.closeAria": "Close chat",
     "companion.hello": "I'm here with you. Ask me anything about managing fibromyalgia day to day. I already know your recent logs.",
     "companion.suggestion1": "What helps most during a flare-up?",
@@ -1468,7 +1552,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.section.today": "Today",
     "dashboard.section.core": "Core tools",
     "dashboard.section.insights": "Insights & gentle support",
-    "dashboard.toolkitCard.title": "Somatic Toolkit & Exercises (حقيبة العناية والتمارين)",
+    "dashboard.toolkitCard.title": "Somatic Toolkit & Exercises",
     "dashboard.toolkitCard.desc": "Gentle exercises matched to today's energy, calming offline audio, breathing guides, sleep & HRV, and medication safety.",
     "dashboard.toolkitCard.cta": "Open the Somatic Toolkit",
     "toolkit.title": "Care Toolkit",
@@ -1491,7 +1575,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medications.defaultDose": "as prescribed",
     "medications.disclaimer": "This is a screening aid only. Always confirm interactions with your pharmacist or care team.",
     "somatic.title": "Movement & Flare Toolkit",
-    "somatic.subtitle": "Somatic exercises, calming audio, and breathing, matched to your energy budget (ميزانية الطاقة) today.",
+    "somatic.subtitle": "Somatic exercises, calming audio, and breathing, matched to your energy budget today.",
     "somatic.painToday": "Pain today",
     "somatic.spoonsLeft": "Spoons left",
     "somatic.start": "Start",
@@ -1717,7 +1801,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "landing.footer.faq": "FAQ",
     "landing.footer.privacy": "Privacy policy",
     "landing.footer.terms": "Terms of service",
-    "landing.footer.madeWith": "Made with care.",
+    "landing.footer.madeWith": "Crafted with care.",
     "landing.footer.disclaimer": "Not a diagnostic tool. If you are in crisis, reach your local emergency services.",
     "landing.footer.copyright": "© {year} FibroCare.",
     "meta.title": "FibroCare - Empathetic Health Companion",
@@ -2023,10 +2107,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "today.liveWeather": "طقس مباشر · {location}",
     "today.temp": "درجة الحرارة",
     "today.humidity": "الرطوبة",
-    "today.pressure": "هيكتو باسكال",
+    "today.pressure": "الضغط الجوي",
     "today.impact.low": "الضغط المنخفض قد يزيد حساسية الألم",
     "today.impact.high": "الضغط المرتفع قد يسبب الصداع",
     "today.impact.normal": "الضغط ضمن النطاق المريح",
+    "today.status.stable": "الضغط الجوي مستقر ضمن النطاق المريح.",
+    "today.status.pressureDrop": "تنبيه: انخفاض في الضغط الجوي قد يؤثر على المفاصل.",
+    "today.trigger.humidityHigh": "رطوبة عالية اليوم قد تثقل على المفاصل الحساسة.",
+    "today.trigger.heat": "حرارة شديدة — احرص على البرودة والترطيب.",
+    "today.trigger.cold": "البرد الشديد قد يزيد التيبس — حافظ على دفئك.",
     "today.estimated": "قيم تقريبية (واجهة الطقس غير مهيأة).",
     "recent.title": "السجلات الأخيرة",
     "recent.empty": "لا توجد سجلات بعد. ابدأ التسجيل لترى سجلك هنا.",
@@ -2081,6 +2170,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.stat.flareDays": "أيام النوبات",
     "reports.stat.topSymptoms": "أبرز الأعراض",
     "reports.stat.noneRecorded": "لا توجد أعراض مسجّلة",
+    "reports.stat.symptom.widespreadPain": "آلام منتشرات",
+    "reports.stat.symptom.fatigue": "إرهاق",
+    "reports.stat.symptom.sleepProblems": "مشاكل النوم",
+    "reports.stat.symptom.fibroFog": "ضبابية الذهن",
+    "reports.stat.symptom.headache": "صداع / شقيقة",
+    "reports.stat.symptom.tenderPoints": "نقاط حساسة",
+    "reports.stat.symptom.stiffness": "تيبس",
+    "reports.stat.symptom.sensitivity": "حساسية للضوء/الضوضاء",
     "reports.insights.subtitle": "ملاحظات مستندة إلى بيانات تسجيلاتك.",
     "reports.insights.empty": "سجّل 5 أيام على الأقل من الألم والأعراض لتفعيل رؤى مخصّصة لك.",
     "reports.insights.filterLabel": "تصفية الرؤى حسب الشدة",
@@ -2096,8 +2193,33 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "reports.brief.velocity": "سرعة تغيّر الأعراض",
     "reports.brief.functional": "القدرة الوظيفية",
     "reports.brief.adherence": "التزام بالتسجيل",
-    "reports.brief.medications": "أدوية ذكرها المريض",
+    "reports.brief.medications": "الأدوية المذكورة بواسطة المريض",
     "reports.brief.discussion": "نقاط مقترحة للمناقشة",
+    "reports.brief.headline": "متوسط الألم خلال {days} يومًا هو {avg}/10 مع {flares}؛ {velocity}.",
+    "reports.brief.headline.noData": "لا توجد بيانات مسجلة في هذه الفترة — لا يمكن للملخص تحديد الحالة الحالية.",
+    "reports.brief.flareDays.zero": "بدون أيام اشتعال",
+    "reports.brief.flareDays.one": "يوم اشتعال واحد",
+    "reports.brief.flareDays.two": "يومان اشتعال",
+    "reports.brief.flareDays.few": "{count} أيام اشتعال",
+    "reports.brief.flareDays.many": "{count} يوم اشتعال",
+    "reports.brief.ratePerMonth": "~{perMonth}/شهر",
+    "reports.brief.velocity.improving": "تحسّن",
+    "reports.brief.velocity.stable": "مستقر",
+    "reports.brief.velocity.worsening": "يتدهور",
+    "reports.brief.velocity.insufficientData": "بيانات غير كافية",
+    "reports.brief.trend.rising": "في ارتفاع",
+    "reports.brief.trend.falling": "في تراجع",
+    "reports.brief.trend.stable": "مستقر",
+    "reports.brief.trend.insufficientData": "بيانات غير كافية",
+    "reports.brief.streakDays": "{count} يومًا متواصلة من التسجيل",
+    "reports.brief.discussion.worsening": "مسار الأعراض يتدهور — هل ما زالت خطة العلاج الحالية مناسبة؟",
+    "reports.brief.discussion.painControl": "متوسط الألم {avg}/10 لا يزال مهمًا سريريًا — خيارات للتحكم الأفضل",
+    "reports.brief.discussion.medicationsList": "المريض يذكر تناول: {meds} — تأكد من النظام الدوائي والالتزام والتحمّل.",
+    "reports.brief.discussion.noMedications": "لا ذكر لأدوية في السجلات — هل يتناول المريض أي علاج دوائي حاليًا؟",
+    "reports.brief.discussion.sleep": "اضطراب النوم من أكثر الأعراض المُبلَّغ عنها — يُنصح بتقييم إدارة النوم.",
+    "reports.brief.discussion.weather": "تم رصد ارتباط بالطقس ({factors}) — ناقش إدارة المحفزات البيئية.",
+    "reports.brief.discussion.default": "الاستمرار على الخطة الحالية مع تعزيز تنظيم النشاط والتمارين المتدرجة ونظافة النوم.",
+    "reports.brief.caveat": "تم الإنشاء بناءً على {logged} من {total} يومًا تم تسجيلها بواسطة المريض ({adherence}% نسبة الالتزام). بيانات مدخلة ذاتيًا؛ وليست تقييمًا سريريًا أو تشخيصًا.",
     "reports.filter.all": "الكل",
     "reports.download.title": "الملخّص السريري PDF",
     "reports.download.description": "يتضمّن مخطط اتجاه الألم لآخر 30 يومًا، وملخّص الارتباطات، والرؤى الرئيسية، وملحق السجلّ الكامل.",
@@ -2124,11 +2246,13 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "careInsight.humidity.humid": "الهواء رطب اليوم، وهو ما قد يضيف شعورًا بالثقل. طبقات خفيفة وتدفق هواء يساعدان.",
     "careInsight.humidity.dry": "الهواء الجاف جدًا يمكن أن يهيّج البشرة والجيوب الأنفية. القليل الإضافي من الماء وجهاز ترطيب يحافظان على الراحة.",
     "careInsight.humidity.moderate": "الرطوبة ضمن نطاق مريح اليوم.",
+    "careInsight.barometric.dropping": "الضغط الجوي ينخفض بسرعة، وهو ما قد يسبق أيام النوبات لدى الأجسام الحساسة.",
+    "careInsight.barometric.low": "الضغط الجوي المنخفض قد يزيد حساسية الألم اليوم.",
     "careInsight.trend.rising": "كان ألمك يتصاعد بلطف هذا الأسبوع، لذا فإن تنظيم الجهد مهم اليوم أكثر من المعتاد.",
     "careInsight.trend.falling": "كان ألمك يتراجع خلال الأيام الأخيرة — لحظة جيدة لحركة خفيفة ومدروسة.",
     "careInsight.trend.stable": "كان ألمك مستقرًا هذا الأسبوع.",
     "careInsight.suggest.severe.1": "استرح في غرفة باردة منخفضة الإضاءة واقتصر النشاط على المهام الأساسية.",
-    "careInsight.suggest.severe.2": "جرّب كمادة باردة على المناطق المتوترة واشرب الماء بانتظام.",
+    "careInsight.suggest.severe.2": "جرّب كمادة دافئة أو حماماً دافئاً لتخفيف تشنج العضلات واسترخائها، واشرب الماء بانتظام.",
     "careInsight.suggest.severe.3": "فعّل وضع التهدئة لمدة 3 دقائق من التنفس البطيء.",
     "careInsight.suggest.mild.1": "قم بنزهة قصيرة لطيفة أو تمطيط خفيف لتنشيط الدورة الدموية.",
     "careInsight.suggest.mild.2": "أبقِ الماء قريبًا ونظّم المهام مع استراحة قصيرة بينها.",
@@ -2248,6 +2372,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.offlineBadge": "غير متصل · أضف مفتاح ذكاء اصطناعي للدردشة المباشرة",
     "companion.liveSimulated": "مباشر · محاكاة ({provider})",
     "companion.livePowered": "مباشر · مدعوم بـ {provider}",
+    "companion.liveRag": "مباشر · RAG Active",
+    "companion.retrieving": "جاري البحث في المراجع الطبية وتجميع البيانات...",
     "companion.closeAria": "إغلاق الدردشة",
     "companion.hello": "أنا هنا معك. اسألني أي شيء عن إدارة التهاب العضلات الليفية يومًا بيوم — أنا أعرف سجلاتك الأخيرة بالفعل.",
     "companion.suggestion1": "ما الذي يساعد أكثر أثناء النوبة؟",
@@ -2332,7 +2458,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.section.today": "اليوم",
     "dashboard.section.core": "الأدوات الأساسية",
     "dashboard.section.insights": "الرؤى والدعم الهادئ",
-    "dashboard.toolkitCard.title": "حقيبة العناية والتمارين السوماتية",
+    "dashboard.toolkitCard.title": "حقيبة العناية والتمرين",
     "dashboard.toolkitCard.desc": "تمارين لطيفة تناسب طاقة اليوم، وصوت مهدّئ دون اتصال، وأدلة تنفس، والنوم وHRV، وسلامة الأدوية.",
     "dashboard.toolkitCard.cta": "فتح حقيبة العناية والتمارين",
     "toolkit.title": "حقيبة العناية",
@@ -2354,7 +2480,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "medications.severity.caution": "احتراس",
     "medications.defaultDose": "حسب الوصفة",
     "medications.disclaimer": "أداة فحص أولي فقط — أكّد التداخلات دائمًا مع طبيبك أو الصيدلي.",
-    "somatic.title": "أدوات الحركة والنوبات الحادة (ملاذ النوبات الحادة)",
+    "somatic.title": "أدوات الحركة والنوبات الحادة",
     "somatic.subtitle": "تمارين جسدية وصوت مهدّئ وتنفّس — بما يناسب ميزانية الطاقة اليوم.",
     "somatic.painToday": "الألم اليوم",
     "somatic.spoonsLeft": "الملاعق المتبقية",
@@ -2582,7 +2708,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "landing.footer.privacy": "سياسة الخصوصية",
     "landing.footer.terms": "شروط الخدمة",
     "landing.footer.madeWith": "صُنع بعناية.",
-    "landing.footer.disclaimer": "ليست أداة تشخيص. إذا كنت في أزمة، تواصل مع خدمات الطوارئ المحلية.",
+    "landing.footer.disclaimer": "ليس أداة تشخيصية. إذا كنت في حالة طوارئ، يرجى التواصل مع خدمات الطوارئ المحلية.",
     "landing.footer.copyright": "© {year} فيبروكير.",
     "meta.title": "فيبروكير - رفيق الصحة المتعاطف",
     "meta.description":

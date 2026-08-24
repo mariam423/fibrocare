@@ -5,6 +5,64 @@ export interface WeatherData {
   condition: "sunny" | "cloudy" | "rainy";
 }
 
+/** Direction of barometric change between the two most recent readings. */
+export type BarometricTrend = "falling" | "steady" | "rising";
+
+export interface PressureReading {
+  trend: BarometricTrend;
+  /** Signed hPa delta vs the previous reading (rounded). */
+  deltaHpa: number;
+}
+
+/** Fibromyalgia-relevant weather triggers detected from current conditions. */
+export type WeatherTriggerId =
+  | "pressure-drop"
+  | "pressure-low"
+  | "humidity-high"
+  | "heat-extreme"
+  | "cold-extreme"
+  | "calm";
+
+/**
+ * Compare the current pressure against the previous stored reading.
+ * A ≥2 hPa move between consecutive samples (minutes-to-hours apart) is a
+ * meaningful, symptom-relevant shift; anything smaller reads as steady.
+ */
+export function computePressureTrend(
+  currentPressure: number,
+  previousPressure: number | null | undefined
+): PressureReading {
+  if (
+    typeof previousPressure !== "number" ||
+    !Number.isFinite(previousPressure)
+  ) {
+    return { trend: "steady", deltaHpa: 0 };
+  }
+  const deltaHpa = Math.round(currentPressure - previousPressure);
+  if (deltaHpa <= -2) return { trend: "falling", deltaHpa };
+  if (deltaHpa >= 2) return { trend: "rising", deltaHpa };
+  return { trend: "steady", deltaHpa };
+}
+
+/**
+ * Pure trigger detection over the current reading (+ optional pressure
+ * trend). Thresholds align with the app's existing engines: humidity ≥70%
+ * matches `getHumidityLevel`, heat/cold use absolute comfort extremes, and
+ * low pressure follows the widget's sub-1010 hPa band with a stricter floor.
+ */
+export function detectWeatherTriggers(
+  weather: WeatherData,
+  pressure?: PressureReading
+): WeatherTriggerId[] {
+  const triggers: WeatherTriggerId[] = [];
+  if (pressure?.trend === "falling") triggers.push("pressure-drop");
+  if (weather.pressure < 1005) triggers.push("pressure-low");
+  if (weather.humidity >= 70) triggers.push("humidity-high");
+  if (weather.temperature >= 32) triggers.push("heat-extreme");
+  if (weather.temperature <= 5) triggers.push("cold-extreme");
+  return triggers.length > 0 ? triggers : ["calm"];
+}
+
 function hashSeed(key: string): number {
   let h = 2166136261;
   for (let i = 0; i < key.length; i++) {

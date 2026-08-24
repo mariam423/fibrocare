@@ -19,36 +19,55 @@ import { DepthCard } from "@/components/ui/DepthCard";
 import { useWeather } from "@/hooks/useWeather";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
-import type { WeatherData } from "@/lib/weather";
+import type { WeatherData, WeatherTriggerId } from "@/lib/weather";
 import { cn } from "@/lib/utils";
 
-function getBarometricImpact(
-  pressure: number,
+/**
+ * Priority-ordered status: a falling barometer is the most actionable
+ * signal, then absolute low pressure, then temperature/humidity extremes,
+ * then high pressure; everything else reads as a calm, comfortable day.
+ */
+const STATUS_TONE = {
+  alert: "text-rose-600 dark:text-rose-400",
+  warn: "text-amber-600 dark:text-amber-400",
+  calm: "text-emerald-600 dark:text-emerald-400",
+} as const;
+
+function getWeatherStatus(
+  weather: WeatherData,
+  triggers: WeatherTriggerId[],
   t: (key: TranslationKey, params?: Record<string, string | number>) => string
-): {
-  label: string;
-  color: string;
-  icon: React.ReactNode;
-} {
-  if (pressure < 1010) {
+): { label: string; tone: keyof typeof STATUS_TONE; icon: React.ReactNode } {
+  const dot = (cls: string) => (
+    <span aria-hidden="true" className={cn("h-2 w-2 shrink-0 rounded-full", cls)} />
+  );
+  if (triggers.includes("pressure-drop")) {
     return {
-      label: t("today.impact.low"),
-      color: "text-orange-600 dark:text-orange-400",
-      icon: <span className="h-2 w-2 rounded-full bg-orange-400" />,
+      label: t("today.status.pressureDrop"),
+      tone: "alert",
+      icon: dot("bg-rose-400"),
     };
   }
-  if (pressure > 1025) {
+  if (triggers.includes("pressure-low")) {
+    return { label: t("today.impact.low"), tone: "warn", icon: dot("bg-orange-400") };
+  }
+  if (triggers.includes("heat-extreme")) {
+    return { label: t("today.trigger.heat"), tone: "warn", icon: dot("bg-amber-400") };
+  }
+  if (triggers.includes("cold-extreme")) {
+    return { label: t("today.trigger.cold"), tone: "warn", icon: dot("bg-sky-400") };
+  }
+  if (triggers.includes("humidity-high")) {
     return {
-      label: t("today.impact.high"),
-      color: "text-amber-600 dark:text-amber-400",
-      icon: <span className="h-2 w-2 rounded-full bg-amber-400" />,
+      label: t("today.trigger.humidityHigh"),
+      tone: "warn",
+      icon: dot("bg-amber-400"),
     };
   }
-  return {
-    label: t("today.impact.normal"),
-    color: "text-emerald-600 dark:text-emerald-400",
-    icon: <span className="h-2 w-2 rounded-full bg-emerald-400" />,
-  };
+  if (weather.pressure > 1025) {
+    return { label: t("today.impact.high"), tone: "warn", icon: dot("bg-amber-400") };
+  }
+  return { label: t("today.status.stable"), tone: "calm", icon: dot("bg-emerald-400") };
 }
 
 function getWeatherIcon(condition: WeatherData["condition"]) {
@@ -64,8 +83,8 @@ function getWeatherIcon(condition: WeatherData["condition"]) {
 
 export function TodayContextWidget() {
   const { t } = useLanguage();
-  const { weather, source, location } = useWeather();
-  const impact = getBarometricImpact(weather.pressure, t);
+  const { weather, source, location, triggers } = useWeather();
+  const status = getWeatherStatus(weather, triggers ?? ["calm"], t);
   const WeatherIcon = getWeatherIcon(weather.condition);
 
   return (
@@ -95,8 +114,9 @@ export function TodayContextWidget() {
                 className="h-4 w-4 text-orange-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-foreground">
-                {weather.temperature}°
+              {/* Numeric + unit stay LTR inside RTL layouts */}
+              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
+                {weather.temperature}°C
               </span>
               <span className="text-[10px] text-muted-foreground tracking-wide">
                 {t("today.temp")}
@@ -108,7 +128,7 @@ export function TodayContextWidget() {
                 className="h-4 w-4 text-emerald-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-foreground">
+              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
                 {weather.humidity}%
               </span>
               <span className="text-[10px] text-muted-foreground tracking-wide">
@@ -121,8 +141,9 @@ export function TodayContextWidget() {
                 className="h-4 w-4 text-violet-500"
                 aria-hidden="true"
               />
-              <span className="text-lg font-bold text-foreground">
+              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
                 {weather.pressure}
+                <span className="ms-0.5 text-[10px] font-medium text-muted-foreground">hPa</span>
               </span>
               <span className="text-[10px] text-muted-foreground tracking-wide">
                 {t("today.pressure")}
@@ -130,15 +151,15 @@ export function TodayContextWidget() {
             </div>
           </div>
 
-          {/* Barometric impact note */}
+          {/* Localized weather-trigger status */}
           <div
             className={cn(
               "flex items-start gap-2 rounded-lg p-2.5 text-xs leading-relaxed",
               "bg-muted/60 border border-border backdrop-blur-md"
             )}
           >
-            {impact.icon}
-            <span className={impact.color}>{impact.label}</span>
+            {status.icon}
+            <span className={STATUS_TONE[status.tone]}>{status.label}</span>
           </div>
 
           {source === "fallback" && (

@@ -8,7 +8,8 @@
  * offline behavior — never a dead button).
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon, FlashIcon } from "@hugeicons/core-free-icons";
@@ -37,8 +38,17 @@ export interface PricingModalProps {
   checkoutUrl?: string;
 }
 
+const subscribeNoop = () => () => {};
+
 export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) {
   const { t } = useLanguage();
+  // Hydration-safe client check: false on the server render, true once the
+  // client hydrates. Avoids both SSR portals and setState-in-effect.
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -57,11 +67,16 @@ export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) 
     // beyond showing the "coming soon" note under it.
   };
 
-  return (
+  // Portal to <body>: ancestors with backdrop-blur/filter/transform (e.g. the
+  // fixed app header) would otherwise become the containing block for our
+  // fixed overlay and clip the modal to the header bar.
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -71,7 +86,7 @@ export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) 
           onClick={onClose}
         >
           <motion.div
-            className="w-full max-w-3xl rounded-3xl border border-border/60 glass-surface card-depth bg-card/95 p-6"
+            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto overscroll-contain rounded-3xl border border-border/60 glass-surface card-depth bg-card/95 p-6"
             initial={{ scale: 0.95, y: 12 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 12 }}
@@ -96,7 +111,11 @@ export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) 
               {/* Free tier */}
               <div className="rounded-2xl border border-border/60 bg-muted/30 p-5">
                 <p className="text-sm font-semibold text-muted-foreground">{t("pricing.free.name")}</p>
-                <p className="mt-1 text-3xl font-bold">{t("pricing.free.price")}</p>
+                <p className="mt-1 text-3xl font-bold">
+                  <span dir="ltr" className="whitespace-nowrap tabular-nums">
+                    {t("pricing.free.price")}
+                  </span>
+                </p>
                 <ul className="mt-4 space-y-2 text-sm">
                   {FREE_PERKS_KEYS.map((key) => (
                     <li key={key} className="flex items-start gap-2">
@@ -118,14 +137,20 @@ export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) 
                   "shadow-[0_0_30px_rgba(45,212,191,0.15)]"
                 )}
               >
-                <span className="absolute -top-2.5 end-4 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground">
-                  <HugeiconsIcon icon={FlashIcon} className="h-3 w-3" aria-hidden="true" />
+                <span className="absolute -top-2.5 end-4 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground">
+                  <HugeiconsIcon icon={FlashIcon} className="h-3 w-3 shrink-0" aria-hidden="true" />
                   {t("pricing.pro.badge")}
                 </span>
                 <p className="text-sm font-semibold text-primary">{t("pricing.pro.name")}</p>
-                <p className="mt-1 text-3xl font-bold">
-                  {t("pricing.pro.price")}
-                  <span className="text-sm font-normal text-muted-foreground"> {t("pricing.pro.period")}</span>
+                {/* Flex + dir-isolated currency: keeps "$6 / month" in a stable
+                    visual order under RTL without bidi re-ordering. */}
+                <p className="mt-1 flex flex-wrap items-baseline gap-x-1 text-3xl font-bold">
+                  <span dir="ltr" className="whitespace-nowrap tabular-nums">
+                    {t("pricing.pro.price")}
+                  </span>
+                  <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
+                    {t("pricing.pro.period")}
+                  </span>
                 </p>
                 <ul className="mt-4 space-y-2 text-sm">
                   {PRO_PERKS_KEYS.map((key) => (
@@ -149,6 +174,7 @@ export function PricingModal({ open, onClose, checkoutUrl }: PricingModalProps) 
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

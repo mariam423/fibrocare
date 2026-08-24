@@ -7,9 +7,9 @@
  * is configured, using the deterministic insight engines as a fallback.
  *
  * Env:
- *   AI_PROVIDER    = "google" | "openai" | "anthropic"  (optional; auto-detected)
+ *   AI_PROVIDER    = "google" | "openai" | "anthropic" | "openrouter"  (optional; auto-detected)
  *   AI_MODEL       = optional model-id override
- *   GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY
+ *   GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY / OPENROUTER_API_KEY
  *   AI_MOCK_MODE   = "true" forces simulated AI replies (no key needed);
  *                    "false" disables them. Unset defaults to ON in local dev
  *                    when no key is configured, so `npm run dev` always has an
@@ -17,11 +17,11 @@
  */
 
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI, openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
 
-export type AiProvider = "google" | "openai" | "anthropic";
+export type AiProvider = "google" | "openai" | "anthropic" | "openrouter";
 
 /**
  * How the AI runtime is behaving right now:
@@ -36,7 +36,23 @@ const PROVIDER_MODELS: Record<AiProvider, string> = {
   google: "gemini-2.5-flash",
   openai: "gpt-4o-mini",
   anthropic: "claude-haiku-4-5",
+  // OpenRouter slugs are vendor-prefixed. The task's preferred engines
+  // (anthropic/claude-3.5-sonnet → retired upstream; google/gemini-flash-1.5
+  // → retired) are gone, and paid Sonnet endpoints 402 on a fresh key. Free
+  // tiers are shared pools — gemma/glm were rate-limited (429) in testing,
+  // so the default is the free model that verified 200 live. Override with
+  // AI_MODEL=anthropic/claude-sonnet-4.5 once credits exist.
+  openrouter: "nvidia/nemotron-3-super-120b-a12b:free",
 };
+
+/** App identity sent with every OpenRouter request (their header contract). */
+function appOrigin(): string {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.APP_URL ??
+    "http://localhost:3000"
+  );
+}
 
 /**
  * Reads keys lazily so every call reflects the current process.env. This is
@@ -49,6 +65,7 @@ function getProviderKeys(): Record<AiProvider, string | undefined> {
     google: process.env.GEMINI_API_KEY,
     openai: process.env.OPENAI_API_KEY,
     anthropic: process.env.ANTHROPIC_API_KEY,
+    openrouter: process.env.OPENROUTER_API_KEY,
   };
 }
 
@@ -97,7 +114,9 @@ export function getProviderDisplayName(): string {
     ? "Gemini"
     : provider === "openai"
       ? "OpenAI"
-      : "Claude";
+      : provider === "anthropic"
+        ? "Claude"
+        : "OpenRouter";
 }
 
 /** Returns the configured model or null when no provider key exists. */
@@ -112,5 +131,16 @@ export function getModel(): LanguageModel | null {
       return openai(modelId);
     case "anthropic":
       return anthropic(modelId);
+    case "openrouter":
+      // OpenRouter speaks the OpenAI chat-completions dialect and asks
+      // callers to identify their app via HTTP-Referer / X-Title.
+      return createOpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENROUTER_API_KEY,
+        headers: {
+          "HTTP-Referer": appOrigin(),
+          "X-Title": "FibroCare",
+        },
+      })(modelId);
   }
 }

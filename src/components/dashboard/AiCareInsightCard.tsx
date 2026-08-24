@@ -12,11 +12,12 @@ import {
 import {
   buildCareInsight,
   getPainTrend,
+  type BarometricState,
   type FlareState,
   type HumidityLevel,
   type PainTrend,
 } from "@/lib/careInsightEngine";
-import { useSimulatedWeather } from "@/hooks/useSimulatedWeather";
+import { useWeather } from "@/hooks/useWeather";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,12 @@ const TREND_MESSAGE: Record<PainTrend, TranslationKey> = {
   rising: "careInsight.trend.rising",
   falling: "careInsight.trend.falling",
   stable: "careInsight.trend.stable",
+};
+
+const BAROMETRIC_MESSAGE: Record<BarometricState, TranslationKey | null> = {
+  dropping: "careInsight.barometric.dropping",
+  low: "careInsight.barometric.low",
+  stable: null,
 };
 
 const SUGGESTION_KEYS: Record<FlareState, [TranslationKey, TranslationKey, TranslationKey]> = {
@@ -99,7 +106,10 @@ export function AiCareInsightCard({
   painLevel,
   weeklyTrend,
 }: AiCareInsightCardProps) {
-  const weather = useSimulatedWeather();
+  // Live weather (deterministic estimate when the API is unconfigured) keeps
+  // the climate insight tracking real conditions, including the barometric
+  // trend served by /api/weather.
+  const { weather, pressureTrend } = useWeather();
   const { t } = useLanguage();
   const trend = useMemo(() => {
     const valid = weeklyTrend.filter((p): p is { level: number } => p.level !== null);
@@ -112,8 +122,10 @@ export function AiCareInsightCard({
         temperature: weather.temperature,
         humidity: weather.humidity,
         trend,
+        pressure: weather.pressure,
+        pressureTrend,
       }),
-    [painLevel, weather.temperature, weather.humidity, trend]
+    [painLevel, weather.temperature, weather.humidity, weather.pressure, trend, pressureTrend]
   );
   const tone = FLARE_TONE[insight.flareState];
 
@@ -129,6 +141,10 @@ export function AiCareInsightCard({
   const message = [
     t(HEAT_MESSAGE[insight.flareState]),
     t(humidityKey),
+    // Climate signal: only rendered when the barometer is actually moving.
+    ...(BAROMETRIC_MESSAGE[insight.barometric]
+      ? [t(BAROMETRIC_MESSAGE[insight.barometric]!)]
+      : []),
     t(TREND_MESSAGE[trend]),
   ].join(" ");
   const suggestions = SUGGESTION_KEYS[insight.flareState].map((key) => t(key));

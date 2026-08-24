@@ -49,7 +49,7 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
       "pain spike", "episode",
     ],
     content:
-      "A fibromyalgia flare is a temporary period of sharply increased pain, fatigue, or cognitive symptoms, often triggered by stress, poor sleep, overexertion, illness, or weather changes. During a flare the generally recommended approach is to lower demands rather than push through: cancel or postpone non-essential tasks, prioritize rest in a comfortable sensory environment, keep gentle movement (short walks, stretching) if tolerable, stay hydrated, and resume normal activity gradually afterward to avoid a crash-rebound cycle. If a flare is severe, unusually long, or accompanied by new symptoms (fever, numbness, chest pain), contacting a care team is advised.",
+      "A fibromyalgia flare is a temporary period of sharply increased pain, fatigue, or cognitive symptoms, often triggered by stress, poor sleep, overexertion, illness, or weather changes. During a flare the generally recommended approach is to lower demands rather than push through: cancel or postpone non-essential tasks, prioritize rest in a low-stimulation environment (dim lights, less noise, minimal screens), keep gentle movement (short walks, stretching) if tolerable, stay hydrated, and resume normal activity gradually afterward to avoid a crash-rebound cycle. If a flare is severe, unusually long, or accompanied by new symptoms (fever, numbness, chest pain), contacting a care team is advised.",
   },
   {
     id: "exercise-protocols",
@@ -81,8 +81,9 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
     source: "FibroCare clinical summary of activity pacing practice",
     domains: ["pacing", "flares"],
     keywords: [
-      "pacing", "energy", "spoons", "overdo", "overexert", "boom",
-      "bust", "activity", "rest breaks", "burnout",
+      "pacing", "energy", "spoons", "spoon theory", "overdo", "overexert",
+      "boom", "bust", "activity", "rest breaks", "burnout",
+      "planning", "plan", "low-energy",
     ],
     content:
       "Activity pacing — spreading effort across the day with planned rests instead of doing everything on good days — is a core self-management skill for fibromyalgia. The 'boom-bust' cycle (overdoing on better days, then crashing for several) is one of the most common patterns reported. Practical pacing: break tasks into small steps with short rest breaks, alternate physical and mental tasks, set time-based (not finish-based) stopping points, and keep daily activity roughly even rather than swinging with how you feel. Tracking energy (as FibroCare's spoon tracker does) makes the personal boom-bust pattern visible.",
@@ -134,6 +135,58 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
     ],
     content:
       "Many people with fibromyalgia report that weather changes — especially drops in barometric pressure, high humidity, and cold — worsen pain and fatigue. Research findings are mixed: studies generally confirm that a substantial subgroup is weather-sensitive, but the effect varies greatly between individuals, and no single weather variable reliably predicts flares for everyone. Tracking personal symptoms against local conditions (as FibroCare's weather insights do) is the most practical way to identify an individual's own triggers, which can then inform planning around high-risk days.",
+  },
+  {
+    id: "somatic-exercise-protocols",
+    title: "Somatic movement and pandiculation protocols",
+    source: "FibroCare clinical summary of somatic movement practice",
+    domains: ["exercise", "pacing"],
+    keywords: [
+      "somatic", "somatics", "pandiculation", "gentle movement",
+      "body scan", "body scanning", "neuromuscular", "proprioception",
+      "releasing", "guarded muscles", "lying down", "seated",
+    ],
+    content:
+      "Somatic practices work through the nervous system rather than through intensity: slow, mindful movements such as pandiculation (deliberately contracting a muscle, then releasing it very slowly while paying attention to the sensation), gentle joint-mobility arcs, body scanning, and breath-led relaxation. By retraining how muscles let go of chronic guarding, somatic work aims to reduce resting muscle tension without the strain conventional workouts can cause. Sessions are typically short — about 5–15 minutes — performed lying down or seated, and stopped well before tiredness sets in, which makes them suitable on low-energy days. FibroCare's Somatic Studio follows this same graded, stop-early principle.",
+  },
+  {
+    id: "sleep-architecture-fibromyalgia",
+    title: "Sleep architecture findings in fibromyalgia",
+    source: "FibroCare clinical summary of sleep-architecture research",
+    domains: ["sleep"],
+    keywords: [
+      "deep sleep", "slow-wave", "slow wave", "delta", "rem", "stages",
+      "architecture", "alpha-delta", "arousals", "fragmented",
+      "night waking", "non-restorative", "polysomnography",
+    ],
+    content:
+      "Polysomnography studies have found that many people with fibromyalgia show disrupted sleep architecture — classically described as 'alpha-delta sleep', where waking-frequency alpha brainwaves intrude into the deep, slow-wave delta stages responsible for physical restoration. Reduced slow-wave sleep and frequent brief arousals correlate with morning stiffness, unrefreshing rest, fatigue, and next-day pain amplification, which is one proposed loop linking poor nights to harder days. The practical implication is that protecting deep sleep matters as much as total hours in bed: a consistent sleep-wake schedule, a cool dark quiet bedroom, treating pain before bedtime, and screening for co-existing problems such as restless legs or sleep apnea are all worth raising with a care team when mornings never feel restorative.",
+  },
+  {
+    id: "clinical-evidence-overview",
+    title: "What clinical studies show helps fibromyalgia",
+    source: "FibroCare clinical summary of randomized trial evidence",
+    domains: ["exercise", "mental-health", "complementary"],
+    keywords: [
+      "studies", "research", "evidence", "trials", "randomized",
+      "meta-analysis", "systematic review", "clinical", "proven", "science",
+    ],
+    content:
+      "Across randomized controlled trials and meta-analyses, the interventions with the most consistent benefit in fibromyalgia are graded aerobic exercise, supervised strength training, tai chi and qigong, cognitive behavioral therapy, and multicomponent programs that combine patient education with gradual movement. Benefits are usually modest-to-moderate and concentrate on function, fitness, mood, and quality of life rather than on eliminating symptoms entirely — no studied treatment removes fibromyalgia completely, and guideline bodies consistently rank exercise first among non-drug options. Study populations also varied widely, so an intervention that failed for one person may still be worth trying under a care team's guidance.",
+  },
+  {
+    id: "warm-compress-heat-therapy",
+    title: "Heat therapy for muscle tension (warm compress / warm bath)",
+    source: "FibroCare clinical summary of heat-therapy self-care practice",
+    domains: ["complementary", "pacing", "flares"],
+    keywords: [
+      "warm", "heat", "heating", "compress", "bath", "shower", "muscle",
+      "tension", "tense", "stiffness", "stiff", "soothe", "relax",
+      "moist", "moist heat", "pain", "achy", "sore",
+      "كمادة", "كمادات", "دافئة", "دافئ", "حمام", "توتر", "العضلات", "تيبس",
+    ],
+    content:
+      "For the muscle tension and stiffness that often accompany fibromyalgia, gentle heat is the classic comfort measure: a moist warm compress or heating pad on tight areas (moist heat penetrates best), or a warm bath or shower (some people add Epsom salts or do gentle stretches while the muscles are still warm). Warmth relaxes tense muscles, eases stiffness, and calms the aching regions without medication. Heat should be comfortably warm — never hot enough to burn — and applied for about 15–20 minutes at a time. Cold packs and ice are generally not recommended for fibromyalgia muscle pain, because they can increase muscle tension and are better suited to acute injuries like sprains rather than chronic widespread pain.",
   },
 ];
 

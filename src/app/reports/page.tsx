@@ -25,7 +25,8 @@ import AppHeader from "@/components/layout/AppHeader";
 import { SegmentedFilter, type SegmentedFilterOption } from "@/components/ui/SegmentedFilter";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
-import { localizeInsight } from "@/lib/insightLocalization";
+import { localizeInsight, localizeSymptom } from "@/lib/insightLocalization";
+import { cleanBriefText } from "@/lib/ai/clinical-brief/format";
 import { cn } from "@/lib/utils";
 
 interface ReportSnapshot {
@@ -49,8 +50,72 @@ const severityLabelKey: Record<Insight["severity"], TranslationKey> = {
   info: "reports.severity.info",
 };
 
+const velocityKeyByValue: Record<ClinicalBrief["painProfile"]["velocity"], TranslationKey> = {
+  improving: "reports.brief.velocity.improving",
+  stable: "reports.brief.velocity.stable",
+  worsening: "reports.brief.velocity.worsening",
+  "insufficient-data": "reports.brief.velocity.insufficientData",
+};
+
+const trendKeyByValue: Record<ClinicalBrief["flareFrequency"]["trend"], TranslationKey> = {
+  rising: "reports.brief.trend.rising",
+  falling: "reports.brief.trend.falling",
+  stable: "reports.brief.trend.stable",
+  "insufficient-data": "reports.brief.trend.insufficientData",
+};
+
+function flareDaysKey(count: number): TranslationKey {
+  if (count === 0) return "reports.brief.flareDays.zero";
+  if (count === 1) return "reports.brief.flareDays.one";
+  if (count === 2) return "reports.brief.flareDays.two";
+  return count <= 10 ? "reports.brief.flareDays.few" : "reports.brief.flareDays.many";
+}
+
+/**
+ * Mirrors the engine's discussion-point conditions over the brief's
+ * structured fields so the UI can phrase them in the active locale.
+ */
+function buildLocalizedDiscussionPoints(
+  brief: ClinicalBrief,
+  t: (key: TranslationKey, params?: Record<string, string | number>) => string
+): string[] {
+  const points: string[] = [];
+  const { painProfile, flareFrequency } = brief;
+
+  if (flareFrequency.trend === "rising" || painProfile.velocity === "worsening") {
+    points.push(t("reports.brief.discussion.worsening"));
+  }
+  if (painProfile.average !== null && painProfile.average >= 6) {
+    points.push(t("reports.brief.discussion.painControl", { avg: painProfile.average }));
+  }
+  if (brief.patientReportedMedications.length > 0) {
+    points.push(
+      t("reports.brief.discussion.medicationsList", {
+        meds: brief.patientReportedMedications.join(", "),
+      })
+    );
+  } else {
+    points.push(t("reports.brief.discussion.noMedications"));
+  }
+  const symptoms = brief.symptomProfile.mostReported;
+  if (symptoms.includes("insomnia") || symptoms.includes("unrefreshing sleep")) {
+    points.push(t("reports.brief.discussion.sleep"));
+  }
+  if (brief.topTriggers.length > 0) {
+    points.push(
+      t("reports.brief.discussion.weather", {
+        factors: brief.topTriggers.map((trigger) => trigger.factor).join(", "),
+      })
+    );
+  }
+  if (points.length === 0) {
+    points.push(t("reports.brief.discussion.default"));
+  }
+  return points.slice(0, 5);
+}
+
 export default function ReportsPage() {
-  const { t, locale } = useLanguage();
+  const { t, locale, dir } = useLanguage();
   const [snapshot, setSnapshot] = useState<ReportSnapshot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -218,7 +283,9 @@ export default function ReportsPage() {
                     <p className="text-xs font-medium text-muted-foreground">{t("reports.stat.topSymptoms")}</p>
                     <p className="text-sm font-semibold leading-snug">
                       {snapshot.topSymptoms.length > 0
-                        ? snapshot.topSymptoms.join(locale === "ar" ? "، " : ", ")
+                        ? snapshot.topSymptoms
+                            .map((symptom) => localizeSymptom(symptom, t))
+                            .join(locale === "ar" ? "، " : ", ")
                         : t("reports.stat.noneRecorded")}
                     </p>
                   </div>
@@ -304,19 +371,45 @@ export default function ReportsPage() {
                       </CardTitle>
                       <CardDescription>{t("reports.brief.subtitle")}</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4 text-sm">
-                      <p className="font-medium leading-relaxed">{brief.headline}</p>
+                    <CardContent dir={dir} className="space-y-4 text-sm">
+                      {locale === "ar" && brief.painProfile.average !== null ? (
+                        <p className="font-medium leading-relaxed">
+                          {t("reports.brief.headline", {
+                            days: brief.periodDays,
+                            avg: brief.painProfile.average,
+                            flares: t(flareDaysKey(brief.flareFrequency.flareDays), {
+                              count: brief.flareFrequency.flareDays,
+                            }),
+                            velocity:
+                              brief.painProfile.velocity === "insufficient-data"
+                                ? t(velocityKeyByValue[brief.painProfile.velocity])
+                                : `${t(velocityKeyByValue[brief.painProfile.velocity])}${
+                                    brief.painProfile.velocityDelta !== null
+                                      ? ` (Δ ${brief.painProfile.velocityDelta > 0 ? "+" : ""}${brief.painProfile.velocityDelta})`
+                                      : ""
+                                  }`,
+                          })}
+                        </p>
+                      ) : locale === "ar" ? (
+                        <p className="font-medium leading-relaxed">{t("reports.brief.headline.noData")}</p>
+                      ) : (
+                        <p className="font-medium leading-relaxed">{cleanBriefText(brief.headline)}</p>
+                      )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="rounded-xl border bg-muted/30 p-3">
                           <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.flareFrequency")}</p>
                           <p className="mt-1">
-                            {brief.flareFrequency.flareDays} {t("reports.brief.flareDaysUnit")} · ~{brief.flareFrequency.perMonth}/mo · {brief.flareFrequency.trend}
+                            {locale === "ar"
+                              ? `${t(flareDaysKey(brief.flareFrequency.flareDays), { count: brief.flareFrequency.flareDays })} · ${t("reports.brief.ratePerMonth", { perMonth: brief.flareFrequency.perMonth })} · ${t(trendKeyByValue[brief.flareFrequency.trend])}`
+                              : `${brief.flareFrequency.flareDays} ${t("reports.brief.flareDaysUnit")} · ~${brief.flareFrequency.perMonth}/mo · ${brief.flareFrequency.trend}`}
                           </p>
                         </div>
                         <div className="rounded-xl border bg-muted/30 p-3">
                           <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.velocity")}</p>
                           <p className="mt-1">
-                            {brief.painProfile.velocity}
+                            {locale === "ar"
+                              ? t(velocityKeyByValue[brief.painProfile.velocity])
+                              : brief.painProfile.velocity}
                             {brief.painProfile.velocityDelta !== null
                               ? ` (Δ ${brief.painProfile.velocityDelta > 0 ? "+" : ""}${brief.painProfile.velocityDelta})`
                               : ""}
@@ -325,7 +418,8 @@ export default function ReportsPage() {
                         <div className="rounded-xl border bg-muted/30 p-3">
                           <p className="text-xs font-semibold text-muted-foreground">{t("reports.brief.functional")}</p>
                           <p className="mt-1">
-                            {brief.functionalCapacity.loggingAdherencePct}% {t("reports.brief.adherence")} · {brief.functionalCapacity.loggingStreakDays}-day streak
+                            {brief.functionalCapacity.loggingAdherencePct}% {t("reports.brief.adherence")} ·{" "}
+                            {t("reports.brief.streakDays", { count: brief.functionalCapacity.loggingStreakDays })}
                           </p>
                         </div>
                         <div className="rounded-xl border bg-muted/30 p-3">
@@ -343,13 +437,26 @@ export default function ReportsPage() {
                             {t("reports.brief.discussion")}
                           </p>
                           <ul className="list-disc space-y-1 ms-5">
-                            {brief.suggestedDiscussionPoints.map((point) => (
+                            {(locale === "ar"
+                              ? buildLocalizedDiscussionPoints(brief, t)
+                              : brief.suggestedDiscussionPoints.map(cleanBriefText)
+                            ).map((point) => (
                               <li key={point}>{point}</li>
                             ))}
                           </ul>
                         </div>
                       )}
-                      <p className="text-xs text-muted-foreground">{brief.dataCaveat}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {locale === "ar"
+                          ? t("reports.brief.caveat", {
+                              logged: Math.round(
+                                (brief.functionalCapacity.loggingAdherencePct * brief.periodDays) / 100
+                              ),
+                              total: brief.periodDays,
+                              adherence: brief.functionalCapacity.loggingAdherencePct,
+                            })
+                          : cleanBriefText(brief.dataCaveat)}
+                      </p>
                     </CardContent>
                   </Card>
                 </DepthCard>

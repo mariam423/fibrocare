@@ -38,7 +38,7 @@ const DOMAIN_KEYWORDS: Record<RagDomain, string[]> = {
   medications: ["medic", "drug", "pill", "dose", "amitriptyline", "duloxetine", "pregabalin", "lyrica", "cymbalta", "side effect", "ibuprofen", "painkiller"],
   pacing: ["pac", "spoon", "energy", "overdo", "overexert", "boom", "bust", "break", "burnout", "activity"],
   "mental-health": ["anxi", "depress", "stress", "mood", "therapy", "cbt", "mental", "panic", "sad", "overwhelm"],
-  complementary: ["meditat", "mindful", "acupuncture", "massage", "breathing", "relax", "complementary", "calming"],
+  complementary: ["meditat", "mindful", "acupuncture", "massage", "breathing", "relax", "complementary", "calming", "muscle", "tension", "tense", "stiff", "warm", "compress", "heat", "كمادة", "حمام", "دافئ", "توتر"],
 };
 
 function tokenize(text: string): string[] {

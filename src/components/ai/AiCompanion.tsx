@@ -19,6 +19,12 @@ import {
 } from "@/context/AiStatusContext";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  EMPTY_USER_FACTS,
+  loadUserFacts,
+  recordConversationTurn,
+  type UserFacts,
+} from "@/lib/ai/memory/userMemory";
 
 interface UiPart {
   type?: string;
@@ -47,7 +53,7 @@ function hasToolResult(parts: UiPart[] | undefined): boolean {
 
 export function AiCompanion() {
   const reduceMotion = useReducedMotion();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -73,10 +79,44 @@ export function AiCompanion() {
 
   // AI SDK v7: useChat() with no options uses the default HttpChatTransport
   // pointed at /api/chat. Input is managed locally.
+  //
+  // Memory Layer (client side): durable patient facts live encrypted in
+  // localStorage (AES-GCM via security/crypto.ts). They ride to the API in
+  // each send's request body — re-validated server-side before touching a
+  // prompt — and grow after every completed answer.
+  const [userFacts, setUserFacts] = useState<UserFacts>(EMPTY_USER_FACTS);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadUserFacts()
+      .then((facts) => {
+        if (!cancelled) setUserFacts(facts);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const { messages, sendMessage, stop, status, error, clearError } = useChat();
 
   const isLoading = status === "submitted" || status === "streaming";
   const isOffline = aiConfigured === false;
+
+  // After each completed answer, learn any new durable facts from what the
+  // user just said (deterministic extraction + encrypted save).
+  const lastStatusRef = useRef(status);
+  useEffect(() => {
+    const previous = lastStatusRef.current;
+    lastStatusRef.current = status;
+    if (previous !== "streaming" || status !== "ready") return;
+    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    const text = getMessageText(lastUser?.parts as UiPart[] | undefined);
+    if (!text) return;
+    recordConversationTurn(text)
+      .then(setUserFacts)
+      .catch(() => {});
+  }, [status, messages]);
 
   // Keep the newest message in view while streaming.
   useEffect(() => {
@@ -109,9 +149,10 @@ export function AiCompanion() {
   const submitSuggestion = useCallback(
     (prompt: string) => {
       if (aiConfigured !== true || isLoading) return;
-      void sendMessage({ text: prompt });
+      // locale rides the body so the server prompt isolates output language.
+      void sendMessage({ text: prompt }, { body: { userFacts, locale } });
     },
-    [aiConfigured, isLoading, sendMessage]
+    [aiConfigured, isLoading, sendMessage, userFacts, locale]
   );
 
   const handleSubmit = useCallback(
@@ -121,9 +162,9 @@ export function AiCompanion() {
       if (!value || aiConfigured !== true || isLoading) return;
       setInput("");
       clearError();
-      void sendMessage({ text: value });
+      void sendMessage({ text: value }, { body: { userFacts, locale } });
     },
-    [input, aiConfigured, isLoading, sendMessage, clearError]
+    [input, aiConfigured, isLoading, sendMessage, clearError, userFacts, locale]
   );
 
   const lastAssistantIndex = useMemo(() => {
@@ -213,7 +254,7 @@ export function AiCompanion() {
                       ? t("companion.offlineBadge")
                       : mockMode
                         ? t("companion.liveSimulated", { provider: providerName || "mock" })
-                        : t("companion.livePowered", { provider: providerName || "AI" })}
+                        : t("companion.liveRag")}
                 </p>
               </div>
               <button
@@ -320,7 +361,17 @@ export function AiCompanion() {
                       {text ? (
                         <AiMarkdown text={text} />
                       ) : streaming ? (
-                        <StreamingCaret reduceMotion={reduceMotion ?? false} />
+                        <span className="flex flex-col gap-1.5">
+                          <StreamingCaret reduceMotion={reduceMotion ?? false} />
+                          <span className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                            <HugeiconsIcon
+                              icon={SparklesIcon}
+                              className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-pulse text-primary"
+                              aria-hidden="true"
+                            />
+                            {t("companion.retrieving")}
+                          </span>
+                        </span>
                       ) : null}
                     </div>
                   </div>

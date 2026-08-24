@@ -22,6 +22,7 @@ import {
 import { generateMedicalSummary } from "@/app/actions";
 import type { MedicalSummary } from "@/lib/medicalSummary";
 import { useLanguage } from "@/context/LanguageContext";
+import { localizeInsight } from "@/lib/insightLocalization";
 import { cn } from "@/lib/utils";
 
 const SEVERITY_STYLE: Record<
@@ -49,7 +50,11 @@ export function MedicalSummaryCard() {
   const loadAiQuestions = async () => {
     setAiLoading(true);
     try {
-      const res = await fetch("/api/ai/questions", { method: "POST" });
+      const res = await fetch("/api/ai/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
       if (!res.ok) {
         setAiQuestions(null);
         return;
@@ -229,15 +234,32 @@ export function MedicalSummaryCard() {
                       {t("medical.insightsEmpty")}
                     </p>
                   ) : (
-                    summary.keyInsights.map((insight) => (
-                      <div
-                        key={insight.title}
-                        className={cn("rounded-xl border p-3", SEVERITY_STYLE[insight.severity])}
-                      >
-                        <p className="text-sm font-semibold">{insight.title}</p>
-                        <p className="mt-0.5 text-xs opacity-80">{insight.message}</p>
-                      </div>
-                    ))
+                    summary.keyInsights.map((insight, idx) => {
+                      // Engine ids + params ride along in the payload, so
+                      // titles/messages localize here in the active locale.
+                      const localized = insight.id
+                        ? localizeInsight(
+                            {
+                              id: insight.id,
+                              title: insight.title,
+                              message: insight.message,
+                              severity: insight.severity,
+                              params: insight.params,
+                            },
+                            locale,
+                            t
+                          )
+                        : { title: insight.title, message: insight.message };
+                      return (
+                        <div
+                          key={insight.id ?? `${insight.title}-${idx}`}
+                          className={cn("rounded-xl border p-3", SEVERITY_STYLE[insight.severity])}
+                        >
+                          <p className="text-sm font-semibold">{localized.title}</p>
+                          <p className="mt-0.5 text-xs opacity-80">{localized.message}</p>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -253,19 +275,26 @@ export function MedicalSummaryCard() {
                   {t("medical.questions")}
                 </h3>
                 <ul className="mt-3 space-y-2">
-                  {summary.recommendedQuestions.map((question) => (
-                    <li
-                      key={question}
-                      className="flex items-start gap-2 rounded-xl border border-border bg-muted/60 p-3 text-sm text-foreground backdrop-blur-md"
-                    >
-                      <HugeiconsIcon
-                        icon={CheckmarkCircle01Icon}
-                        className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500"
-                        aria-hidden="true"
-                      />
-                      <span dir="ltr" className="text-left [unicode-bidi:isolate]">{question}</span>
-                    </li>
-                  ))}
+                  {summary.recommendedQuestions.map((question, idx) => {
+                    // Refs are index-aligned with the legacy strings; when
+                    // present, render through the translation dictionary so
+                    // Arabic users get native questions.
+                    const ref = summary.questionRefs?.[idx];
+                    const text = ref ? t(ref.key, ref.params) : question;
+                    return (
+                      <li
+                        key={`${ref?.key ?? "question"}-${idx}`}
+                        className="flex items-start gap-2 rounded-xl border border-border bg-muted/60 p-3 text-sm text-foreground backdrop-blur-md"
+                      >
+                        <HugeiconsIcon
+                          icon={CheckmarkCircle01Icon}
+                          className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500"
+                          aria-hidden="true"
+                        />
+                        <span className="text-start [unicode-bidi:isolate]">{text}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 {aiLoading && (
@@ -289,10 +318,10 @@ export function MedicalSummaryCard() {
                             aria-hidden="true"
                           />
                           <div className="min-w-0">
-                            <span dir="ltr" className="block text-left [unicode-bidi:isolate]">
+                            <span className="block text-start [unicode-bidi:isolate]">
                               {item.question}
                             </span>
-                            <p dir="ltr" className="mt-1 text-left text-xs text-muted-foreground [unicode-bidi:isolate]">
+                            <p className="mt-1 text-start text-xs text-muted-foreground [unicode-bidi:isolate]">
                               {item.reason}
                             </p>
                           </div>

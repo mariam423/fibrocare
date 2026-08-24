@@ -61,7 +61,7 @@ export async function POST() {
     model,
     system: buildNarrationPrompt(snapshot, insights, userName),
     prompt: "Explain my health data to me, kindly.",
-    maxOutputTokens: 380,
+    maxOutputTokens: 768, // Arabic-safe: ~2-3 tokens/word vs English
     timeout: 30_000,
     onFinish: async ({ usage }) => {
       console.log(

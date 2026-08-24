@@ -74,6 +74,25 @@ export const healthSnapshotSchema = z.object({
   mood: z.string().nullable(),
   lastLogAt: z.string().nullable(),
   trend: z.enum(["rising", "stable", "falling"]).nullable(),
+  /**
+   * The newest raw log entry verbatim — pain level, severity bucket, its own
+   * note excerpt, and the symptoms logged that same day. This is what lets
+   * the companion react to "where the user is right now" (e.g. a 10/10
+   * severe flare this morning) instead of only 30-day aggregates. Optional
+   * + nullable so every existing snapshot constructor stays valid.
+   */
+  latestLog: z
+    .object({
+      painLevel: z.number().min(0).max(10),
+      moodTag: z.string().nullable(),
+      severity: z.enum(["low", "moderate", "severe"]),
+      loggedAt: z.string(),
+      ageHours: z.number().min(0),
+      noteExcerpt: z.string().nullable(),
+      symptoms: z.array(z.string()),
+    })
+    .nullable()
+    .optional(),
 });
 
 export type HealthSnapshot = z.infer<typeof healthSnapshotSchema>;

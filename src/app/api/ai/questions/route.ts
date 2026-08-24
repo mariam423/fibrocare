@@ -16,6 +16,7 @@ import {
 } from "@/lib/ai/schemas";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { TtlCache } from "@/lib/ai/cache";
+import type { Locale } from "@/lib/translations";
 
 export const maxDuration = 30;
 
@@ -27,10 +28,20 @@ const questionsCache = new TtlCache<DoctorQuestions["questions"]>();
  * Returns validated JSON; deterministic summaries keep their own questions
  * as a fallback when the AI is offline.
  */
-export async function POST() {
+export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
+  }
+
+  // UI locale — whitelisted to the shipped locales (mirrors the chat route);
+  // anything but "ar" stays English.
+  let locale: Locale = "en";
+  try {
+    const body = await request.json();
+    if (body?.locale === "ar") locale = "ar";
+  } catch {
+    // Empty/invalid body → English questions.
   }
 
   const { ok } = checkFeatureRateLimit(session.user.id);
@@ -63,15 +74,17 @@ export async function POST() {
     return Response.json({ offline: true });
   }
 
-  const cacheKey = `doctor-questions:${session.user.id}:${snapshot.logCount30d}:${snapshot.lastLogAt ?? "none"}`;
+  // Locale is part of the cache key — Arabic and English answers are
+  // different artifacts and must never be served cross-locale.
+  const cacheKey = `doctor-questions:${session.user.id}:${snapshot.logCount30d}:${snapshot.lastLogAt ?? "none"}:${locale}`;
   const questions = await questionsCache.getOrSet(cacheKey, async () => {
     const { object, usage } = await generateObject({
       model,
       schema: doctorQuestionsSchema,
-      system: buildDoctorQuestionsPrompt(snapshot, insights, userName),
+      system: buildDoctorQuestionsPrompt(snapshot, insights, userName, locale),
       prompt: "Generate my doctor questions.",
       temperature: 0.2,
-      maxOutputTokens: 600,
+      maxOutputTokens: 1024, // Arabic-safe headroom for structured output
     });
     // Double validation at the boundary — never trust the provider blindly.
     const parsed = doctorQuestionsSchema.parse(object);

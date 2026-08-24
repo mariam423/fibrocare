@@ -91,10 +91,14 @@ export function LandingFooter() {
 
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border/40 pt-6 sm:flex-row sm:items-center">
           <p className="text-[13px] text-muted-foreground">
-            © 2026 فيبروكير. صُنع بعناية.
+            {mounted
+              ? `${t("landing.footer.copyright", { year: 2026 })} ${t("landing.footer.madeWith")}`
+              : "© 2026 فيبروكير. صُنع بعناية."}
           </p>
           <p className="text-[13px] text-muted-foreground">
-            {mounted ? t("landing.footer.disclaimer") : "ليست أداة تشخيص. إذا كنت في أزمة، تواصل مع خدمات الطوارئ المحلية."}
+            {mounted
+              ? t("landing.footer.disclaimer")
+              : "ليس أداة تشخيصية. إذا كنت في حالة طوارئ، يرجى التواصل مع خدمات الطوارئ المحلية."}
           </p>
         </div>
       </div>

@@ -23,6 +23,24 @@ describe("knowledge base", () => {
       expect(ids).toContain(expected);
     }
   });
+
+  it("covers somatic protocols, sleep architecture, and clinical evidence", () => {
+    const ids = KNOWLEDGE_BASE.map((c) => c.id);
+    for (const expected of [
+      "somatic-exercise-protocols",
+      "sleep-architecture-fibromyalgia",
+      "clinical-evidence-overview",
+    ]) {
+      expect(ids).toContain(expected);
+    }
+  });
+
+  it("keeps every new chunk warm-therapy compliant", () => {
+    for (const chunk of KNOWLEDGE_BASE) {
+      if (chunk.id === "warm-compress-heat-therapy") continue; // explains why cold is NOT advised
+      expect(chunk.content).not.toMatch(/ice pack|cold pack|ice bath|cold compress/i);
+    }
+  });
 });
 
 describe("routeQuery", () => {
@@ -58,6 +76,27 @@ describe("localRetrieve", () => {
     const chunks = localRetrieve("why can't I sleep well with fibromyalgia?");
     expect(chunks.length).toBeGreaterThan(0);
     expect(chunks[0].domains).toContain("sleep");
+  });
+
+  it("retrieves the somatic protocol chunk for somatic movement questions", async () => {
+    const { chunks } = await retrieveKnowledge(
+      "are there somatic exercises or pandiculation that release muscle tension gently?"
+    );
+    expect(chunks.some((c) => c.id === "somatic-exercise-protocols")).toBe(true);
+  });
+
+  it("ranks sleep-architecture evidence first for deep-sleep questions", () => {
+    const chunks = localRetrieve(
+      "do I get enough deep slow-wave sleep at night?"
+    );
+    expect(chunks[0]?.id).toBe("sleep-architecture-fibromyalgia");
+  });
+
+  it("retrieves clinical-trial evidence for research questions", async () => {
+    const { chunks } = await retrieveKnowledge(
+      "what does the clinical research evidence say actually helps?"
+    );
+    expect(chunks.some((c) => c.id === "clinical-evidence-overview")).toBe(true);
   });
 
   it("returns flare content for a flare query", () => {

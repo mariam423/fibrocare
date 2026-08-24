@@ -14,6 +14,8 @@ import { getPainTrend } from "@/lib/careInsightEngine";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_LOGS = 14;
+/** Token-budget guard for the latest entry's free-form note. */
+export const NOTE_EXCERPT_MAX_CHARS = 200;
 
 function toDateKey(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -24,6 +26,58 @@ function toDateKey(d: Date): string {
 function mean(values: number[]): number {
   if (values.length === 0) return 0;
   return Math.round((values.reduce((s, v) => s + v, 0) / values.length) * 10) / 10;
+}
+
+/**
+ * Severity bucket for a pain level — mirrors the Health Logs page buckets
+ * (≤3 low, ≤6 moderate, else severe) so the companion speaks the same
+ * language the user sees in their log table.
+ */
+export function severityBucket(level: number): "low" | "moderate" | "severe" {
+  if (level <= 3) return "low";
+  if (level <= 6) return "moderate";
+  return "severe";
+}
+
+/**
+ * Shape the newest raw log entry into the snapshot's `latestLog` anchor:
+ * pain level + severity bucket, mood tag, freshness (hours ago), a truncated
+ * note excerpt, and the symptoms logged on that same calendar day.
+ * Pure — unit-tested without a database.
+ */
+export function buildLatestLogContext(
+  latest: {
+    painLevel: number;
+    moodTag: string;
+    notes: string | null;
+    loggedAt: Date;
+  } | null,
+  sameDaySymptoms: string[],
+  now: Date = new Date()
+): HealthSnapshot["latestLog"] {
+  if (!latest) return null;
+
+  const trimmedNote = latest.notes?.trim() ?? "";
+  const noteExcerpt = trimmedNote
+    ? trimmedNote.length > NOTE_EXCERPT_MAX_CHARS
+      ? `${trimmedNote.slice(0, NOTE_EXCERPT_MAX_CHARS)}…`
+      : trimmedNote
+    : null;
+
+  // Sub-hour ages collapse to 0 so the prompt can say "just now" instead of
+  // an awkward "0.3h ago"; older entries keep one-decimal precision.
+  const rawHours = (now.getTime() - latest.loggedAt.getTime()) / (60 * 60 * 1000);
+  const ageHours = rawHours < 1 ? 0 : Math.round(rawHours * 10) / 10;
+
+  return {
+    painLevel: latest.painLevel,
+    moodTag: latest.moodTag || null,
+    severity: severityBucket(latest.painLevel),
+    loggedAt: latest.loggedAt.toISOString(),
+    ageHours,
+    noteExcerpt,
+    symptoms: [...new Set(sameDaySymptoms)].slice(0, 8),
+  };
 }
 
 /** Fetch and shape the user's current health data into a compact snapshot. */
@@ -40,11 +94,11 @@ export async function buildHealthSnapshot(
       where: { userId, loggedAt: { gte: since30 } },
       orderBy: { loggedAt: "desc" },
       take: MAX_LOGS,
-      select: { painLevel: true, moodTag: true, loggedAt: true },
+      select: { painLevel: true, moodTag: true, notes: true, loggedAt: true },
     }),
     prisma.symptomLog.findMany({
       where: { userId, date: { gte: toDateKey(since30) } },
-      select: { symptom: true },
+      select: { symptom: true, date: true },
     }),
   ]);
 
@@ -99,6 +153,16 @@ export async function buildHealthSnapshot(
   }
 
   const lastLog = logs30[0]; // newest first
+
+  // Symptoms logged on the same calendar day as the latest entry — derived
+  // from the already-fetched 30-day symptom rows (no extra query). This is
+  // what ties "the latest log" to its concrete symptoms (e.g. a 10/10 flare
+  // day with brain fog + headache).
+  const latestDayKey = lastLog ? toDateKey(lastLog.loggedAt) : null;
+  const latestDaySymptoms = latestDayKey
+    ? symptoms30.filter((s) => s.date === latestDayKey).map((s) => s.symptom)
+    : [];
+
   const snapshot = healthSnapshotSchema.parse({
     currentPain: lastLog?.painLevel ?? null,
     avgPain7d: logs7.length ? mean(logs7.map((l) => l.painLevel)) : null,
@@ -110,6 +174,7 @@ export async function buildHealthSnapshot(
     mood: lastLog?.moodTag ?? null,
     lastLogAt: lastLog ? lastLog.loggedAt.toISOString() : null,
     trend,
+    latestLog: buildLatestLogContext(lastLog ?? null, latestDaySymptoms),
   });
 
   return snapshot;

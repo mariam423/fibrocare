@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     model,
     system: buildReflectionPrompt(note, snapshot, userName),
     prompt: "Reflect on this journal note with warmth and specificity.",
-    maxOutputTokens: 380,
+    maxOutputTokens: 768, // Arabic-safe: ~2-3 tokens/word vs English
     timeout: 30_000,
     onFinish: async ({ usage }) => {
       console.log(

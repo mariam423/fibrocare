@@ -50,7 +50,7 @@ export default function TreatmentPage() {
       title: t("treatment.sleep"),
       icon: Moon01Icon,
       content: locale === "ar"
-        ? "تحسين جودة النوم ضروري للأمان والراحة:\n\nروتين نوم ثابت: اذهب إلى النوم واستيقظ في نفس الوقت.\n\nبيئة مريحة: غرفة مظلمة وباردة وهادئة.\n\nتجنب الكافيين: خاصة في المساء.\n\nاسترخاء قبل النوم: قراءة أو الاستماع إلى موسيقى هادئة.\n\nال limitations: قلل من الشاشات قبل النوم."
+        ? "تحسين جودة النوم ضروري للأمان والراحة:\n\nروتين نوم ثابت: اذهب إلى النوم واستيقظ في نفس الوقت.\n\nبيئة مريحة: غرفة مظلمة وباردة وهادئة.\n\nتجنب الكافيين: خاصة في المساء.\n\nاسترخاء قبل النوم: قراءة أو الاستماع إلى موسيقى هادئة.\n\nحدود الشاشات: قلل من وقت الشاشات قبل النوم."
         : "Improving sleep quality is essential for rest and recovery:\n\nConsistent sleep routine: Go to bed and wake up at the same time.\n\nComfortable environment: Dark, cool, and quiet room.\n\nAvoid caffeine: Especially in the evening.\n\nPre-sleep relaxation: Reading or listening to calming music.\n\nScreen limits: Reduce screen time before bed.",
     },
     {

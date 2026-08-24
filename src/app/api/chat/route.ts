@@ -13,11 +13,9 @@ import {
   mockStreamResponse,
 } from "@/lib/ai/mock";
 import { buildLongTermMemory, buildShortTermMemory } from "@/lib/ai/memory";
-import { buildCompanionSystemPrompt } from "@/lib/ai/prompts";
-import { routeQuery } from "@/lib/ai/rag/router";
-import { retrieveKnowledge } from "@/lib/ai/rag/retriever";
-import { buildRagContextBlock } from "@/lib/ai/rag/injector";
 import { checkChatRateLimit } from "@/lib/ai/ratelimit";
+import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
+import { assembleCompanionContext } from "@/lib/ai/companion";
 
 export const maxDuration = 45;
 
@@ -62,16 +60,22 @@ export async function POST(req: Request) {
 
   let memory: ReturnType<typeof buildShortTermMemory>;
   let pendingMessageId: string | null = null;
+  let clientFacts: unknown = undefined;
+  let rawMessages: unknown[] = [];
+  // UI locale — whitelisted to the two shipped locales; anything but "ar"
+  // keeps the legacy English prompt path untouched.
+  let locale: "en" | "ar" = "en";
   try {
     const body = await req.json();
-    const raw = Array.isArray(body?.messages) ? body.messages : [];
+    rawMessages = Array.isArray(body?.messages) ? body.messages : [];
     // Short-term memory: validate + compact the thread (token-bloat guard).
-    memory = buildShortTermMemory(raw);
+    memory = buildShortTermMemory(rawMessages);
     pendingMessageId = typeof body?.messageId === "string" ? body.messageId : null;
+    if (body?.locale === "ar") locale = "ar";
+    clientFacts = body?.userFacts;
   } catch {
     return Response.json({ error: "Invalid request." }, { status: 400 });
   }
-  const { messages, lastUserText } = memory;
 
   const userName = session.user.name ?? "there";
 
@@ -80,7 +84,7 @@ export async function POST(req: Request) {
     const snapshot = await buildLongTermMemory(session.user.id);
     console.log(`[ai] chat · mode=mock`);
     return mockStreamResponse(
-      mockChatReply(snapshot, userName, lastUserText || "hi"),
+      mockChatReply(snapshot, userName, memory.lastUserText || "hi"),
       pendingMessageId
     );
   }
@@ -94,36 +98,34 @@ export async function POST(req: Request) {
     return Response.json({ offline: true, error: "offline" });
   }
 
-  const longTerm = await buildLongTermMemory(session.user.id);
+  // Orchestration (companion.ts): intent router → memory layers → RAG →
+  // learned patient facts → layered system prompt.
+  const context = await assembleCompanionContext({
+    userId: session.user.id,
+    userName,
+    rawMessages,
+    userFacts: clientFacts,
+    locale,
+  });
 
-  // RAG: only informational/medical queries hit the knowledge base; casual
-  // conversation skips retrieval. Local deterministic retriever — no keys,
-  // no network, degrades to an empty block if nothing is relevant.
-  const route = routeQuery(lastUserText);
-  let ragContext = "";
-  if (route.needsRetrieval && lastUserText) {
-    try {
-      const { chunks } = await retrieveKnowledge(lastUserText, {
-        domains: route.domains,
-        topK: 3,
-      });
-      ragContext = buildRagContextBlock(chunks);
-      console.log(`[ai] rag · ${route.reason} · ${chunks.length} chunk(s)`);
-    } catch (err) {
-      console.warn("[ai] rag retrieval failed — continuing without context:", err);
-    }
+  if (context.ragChunkCount > 0) {
+    console.log(`[ai] rag · ${context.ragRoute.reason} · ${context.ragChunkCount} chunk(s)`);
   }
 
   const result = streamText({
     model,
-    system: buildCompanionSystemPrompt(longTerm, userName, ragContext),
-    messages,
-    maxOutputTokens: 700,
+    system: context.systemPrompt,
+    messages: context.messages,
+    // Truncation guard: Arabic tokenizes at ~2–3 tokens/word (vs ~1.3 for
+    // English), and some provider tiers reason verbosely before answering.
+    // 1536 leaves full headroom above the ~180-word persona budget while
+    // still bounding cost; the prompt (not this cap) controls length.
+    maxOutputTokens: 2048,
     timeout: 30_000,
     tools: {
       getHealthSnapshot: tool({
         description:
-          "Fetch the user's latest health snapshot (current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
+          "Fetch the user's latest health snapshot (the newest log entry with its pain level, severity, symptoms and note, plus current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
         // AI SDK v7 renamed `parameters` to `inputSchema`.
         inputSchema: z.object({}),
         execute: async () =>
@@ -137,5 +139,20 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toUIMessageStreamResponse();
+  // Layer 4 — medical guardrails: stream through the warm-therapy
+  // sanitizer so cold-pack/ice slips are rewritten to "كمادات دافئة /
+  // حمام دافئ" (warm compress / warm bath) without breaking the protocol.
+  // Arabic streams additionally run the lexical leak sanitizer, which
+  // repairs isolated foreign words ("logged", "streak", "aumento", "/zen")
+  // into the approved Arabic glossary.
+  const base = result.toUIMessageStreamResponse();
+  const guarded = base.body?.pipeThrough(
+    createGuardrailStreamTransform({ arabicLeaks: locale === "ar" })
+  );
+  if (!guarded) return base;
+  return new Response(guarded, {
+    status: base.status,
+    statusText: base.statusText,
+    headers: base.headers,
+  });
 }

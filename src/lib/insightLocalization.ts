@@ -30,7 +30,11 @@ const INSIGHT_MESSAGE_KEYS: Partial<Record<string, TranslationKey>> = {
   "weekday-pattern": "insight.weekdayPattern.message",
 };
 
-const SYMPTOM_KEYS: Record<string, TranslationKey> = {
+/**
+ * Canonical symptom ids ➔ translation keys. Shared with the AI prompt
+ * builders so snapshot labels localize from ONE source of truth.
+ */
+export const SYMPTOM_KEYS: Record<string, TranslationKey> = {
   "widespread-pain": "logging.symptoms.widespreadPain",
   fatigue: "logging.symptoms.fatigue",
   "sleep-problems": "logging.symptoms.sleepProblems",
@@ -41,8 +45,51 @@ const SYMPTOM_KEYS: Record<string, TranslationKey> = {
   sensitivity: "logging.symptoms.sensitivity",
 };
 
+/**
+ * Report-facing symptom labels. Kept separate from `SYMPTOM_KEYS` so the
+ * Reports page can use its own clinical phrasing without changing the
+ * logging UI copy.
+ */
+const REPORT_SYMPTOM_KEYS: Partial<Record<string, TranslationKey>> = {
+  "widespread-pain": "reports.stat.symptom.widespreadPain",
+  fatigue: "reports.stat.symptom.fatigue",
+  "sleep-problems": "reports.stat.symptom.sleepProblems",
+  "fibro-fog": "reports.stat.symptom.fibroFog",
+  headache: "reports.stat.symptom.headache",
+  "tender-points": "reports.stat.symptom.tenderPoints",
+  stiffness: "reports.stat.symptom.stiffness",
+  sensitivity: "reports.stat.symptom.sensitivity",
+};
+
+/** Humanize an unknown raw symptom id (e.g. voice-logged free text). */
+export function humanizeSymptom(rawKey: string): string {
+  const cleaned = rawKey.trim().replace(/[-_]+/g, " ");
+  return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : cleaned;
+}
+
+/**
+ * Map a raw symptom key ("fatigue", "fibro-fog", …) to a localized label.
+ * Unknown ids fall back to a readable humanized form instead of leaking
+ * machine keys into the report.
+ */
+export function localizeSymptom(
+  rawKey: string,
+  t: (key: TranslationKey) => string
+): string {
+  const key = REPORT_SYMPTOM_KEYS[rawKey];
+  return key ? t(key) : humanizeSymptom(rawKey);
+}
+
+/**
+ * Structural subset localizeInsight actually reads. Accepts full engine
+ * Insights as well as lighter serialized copies (e.g. the Medical Summary
+ * payload) that omit engine-only fields like `type`.
+ */
+export type LocalizableInsight = Pick<Insight, "id" | "title" | "message"> &
+  Partial<Pick<Insight, "severity" | "params">>;
+
 export function localizeInsight(
-  insight: Insight,
+  insight: LocalizableInsight,
   locale: string,
   t: (key: TranslationKey, params?: Record<string, string | number>) => string
 ): { title: string; message: string } {

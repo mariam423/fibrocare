@@ -14,7 +14,7 @@ import { getAiStatus } from "@/app/actions";
 /** Shape of the shared AI runtime status (kept in sync with the server action). */
 export type AiStatus = Awaited<ReturnType<typeof getAiStatus>>;
 
-/** Human label for a live provider id (Gemini/OpenAI/Claude) or "" if none. */
+/** Human label for a live provider id (Gemini/OpenAI/Claude/OpenRouter) or "". */
 export function providerDisplayName(provider: string | null): string {
   return provider === "google"
     ? "Gemini"
@@ -22,7 +22,9 @@ export function providerDisplayName(provider: string | null): string {
       ? "OpenAI"
       : provider === "anthropic"
         ? "Claude"
-        : "";
+        : provider === "openrouter"
+          ? "OpenRouter"
+          : "";
 }
 
 interface AiStatusContextValue {

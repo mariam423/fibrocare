@@ -115,7 +115,7 @@ export default function ProfilePage() {
     <div className="min-h-[100dvh] text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" />
 
-      <main className="pb-16 px-4 sm:px-6 lg:px-8 space-y-8 max-w-2xl mx-auto">
+      <main className="pb-32 pt-6 px-4 sm:px-6 lg:px-8 space-y-8 max-w-2xl mx-auto">
         {/* Hero Header */}
         <ScrollReveal as="section" className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">

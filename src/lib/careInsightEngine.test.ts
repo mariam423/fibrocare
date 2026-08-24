@@ -6,6 +6,12 @@ import {
   getHumidityLevel,
   getPainTrend,
 } from "@/lib/careInsightEngine";
+import { sanitizeWarmTherapy } from "@/lib/ai/guardrails";
+import { translations, type TranslationKey } from "@/lib/translations";
+
+/** Cold-therapy advice is never allowed for fibromyalgia muscle flares. */
+const COLD_THERAPY =
+  /\b(cold|ice[d]?|chilled)\s+(compress|pack|bath|shower|water)|\bicing\b|كمادة باردة|كمادات باردة|حمام بارد|حمام مثلج|دش بارد|دش مثلج|ماء بارد|ماء مثلج|ثلج/i;
 
 describe("getFlareState", () => {
   it("maps pain levels to calm / mild / severe", () => {
@@ -81,5 +87,111 @@ describe("buildCareInsight", () => {
       trend: "rising",
     });
     expect(insight.message).toContain("trending up");
+  });
+});
+
+describe("barometric state (climate insights)", () => {
+  it("defaults to stable when no pressure context is given", () => {
+    const insight = buildCareInsight({
+      painLevel: 3,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+    });
+    expect(insight.barometric).toBe("stable");
+  });
+
+  it("reports dropping when the barometer is falling", () => {
+    const insight = buildCareInsight({
+      painLevel: 3,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+      pressure: 1006,
+      pressureTrend: { trend: "falling", deltaHpa: -4 },
+    });
+    expect(insight.barometric).toBe("dropping");
+  });
+
+  it("reports low for absolute low pressure without a falling trend", () => {
+    const insight = buildCareInsight({
+      painLevel: 3,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+      pressure: 1001,
+      pressureTrend: { trend: "steady", deltaHpa: 0 },
+    });
+    expect(insight.barometric).toBe("low");
+  });
+
+  it("keeps stable for healthy pressure", () => {
+    const insight = buildCareInsight({
+      painLevel: 3,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+      pressure: 1015,
+      pressureTrend: { trend: "rising", deltaHpa: 2 },
+    });
+    expect(insight.barometric).toBe("stable");
+  });
+});
+
+describe("warm-therapy guardrail (care insight)", () => {
+  it("never emits cold-therapy advice across flare states and weather", () => {
+    for (const painLevel of [1, 5, 9]) {
+      for (const temperature of [12, 22, 31]) {
+        const insight = buildCareInsight({
+          painLevel,
+          temperature,
+          humidity: 50,
+          trend: "stable",
+        });
+        const text = [
+          insight.title,
+          insight.message,
+          ...insight.suggestions,
+        ].join(" ");
+        expect(text).not.toMatch(COLD_THERAPY);
+      }
+    }
+  });
+
+  it("recommends a warm compress or warm bath for severe flares", () => {
+    const insight = buildCareInsight({
+      painLevel: 9,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+    });
+    expect(insight.suggestions.join(" ")).toMatch(
+      /warm compress or a warm bath/i
+    );
+  });
+
+  it("keeps EN and AR insight suggestions warm and synced", () => {
+    const key = "careInsight.suggest.severe.2" as TranslationKey;
+    const en = translations.en[key];
+    const ar = translations.ar[key];
+    expect(en).toMatch(/warm compress|warm bath/i);
+    expect(en).not.toMatch(COLD_THERAPY);
+    expect(ar).toMatch(/كمادة دافئة|حماما? دافئ/);
+    expect(ar).not.toMatch(COLD_THERAPY);
+    expect(ar).toContain("تشنج العضلات");
+  });
+
+  it("sanitizes cold-therapy phrases out of generated output fields", () => {
+    // The engine routes every generated field through sanitizeWarmTherapy,
+    // so even a future copy regression cannot ship cold advice.
+    const insight = buildCareInsight({
+      painLevel: 9,
+      temperature: 22,
+      humidity: 50,
+      trend: "stable",
+    });
+    for (const field of [insight.title, insight.message, ...insight.suggestions]) {
+      expect(field).toBe(sanitizeWarmTherapy(field));
+    }
   });
 });

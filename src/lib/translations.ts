@@ -315,6 +315,7 @@ export type TranslationKey =
   | "today.trigger.humidityHigh"
   | "today.trigger.heat"
   | "today.trigger.cold"
+  | "today.triggers.neutral"
   | "today.estimated"
   | "recent.title"
   | "recent.empty"
@@ -1210,6 +1211,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "today.trigger.humidityHigh": "High humidity may weigh on sensitive joints today.",
     "today.trigger.heat": "Extreme heat — keep cool and stay hydrated.",
     "today.trigger.cold": "Extreme cold may increase stiffness — keep warm.",
+    "today.triggers.neutral":
+      "Log your daily symptoms to track weather triggers once the service is enabled.",
     "today.estimated": "Estimated values (weather API not configured).",
     "recent.title": "Recent Logs",
     "recent.empty": "No logs yet. Start tracking to see your history here.",
@@ -2116,7 +2119,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "today.trigger.humidityHigh": "رطوبة عالية اليوم قد تثقل على المفاصل الحساسة.",
     "today.trigger.heat": "حرارة شديدة — احرص على البرودة والترطيب.",
     "today.trigger.cold": "البرد الشديد قد يزيد التيبس — حافظ على دفئك.",
-    "today.estimated": "قيم تقريبية (واجهة الطقس غير مهيأة).",
+    "today.triggers.neutral": "سجل أعراضك اليومية لمتابعة محفزات الطقس عند تفعيل الخدمة.",
+    "today.estimated": "قيم تقريبية (واجهة الطقس غير مهيأة)",
     "recent.title": "السجلات الأخيرة",
     "recent.empty": "لا توجد سجلات بعد. ابدأ التسجيل لترى سجلك هنا.",
     "recent.today": "اليوم",

@@ -11,6 +11,8 @@ import {
 
 export interface LiveWeather {
   source: "live" | "fallback";
+  /** True when the payload is a deterministic estimate, not live data. */
+  isEstimated: boolean;
   weather: WeatherData;
   location?: string;
   note?: string;
@@ -30,7 +32,12 @@ export interface LiveWeather {
 export function useWeather(): LiveWeather {
   const [state, setState] = useState<LiveWeather>(() => {
     const weather = deterministicWeather(new Date());
-    return { source: "fallback", weather, triggers: detectWeatherTriggers(weather) };
+    return {
+      source: "fallback",
+      isEstimated: true,
+      weather,
+      triggers: detectWeatherTriggers(weather),
+    };
   });
 
   useEffect(() => {
@@ -40,8 +47,11 @@ export function useWeather(): LiveWeather {
         const res = await fetch("/api/weather", { cache: "no-store" });
         const data = (await res.json()) as Partial<LiveWeather>;
         if (!cancelled && data?.weather) {
+          const source = data.source === "live" ? "live" : "fallback";
           setState({
-            source: data.source === "live" ? "live" : "fallback",
+            source,
+            // Older cached payloads may lack the flag — derive from source.
+            isEstimated: data.isEstimated ?? source !== "live",
             weather: data.weather,
             location: data.location,
             note: data.note,

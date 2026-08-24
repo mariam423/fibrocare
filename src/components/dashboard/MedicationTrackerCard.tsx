@@ -72,7 +72,7 @@ export function MedicationTrackerCard() {
               type="button"
               onClick={() => toggle(med.id)}
               className={cn(
-                "flex items-center gap-3 w-full rounded-xl py-3 px-4 text-left transition-all duration-200",
+                "flex items-center gap-3 w-full rounded-xl py-3 px-4 text-start transition-all duration-200",
                 isTaken
                   ? "bg-emerald-500/10 border border-emerald-500/20"
                   : "bg-muted/60 border border-border hover:bg-muted"

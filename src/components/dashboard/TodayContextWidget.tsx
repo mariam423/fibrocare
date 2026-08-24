@@ -83,7 +83,10 @@ function getWeatherIcon(condition: WeatherData["condition"]) {
 
 export function TodayContextWidget() {
   const { t } = useLanguage();
-  const { weather, source, location, triggers } = useWeather();
+  const { weather, source, location, triggers, isEstimated } = useWeather();
+  // Trigger insights are only meaningful for real conditions — deterministic
+  // fallback numbers must never generate medical warnings.
+  const live = !isEstimated && source === "live";
   const status = getWeatherStatus(weather, triggers ?? ["calm"], t);
   const WeatherIcon = getWeatherIcon(weather.condition);
 
@@ -115,7 +118,7 @@ export function TodayContextWidget() {
                 aria-hidden="true"
               />
               {/* Numeric + unit stay LTR inside RTL layouts */}
-              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
+              <span dir="ltr" className="inline-block text-lg font-bold text-foreground [unicode-bidi:isolate]">
                 {weather.temperature}°C
               </span>
               <span className="text-[10px] text-muted-foreground tracking-wide">
@@ -128,7 +131,7 @@ export function TodayContextWidget() {
                 className="h-4 w-4 text-emerald-500"
                 aria-hidden="true"
               />
-              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
+              <span dir="ltr" className="inline-block text-lg font-bold text-foreground [unicode-bidi:isolate]">
                 {weather.humidity}%
               </span>
               <span className="text-[10px] text-muted-foreground tracking-wide">
@@ -141,7 +144,7 @@ export function TodayContextWidget() {
                 className="h-4 w-4 text-violet-500"
                 aria-hidden="true"
               />
-              <span dir="ltr" className="text-lg font-bold text-foreground [unicode-bidi:isolate]">
+              <span dir="ltr" className="inline-block text-lg font-bold text-foreground [unicode-bidi:isolate]">
                 {weather.pressure}
                 <span className="ms-0.5 text-[10px] font-medium text-muted-foreground">hPa</span>
               </span>
@@ -151,21 +154,43 @@ export function TodayContextWidget() {
             </div>
           </div>
 
-          {/* Localized weather-trigger status */}
-          <div
-            className={cn(
-              "flex items-start gap-2 rounded-lg p-2.5 text-xs leading-relaxed",
-              "bg-muted/60 border border-border backdrop-blur-md"
-            )}
-          >
-            {status.icon}
-            <span className={STATUS_TONE[status.tone]}>{status.label}</span>
-          </div>
+          {/* Estimated data → neutral baseline message only; live data →
+              the real trigger insight. Direction inherits from the document
+              (rtl in Arabic), so the dot lands on the reading side
+              automatically; text-start keeps the line flush to that edge. */}
+          {live ? (
+            <div
+              className={cn(
+                "flex min-w-0 items-start gap-2 rounded-lg p-2.5 text-start text-xs leading-relaxed",
+                "bg-muted/60 border border-border backdrop-blur-md"
+              )}
+            >
+              {status.icon}
+              <span className={cn("min-w-0 break-words", STATUS_TONE[status.tone])}>
+                {status.label}
+              </span>
+            </div>
+          ) : (
+            <div className="flex min-w-0 items-start gap-2 rounded-lg border border-border bg-muted/60 p-2.5 text-start text-xs leading-relaxed text-muted-foreground backdrop-blur-md">
+              <span
+                aria-hidden="true"
+                className="mt-1 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50"
+              />
+              <span className="min-w-0 break-words">
+                {t("today.triggers.neutral")}
+              </span>
+            </div>
+          )}
 
-          {source === "fallback" && (
-            <p className="text-[11px] italic text-muted-foreground">
-              {t("today.estimated")}
-            </p>
+          {/* The estimated badge is hidden completely on live data. */}
+          {!live && (
+            <div className="flex min-w-0 items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-start text-xs italic leading-relaxed text-amber-700 backdrop-blur-md dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-300">
+              <span
+                aria-hidden="true"
+                className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-400"
+              />
+              <span className="min-w-0 break-words">{t("today.estimated")}</span>
+            </div>
           )}
         </CardContent>
       </Card>

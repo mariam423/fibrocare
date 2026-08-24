@@ -14,6 +14,8 @@ export const dynamic = "force-dynamic";
 
 export interface WeatherApiResponse {
   source: "live" | "fallback";
+  /** True when the payload is a deterministic estimate, not live data. */
+  isEstimated: boolean;
   weather: WeatherData;
   location?: string;
   note?: string;
@@ -37,15 +39,27 @@ const weatherCache = new TtlCache<WeatherApiResponse>(CACHE_TTL_MS);
  */
 const lastPressureByLocation = new Map<string, number>();
 
-function fallback(city: string): WeatherApiResponse {
+function fallback(city: string, note?: string): WeatherApiResponse {
   const weather = deterministicWeather(new Date());
   return {
     source: "fallback",
+    isEstimated: true,
     weather,
     location: city,
-    note: "Weather API key not configured — using estimated values.",
+    note,
     triggers: detectWeatherTriggers(weather),
   };
+}
+
+/**
+ * Server-side key resolution. `NEXT_PUBLIC_WEATHER_API_KEY` also works here
+ * (and is the same var some client tooling reads) — note that NEXT_PUBLIC_*
+ * values are public by design once bundled, so prefer OPENWEATHER_API_KEY.
+ */
+function resolveApiKey(): string | undefined {
+  const key =
+    process.env.OPENWEATHER_API_KEY || process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+  return key?.trim() || undefined;
 }
 
 /** Validate optional ?lat=&lon= query params (client geolocation). */
@@ -72,10 +86,13 @@ async function fetchLive(
 
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
-    return {
-      ...fallback(city),
-      note: `Weather service unavailable (${res.status}). Using estimated values.`,
-    };
+    // An invalid key (401) must never surface as live data.
+    return fallback(
+      city,
+      res.status === 401
+        ? "Weather API key rejected (401) — using estimated values."
+        : `Weather service unavailable (${res.status}). Using estimated values.`
+    );
   }
 
   const data = await res.json();
@@ -90,6 +107,7 @@ async function fetchLive(
 
   return {
     source: "live",
+    isEstimated: false,
     weather,
     location:
       typeof data.name === "string" && data.name.length > 0 ? data.name : city,
@@ -114,13 +132,17 @@ function locationKey(coords: { lat: number; lon: number } | null): string {
  * upstream call fails, so the dashboard always renders usable weather.
  */
 export async function GET(request: Request) {
-  if (!process.env.OPENWEATHER_API_KEY?.trim()) {
-    const city = process.env.OPENWEATHER_CITY?.trim() || "London";
-    return NextResponse.json(fallback(city));
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    return NextResponse.json(
+      fallback(
+        process.env.OPENWEATHER_CITY?.trim() || "London",
+        "Weather API key not configured — using estimated values."
+      )
+    );
   }
 
   try {
-    const apiKey = process.env.OPENWEATHER_API_KEY.trim();
     const payload = await weatherCache.getOrSet(
       locationKey(parseCoordinates(request)),
       () => fetchLive(request, apiKey)
@@ -128,7 +150,6 @@ export async function GET(request: Request) {
     return NextResponse.json(payload);
   } catch (error) {
     console.error("[weather] OpenWeather fetch failed:", error);
-    const city = process.env.OPENWEATHER_CITY?.trim() || "London";
-    return NextResponse.json(fallback(city));
+    return NextResponse.json(fallback(process.env.OPENWEATHER_CITY?.trim() || "London"));
   }
 }

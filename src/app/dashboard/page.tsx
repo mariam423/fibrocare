@@ -64,6 +64,18 @@ function getTimeGreeting(t: (key: TranslationKey, params?: Record<string, string
   return t("dashboard.greeting.evening");
 }
 
+/**
+ * WordReveal lays each word out as its own inline-block, so under an RTL
+ * page a Latin-script name ("Mariam Mahmoud") would read "Mahmoud Mariam".
+ * Rendering the name as its own reveal with a script-aware base direction
+ * keeps both "Mariam Mahmoud" and "مريم محمود" in natural order.
+ */
+const RTL_SCRIPT_RE = /[\u0590-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+function nameDirection(userName: string): "rtl" | "ltr" {
+  return RTL_SCRIPT_RE.test(userName) ? "rtl" : "ltr";
+}
+
 function getTodayLabel(locale: string): string {
   return new Date().toLocaleDateString(locale === "ar" ? "ar" : "en-US", {
     weekday: "long",
@@ -202,12 +214,21 @@ export default function Home() {
         <ScrollReveal as="section" className="space-y-1">
           <div className="flex flex-col gap-x-6 gap-y-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div className="min-w-0 flex-1">
-              <WordReveal
-                as="h1"
-                text={`${getTimeGreeting(t)}, ${userName}`}
-                className="text-3xl sm:text-4xl font-bold tracking-tight"
-                amount={0.6}
-              />
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                <WordReveal
+                  as="span"
+                  text={`${getTimeGreeting(t)},`}
+                  amount={0.6}
+                />{" "}
+                <WordReveal
+                  as="span"
+                  dir={nameDirection(userName)}
+                  text={userName}
+                  className="inline-block [unicode-bidi:isolate]"
+                  amount={0.6}
+                  delay={0.1}
+                />
+              </h1>
               <WordReveal
                 as="p"
                 text={`${getTodayLabel(locale)}. ${t("dashboard.todayMessage")}`}

@@ -138,7 +138,9 @@ export type TranslationKey =
   | "resources.ai.hide"
   | "resources.ai.verified"
   | "resources.ai.guidelineLabel"
+  | "resources.ai.titleLabel"
   | "resources.ai.originLabel"
+  | "resources.ai.summaryLabel"
   | "resources.ai.viewGuideline"
   | "resources.ai.unverified"
   | "resources.ai.unverifiedNote"
@@ -1470,7 +1472,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.ai.hide": "Hide summary",
     "resources.ai.verified": "Verified Source",
     "resources.ai.guidelineLabel": "Cited guideline",
+    "resources.ai.titleLabel": "Medical title",
     "resources.ai.originLabel": "Clinical origin",
+    "resources.ai.summaryLabel": "Clinical summary",
     "resources.ai.viewGuideline": "View cited guideline",
     "resources.ai.unverified": "Couldn't verify this in the knowledge index",
     "resources.ai.unverifiedNote": "Safe offline guidance instead: keep demands low, rest, and stay hydrated. Contact your care team if symptoms are severe or unusual.",
@@ -2808,7 +2812,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.ai.hide": "إخفاء الملخص",
     "resources.ai.verified": "مصدر موثوق",
     "resources.ai.guidelineLabel": "الإرشاد المُستشهد به",
+    "resources.ai.titleLabel": "العنوان الطبي",
     "resources.ai.originLabel": "الأصل السريري",
+    "resources.ai.summaryLabel": "الملخص السريري",
     "resources.ai.viewGuideline": "عرض الإرشاد المُستشهد به",
     "resources.ai.unverified": "تعذّر التحقق من هذا في فهرس المعرفة",
     "resources.ai.unverifiedNote": "إرشاد آمن دون اتصال بدلًا من ذلك: خفّف المتطلبات، واسترح، وحافظ على الترطيب. تواصل مع فريقك الطبي إذا كانت الأعراض شديدة أو غير معتادة.",

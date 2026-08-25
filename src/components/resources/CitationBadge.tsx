@@ -31,7 +31,12 @@ export function CitationBadge({
   chunk: RetrievedChunk;
   className?: string;
 }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  // Section badges follow the reading direction of the active locale:
+  // Arabic labels flow RTL/right, English labels LTR/left. The values below
+  // are English knowledge-base strings and are pinned LTR independently.
+  const labelAlign = locale === "ar" ? "text-right" : "text-left";
+  const labelClass = `text-[11px] font-semibold uppercase tracking-wide text-muted-foreground ${labelAlign}`;
 
   return (
     <Dialog>
@@ -48,6 +53,8 @@ export function CitationBadge({
         }
       />
       <DialogContent className="ring-1 ring-border">
+        {/* Header rendered once — the verified-source title + the cited
+            guideline description live here and nowhere else in the body. */}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <HugeiconsIcon icon={BadgeCheckIcon} className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
@@ -56,32 +63,31 @@ export function CitationBadge({
           <DialogDescription>{t("resources.ai.guidelineLabel")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
-          {/* Guideline title — English knowledge-base text, so the block is
-              pinned LTR/left-aligned and the string is <bdi>-isolated so
-              trailing punctuation never inverts inside the Arabic RTL page. */}
+          {/* Medical title — English knowledge-base text: value pinned
+              LTR/left-aligned and <bdi>-isolated so trailing punctuation
+              never inverts inside the Arabic RTL page. */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("resources.ai.guidelineLabel")}
-            </p>
+            <p className={labelClass}>{t("resources.ai.titleLabel")}</p>
             <p dir="ltr" className="text-left text-sm font-medium text-foreground">
               <bdi>{chunk.title}</bdi>
             </p>
           </div>
+          {/* Clinical origin — same LTR/bdi treatment. */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("resources.ai.originLabel")}
-            </p>
+            <p className={labelClass}>{t("resources.ai.originLabel")}</p>
             <p dir="ltr" className="text-left text-sm text-foreground">
               <bdi>{chunk.source}</bdi>
             </p>
           </div>
-          {/* Clinical quote block — long English guideline passage, pinned
-              LTR so brackets/quotes/trailing periods stay on the correct
-              edge, with the text itself isolated in <bdi>. */}
-          <div dir="ltr" className="rounded-xl border border-border/60 bg-muted/30 p-3 text-left">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              <bdi>{chunk.content}</bdi>
-            </p>
+          {/* Clinical summary — long English guideline passage, pinned LTR
+              so brackets/quotes/trailing periods stay on the correct edge. */}
+          <div>
+            <p className={labelClass}>{t("resources.ai.summaryLabel")}</p>
+            <div dir="ltr" className="rounded-xl border border-border/60 bg-muted/30 p-3 text-left">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                <bdi>{chunk.content}</bdi>
+              </p>
+            </div>
           </div>
         </div>
       </DialogContent>

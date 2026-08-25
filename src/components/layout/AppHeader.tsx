@@ -17,6 +17,7 @@ import {
 import { PricingModal } from "@/components/pricing/PricingModal";
 import { Button } from "@/components/ui/button";
 import { AiStatusBadge } from "@/components/ai/AiStatusBadge";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useHealth } from "@/context/HealthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -133,6 +134,9 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
                 onClose={() => setPricingOpen(false)}
                 checkoutUrl={process.env.NEXT_PUBLIC_CHECKOUT_URL}
               />
+
+              {/* Smart Notification Center — bell + unread badge */}
+              <NotificationBell />
 
               <Button
                 onClick={() => setLocale(locale === "en" ? "ar" : "en")}

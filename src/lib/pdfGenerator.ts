@@ -3,6 +3,16 @@ import autoTable from "jspdf-autotable";
 import type { HealthLog } from "@/lib/types";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
+import type { Locale, TranslationKey } from "@/lib/translations";
+import { translations } from "@/lib/translations";
+import { localizeInsight, localizeSymptom } from "@/lib/insightLocalization";
+import {
+  buildLocalizedDiscussionPoints,
+  flareDaysKey,
+  localizeBriefHeadline,
+  trendKeyByValue,
+  velocityKeyByValue,
+} from "@/lib/ai/clinical-brief/localize";
 
 export interface ReportData {
   userName: string;
@@ -16,6 +26,72 @@ export interface ReportData {
 }
 
 const PERIOD_DAYS = 90;
+
+export interface PdfExportOptions {
+  /**
+   * Base path for the self-hosted Amiri fonts (default "/fonts"). The PWA
+   * precache serves these offline; tests override to force a fresh fetch.
+   */
+  fontsBaseUrl?: string;
+}
+
+const DEFAULT_FONTS_BASE_URL = "/fonts";
+
+/** Base64 cache so repeated exports never refetch/re-encode the fonts. */
+const fontCache = new Map<string, string>();
+
+async function toBase64(buffer: ArrayBuffer): Promise<string> {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function loadFontBase64(url: string): Promise<string> {
+  const cached = fontCache.get(url);
+  if (cached) return cached;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to load PDF font ${url} (${res.status})`);
+  }
+  const base64 = await toBase64(await res.arrayBuffer());
+  fontCache.set(url, base64);
+  return base64;
+}
+
+/** Embed Amiri (regular + bold) so Arabic text shapes and renders in the PDF. */
+async function installArabicFonts(
+  doc: jsPDF,
+  fontsBaseUrl: string
+): Promise<void> {
+  const [regular, bold] = await Promise.all([
+    loadFontBase64(`${fontsBaseUrl}/Amiri-Regular.ttf`),
+    loadFontBase64(`${fontsBaseUrl}/Amiri-Bold.ttf`),
+  ]);
+  doc.addFileToVFS("Amiri-Regular.ttf", regular);
+  doc.addFileToVFS("Amiri-Bold.ttf", bold);
+  doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+  doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+}
+
+function makeT(locale: Locale) {
+  const dict = translations[locale];
+  return (
+    key: TranslationKey,
+    params?: Record<string, string | number>
+  ): string => {
+    let text = dict[key] ?? translations.en[key] ?? key;
+    if (params) {
+      for (const [name, value] of Object.entries(params)) {
+        text = text.replaceAll(`{${name}}`, String(value));
+      }
+    }
+    return text;
+  };
+}
 
 function toDateKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -50,7 +126,8 @@ function drawTrendChart(
   x: number,
   y: number,
   w: number,
-  h: number
+  h: number,
+  noDataLabel: string
 ) {
   const maxLevel = 10;
   const padLeft = 16;
@@ -79,7 +156,7 @@ function drawTrendChart(
   if (series.length < 2) {
     doc.setFontSize(9);
     doc.setTextColor(150);
-    doc.text("Not enough data to plot.", plotX + plotW / 2, plotY + plotH / 2, {
+    doc.text(noDataLabel, plotX + plotW / 2, plotY + plotH / 2, {
       align: "center",
     });
     return;
@@ -136,52 +213,119 @@ function drawTrendChart(
   });
 }
 
-export async function generateMedicalReport(data: ReportData): Promise<Blob> {
+/**
+ * Generate the clinical summary PDF.
+ *
+ * `locale === "ar"` renders a fully Arabic, right-to-left document: an
+ * embedded Amiri font provides the glyphs, jsPDF shapes/joins the Arabic
+ * letters and reorders bidi runs, and every label/value pair is mirrored.
+ * The English path is untouched (helvetica, LTR, identical strings).
+ */
+export async function generateMedicalReport(
+  data: ReportData,
+  locale: Locale = "en",
+  options: PdfExportOptions = {}
+): Promise<Blob> {
+  const rtl = locale === "ar";
+  const t = makeT(locale);
+  const fontsBaseUrl = options.fontsBaseUrl ?? DEFAULT_FONTS_BASE_URL;
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 48;
   const contentW = pageW - margin * 2;
 
+  if (rtl) {
+    await installArabicFonts(doc, fontsBaseUrl);
+    doc.setLanguage("ar");
+    doc.viewerPreferences({ Direction: "R2L" });
+  }
+
+  const FONT = rtl ? "Amiri" : "helvetica";
+
+  /**
+   * Draw a section heading. In RTL the leading number ("1. العنوان") is
+   * drawn as its own right-aligned run at the page edge so it sits on the
+   * right (where an RTL reader expects it) while the Arabic title flows to
+   * its left with embedded numbers intact.
+   */
+  const drawHeading = (text: string) => {
+    if (!rtl) {
+      drawText(text, margin, y);
+      return;
+    }
+    const m = text.match(/^(\d+)\.\s*([\s\S]*)$/);
+    if (!m) {
+      drawText(text, margin, y);
+      return;
+    }
+    const numWidth = doc.getStringUnitWidth(`${m[1]}.`) * doc.getFontSize() + 12;
+    doc.text(m[2], pageW - margin - numWidth, y, { align: "right" });
+    doc.text(`${m[1]}.`, pageW - margin, y, { align: "right" });
+  };
+
+  /**
+   * Draw text at the LTR position `enX` and mirror it horizontally for RTL.
+   * jsPDF's bidi engine shapes and reorders each string contextually, so
+   * Arabic lines flow right-to-left while embedded numbers stay intact.
+   */
+  const drawText = (
+    text: string | string[],
+    enX: number,
+    y: number,
+    enAlign: "left" | "right" | "center" = "left"
+  ) => {
+    if (enAlign === "center") {
+      doc.text(text, enX, y, { align: "center" });
+    } else if (rtl) {
+      doc.text(text, pageW - enX, y, {
+        align: enAlign === "left" ? "right" : "left",
+      });
+    } else if (enAlign === "right") {
+      doc.text(text, enX, y, { align: "right" });
+    } else {
+      doc.text(text, enX, y);
+    }
+  };
+
+
+
   // ---------- Header band ----------
   doc.setFillColor(88, 28, 135);
   doc.rect(0, 0, pageW, 96, "F");
   doc.setTextColor(255);
   doc.setFontSize(22);
-  doc.setFont("helvetica", "bold");
-  doc.text("FibroCare", margin, 46);
+  doc.setFont(FONT, "bold");
+  drawText("FibroCare", margin, 46);
   doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text("Medical Health Summary", margin, 64);
+  doc.setFont(FONT, "normal");
+  drawText(t("pdf.title"), margin, 64);
   doc.setFontSize(8);
   doc.setTextColor(230);
-  doc.text("Generated for review with your care team", margin, 78);
+  drawText(t("pdf.subtitle"), margin, 78);
 
   const periodEnd = new Date();
   const periodStart = new Date(periodEnd);
   periodStart.setDate(periodStart.getDate() - PERIOD_DAYS);
+  const fmtDate = (d: Date) => d.toLocaleDateString(rtl ? "ar" : undefined);
 
   let y = 118;
   doc.setTextColor(60);
   doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.text("Patient", margin, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.userName, margin + 60, y);
-  doc.setFont("helvetica", "bold");
-  doc.text("Report date", pageW - margin - 160, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    new Date().toLocaleDateString(),
-    pageW - margin - 100,
-    y
-  );
+  doc.setFont(FONT, "bold");
+  drawText(t("pdf.patient"), margin, y);
+  doc.setFont(FONT, "normal");
+  drawText(data.userName, margin + 60, y);
+  doc.setFont(FONT, "bold");
+  drawText(t("pdf.reportDate"), pageW - margin - 160, y);
+  doc.setFont(FONT, "normal");
+  drawText(fmtDate(new Date()), pageW - margin - 100, y);
   y += 18;
-  doc.setFont("helvetica", "bold");
-  doc.text("Reporting period", margin, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    `${periodStart.toLocaleDateString()} to ${periodEnd.toLocaleDateString()}`,
+  doc.setFont(FONT, "bold");
+  drawText(t("pdf.reportingPeriod"), margin, y);
+  doc.setFont(FONT, "normal");
+  drawText(
+    t("pdf.periodRange", { start: fmtDate(periodStart), end: fmtDate(periodEnd) }),
     margin + 60,
     y
   );
@@ -194,25 +338,32 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   y += 22;
   doc.setTextColor(40);
   doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("1. Executive Summary", margin, y);
+  doc.setFont(FONT, "bold");
+  drawHeading(t("pdf.executiveSummary"));
   y += 18;
 
   const summaryRows: [string, string][] = [
-    ["Average pain (90 days)", `${data.avgPain.toFixed(1)} / 10`],
-    ["Flare-up days (pain ≥ 7)", String(data.flareUpDays)],
-    ["Primary symptoms", data.topSymptoms.join(", ") || "None recorded"],
-    ["Entries in period", String(data.logs.length)],
+    [t("pdf.avgPain"), `${data.avgPain.toFixed(1)} / 10`],
+    [t("pdf.flareDays"), String(data.flareUpDays)],
+    [
+      t("pdf.primarySymptoms"),
+      rtl
+        ? data.topSymptoms
+            .map((symptom) => localizeSymptom(symptom, t))
+            .join("، ")
+        : data.topSymptoms.join(", ") || "None recorded",
+    ],
+    [t("pdf.entries"), String(data.logs.length)],
   ];
 
   doc.setFontSize(10);
   summaryRows.forEach(([label, value]) => {
     doc.setTextColor(90);
-    doc.setFont("helvetica", "normal");
-    doc.text(label, margin + 12, y);
+    doc.setFont(FONT, "normal");
+    drawText(label, margin + 12, y);
     doc.setTextColor(30);
-    doc.setFont("helvetica", "bold");
-    doc.text(value, margin + 200, y);
+    doc.setFont(FONT, "bold");
+    drawText(value, margin + 200, y);
     y += 15;
   });
 
@@ -223,77 +374,144 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
     const brief = data.brief;
     doc.setTextColor(40);
     doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("AI Clinical Executive Brief (30-day)", margin, y);
+    doc.setFont(FONT, "bold");
+    drawText(t("pdf.briefTitle"), margin, y);
     y += 15;
 
     doc.setFontSize(9);
     doc.setTextColor(70);
-    doc.setFont("helvetica", "normal");
-    const briefLines = doc.splitTextToSize(brief.headline, contentW) as string[];
-    doc.text(briefLines, margin, y);
+    doc.setFont(FONT, "normal");
+    // English keeps the raw engine headline byte-identical; Arabic renders
+    // the localized template through the shared brief localization helper.
+    // "Δ" has no glyph in Amiri, so it is dropped from the PDF delta.
+    const headline = rtl
+      ? localizeBriefHeadline(brief, locale, t).replaceAll("Δ", "")
+      : brief.headline;
+    const briefLines = doc.splitTextToSize(headline, contentW) as string[];
+    drawText(briefLines, margin, y);
     y += briefLines.length * 11 + 4;
+
+    const flare = brief.flareFrequency;
+    const pain = brief.painProfile;
+    const velocityDelta = pain.velocityDelta;
+    // "Δ" has no glyph in Amiri, so the Arabic PDF shows the signed delta
+    // alone; English keeps the Δ symbol byte-identical to before.
+    const deltaPart =
+      velocityDelta !== null
+        ? rtl
+          ? ` (${velocityDelta > 0 ? "+" : ""}${velocityDelta})`
+          : ` (Δ ${velocityDelta > 0 ? "+" : ""}${velocityDelta})`
+        : "";
+    const medsValue =
+      brief.patientReportedMedications.length > 0
+        ? brief.patientReportedMedications.join(", ")
+        : rtl
+          ? t("pdf.noMedsMentioned")
+          : "None mentioned in logs";
 
     const briefRows: [string, string][] = [
       [
-        "Flare frequency",
-        `${brief.flareFrequency.flareDays} flare day(s) · ~${brief.flareFrequency.perMonth}/month · trend: ${brief.flareFrequency.trend}`,
+        t("reports.brief.flareFrequency"),
+        rtl
+          ? `${t(flareDaysKey(flare.flareDays), { count: flare.flareDays })} · ${t(
+              "reports.brief.ratePerMonth",
+              { perMonth: flare.perMonth }
+            )} · ${t(trendKeyByValue[flare.trend])}`
+          : `${flare.flareDays} flare day(s) · ~${flare.perMonth}/month · trend: ${flare.trend}`,
       ],
       [
-        "Symptom velocity",
-        `${brief.painProfile.velocity}${brief.painProfile.velocityDelta !== null ? ` (Δ ${brief.painProfile.velocityDelta > 0 ? "+" : ""}${brief.painProfile.velocityDelta})` : ""} · 7-day mean ${brief.painProfile.average7d ?? "n/a"} / 10`,
+        t("reports.brief.velocity"),
+        rtl
+          ? `${t(velocityKeyByValue[pain.velocity])}${deltaPart} · ${t("pdf.avg7d")} ${
+              pain.average7d ?? t("pdf.na")
+            } / 10`
+          : `${pain.velocity}${deltaPart} · 7-day mean ${pain.average7d ?? "n/a"} / 10`,
       ],
       [
-        "Functional capacity",
-        `${brief.functionalCapacity.loggingAdherencePct}% logging adherence · ${brief.functionalCapacity.loggingStreakDays}-day streak`,
+        t("reports.brief.functional"),
+        rtl
+          ? `${brief.functionalCapacity.loggingAdherencePct}% ${t(
+              "reports.brief.adherence"
+            )} · ${t("reports.brief.streakDays", {
+              count: brief.functionalCapacity.loggingStreakDays,
+            })}`
+          : `${brief.functionalCapacity.loggingAdherencePct}% logging adherence · ${brief.functionalCapacity.loggingStreakDays}-day streak`,
       ],
-      [
-        "Patient-reported medications",
-        brief.patientReportedMedications.length
-          ? brief.patientReportedMedications.join(", ")
-          : "None mentioned in logs",
-      ],
+      [t("reports.brief.medications"), medsValue],
     ];
     if (brief.topTriggers.length > 0) {
       briefRows.push([
-        "Detected triggers",
-        brief.topTriggers.map((t) => `${t.factor} (${t.evidence})`).join("; "),
+        t("reports.brief.detectedTriggers"),
+        brief.topTriggers.map((tr) => `${tr.factor} (${tr.evidence})`).join("; "),
       ]);
     }
     briefRows.push([
-      "Suggested discussion points",
-      brief.suggestedDiscussionPoints.map((p, i) => `${i + 1}. ${p}`).join("  "),
+      t("reports.brief.discussion"),
+      rtl
+        ? buildLocalizedDiscussionPoints(brief, t)
+            .map((p, i) => `${i + 1}. ${p}`)
+            .join("  ")
+        : brief.suggestedDiscussionPoints.map((p, i) => `${i + 1}. ${p}`).join("  "),
     ]);
 
+    // RTL mirrors the two columns: the bold label becomes the rightmost column.
     autoTable(doc, {
       startY: y,
       head: [],
-      body: briefRows,
+      body: rtl ? briefRows.map(([label, value]) => [value, label]) : briefRows,
       theme: "plain",
-      styles: { fontSize: 8.5, cellPadding: 3, textColor: 60 },
-      columnStyles: {
-        0: { cellWidth: 130, fontStyle: "bold", textColor: 90 },
-        1: { cellWidth: contentW - 130 },
+      styles: {
+        font: FONT,
+        fontSize: 8.5,
+        cellPadding: 3,
+        textColor: 60,
+        ...(rtl ? { halign: "right" as const } : {}),
       },
+      columnStyles: rtl
+        ? {
+            0: { cellWidth: contentW - 130 },
+            1: { cellWidth: 130, fontStyle: "bold", textColor: 90 },
+          }
+        : {
+            0: { cellWidth: 130, fontStyle: "bold", textColor: 90 },
+            1: { cellWidth: contentW - 130 },
+          },
       margin: { left: margin, right: margin },
     });
     y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
     doc.setFontSize(7.5);
     doc.setTextColor(130);
-    const caveatLines = doc.splitTextToSize(brief.dataCaveat, contentW) as string[];
-    doc.text(caveatLines, margin, y);
+    const caveat = rtl
+      ? t("reports.brief.caveat", {
+          logged: Math.round(
+            (brief.functionalCapacity.loggingAdherencePct * brief.periodDays) / 100
+          ),
+          total: brief.periodDays,
+          adherence: brief.functionalCapacity.loggingAdherencePct,
+        })
+      : brief.dataCaveat;
+    const caveatLines = doc.splitTextToSize(caveat, contentW) as string[];
+    drawText(caveatLines, margin, y);
     y += caveatLines.length * 9 + 10;
   }
 
   // ---------- Pain trend chart ----------
   doc.setTextColor(40);
   doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("2. Pain Trend (last 30 days)", margin, y);
+  doc.setFont(FONT, "bold");
+  drawHeading(t("pdf.chartTitle"));
   y += 14;
   const chartH = 150;
-  drawTrendChart(doc, buildDailySeries(data.logs), margin + 20, y, contentW - 40, chartH);
+  drawTrendChart(
+    doc,
+    buildDailySeries(data.logs),
+    margin + 20,
+    y,
+    contentW - 40,
+    chartH,
+    t("pdf.notEnoughData")
+  );
   y += chartH + 30;
 
   // ---------- Correlation summary ----------
@@ -304,25 +522,24 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   }
   doc.setTextColor(40);
   doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("3. Correlation Summary", margin, y);
+  doc.setFont(FONT, "bold");
+  drawHeading(t("pdf.correlationTitle"));
   y += 18;
   doc.setTextColor(70);
   doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
+  doc.setFont(FONT, "normal");
   if (correlation) {
+    const localized = rtl ? localizeInsight(correlation, locale, t) : null;
     const wrapped = doc.splitTextToSize(
-      `The strongest relationship found in your logs: ${correlation.message}`,
+      rtl
+        ? t("pdf.correlationText", { message: localized!.message })
+        : `The strongest relationship found in your logs: ${correlation.message}`,
       contentW
     );
-    doc.text(wrapped, margin + 12, y);
+    drawText(wrapped, margin + 12, y);
     y += wrapped.length * 12;
   } else {
-    doc.text(
-      "No statistically meaningful symptom-pain relationships were detected with the current data. Continue logging symptoms for sharper correlations.",
-      margin + 12,
-      y
-    );
+    drawText(t("pdf.noCorrelation"), margin + 12, y);
     y += 30;
   }
 
@@ -334,8 +551,8 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   y += 12;
   doc.setTextColor(40);
   doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("4. Key Health Insights", margin, y);
+  doc.setFont(FONT, "bold");
+  drawHeading(t("pdf.insightsTitle"));
   y += 16;
 
   const severityColor: Record<Insight["severity"], [number, number, number]> = {
@@ -347,15 +564,14 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   if (data.insights.length === 0) {
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(
-      "Log your pain and symptoms for at least 5 days to unlock personalized insights.",
-      margin + 12,
-      y
-    );
+    drawText(t("pdf.insightsEmpty"), margin + 12, y);
     y += 30;
   } else {
     data.insights.forEach((insight) => {
-      const lines = doc.splitTextToSize(insight.message, contentW - 90) as string[];
+      const localized = rtl ? localizeInsight(insight, locale, t) : null;
+      const message = localized ? localized.message : insight.message;
+      const title = localized ? localized.title : insight.title;
+      const lines = doc.splitTextToSize(message, contentW - 90) as string[];
       const blockH = lines.length * 12 + 14;
       if (y + blockH > pageH - 50) {
         doc.addPage();
@@ -367,16 +583,20 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
       doc.rect(margin, y, contentW, blockH, "S");
       doc.setTextColor(r, g, b);
       doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text(SEVERITY_LABEL[insight.severity], margin + 8, y + 14);
+      doc.setFont(FONT, "bold");
+      drawText(
+        rtl ? t(`reports.severity.${insight.severity}` as TranslationKey) : SEVERITY_LABEL[insight.severity],
+        margin + 8,
+        y + 14
+      );
       doc.setTextColor(50);
       doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text(insight.title, margin + 66, y + 14);
-      doc.setFont("helvetica", "normal");
+      doc.setFont(FONT, "bold");
+      drawText(title, margin + 66, y + 14);
+      doc.setFont(FONT, "normal");
       doc.setTextColor(70);
       doc.setFontSize(9);
-      doc.text(lines, margin + 66, y + 28);
+      drawText(lines, margin + 66, y + 28);
       y += blockH + 12;
     });
   }
@@ -387,38 +607,49 @@ export async function generateMedicalReport(data: ReportData): Promise<Blob> {
   doc.rect(0, 0, pageW, 56, "F");
   doc.setTextColor(255);
   doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("Annex A: Full Log History", margin, 34);
+  doc.setFont(FONT, "bold");
+  drawText(t("pdf.annexTitle"), margin, 34);
   doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    `Raw entries for ${data.logs.length} logs within the reporting period.`,
-    margin,
-    46
-  );
+  doc.setFont(FONT, "normal");
+  drawText(t("pdf.annexSubtitle", { count: data.logs.length }), margin, 46);
+
+  // RTL mirrors the table: the date column moves to the right edge.
+  const annexHead = rtl
+    ? [t("pdf.colSymptoms"), t("pdf.colMood"), t("pdf.colPain"), t("pdf.colDate")]
+    : ["Date", "Pain", "Mood", "Symptoms / Notes"];
+  const annexBody = data.logs.map((log) => {
+    const row = [
+      fmtDate(new Date(log.loggedAt)),
+      `${log.painLevel}/10`,
+      log.moodTag,
+      log.notes || "",
+    ];
+    return rtl ? [...row].reverse() : row;
+  });
 
   autoTable(doc, {
     startY: 72,
     margin: { left: margin, right: margin },
-    head: [["Date", "Pain", "Mood", "Symptoms / Notes"]],
-    body: data.logs.map((log) => [
-      new Date(log.loggedAt).toLocaleDateString(),
-      `${log.painLevel}/10`,
-      log.moodTag,
-      log.notes || "",
-    ]),
+    head: [annexHead],
+    body: annexBody,
     theme: "grid",
-    headStyles: { fillColor: [124, 58, 237], textColor: 255, fontStyle: "bold" },
+    headStyles: { font: FONT, fillColor: [124, 58, 237], textColor: 255, fontStyle: "bold" },
     alternateRowStyles: { fillColor: [246, 244, 252] },
-    styles: { fontSize: 8, cellPadding: 4 },
+    styles: { font: FONT, fontSize: 8, cellPadding: 4, ...(rtl ? { halign: "right" as const } : {}) },
     didDrawPage: () => {
       doc.setFontSize(7);
       doc.setTextColor(140);
-      doc.text(
-        "Generated by FibroCare · For informational purposes, not a medical diagnosis.",
-        margin,
-        pageH - 20
-      );
+      if (rtl) {
+        doc.text(t("pdf.footer"), pageW - margin, pageH - 20, {
+          align: "right",
+        });
+      } else {
+        doc.text(
+          "Generated by FibroCare · For informational purposes, not a medical diagnosis.",
+          margin,
+          pageH - 20
+        );
+      }
     },
   });
 

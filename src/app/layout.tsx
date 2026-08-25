@@ -6,6 +6,7 @@ import "./globals.css";
 import "../styles/themes.css";
 import { HealthProvider } from "@/context/HealthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { NotificationProvider } from "@/lib/notifications";
 import { LOCALE_COOKIE, parseLocale } from "@/lib/locale";
 import { translations, type Locale } from "@/lib/translations";
 import { AiStatusProvider } from "@/context/AiStatusContext";
@@ -114,25 +115,27 @@ export default async function RootLayout({
         <PwaPrompt />
         <HealthProvider>
           <LanguageProvider initialLocale={locale}>
-            <ThemeManager />
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[200] focus:bg-card focus:text-foreground focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg"
-            >
-              Skip to main content
-            </a>
-            <PrivacyProvider>
-              <SessionProvider>
-                <AiStatusProvider>
-                  <PrivacyGate>
-                    <main id="main-content" className="pt-20 sm:pt-24 pb-16">
-                      {children}
-                    </main>
-                  </PrivacyGate>
-                </AiStatusProvider>
-              </SessionProvider>
-            </PrivacyProvider>
-            <Toaster richColors position="bottom-right" />
+            <NotificationProvider>
+              <ThemeManager />
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[200] focus:bg-card focus:text-foreground focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg"
+              >
+                Skip to main content
+              </a>
+              <PrivacyProvider>
+                <SessionProvider>
+                  <AiStatusProvider>
+                    <PrivacyGate>
+                      <main id="main-content" className="pt-20 sm:pt-24 pb-16">
+                        {children}
+                      </main>
+                    </PrivacyGate>
+                  </AiStatusProvider>
+                </SessionProvider>
+              </PrivacyProvider>
+              <Toaster richColors position="bottom-right" />
+            </NotificationProvider>
           </LanguageProvider>
         </HealthProvider>
       </body>

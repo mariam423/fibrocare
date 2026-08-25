@@ -56,20 +56,32 @@ export function CitationBadge({
           <DialogDescription>{t("resources.ai.guidelineLabel")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
+          {/* Guideline title — English knowledge-base text, so the block is
+              pinned LTR/left-aligned and the string is <bdi>-isolated so
+              trailing punctuation never inverts inside the Arabic RTL page. */}
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               {t("resources.ai.guidelineLabel")}
             </p>
-            <p className="text-sm font-medium text-foreground">{chunk.title}</p>
+            <p dir="ltr" className="text-left text-sm font-medium text-foreground">
+              <bdi>{chunk.title}</bdi>
+            </p>
           </div>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               {t("resources.ai.originLabel")}
             </p>
-            <p className="text-sm text-foreground">{chunk.source}</p>
+            <p dir="ltr" className="text-left text-sm text-foreground">
+              <bdi>{chunk.source}</bdi>
+            </p>
           </div>
-          <div className="rounded-xl border border-border/60 bg-muted/30 p-3">
-            <p className="text-sm leading-relaxed text-muted-foreground">{chunk.content}</p>
+          {/* Clinical quote block — long English guideline passage, pinned
+              LTR so brackets/quotes/trailing periods stay on the correct
+              edge, with the text itself isolated in <bdi>. */}
+          <div dir="ltr" className="rounded-xl border border-border/60 bg-muted/30 p-3 text-left">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              <bdi>{chunk.content}</bdi>
+            </p>
           </div>
         </div>
       </DialogContent>

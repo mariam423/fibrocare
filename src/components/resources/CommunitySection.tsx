@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Message02Icon,
   HeartIcon,
   UserCircleIcon,
+  LanguageCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,11 @@ import {
 import { DepthCard } from "@/components/ui/DepthCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { AiTakeawayBanner } from "@/components/resources/AiTakeawayBanner";
+import { BdiText } from "@/components/resources/BdiText";
 import { useLanguage } from "@/context/LanguageContext";
+import { translations, type Locale, type TranslationKey } from "@/lib/translations";
+import { PAGE_TAKEAWAYS, groundingTakeaway } from "@/lib/resources/engine";
 import { cn } from "@/lib/utils";
 
 interface CommunityPost {
@@ -27,32 +32,48 @@ interface CommunityPost {
   likes: number;
 }
 
-const SAMPLE_POSTS: CommunityPost[] = [
+/**
+ * Sample posts render through translation keys so toggling locale re-words
+ * every card. They live in a module constant (ids/authors/likes are static)
+ * and the localized content/timestamp are derived at render time.
+ */
+const SAMPLE_POSTS: Omit<CommunityPost, "content" | "timestamp">[] = [
   {
     id: "1",
     author: "Sarah M.",
-    content: "After being diagnosed, I felt alone. This community helped me realize I'm not the only one fighting this battle. Gentle yoga has been a game-changer for my morning stiffness.",
     type: "story",
-    timestamp: "2 hours ago",
     likes: 24,
   },
   {
     id: "2",
     author: "Ahmed K.",
-    content: "Tip: Keep a heating pad near your bed. Waking up with stiff muscles? Apply heat for 15 minutes before getting up. It makes a huge difference in my mornings.",
     type: "tip",
-    timestamp: "5 hours ago",
     likes: 18,
   },
   {
     id: "3",
     author: "Maria L.",
-    content: "To anyone having a flare-up today: You are stronger than you think. This too shall pass. Be gentle with yourself. 💜",
     type: "support",
-    timestamp: "1 day ago",
     likes: 42,
   },
 ];
+
+const SAMPLE_CONTENT_KEYS: TranslationKey[] = [
+  "community.samplePost.1.content",
+  "community.samplePost.2.content",
+  "community.samplePost.3.content",
+];
+
+const SAMPLE_TIME_KEYS: TranslationKey[] = [
+  "community.samplePost.1.time",
+  "community.samplePost.2.time",
+  "community.samplePost.3.time",
+];
+
+/** Sample post ids — likes for these live in `sampleLikes` state. */
+const SAMPLE_IDS = new Set(SAMPLE_POSTS.map((p) => p.id));
+
+type PostFilter = "all" | CommunityPost["type"];
 
 function PostTypeBadge({ type }: { type: CommunityPost["type"] }) {
   const { t } = useLanguage();
@@ -75,31 +96,83 @@ function PostTypeBadge({ type }: { type: CommunityPost["type"] }) {
 }
 
 export function CommunitySection() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [newPost, setNewPost] = useState("");
-  const [posts, setPosts] = useState<CommunityPost[]>(SAMPLE_POSTS);
+  // User-generated posts only. Sample posts are derived at render time so
+  // they re-localize instantly on locale toggle; their likes live here.
+  const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
+  const [sampleLikes, setSampleLikes] = useState<Record<string, number>>(() =>
+    Object.fromEntries(SAMPLE_POSTS.map((p) => [p.id, p.likes]))
+  );
+  const [filter, setFilter] = useState<PostFilter>("all");
+  // Per-post bilingual toggle: sample posts carry both locales in the
+  // translation dictionary, so toggling swaps curated content EN ↔ AR.
+  // User-written posts can't be translated offline and skip the button.
+  const [translated, setTranslated] = useState<Record<string, boolean>>({});
+
+  const otherLocale: Locale = locale === "ar" ? "en" : "ar";
+
+  const takeaway = useMemo(
+    () => ({
+      bullets: PAGE_TAKEAWAYS.community.bullets,
+      chunk: groundingTakeaway("community"),
+    }),
+    []
+  );
+
+  // Sample feed, localized on every render (locale toggle re-words it).
+  const samplePosts: CommunityPost[] = SAMPLE_POSTS.map((p, i) => {
+    const isTranslated = translated[p.id];
+    return {
+      ...p,
+      content: isTranslated
+        ? translations[otherLocale][SAMPLE_CONTENT_KEYS[i]]
+        : t(SAMPLE_CONTENT_KEYS[i]),
+      timestamp: isTranslated
+        ? translations[otherLocale][SAMPLE_TIME_KEYS[i]]
+        : t(SAMPLE_TIME_KEYS[i]),
+      likes: sampleLikes[p.id] ?? 0,
+    };
+  });
+
+  const allPosts: CommunityPost[] = [...userPosts, ...samplePosts];
+  const visiblePosts =
+    filter === "all" ? allPosts : allPosts.filter((p) => p.type === filter);
 
   const handlePost = () => {
     if (!newPost.trim()) return;
     const post: CommunityPost = {
       id: String(Date.now()),
-      author: "You",
+      author: t("community.you"),
       content: newPost,
       type: "story",
-      timestamp: "Just now",
+      timestamp: t("community.justNow"),
       likes: 0,
     };
-    setPosts([post, ...posts]);
+    setUserPosts([post, ...userPosts]);
     setNewPost("");
   };
 
   const handleLike = (id: string) => {
-    setPosts(
-      posts.map((p) =>
-        p.id === id ? { ...p, likes: p.likes + 1 } : p
-      )
+    if (SAMPLE_IDS.has(id)) {
+      setSampleLikes((likes) => ({ ...likes, [id]: (likes[id] ?? 0) + 1 }));
+      return;
+    }
+    setUserPosts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
     );
   };
+
+  const toggleTranslate = (id: string) => {
+    setTranslated((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const FILTERS: Array<{ id: PostFilter; labelKey: TranslationKey }> = [
+    { id: "all", labelKey: "community.filter.all" },
+    { id: "story", labelKey: "community.stories" },
+    { id: "tip", labelKey: "community.tips" },
+    { id: "support", labelKey: "community.support" },
+  ];
 
   return (
     <ScrollReveal as="section" className="space-y-4">
@@ -117,9 +190,11 @@ export function CommunitySection() {
         </div>
       </div>
 
+      <AiTakeawayBanner bullets={takeaway.bullets} chunk={takeaway.chunk} />
+
       {/* Post Input */}
       <DepthCard tilt={2} delay={0.05}>
-              <SpotlightCard className="rounded-3xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
+        <SpotlightCard className="rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-200 hover:scale-[1.01] hover:border-emerald-400/40 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
           <CardContent className="p-6">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
@@ -142,7 +217,7 @@ export function CommunitySection() {
                   <Button
                     onClick={handlePost}
                     disabled={!newPost.trim()}
-                    className="rounded-xl px-4 py-2 text-sm font-medium"
+                    className="rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {t("community.postButton")}
                   </Button>
@@ -153,26 +228,53 @@ export function CommunitySection() {
         </SpotlightCard>
       </DepthCard>
 
+      {/* Category filter chips */}
+      <div
+        className="flex flex-wrap items-center gap-2"
+        role="group"
+        aria-label={t("community.filter.aria")}
+      >
+        {FILTERS.map((option) => {
+          const active = filter === option.id;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setFilter(option.id)}
+              className={cn(
+                "inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                active
+                  ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-700 shadow-sm shadow-emerald-500/10 dark:text-emerald-300"
+                  : "border-border bg-card/60 text-muted-foreground hover:border-emerald-400/30 hover:text-foreground"
+              )}
+            >
+              {t(option.labelKey)}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Posts List */}
       <div className="space-y-3">
-        {posts.map((post, index) => (
+        {visiblePosts.map((post, index) => (
           <ScrollReveal key={post.id} delay={index * 0.05}>
             <DepthCard tilt={2} delay={index * 0.05}>
-        <SpotlightCard className="rounded-3xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
+              <SpotlightCard className="rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-200 hover:scale-[1.01] hover:border-emerald-400/40 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
                 <CardContent className="p-6">
                   <div className="space-y-3">
                     {/* Header */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
-                          {post.author.charAt(0)}
+                          <bdi>{post.author.charAt(0)}</bdi>
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground">
-                            {post.author}
+                            <bdi>{post.author}</bdi>
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {post.timestamp}
+                            <bdi>{post.timestamp}</bdi>
                           </p>
                         </div>
                       </div>
@@ -180,37 +282,61 @@ export function CommunitySection() {
                     </div>
 
                     {/* Content */}
-                    <p className="text-sm text-foreground/90 leading-relaxed">
-                      {post.content}
-                    </p>
+                    <div className="text-sm text-foreground/90 leading-relaxed">
+                      <BdiText text={post.content} />
+                    </div>
 
                     {/* Actions */}
                     <div className="flex items-center gap-4 pt-1 border-t border-border/50">
                       <button
                         type="button"
                         onClick={() => handleLike(post.id)}
-                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                        aria-label={`Like (${post.likes})`}
+                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                        aria-label={t("community.likeAria", { count: post.likes })}
                       >
                         <HugeiconsIcon
                           icon={HeartIcon}
                           className="h-4 w-4"
                           aria-hidden="true"
                         />
-                        <span>{post.likes}</span>
+                        <bdi>{post.likes}</bdi>
                       </button>
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                        aria-label="Reply"
+                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                        aria-label={t("community.reply")}
                       >
                         <HugeiconsIcon
                           icon={Message02Icon}
                           className="h-4 w-4"
                           aria-hidden="true"
                         />
-                        <span>Reply</span>
+                        <span>{t("community.reply")}</span>
                       </button>
+                      {SAMPLE_IDS.has(post.id) && (
+                        <button
+                          type="button"
+                          onClick={() => toggleTranslate(post.id)}
+                          className="ms-auto inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                          aria-label={
+                            translated[post.id]
+                              ? t("community.translated")
+                              : t("community.translate")
+                          }
+                          aria-pressed={translated[post.id]}
+                        >
+                          <HugeiconsIcon
+                            icon={LanguageCircleIcon}
+                            className="h-4 w-4"
+                            aria-hidden="true"
+                          />
+                          <span>
+                            {translated[post.id]
+                              ? t("community.translated")
+                              : t("community.translate")}
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -221,7 +347,7 @@ export function CommunitySection() {
       </div>
 
       {/* Empty State */}
-      {posts.length === 0 && (
+      {visiblePosts.length === 0 && (
         <Card className="border-none shadow-depth-sm">
           <CardContent className="py-12 text-center">
             <HugeiconsIcon

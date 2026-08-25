@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -34,9 +34,15 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
 
-  useEffect(() => {
+  // Close the mobile menu whenever the route changes — done by comparing
+  // with the previously rendered pathname during render (the React docs'
+  // "storing information from previous renders" pattern) instead of an
+  // effect, so no extra render pass is scheduled.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   const NAV_LINKS = [
     { href: "/dashboard", label: t("nav.dashboard") },

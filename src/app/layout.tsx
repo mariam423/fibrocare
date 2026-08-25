@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Readex_Pro } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import "./print.css";
 import "../styles/themes.css";
 import { HealthProvider } from "@/context/HealthContext";
 import { LanguageProvider } from "@/context/LanguageContext";

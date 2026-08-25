@@ -2,7 +2,11 @@ import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import jsPDF from "jspdf";
-import { generateMedicalReport, type ReportData } from "@/lib/pdfGenerator";
+import {
+  generateDiagnosticCheckPdf,
+  generateMedicalReport,
+  type ReportData,
+} from "@/lib/pdfGenerator";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
 
@@ -139,6 +143,55 @@ function shapedVisual(text: string): string {
   const doc = new jsPDF();
   return [...doc.processArabic(text)].reverse().join("");
 }
+
+describe("generateDiagnosticCheckPdf", () => {
+  const checkData = {
+    verdict: "likely" as const,
+    metCount: 4,
+    total: 4,
+    lines: [
+      { id: "widespread" as const, met: true },
+      { id: "severity" as const, met: true },
+      { id: "duration" as const, met: true },
+      { id: "exclusion" as const, met: true },
+    ],
+  };
+
+  it("renders an English PDF with the verdict and summary lines", async () => {
+    const blob = await generateDiagnosticCheckPdf(checkData, "en");
+    const raw = Buffer.from(await blob.arrayBuffer()).toString("latin1");
+
+    expect(raw.slice(0, 8)).toBe("%PDF-1.3");
+    expect(raw).toContain("AI Diagnostic Readiness Checker");
+    expect(raw).toContain("Summary for your doctor");
+    expect(raw).toContain("Your answers align closely with the ACR criteria.");
+    expect(raw).toContain("4/4 ACR criteria met");
+    expect(raw).toContain("Widespread pain in many areas: Yes");
+    expect(raw).toContain("Other disorders ruled out: Yes");
+    // Standard font, no Arabic embedding, no font fetch on the EN path.
+    expect(raw).toContain("/Helvetica");
+    expect(raw).not.toContain("Amiri");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("renders an Arabic RTL PDF with shaped, connected text", async () => {
+    const blob = await generateDiagnosticCheckPdf(checkData, "ar");
+    const raw = Buffer.from(await blob.arrayBuffer()).toString("latin1");
+    const decoded = await decodePdfText(blob);
+
+    expect(raw).toContain("Amiri");
+    // No unshaped base Arabic letters survive — no missing-glyph boxes.
+    expect(/[\u0621-\u064A]/.test(decoded)).toBe(false);
+    // Pure-Arabic strings decode to their shaped RTL visual order.
+    for (const label of ["ملخص لطبيبك", "نعم"]) {
+      expect(decoded).toContain(shapedVisual(label));
+    }
+    // Mixed runs: the Latin acronym stays intact while Arabic flows around
+    // it (jsPDF's bidi keeps ACR unreversed inside the RTL line).
+    expect(decoded).toContain("ACR");
+    expect(decoded).toContain("4/4");
+  });
+});
 
 describe("generateMedicalReport — English path (unchanged baseline)", () => {
   it("renders the report with the standard helvetica LTR layout", async () => {

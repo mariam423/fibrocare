@@ -50,6 +50,16 @@ const FOG_LEVEL_KEYS = {
   high: "sleep.fogLevel.high",
 } as const;
 
+/**
+ * Locale-aware guidance per fog level. The analyzer's `fog.guidance` stays
+ * English (unit tests assert on it); the card renders the translated copy.
+ */
+const FOG_GUIDANCE_KEYS = {
+  low: "sleep.fogGuidance.low",
+  moderate: "sleep.fogGuidance.moderate",
+  high: "sleep.fogGuidance.high",
+} as const;
+
 const fogLevelStyle = {
   low: "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200",
   moderate: "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200",
@@ -82,7 +92,7 @@ export function SleepHrvCard() {
 
   return (
     <DepthCard tilt={3}>
-      <Card className="h-full border-none shadow-depth-sm ring-1 ring-border">
+      <Card className="h-full shadow-depth-sm backdrop-blur-xl border border-emerald-500/20 bg-white/70 dark:bg-slate-900/60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HugeiconsIcon icon={Moon02Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
@@ -155,9 +165,9 @@ export function SleepHrvCard() {
           {/* Fog risk */}
           <div className={cn("rounded-xl border p-3", fogLevelStyle[fog.level])}>
             <p className="font-semibold">
-              {t("sleep.fogRisk")} · {fog.score}/10 · {t(FOG_LEVEL_KEYS[fog.level])}
+              {t("sleep.fogRisk")} · <bdi>{fog.score}</bdi>/10 · {t(FOG_LEVEL_KEYS[fog.level])}
             </p>
-            <p className="mt-1 text-sm opacity-90">{fog.guidance}</p>
+            <p className="mt-1 text-sm opacity-90">{t(FOG_GUIDANCE_KEYS[fog.level])}</p>
           </div>
 
           <p className="text-xs text-muted-foreground">{t("sleep.disclaimer")}</p>

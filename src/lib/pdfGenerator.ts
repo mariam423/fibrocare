@@ -4,6 +4,10 @@ import type { HealthLog } from "@/lib/types";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
 import type { Locale, TranslationKey } from "@/lib/translations";
+import type {
+  DiagnosticCheckQuestionId,
+  DiagnosticVerdict,
+} from "@/lib/resources/diagnosticCheck";
 import { translations } from "@/lib/translations";
 import { localizeInsight, localizeSymptom } from "@/lib/insightLocalization";
 import {
@@ -652,6 +656,192 @@ export async function generateMedicalReport(
       }
     },
   });
+
+  return doc.output("blob");
+}
+
+/* ------------------------------------------------------------------ */
+/* AI Diagnostic Readiness Checker — exportable doctor-visit PDF       */
+/* ------------------------------------------------------------------ */
+
+export interface DiagnosticCheckPdfData {
+  verdict: DiagnosticVerdict;
+  metCount: number;
+  total: number;
+  /** Per-question answers in display order (widespread → exclusion). */
+  lines: Array<{ id: DiagnosticCheckQuestionId; met: boolean }>;
+}
+
+const CHECK_LINE_KEYS: Record<DiagnosticCheckQuestionId, TranslationKey> = {
+  widespread: "diagnosis.check.summary.line1",
+  severity: "diagnosis.check.summary.line2",
+  duration: "diagnosis.check.summary.line3",
+  exclusion: "diagnosis.check.summary.line4",
+};
+
+const CHECK_VERDICT_KEYS: Record<DiagnosticVerdict, TranslationKey> = {
+  likely: "diagnosis.check.verdict.likely",
+  possible: "diagnosis.check.verdict.possible",
+  unlikely: "diagnosis.check.verdict.unlikely",
+};
+
+const CHECK_VERDICT_COLOR: Record<
+  DiagnosticVerdict,
+  [number, number, number]
+> = {
+  likely: [16, 163, 74], // emerald
+  possible: [217, 119, 6], // amber
+  unlikely: [100, 116, 139], // slate
+};
+
+/**
+ * Generate a compact, printable one-page summary of the ACR readiness
+ * check, intended to be handed to a doctor. `locale === "ar"` renders a
+ * fully Arabic, right-to-left document (embedded Amiri, mirrored layout)
+ * with the same shaping/bidi guarantees as the main medical report.
+ */
+export async function generateDiagnosticCheckPdf(
+  data: DiagnosticCheckPdfData,
+  locale: Locale = "en",
+  options: PdfExportOptions = {}
+): Promise<Blob> {
+  const rtl = locale === "ar";
+  const t = makeT(locale);
+  const fontsBaseUrl = options.fontsBaseUrl ?? DEFAULT_FONTS_BASE_URL;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 48;
+  const contentW = pageW - margin * 2;
+
+  if (rtl) {
+    await installArabicFonts(doc, fontsBaseUrl);
+    doc.setLanguage("ar");
+    doc.viewerPreferences({ Direction: "R2L" });
+  }
+
+  const FONT = rtl ? "Amiri" : "helvetica";
+
+  const drawText = (
+    text: string | string[],
+    enX: number,
+    y: number,
+    enAlign: "left" | "right" | "center" = "left"
+  ) => {
+    if (enAlign === "center") {
+      doc.text(text, enX, y, { align: "center" });
+    } else if (rtl) {
+      doc.text(text, pageW - enX, y, {
+        align: enAlign === "left" ? "right" : "left",
+      });
+    } else if (enAlign === "right") {
+      doc.text(text, enX, y, { align: "right" });
+    } else {
+      doc.text(text, enX, y);
+    }
+  };
+
+  // ---------- Header band ----------
+  doc.setFillColor(88, 28, 135);
+  doc.rect(0, 0, pageW, 92, "F");
+  doc.setTextColor(255);
+  doc.setFontSize(20);
+  doc.setFont(FONT, "bold");
+  drawText("FibroCare", margin, 42);
+  doc.setFontSize(11);
+  doc.setFont(FONT, "normal");
+  drawText(t("diagnosis.check.title"), margin, 62);
+  doc.setFontSize(8);
+  doc.setTextColor(230);
+  const subtitleLines = doc.splitTextToSize(
+    t("diagnosis.check.subtitle"),
+    contentW
+  ) as string[];
+  drawText(subtitleLines, margin, 78);
+
+  // ---------- Meta line ----------
+  let y = 116;
+  doc.setTextColor(60);
+  doc.setFontSize(9);
+  doc.setFont(FONT, "bold");
+  drawText(t("pdf.reportDate"), margin, y);
+  doc.setFont(FONT, "normal");
+  drawText(
+    new Date().toLocaleDateString(rtl ? "ar" : undefined),
+    margin + 66,
+    y
+  );
+  y += 26;
+
+  // ---------- Verdict banner ----------
+  const [vr, vg, vb] = CHECK_VERDICT_COLOR[data.verdict];
+  doc.setFillColor(vr, vg, vb);
+  doc.roundedRect(margin, y, contentW, 46, 6, 6, "F");
+  doc.setTextColor(255);
+  doc.setFontSize(11);
+  doc.setFont(FONT, "bold");
+  const verdictLines = doc.splitTextToSize(
+    t(CHECK_VERDICT_KEYS[data.verdict]),
+    contentW - 20
+  ) as string[];
+  drawText(verdictLines, margin + 10, y + 16);
+  doc.setFontSize(8);
+  doc.setFont(FONT, "normal");
+  drawText(
+    `${data.metCount}/${data.total} ${t("diagnosis.check.criteriaLabel")}`,
+    margin + 10,
+    y + 32
+  );
+  y += 46 + 22;
+
+  // ---------- Exportable summary ----------
+  doc.setTextColor(40);
+  doc.setFontSize(13);
+  doc.setFont(FONT, "bold");
+  drawText(t("diagnosis.check.summaryTitle"), margin, y);
+  y += 18;
+
+  const yesNo = (met: boolean) =>
+    t(met ? "diagnosis.check.yes" : "diagnosis.check.no");
+
+  doc.setFontSize(10);
+  data.lines.forEach((line) => {
+    // The summary line keys embed an {answer} param ("…: Yes") — substitute
+    // it so the exported PDF reads the same as the copyable summary.
+    const text = t(CHECK_LINE_KEYS[line.id], { answer: yesNo(line.met) });
+    doc.setTextColor(70);
+    doc.setFont(FONT, "normal");
+    const lineText = doc.splitTextToSize(text, contentW - 60) as string[];
+    drawText(lineText, margin, y);
+    y += lineText.length * 13 + 8;
+  });
+
+  y += 10;
+
+  // ---------- Disclaimer + footer ----------
+  const disclaimerLines = doc.splitTextToSize(
+    t("diagnosis.check.disclaimer"),
+    contentW
+  ) as string[];
+  if (y + disclaimerLines.length * 10 + 20 > pageH - 40) {
+    doc.addPage();
+    y = 60;
+  }
+  doc.setFontSize(8);
+  doc.setTextColor(130);
+  doc.setFont(FONT, "normal");
+  drawText(disclaimerLines, margin, y);
+  y += disclaimerLines.length * 10 + 6;
+
+  doc.setFontSize(7);
+  doc.setTextColor(150);
+  if (rtl) {
+    doc.text(t("pdf.footer"), pageW - margin, pageH - 20, {
+      align: "right",
+    });
+  } else {
+    doc.text(t("pdf.footer"), margin, pageH - 20);
+  }
 
   return doc.output("blob");
 }

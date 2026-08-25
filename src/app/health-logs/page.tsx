@@ -65,6 +65,8 @@ const STORED_MOOD_KEYS: Record<string, TranslationKey> = {
   "Calm Day": "logging.presets.calmDay",
   "Mild Flare": "logging.presets.mildFlare",
   "Severe Flare": "logging.presets.severeFlare",
+  // Entries written by the resources pages' "add to today's tracker".
+  "Self-Care": "logging.mood.selfCare",
 };
 
 function formatDateTime(value: string | Date, locale: string): string {

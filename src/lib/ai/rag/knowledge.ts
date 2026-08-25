@@ -28,6 +28,20 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
       "The American College of Rheumatology's 2010 criteria define fibromyalgia by a Widespread Pain Index (pain in at least 7 of 19 body areas) combined with symptom severity (fatigue, unrefreshing sleep, cognitive difficulty) lasting at least 3 months. There is no blood test or scan that confirms fibromyalgia; diagnosis is clinical and partly one of exclusion, which is why doctors often order labs to rule out other conditions first. Many people wait years for a diagnosis because symptoms overlap with other conditions.",
   },
   {
+    id: "diagnostic-blood-tests",
+    title: "Blood tests and evaluations that help rule out other conditions",
+    source: "FibroCare clinical summary of Mayo Clinic and NHS diagnostic guidance",
+    domains: ["diagnosis"],
+    keywords: [
+      "blood test", "blood tests", "cbc", "complete blood count", "esr",
+      "sedimentation rate", "thyroid", "vitamin d", "rheumatoid factor",
+      "rule out", "labs", "anemia", "inflammation",
+      "evaluation", "exams",
+    ],
+    content:
+      "There is no single blood test that confirms fibromyalgia. Doctors order tests mainly to rule out other conditions that can cause similar symptoms. A complete blood count (CBC) checks for anemia or infection; erythrocyte sedimentation rate (ESR) and C-reactive protein screen for inflammation; thyroid function tests rule out thyroid disorders; vitamin D levels check for deficiency that can cause muscle pain; and rheumatoid factor helps exclude rheumatoid arthritis. Sleep studies may be arranged when sleep disorders are suspected. Results are interpreted together with symptoms by a clinician — never by a lab value alone.",
+  },
+  {
     id: "eular-management-overview",
     title: "General management approach (EULAR recommendations)",
     source: "FibroCare clinical summary of EULAR management recommendations",
@@ -187,6 +201,60 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
     ],
     content:
       "For the muscle tension and stiffness that often accompany fibromyalgia, gentle heat is the classic comfort measure: a moist warm compress or heating pad on tight areas (moist heat penetrates best), or a warm bath or shower (some people add Epsom salts or do gentle stretches while the muscles are still warm). Warmth relaxes tense muscles, eases stiffness, and calms the aching regions without medication. Heat should be comfortably warm — never hot enough to burn — and applied for about 15–20 minutes at a time. Cold packs and ice are generally not recommended for fibromyalgia muscle pain, because they can increase muscle tension and are better suited to acute injuries like sprains rather than chronic widespread pain.",
+  },
+  {
+    id: "diet-anti-inflammatory",
+    title: "Anti-inflammatory eating patterns for fibromyalgia",
+    source: "FibroCare clinical summary of dietary evidence for chronic pain",
+    domains: ["complementary"],
+    keywords: [
+      "diet", "food", "eating", "nutrition", "anti-inflammatory",
+      "antiinflammatory", "omega-3", "omega 3", "mediterranean",
+      "vegetables", "fruit", "processed", "sugar", "whole grains",
+      "salmon", "walnuts", "flaxseed",
+      "تغذية", "طعام", "أكل", "أوميغا", "خضار", "فواكه", "سكر",
+    ],
+    content:
+      "A Mediterranean-style, anti-inflammatory pattern is commonly recommended alongside fibromyalgia treatment: plenty of vegetables, fruit, whole grains, and fatty fish rich in omega-3 (such as salmon, sardines, walnuts, and flaxseed), with less ultra-processed food, refined sugar, and fried items. Diet is supportive rather than curative — no single food or supplement has been shown to eliminate symptoms — and changes are best made gradually together with a care team or dietitian, especially when other conditions or medications are involved.",
+  },
+  {
+    id: "hydration-fatigue",
+    title: "Hydration and fibromyalgia fatigue",
+    source: "FibroCare clinical summary of hydration guidance for chronic fatigue",
+    domains: ["complementary"],
+    keywords: [
+      "hydrate", "hydration", "water", "drink", "fluids", "dehydrated",
+      "thirst", "bottle", "reminder",
+      "ترطيب", "ماء", "شرب", "سوائل", "عطش",
+    ],
+    content:
+      "Staying adequately hydrated supports energy and concentration, and dehydration can worsen the fatigue and cognitive fog common in fibromyalgia. Practical low-effort habits: keep a filled water bottle where you already sit, set two or three gentle reminders, drink water with meals, and include water-rich foods such as melon and cucumber. Most people do not need special electrolyte drinks; plain water is sufficient, and anyone with fluid restrictions from other conditions should follow their care team's advice.",
+  },
+  {
+    id: "breathwork-flares",
+    title: "Slow breathing for acute symptom spikes",
+    source: "FibroCare clinical summary of paced-breathing evidence",
+    domains: ["complementary", "mental-health"],
+    keywords: [
+      "breathe", "breathing", "breath", "paced breathing", "belly breathing",
+      "relaxation", "calm", "anxiety", "stress response", "spike",
+      "تنفس", "شهيق", "زفير", "استرخاء", "هدوء", "قلق",
+    ],
+    content:
+      "Slow, paced breathing is one of the most accessible ways to lower the body's stress response during an acute symptom spike. A commonly taught pattern is 4-7-8: inhale through the nose for 4 counts, hold for 7, and exhale slowly for 8, repeated for a few minutes. Breathing low into the belly rather than the upper chest, in a comfortable seated or lying position, tends to be the most calming. Even two minutes can help; it is a supportive technique alongside — not instead of — the plan agreed with a care team.",
+  },
+  {
+    id: "audio-therapy",
+    title: "Calming audio and binaural tones for pain days",
+    source: "FibroCare clinical summary of music-based relaxation evidence",
+    domains: ["complementary", "mental-health"],
+    keywords: [
+      "music", "audio", "sound", "tones", "binaural", "brown noise",
+      "noise", "relaxing", "calming", "headphones", "playlist", "ambient",
+      "موسيقى", "صوت", "نغمات", "سماعات",
+    ],
+    content:
+      "Listening to calming music, ambient sound, or binaural tones is a low-effort, low-cost way many people use to ease discomfort and distract from pain. Relaxing music has modest evidence for reducing perceived pain and anxiety in chronic pain populations; brown noise and binaural tones are commonly used for focus or rest, and binaural beats are best experienced through headphones. Effects are subjective — what helps one person may not help another — and audio therapy works best as one tool alongside pacing, movement, and rest, never as a replacement for medical care.",
   },
 ];
 

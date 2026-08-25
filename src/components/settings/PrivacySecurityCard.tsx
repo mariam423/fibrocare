@@ -7,7 +7,7 @@
  * contexts or routes.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Shield01Icon, Download01Icon, Delete01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
@@ -20,26 +20,55 @@ import { exportEncrypted, purgeAllLocalData } from "@/lib/security/crypto";
 
 const ANALYTICS_OPT_OUT_KEY = "fibrocare-analytics-opt-out";
 
+/* Client-only snapshots read through useSyncExternalStore instead of
+   setState-in-effect: the server snapshot renders first (no hydration
+   mismatch), then the client value flips in after hydration. The analytics
+   opt-out lives in localStorage behind a tiny subscriber set so the toggle
+   below can notify this card to re-read it. */
+const emptySubscribe = () => () => {};
+
+const analyticsSubscribers = new Set<() => void>();
+
+function subscribeAnalytics(callback: () => void): () => void {
+  analyticsSubscribers.add(callback);
+  return () => {
+    analyticsSubscribers.delete(callback);
+  };
+}
+
+function readAnalyticsOptOut(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.localStorage.getItem(ANALYTICS_OPT_OUT_KEY) === "true"
+  );
+}
+
+function writeAnalyticsOptOut(next: boolean): void {
+  window.localStorage.setItem(ANALYTICS_OPT_OUT_KEY, String(next));
+  analyticsSubscribers.forEach((callback) => callback());
+}
+
 export function PrivacySecurityCard() {
   const { t } = useLanguage();
-  const [encryptionActive, setEncryptionActive] = useState<boolean | null>(null);
-  const [analyticsOptOut, setAnalyticsOptOut] = useState(false);
+  // Local crypto is available when Web Crypto exists in this browser.
+  const encryptionActive = useSyncExternalStore(
+    emptySubscribe,
+    () => typeof window !== "undefined" && Boolean(window.crypto?.subtle),
+    () => null
+  );
+  const analyticsOptOut = useSyncExternalStore(
+    subscribeAnalytics,
+    readAnalyticsOptOut,
+    () => false
+  );
   const [confirmPurge, setConfirmPurge] = useState(false);
   const [purging, setPurging] = useState(false);
   const [purgeReport, setPurgeReport] = useState<string | null>(null);
   const [passphrase, setPassphrase] = useState("");
   const [exportState, setExportState] = useState<"idle" | "done" | "error">("idle");
 
-  useEffect(() => {
-    // Local crypto is available when Web Crypto exists in this browser.
-    setEncryptionActive(typeof window !== "undefined" && Boolean(window.crypto?.subtle));
-    setAnalyticsOptOut(window.localStorage.getItem(ANALYTICS_OPT_OUT_KEY) === "true");
-  }, []);
-
   const toggleAnalytics = () => {
-    const next = !analyticsOptOut;
-    setAnalyticsOptOut(next);
-    window.localStorage.setItem(ANALYTICS_OPT_OUT_KEY, String(next));
+    writeAnalyticsOptOut(!analyticsOptOut);
   };
 
   const handleExport = async () => {

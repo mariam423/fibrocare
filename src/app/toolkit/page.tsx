@@ -13,6 +13,7 @@ import { MedicationSafetyCard } from "@/components/medications/MedicationSafetyC
 import { SomaticToolkitCard } from "@/components/somatic/SomaticToolkitCard";
 import { SleepHrvCard } from "@/components/sleep/SleepHrvCard";
 import { CommunityInsightsCard } from "@/components/community/CommunityInsightsCard";
+import { AiRescueCard } from "@/components/toolkit/AiRescueCard";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ToolkitPage() {
@@ -30,16 +31,19 @@ export default function ToolkitPage() {
           </ScrollReveal>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ScrollReveal delay={0.05}>
-              <SomaticToolkitCard />
+            <ScrollReveal delay={0.05} className="lg:col-span-2">
+              <AiRescueCard />
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
-              <SleepHrvCard />
+              <SomaticToolkitCard />
             </ScrollReveal>
             <ScrollReveal delay={0.15}>
-              <MedicationSafetyCard />
+              <SleepHrvCard />
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
+              <MedicationSafetyCard />
+            </ScrollReveal>
+            <ScrollReveal delay={0.25}>
               <CommunityInsightsCard />
             </ScrollReveal>
           </div>

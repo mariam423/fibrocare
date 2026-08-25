@@ -8,11 +8,17 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export function LandingFooter() {
   const { t } = useLanguage();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  // True only after hydration: the server snapshot is `false` and the client
+  // snapshot `true`, so React flips `mounted` right after mount — without a
+  // setState-in-effect (which the react-hooks rule forbids).
+  const mounted = React.useSyncExternalStore(
+    React.useCallback((onStoreChange: () => void) => {
+      onStoreChange();
+      return () => {};
+    }, []),
+    () => true,
+    () => false
+  );
 
   const RESOURCE_LINKS = [
     { href: "/resources/about", label: mounted ? t("landing.footer.about") : "عن الفيبروميالجيا" },

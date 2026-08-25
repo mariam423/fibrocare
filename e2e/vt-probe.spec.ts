@@ -6,7 +6,7 @@ test.describe("vt-test probe", () => {
       const read = () => Number(sessionStorage.getItem("__vtCount") || 0);
       const orig = document.startViewTransition?.bind(document);
       if (orig) {
-        document.startViewTransition = (cb: any) => {
+        document.startViewTransition = (cb: () => void | Promise<void>) => {
           const c = read() + 1;
           sessionStorage.setItem("__vtCount", String(c));
           return orig(cb);
@@ -66,7 +66,11 @@ test.describe("vt-test probe", () => {
 
     const count = countAfterSync;
     const reactVersion = await page.evaluate(() => {
-      const hook = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+      const hook = (
+        window as typeof window & {
+          __REACT_DEVTOOLS_GLOBAL_HOOK__?: { renderers?: { size: number } };
+        }
+      ).__REACT_DEVTOOLS_GLOBAL_HOOK__;
       return hook?.renderers?.size ? "devtools-present" : "no-devtools-hook";
     });
     console.log(

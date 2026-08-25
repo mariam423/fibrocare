@@ -1,18 +1,18 @@
 "use client";
 
 /**
- * Motion canvas synchronized with the 4-7-8 breathing engine.
+ * Breathing pulse visualizer synchronized with the 4-7-8 engine.
  *
- * Draws expanding/contracting concentric ripples whose radius follows the
- * current breath phase (inhale grows, hold holds, exhale shrinks) — driven by
- * the exact same `breathStateAt` clock that paces the audio kit, so visuals
- * and guidance can never drift apart. Pure canvas, fully offline; animates
- * only while active and honors prefers-reduced-motion with a static ring.
+ * A framer-motion keyframe animation mirrors the exact 4-7-8 timing —
+ * 4s inhale (grow), 7s hold (pause), 8s exhale (shrink), 19s per cycle —
+ * so the circle stays in lockstep with the phase label driven by
+ * `breathStateAt`. Concentric rings trail the leading edge with a stagger;
+ * prefers-reduced-motion collapses to a single static ring.
  */
 
-import React, { useEffect, useRef } from "react";
-import { useReducedMotion } from "framer-motion";
-import { breathStateAt } from "@/lib/somatic/breathing";
+import React from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { cycleLength } from "@/lib/somatic/breathing";
 
 export interface BreathMotionCanvasProps {
   /** Whether the breathing session is running. */
@@ -22,82 +22,59 @@ export interface BreathMotionCanvasProps {
   size?: number;
 }
 
-export function BreathMotionCanvas({ active, elapsedSeconds, size = 96 }: BreathMotionCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
+const CYCLE = cycleLength("4-7-8"); // 19s: 4s in · 7s hold · 8s out
+const TIMES: number[] = [0, 4 / CYCLE, 11 / CYCLE, 1];
+const KEYFRAMES: number[] = [0.35, 1, 1, 0.35];
+
+const RINGS = [
+  { alpha: 0.55, width: 2, delay: 0 },
+  { alpha: 0.39, width: 1.6, delay: 0.4 },
+  { alpha: 0.23, width: 1.2, delay: 0.8 },
+] as const;
+
+export function BreathMotionCanvas({ active, size = 96 }: BreathMotionCanvasProps) {
   const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const dpr = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    ctx.scale(dpr, dpr);
-
-    const state = breathStateAt("4-7-8", elapsedSeconds);
-    const phaseDuration = state.secondsElapsedInPhase + state.secondsRemainingInPhase;
-    const progress = phaseDuration > 0
-      ? Math.min(1, state.secondsElapsedInPhase / phaseDuration)
-      : 0;
-
-    // Ring radius maps phase: inhale 0.35→1, hold ~1, exhale 1→0.35.
-    let scale: number;
-    if (state.phase === "inhale") scale = 0.35 + 0.65 * progress;
-    else if (state.phase === "hold") scale = 1;
-    else scale = 1 - 0.65 * progress;
-
-    const draw = (wobble: number) => {
-      ctx.clearRect(0, 0, size, size);
-      const cx = size / 2;
-      const cy = size / 2;
-      const baseR = (size / 2 - 4) * (active ? scale : 0.5);
-
-      // Concentric ripples — outer rings trail the leading edge softly.
-      const rings = reduceMotion ? 1 : 3;
-      for (let i = 0; i < rings; i++) {
-        const r = baseR * (1 - i * 0.18) + (i > 0 && active && !reduceMotion ? wobble * (1 - i * 0.3) : 0);
-        ctx.beginPath();
-        ctx.arc(cx, cy, Math.max(2, r), 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(45, 212, 191, ${0.55 - i * 0.16})`;
-        ctx.lineWidth = 2 - i * 0.4;
-        ctx.stroke();
-      }
-
-      // Calm center dot.
-      ctx.beginPath();
-      ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(45, 212, 191, 0.8)";
-      ctx.fill();
-    };
-
-    if (!active || reduceMotion) {
-      draw(0);
-      return;
-    }
-
-    // Gentle sinusoidal breathing wobble while active.
-    const start = performance.now();
-    const animate = (now: number) => {
-      const wobble = Math.sin((now - start) / 300) * 1.5;
-      draw(wobble);
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    rafRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-    };
-  }, [active, elapsedSeconds, size, reduceMotion]);
+  const animating = active && !reduceMotion;
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      className="relative"
       style={{ width: size, height: size }}
       aria-hidden="true"
-      className="rounded-full"
-    />
+    >
+      {RINGS.map((ring) => (
+        <motion.div
+          key={ring.delay}
+          className="absolute inset-0 rounded-full border-2"
+          style={{ borderColor: `rgba(45, 212, 191, ${ring.alpha})`, borderWidth: ring.width }}
+          initial={false}
+          animate={animating ? { scale: KEYFRAMES } : { scale: 0.5 }}
+          transition={
+            animating
+              ? {
+                  duration: CYCLE,
+                  times: TIMES,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: ring.delay,
+                }
+              : { duration: 0.3, ease: "easeOut" }
+          }
+        />
+      ))}
+      {/* Calm center dot */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 6,
+          height: 6,
+          top: "50%",
+          left: "50%",
+          x: "-50%",
+          y: "-50%",
+          background: "rgba(45, 212, 191, 0.8)",
+        }}
+      />
+    </div>
   );
 }

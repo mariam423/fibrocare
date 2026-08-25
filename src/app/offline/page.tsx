@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 /**
  * Offline fallback page.
@@ -194,9 +195,9 @@ export default function OfflinePage() {
           <button type="button" id="fc-retry" className="fc-btn fc-btn-primary">
             Try again
           </button>
-          <a className="fc-btn fc-btn-ghost" href="/">
+          <Link className="fc-btn fc-btn-ghost" href="/">
             Back to home
-          </a>
+          </Link>
         </div>
       </main>
       <script dangerouslySetInnerHTML={{ __html: retryScript }} />

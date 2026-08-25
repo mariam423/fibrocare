@@ -7,13 +7,49 @@ import { useMotionEnabled } from "@/hooks/useMotionEnabled";
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
+/* Motion components must be created at module scope, never during render
+   (the react-hooks rule forbids it). Each supported tag has its motion
+   component pre-created here; ScrollReveal only looks one up. */
+type ScrollRevealTag =
+  | "div"
+  | "section"
+  | "li"
+  | "span"
+  | "article"
+  | "aside"
+  | "header"
+  | "footer"
+  | "main"
+  | "nav"
+  | "ul"
+  | "ol"
+  | "p"
+  | "figure";
+
+const MOTION_TAGS: Record<ScrollRevealTag, React.ElementType> = {
+  div: motion.div,
+  section: motion.section,
+  li: motion.li,
+  span: motion.span,
+  article: motion.article,
+  aside: motion.aside,
+  header: motion.header,
+  footer: motion.footer,
+  main: motion.main,
+  nav: motion.nav,
+  ul: motion.ul,
+  ol: motion.ol,
+  p: motion.p,
+  figure: motion.figure,
+};
+
 interface ScrollRevealProps extends React.HTMLAttributes<HTMLElement> {
   /** Stagger delay in seconds before the animation runs once in view. */
   delay?: number;
   /** Visibility ratio (0–1) that triggers the reveal. */
   threshold?: number;
   /** Optionally render as a different element (e.g. "section", "li"). */
-  as?: React.ElementType;
+  as?: ScrollRevealTag;
 }
 
 /**
@@ -57,7 +93,7 @@ export function ScrollReveal({
   );
 
   const shouldAnimate = mounted && motionEnabled;
-  const MotionTag = React.useMemo(() => motion.create(Tag), [Tag]);
+  const MotionTag = MOTION_TAGS[Tag];
 
   return (
     <MotionTag

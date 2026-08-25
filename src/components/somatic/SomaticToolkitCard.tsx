@@ -135,7 +135,7 @@ export function SomaticToolkitCard() {
 
   return (
     <DepthCard tilt={3}>
-      <Card className="h-full border-none shadow-depth-sm ring-1 ring-border">
+      <Card className="h-full shadow-depth-sm backdrop-blur-xl border border-emerald-500/20 bg-white/70 dark:bg-slate-900/60">
         <CardHeader>
           <CardTitle>{t("somatic.title")}</CardTitle>
           <CardDescription>{t("somatic.subtitle")}</CardDescription>
@@ -190,7 +190,7 @@ export function SomaticToolkitCard() {
                         <Button
                           size="sm"
                           variant={videoOpen ? "secondary" : "outline"}
-                          className="rounded-xl"
+                          className="rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] active:bg-emerald-500/10"
                           onClick={() => setVideoExercise(videoOpen ? null : ex.id)}
                           aria-pressed={videoOpen}
                           aria-label={`${t(ex.titleKey)} — ${t("video.tab")}`}
@@ -202,7 +202,7 @@ export function SomaticToolkitCard() {
                       <Button
                         size="sm"
                         variant={isActive ? "secondary" : "default"}
-                        className="rounded-xl"
+                        className="rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] active:bg-emerald-500/10"
                         onClick={() => startTimer(ex.id, ex.minutes)}
                         aria-label={`${t(ex.titleKey)} — ${isActive ? t("somatic.stop") : t("somatic.start")}`}
                       >
@@ -249,7 +249,7 @@ export function SomaticToolkitCard() {
                   key={p.name}
                   size="sm"
                   variant={playing === p.name ? "default" : "outline"}
-                  className="rounded-full"
+                  className="rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] active:bg-emerald-500/10"
                   onClick={() => void toggleAudio(p.name)}
                   aria-pressed={playing === p.name}
                 >
@@ -269,7 +269,7 @@ export function SomaticToolkitCard() {
           <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-semibold">{t("somatic.breathing.title")}</p>
-              <Button size="sm" variant={breathOn ? "secondary" : "default"} className="rounded-full" onClick={toggleBreath} aria-pressed={breathOn}>
+              <Button size="sm" variant={breathOn ? "secondary" : "default"} className="rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] active:bg-emerald-500/10" onClick={toggleBreath} aria-pressed={breathOn}>
                 {breathOn ? t("somatic.stop") : t("somatic.start")}
               </Button>
             </div>

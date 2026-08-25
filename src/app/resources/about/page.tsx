@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Activity01Icon,
   BrainIcon,
@@ -10,33 +10,72 @@ import AppHeader from "@/components/layout/AppHeader";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ContentPageLayout } from "@/components/resources/ContentPageLayout";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  PAGE_TAKEAWAYS,
+  groundingTakeaway,
+} from "@/lib/resources/engine";
 
 export default function AboutPage() {
-  const { t, locale } = useLanguage();
+  const { t } = useLanguage();
+
+  const takeaway = useMemo(
+    () => ({
+      bullets: PAGE_TAKEAWAYS.about.bullets,
+      chunk: groundingTakeaway("about"),
+    }),
+    []
+  );
 
   const sections = [
     {
       title: t("about.overview"),
       icon: Activity01Icon,
-      content: locale === "ar"
-        ? "التهاب العضلات الليفية (Fibromyalgia) هو حالة مزمنة تسبب ألمًا واسع النطاق في العضلات والعظام، إلى جانب الإرهاق واضطرابات النوم ومشاكل إدراكية وأعراض أخرى. لا يوجد علاج معروف، لكن يمكن إدارة الأعراض بشكل فعال."
-        : "Fibromyalgia is a chronic condition that causes widespread musculoskeletal pain, along with fatigue, sleep problems, cognitive difficulties, and other symptoms. While there is no known cure, symptoms can be effectively managed with the right approach.",
-      highlights: locale === "ar"
-        ? ["يؤثر على 2-4% من السكان", "يسبب ألمًا مزمنًا في جميع أنحاء الجسم", "يمكن إدارة الأعراض بفعالية"]
-        : ["Affects 2-4% of the population", "Causes chronic widespread pain", "Symptoms can be effectively managed"],
+      content: t("about.overviewContent"),
+      plainContent: t("about.overviewPlain"),
+      highlights: [
+        {
+          label: t("about.highlight.prevalence.label"),
+          value: t("about.highlight.prevalence.value"),
+        },
+        {
+          label: t("about.highlight.pain.label"),
+          value: t("about.highlight.pain.value"),
+        },
+        {
+          label: t("about.highlight.management.label"),
+          value: t("about.highlight.management.value"),
+        },
+      ],
     },
     {
       title: t("about.causes"),
       icon: AlertCircleIcon,
       content: t("about.causesDetail"),
+      plainContent: t("about.causesPlain"),
     },
     {
       title: t("about.symptoms"),
       icon: BrainIcon,
       content: t("about.symptomsDetail"),
-      highlights: locale === "ar"
-        ? ["الألم المزمن الواسع", "الإرهاق المستمر", "صعوبات التركيز (ضباب الألياف)", "اضطرابات النوم"]
-        : ["Chronic widespread pain", "Persistent fatigue", "Cognitive difficulties (fibro fog)", "Sleep disturbances"],
+      plainContent: t("about.symptomsPlain"),
+      highlights: [
+        {
+          label: t("about.symptom.pain.label"),
+          value: t("about.symptom.pain.value"),
+        },
+        {
+          label: t("about.symptom.fatigue.label"),
+          value: t("about.symptom.fatigue.value"),
+        },
+        {
+          label: t("about.symptom.fog.label"),
+          value: t("about.symptom.fog.value"),
+        },
+        {
+          label: t("about.symptom.sleep.label"),
+          value: t("about.symptom.sleep.value"),
+        },
+      ],
     },
   ];
 
@@ -50,6 +89,7 @@ export default function AboutPage() {
           subtitleKey="about.subtitle"
           icon={Activity01Icon}
           sections={sections}
+          takeaway={takeaway}
         />
       </main>
     </div>

@@ -14,11 +14,11 @@ test.describe("route view transitions", () => {
     page.on("pageerror", (err) => errors.push(String(err)));
 
     await page.addInitScript(() => {
-      const w = window as any;
+      const w = window as typeof window & { __vtCount: number };
       const read = () => Number(sessionStorage.getItem("__vtCount") || 0);
       const orig = document.startViewTransition?.bind(document);
       if (orig) {
-        document.startViewTransition = (cb: any) => {
+        document.startViewTransition = (cb: () => void | Promise<void>) => {
           const c = read() + 1;
           sessionStorage.setItem("__vtCount", String(c));
           return orig(cb);

@@ -31,7 +31,7 @@ export function CommunityInsightsCard() {
 
   return (
     <DepthCard tilt={3}>
-      <Card className="h-full border-none shadow-depth-sm ring-1 ring-border">
+      <Card className="h-full shadow-depth-sm backdrop-blur-xl border border-emerald-500/20 bg-white/70 dark:bg-slate-900/60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HugeiconsIcon icon={Globe02Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
@@ -91,7 +91,9 @@ export function CommunityInsightsCard() {
                     {t(s.strategyKey)}
                   </span>
                   <span className="shrink-0 text-muted-foreground">
-                    {s.successPct}% · {t("communityInsights.votes", { count: s.votes })}
+                    {/* <bdi> isolates numbers + percentages so punctuation never
+                        flips/reverses when the page direction is RTL (Arabic). */}
+                    <bdi>{s.successPct}%</bdi> · <bdi>{t("communityInsights.votes", { count: s.votes })}</bdi>
                   </span>
                 </li>
               ))}

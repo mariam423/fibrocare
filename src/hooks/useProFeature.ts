@@ -10,7 +10,7 @@
  * back to the free tier, never to a broken state.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import {
   FREE_SUBSCRIPTION,
   isProActive,
@@ -37,12 +37,25 @@ export interface ProFeatureState {
 
 const PRO_SET = new Set<Permission>(PRO_FEATURES);
 
-export function useProFeature(signedIn = true): ProFeatureState {
-  const [subscription, setSubscription] = useState<Subscription>(FREE_SUBSCRIPTION);
+/* The subscription is resolved once (mirroring the old read-on-mount effect)
+   and cached so useSyncExternalStore always gets a stable snapshot — a fresh
+   object per read would trip its "cached snapshot" guard. Nothing in the
+   client writes the store mid-session (only webhook/server paths do), so a
+   single read is behaviorally identical. The server snapshot is the free
+   default, so hydration never mismatches; the stored value flips in after. */
+const emptySubscribe = () => () => {};
+let subscriptionSnapshot: Subscription | null = null;
+const readSubscription = (): Subscription => {
+  subscriptionSnapshot ??= loadSubscription();
+  return subscriptionSnapshot;
+};
 
-  useEffect(() => {
-    setSubscription(loadSubscription());
-  }, []);
+export function useProFeature(signedIn = true): ProFeatureState {
+  const subscription = useSyncExternalStore(
+    emptySubscribe,
+    readSubscription,
+    () => FREE_SUBSCRIPTION
+  );
 
   const isPro = isProActive(subscription);
   const role: UserRole = !signedIn ? "guest" : isPro ? "pro_user" : "free_user";

@@ -13,7 +13,9 @@ export default function FAQPage() {
     <RouteTransition>
     <div className="min-h-[100dvh]">
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+      {/* pb-20 keeps the last accordion item clear of the fixed PWA
+          install banner on mobile viewports. */}
+      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-20">
         <FAQAccordion />
       </main>
     </div>

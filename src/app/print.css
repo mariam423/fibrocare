@@ -1,0 +1,68 @@
+/* ============================================================
+   Print stylesheet — clean, doctor-ready output
+   Browser print (Ctrl/Cmd+P) should produce a readable sheet,
+   not a screenshot of the app: the fixed header, ambient
+   backgrounds and floating banners are dropped, translucent
+   glass / dark-mode surfaces flatten to white with dark text,
+   and backdrop filters + shadows are stripped so nothing blurs
+   or repeats across pages. `print-color-adjust: exact` keeps
+   the checker's color-coded verdict banner legible instead of
+   stripping it to monochrome.
+   ============================================================ */
+
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  /* App chrome that must never appear on paper: the fixed top
+     header (would otherwise repeat on every page), navigation,
+     footer, the fixed ambient wash + aurora trails, the sticky
+     progressive-blur strip, and toasts. */
+  header,
+  nav,
+  footer,
+  .ambient,
+  .ambient-aurora,
+  .aurora-glow-trail,
+  .gradient-blur-top,
+  [data-sonner-toaster],
+  [data-sonner-toast] {
+    display: none !important;
+  }
+
+  /* Always print light: white canvas, dark ink. */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Dark mode flattens to the light theme so text never prints
+     light-on-dark (wasted ink / unreadable). Overrides both the
+     translucent glass fills and the solid dark card surfaces. */
+  .dark,
+  .dark * {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: rgba(15, 23, 42, 0.12) !important;
+  }
+
+  /* Glass and shadows are screen-only effects. Blur is dropped
+     everywhere, and `print-color-adjust` keeps any remaining
+     tinted fills (e.g. the emerald verdict banner) printable. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* The root layout pads <main> for the fixed header — remove it
+     so the sheet starts at the top of the page. */
+  main#main-content {
+    padding: 0 !important;
+  }
+}

@@ -2,10 +2,10 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Search01Icon,
-  Book01Icon,
   FlameIcon,
   AppleIcon,
   Activity01Icon,
@@ -17,31 +17,31 @@ import {
   HelpCircleIcon,
   Message02Icon,
   ArrowRight01Icon,
+  WaveIcon,
+  SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DepthCard } from "@/components/ui/DepthCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { RouteTransition } from "@/components/ui/RouteTransition";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import AppHeader from "@/components/layout/AppHeader";
-import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
+import { useHealth } from "@/context/HealthContext";
+import { useMotionEnabled } from "@/hooks/useMotionEnabled";
+import { cn } from "@/lib/utils";
 import type { TranslationKey } from "@/lib/translations";
+import {
+  BODY_PARTS,
+  resolveSemanticIntent,
+  type BodyPartId,
+  type EffortLevel,
+} from "@/lib/resources/engine";
+import { ResourceCard, type LocalizedResource } from "@/components/resources/ResourceCard";
+import { BodySymptomMap } from "@/components/resources/BodySymptomMap";
+import { FlareActionPlan } from "@/components/resources/FlareActionPlan";
 
 type CategoryId =
   | "managingFlares"
@@ -71,6 +71,7 @@ interface Resource {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   category: CategoryId;
+  effort: EffortLevel;
   icon: React.ReactNode;
   image: string;
   bannerGradient: string;
@@ -140,6 +141,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.flarePacing.title",
     descriptionKey: "resources.card.flarePacing.description",
     category: "managingFlares",
+    effort: "low",
     icon: <HugeiconsIcon icon={FlameIcon} className="h-6 w-6 text-purple-600 dark:text-purple-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-purple-200 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-950/50",
@@ -160,6 +162,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.flareHeat.title",
     descriptionKey: "resources.card.flareHeat.description",
     category: "managingFlares",
+    effort: "low",
     icon: <HugeiconsIcon icon={FlameIcon} className="h-6 w-6 text-purple-600 dark:text-purple-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-purple-200 to-pink-100 dark:from-purple-900/50 dark:to-pink-950/50",
@@ -175,11 +178,52 @@ const RESOURCES_DATA: Resource[] = [
     ]
   },
   {
+    id: "flare-breathwork",
+    title: "Breathwork for Flares",
+    titleKey: "resources.card.breathwork.title",
+    descriptionKey: "resources.card.breathwork.description",
+    category: "mentalSupport",
+    effort: "low",
+    icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-sky-600 dark:text-sky-300" aria-hidden="true" />,
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    bannerGradient: "from-sky-200 to-indigo-100 dark:from-sky-900/50 dark:to-indigo-950/50",
+    color: {
+      light: "bg-sky-50 text-sky-700 ring-sky-100",
+      dark: "dark:bg-sky-900/30 dark:text-sky-300 dark:ring-sky-900"
+    },
+    tipsKeys: [
+      "resources.card.breathwork.tip1",
+      "resources.card.breathwork.tip2",
+      "resources.card.breathwork.tip3",
+    ]
+  },
+  {
+    id: "mental-audio",
+    title: "Audio Therapy",
+    titleKey: "resources.card.audioTherapy.title",
+    descriptionKey: "resources.card.audioTherapy.description",
+    category: "mentalSupport",
+    effort: "low",
+    icon: <HugeiconsIcon icon={WaveIcon} className="h-6 w-6 text-violet-600 dark:text-violet-300" aria-hidden="true" />,
+    image: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=800&q=80",
+    bannerGradient: "from-violet-200 to-fuchsia-100 dark:from-violet-900/50 dark:to-fuchsia-950/50",
+    color: {
+      light: "bg-violet-50 text-violet-700 ring-violet-100",
+      dark: "dark:bg-violet-900/30 dark:text-violet-300 dark:ring-violet-900"
+    },
+    tipsKeys: [
+      "resources.card.audioTherapy.tip1",
+      "resources.card.audioTherapy.tip2",
+      "resources.card.audioTherapy.tip3",
+    ]
+  },
+  {
     id: "nutri-antiinflam",
     title: "Anti-Inflammatory Diet",
     titleKey: "resources.card.antiInflammatory.title",
     descriptionKey: "resources.card.antiInflammatory.description",
     category: "nutritionHydration",
+    effort: "medium",
     icon: <HugeiconsIcon icon={AppleIcon} className="h-6 w-6 text-teal-600 dark:text-teal-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-teal-200 to-emerald-100 dark:from-teal-900/50 dark:to-emerald-950/50",
@@ -200,6 +244,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.hydration.title",
     descriptionKey: "resources.card.hydration.description",
     category: "nutritionHydration",
+    effort: "medium",
     icon: <HugeiconsIcon icon={AppleIcon} className="h-6 w-6 text-teal-600 dark:text-teal-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-cyan-200 to-teal-100 dark:from-cyan-900/50 dark:to-teal-950/50",
@@ -220,6 +265,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.stretching.title",
     descriptionKey: "resources.card.stretching.description",
     category: "gentleMovement",
+    effort: "medium",
     icon: <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6 text-green-600 dark:text-green-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-green-200 to-emerald-100 dark:from-green-900/50 dark:to-emerald-950/50",
@@ -240,6 +286,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.walking.title",
     descriptionKey: "resources.card.walking.description",
     category: "gentleMovement",
+    effort: "medium",
     icon: <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6 text-green-600 dark:text-green-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-emerald-200 to-teal-100 dark:from-emerald-900/50 dark:to-teal-950/50",
@@ -260,6 +307,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.mindfulness.title",
     descriptionKey: "resources.card.mindfulness.description",
     category: "mentalSupport",
+    effort: "low",
     icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-indigo-200 to-purple-100 dark:from-indigo-900/50 dark:to-purple-950/50",
@@ -280,6 +328,7 @@ const RESOURCES_DATA: Resource[] = [
     titleKey: "resources.card.sleepHygiene.title",
     descriptionKey: "resources.card.sleepHygiene.description",
     category: "mentalSupport",
+    effort: "medium",
     icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
     image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-slate-200 to-indigo-100 dark:from-slate-900/50 dark:to-indigo-950/50",
@@ -296,22 +345,17 @@ const RESOURCES_DATA: Resource[] = [
   },
 ];
 
-interface LocalizedResource {
-  id: string;
-  title: string;
-  description: string;
-  categoryLabel: string;
-  icon: React.ReactNode;
-  image: string;
-  bannerGradient: string;
-  color: { light: string; dark: string };
-  tips: string[];
-}
+const EFFORT_RANK: Record<EffortLevel, number> = { low: 0, medium: 1 };
 
 export default function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all");
+  const [selectedBodyPart, setSelectedBodyPart] = useState<BodyPartId | null>(null);
   const { t } = useLanguage();
+  const { currentPainLevel } = useHealth();
+  const motionEnabled = useMotionEnabled();
+
+  const highPain = currentPainLevel >= 7;
 
   const localizedResources = useMemo<LocalizedResource[]>(
     () =>
@@ -325,24 +369,51 @@ export default function ResourcesPage() {
         bannerGradient: res.bannerGradient,
         color: res.color,
         tips: res.tipsKeys.map((key) => t(key)),
+        effort: res.effort,
       })),
     [t]
   );
 
   const filteredResources = useMemo(() => {
-    return localizedResources.filter((res) => {
-      const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim().toLowerCase();
+    const intent = resolveSemanticIntent(searchQuery);
+    const semanticCardIds = new Set(
+      intent.bodyParts.flatMap((part) => BODY_PARTS[part].cardIds)
+    );
+    const bodyCardIds = selectedBodyPart
+      ? new Set(BODY_PARTS[selectedBodyPart].cardIds)
+      : null;
+
+    const list = localizedResources.filter((res) => {
       const matchesSearch =
         q.length === 0 ||
         res.title.toLowerCase().includes(q) ||
         res.description.toLowerCase().includes(q) ||
-        res.categoryLabel.toLowerCase().includes(q);
+        res.categoryLabel.toLowerCase().includes(q) ||
+        (intent.category !== undefined &&
+          RESOURCES_DATA.find((r) => r.id === res.id)?.category === intent.category) ||
+        (intent.bodyParts.length > 0 && semanticCardIds.has(res.id));
       const matchesCategory =
         activeCategory === "all" ||
         RESOURCES_DATA.find((r) => r.id === res.id)?.category === activeCategory;
-      return matchesSearch && matchesCategory;
+      const matchesBodyPart = bodyCardIds === null || bodyCardIds.has(res.id);
+      return matchesSearch && matchesCategory && matchesBodyPart;
     });
-  }, [localizedResources, searchQuery, activeCategory]);
+
+    // Pain-aware personalization: on high-pain days, surface low-effort
+    // resources first (stable within each effort tier).
+    if (!highPain) return list;
+    return [...list].sort(
+      (a, b) =>
+        EFFORT_RANK[a.effort] - EFFORT_RANK[b.effort] ||
+        localizedResources.indexOf(a) - localizedResources.indexOf(b)
+    );
+  }, [localizedResources, searchQuery, activeCategory, selectedBodyPart, highPain]);
+
+  const semanticIntent = useMemo(
+    () => resolveSemanticIntent(searchQuery),
+    [searchQuery]
+  );
 
   return (
     <RouteTransition>
@@ -369,7 +440,7 @@ export default function ResourcesPage() {
               {CONTENT_NAV_ITEMS.map((item) => (
                 <Link key={item.href} href={item.href} className="group">
                   <DepthCard tilt={3} delay={0} hover={false} className="h-full">
-                    <SpotlightCard className="h-full rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm shadow-depth-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-depth-md dark:border-white/10 dark:bg-background/40 dark:backdrop-blur-xl dark:group-hover:border-emerald-400/30 dark:group-hover:shadow-[0_0_24px_rgba(16,185,129,0.16)]">
+                    <SpotlightCard className="h-full rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-300 group-hover:-translate-y-0.5 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
                       <CardContent className="p-6 flex items-center gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.bg} transition-transform duration-300 group-hover:scale-110`}>
                           <HugeiconsIcon
@@ -399,7 +470,7 @@ export default function ResourcesPage() {
 
         {/* Search & Filters */}
         <ScrollReveal delay={0.1} className="flex flex-col items-center gap-6">
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full max-w-md rounded-full border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl dark:bg-slate-900/60">
             <HugeiconsIcon icon={Search01Icon} className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
               type="search"
@@ -407,9 +478,25 @@ export default function ResourcesPage() {
               aria-label={t("resources.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="ps-10 border-border rounded-full"
+              className="border-0 bg-transparent ps-10 shadow-none focus-visible:ring-0"
             />
           </div>
+
+          {/* Semantic symptom-match chip */}
+          {searchQuery.trim() !== "" && semanticIntent.category && (
+            <p className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+              <HugeiconsIcon icon={SparklesIcon} className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("resources.semantic.matched", { category: t(CATEGORY_KEYS[semanticIntent.category]) })}
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="ms-1 text-[11px] underline underline-offset-2 transition-colors hover:text-emerald-900 dark:hover:text-emerald-100"
+              >
+                {t("resources.semantic.clear")}
+              </button>
+            </p>
+          )}
+
           <div
             className="flex flex-wrap justify-center gap-2"
             role="group"
@@ -421,11 +508,12 @@ export default function ResourcesPage() {
                 variant={activeCategory === cat.id ? "default" : "outline"}
                 onClick={() => setActiveCategory(cat.id)}
                 aria-pressed={activeCategory === cat.id}
-                className={`rounded-full px-4 transition-all ${
+                className={cn(
+                  "rounded-full px-4 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
                   activeCategory === cat.id
-                  ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                  : "bg-card text-muted-foreground border-border"
-                }`}
+                    ? "bg-primary text-primary-foreground shadow-[0_0_16px_rgba(16,185,129,0.35)] hover:bg-primary/90"
+                    : "border-emerald-500/20 bg-white/70 text-muted-foreground backdrop-blur-xl dark:bg-slate-900/60"
+                )}
               >
                 {t(cat.tKey)}
               </Button>
@@ -433,73 +521,50 @@ export default function ResourcesPage() {
           </div>
         </ScrollReveal>
 
+        {/* Body Symptom Map */}
+        <ScrollReveal delay={0.12}>
+          <BodySymptomMap selected={selectedBodyPart} onSelect={setSelectedBodyPart} />
+        </ScrollReveal>
+
+        {/* AI Flare Action Plan */}
+        <ScrollReveal delay={0.14}>
+          <FlareActionPlan />
+        </ScrollReveal>
+
+        {/* Pain-aware banner */}
+        {highPain && filteredResources.length > 0 && (
+          <ScrollReveal delay={0.16}>
+            <p
+              role="status"
+              className="flex items-center gap-2 rounded-2xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-700 backdrop-blur-xl dark:text-red-300"
+            >
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+              {t("resources.painAware.banner")}
+            </p>
+          </ScrollReveal>
+        )}
+
         {/* Resources Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredResources.map((res, index) => (
-            <ScrollReveal key={res.id} delay={Math.min(index * 0.06, 0.3)} className="h-full">
-            <DepthCard tilt={5} animateIn={false} className="h-full">
-            <SpotlightCard className={`group h-full rounded-3xl border-none shadow-depth-sm ring-1 transition-all duration-300 overflow-hidden ${res.color.light} ${res.color.dark}`}>
-              <div className="relative h-48 w-full overflow-hidden">
-                <Image
-                  src={res.image}
-                  alt={res.title}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/30" />
-              </div>
-              <CardHeader className="px-6 pt-6 pb-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-medium tracking-wide opacity-70">
-                    {res.categoryLabel}
-                  </span>
-                </div>
-                <CardTitle className="text-xl text-foreground">{res.title}</CardTitle>
-                <CardDescription className="text-muted-foreground line-clamp-2">
-                  {res.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <Dialog>
-                  <DialogTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        className="w-full rounded-xl border-border hover:bg-muted"
-                      >
-                        <HugeiconsIcon icon={Book01Icon} className="me-2 h-4 w-4" aria-hidden="true" />
-                        {t("common.readMore")}
-                      </Button>
-                    }
-                  />
-                  <DialogContent className="ring-1 ring-border">
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl text-foreground">
-                        {res.title}
-                      </DialogTitle>
-                      <DialogDescription className="text-muted-foreground">
-                        {t("resources.tipsFor", { category: res.categoryLabel })}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <ul className="space-y-3">
-                        {res.tips.map((tip, idx) => (
-                          <li key={idx} className="flex items-start gap-3 text-foreground">
-                            <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                            <span>{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </SpotlightCard>
-            </DepthCard>
-            </ScrollReveal>
-          ))}
+          <AnimatePresence mode="popLayout" initial={false}>
+            {filteredResources.map((res) => (
+              <motion.div
+                key={res.id}
+                layout={motionEnabled}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: motionEnabled ? 0.2 : 0 }}
+                className="h-full"
+              >
+                <ResourceCard res={res} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
+        {filteredResources.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground">{t("resources.empty")}</p>
+        )}
       </main>
     </div>
     </RouteTransition>

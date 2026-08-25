@@ -21,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
-import { generateDiagnosticCheckPdf } from "@/lib/pdfGenerator";
 import {
   evaluateDiagnosticReadiness,
   type DiagnosticCheckAnswers,
@@ -87,6 +86,9 @@ export function DiagnosticReadinessChecker() {
     if (!result || downloading) return;
     setDownloading(true);
     try {
+      // Lazy-load jsPDF only when the user actually exports — keeps it out
+      // of the initial client bundle for the diagnosis page.
+      const { generateDiagnosticCheckPdf } = await import("@/lib/pdfGenerator");
       const blob = await generateDiagnosticCheckPdf(
         {
           verdict: result.verdict,

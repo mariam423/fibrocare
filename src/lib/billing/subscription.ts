@@ -143,7 +143,16 @@ export function subscriptionFromWebhook(raw: unknown): Subscription | null {
       : `lemon-squeezy:${event.meta.event_name}`;
 
   if (DEACTIVATE_EVENTS.has(kind)) {
-    return { ...FREE_SUBSCRIPTION, provider: event.provider };
+    // Keep the provider id so the webhook store can upsert the same row
+    // back to the free plan instead of leaving a stale Pro record behind.
+    return {
+      ...FREE_SUBSCRIPTION,
+      provider: event.provider,
+      externalId:
+        event.provider === "stripe"
+          ? event.data.object.id
+          : event.data.id,
+    };
   }
   if (!ACTIVATE_EVENTS.has(kind)) return null;
 

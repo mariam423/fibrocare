@@ -33,11 +33,36 @@ import { prisma } from "@/lib/prisma";
  */
 const DEV_FALLBACK_SECRET = "fibrocare-dev-only-fallback-secret-not-for-production";
 
+/**
+ * Resolve the JWT secret with a dev-only fallback. Production refuses to
+ * run without a real NEXTAUTH_SECRET — silently signing JWTs with a known
+ * value would be worse than a loud error. Shared with the route guard in
+ * `src/proxy.ts` so both layers agree on the same secret.
+ */
+export function getJwtSecret(): string | undefined {
+  return (
+    process.env.NEXTAUTH_SECRET ??
+    (process.env.NODE_ENV === "production" ? undefined : DEV_FALLBACK_SECRET)
+  );
+}
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
-  secret:
-    process.env.NEXTAUTH_SECRET ??
-    (process.env.NODE_ENV === "production" ? undefined : DEV_FALLBACK_SECRET),
+  // Explicit cookie hardening instead of relying on inference: the JWT is
+  // httpOnly (never readable by scripts), SameSite=Lax (CSRF-safe for
+  // top-level navigations), and Secure in production (HTTPS-only).
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
+  secret: getJwtSecret(),
   providers: [
     CredentialsProvider({
       name: "Email",

@@ -10,6 +10,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { NotificationProvider } from "@/lib/notifications";
 import { LOCALE_COOKIE, parseLocale } from "@/lib/locale";
 import { translations, type Locale } from "@/lib/translations";
+import { buildMedicalWebPageJsonLd } from "@/lib/seo/metadata";
 import { AiStatusProvider } from "@/context/AiStatusContext";
 import { PrivacyProvider, PrivacyGate } from "@/components/auth/PrivacyLock";
 import { SessionProvider } from "@/components/auth/SessionProvider";
@@ -112,6 +113,31 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning={true}>
+        {/* Structured medical schema: WebApplication + localized
+            MedicalWebPage (reuses the shared SEO helper). Static data only,
+            so the JSON is never built from user input. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                name: "FibroCare",
+                applicationCategory: "HealthApplication",
+                operatingSystem: "Any",
+                inLanguage: ["en", "ar"],
+                offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+                about: {
+                  "@type": "MedicalCondition",
+                  name: "Fibromyalgia",
+                  alternateName: "الفيبروميالغيا",
+                },
+              },
+              buildMedicalWebPageJsonLd("home", locale),
+            ]),
+          }}
+        />
         <AmbientAurora />
         <PwaPrompt />
         <HealthProvider>

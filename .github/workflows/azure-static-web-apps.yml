@@ -1,0 +1,142 @@
+name: Azure Static Web Apps CI/CD
+
+# Deploy to Azure Static Web Apps:
+#  - production deploy on every push to `main`
+#  - preview environments for open pull requests (torn down on close)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-swa-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Non-secret build-time value (SEO/OG metadata). Override per-environment
+  # with a repository variable if the app lives at another origin.
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://fibrocare.app' }}
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────
+  # Gate: unit tests + production build must pass before anything deploys.
+  # Azure SWA intentionally has no persistent filesystem — DATABASE_URL
+  # must point at a managed database (e.g. Azure SQL / Neon) in production.
+  # ─────────────────────────────────────────────────────────────────────
+  validate:
+    name: Test & Build gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Next.js 16 requires Node 18.18+ — 22 is LTS
+          cache: npm
+
+      # .env is gitignored and the Prisma schema reads DATABASE_URL via
+      # env(), so CI materializes its own .env BEFORE `npm install` — the
+      # @prisma/client postinstall generates the client from the schema and
+      # would fail without the variable.
+      - name: Create .env for CI
+        run: |
+          echo 'DATABASE_URL="file:./dev.db"' > .env
+          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
+          echo 'NEXTAUTH_URL=http://localhost:3000' >> .env
+
+      # No package-lock.json is committed, so `npm install` (not `npm ci`).
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Prisma client + apply migrations
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+        env:
+          # Server-side keys are read only in server routes/libs and never
+          # reach the client bundle; referenced from GitHub Secrets so the
+          # value stays out of the repository and the build logs.
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Deploy. The Azure action performs its own `npm install` + Next.js build
+  # (app_build_command) and uploads the bundle. Runs only after the gate.
+  # ─────────────────────────────────────────────────────────────────────
+  build_and_deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: validate
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Same reasoning as the gate: the SWA CLI's `npm install` triggers the
+      # Prisma postinstall, which needs DATABASE_URL present in the workspace.
+      - name: Create .env for Azure build
+        run: |
+          echo 'DATABASE_URL="file:./dev.db"' > .env
+          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
+          echo "NEXTAUTH_URL=${NEXT_PUBLIC_SITE_URL}" >> .env
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # One token per SWA environment, created in the Azure portal
+          # (Static Web Apps → Manage deployment token) and stored as a
+          # GitHub secret. The deploy action refuses to run without it.
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          api_location: ""
+          output_location: ""
+          app_build_command: "npm run build"
+          # Runtime app settings applied to the deployed app. Quoted so
+          # values with YAML-special characters parse safely; for secrets
+          # with unusual formatting (e.g. connection strings), configure
+          # them in the Azure portal app settings instead.
+          app_settings: |
+            NEXT_PUBLIC_SITE_URL: "${{ vars.NEXT_PUBLIC_SITE_URL || 'https://fibrocare.app' }}"
+            OPENWEATHER_API_KEY: "${{ secrets.OPENWEATHER_API_KEY }}"
+            NEXTAUTH_SECRET: "${{ secrets.NEXTAUTH_SECRET }}"
+            NEXTAUTH_URL: "${{ secrets.NEXTAUTH_URL }}"
+            DATABASE_URL: "${{ secrets.DATABASE_URL }}"
+            HEALTH_DATA_ENCRYPTION_KEY: "${{ secrets.HEALTH_DATA_ENCRYPTION_KEY }}"
+            AI_PROVIDER: "${{ secrets.AI_PROVIDER }}"
+            GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY }}"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Remove the Azure preview environment when its pull request closes.
+  # ─────────────────────────────────────────────────────────────────────
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"

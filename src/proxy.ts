@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { getJwtSecret } from "@/lib/auth";
 
 /**
  * Route protection for authenticated-only pages.
@@ -37,10 +38,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+  const secret = getJwtSecret();
+  // Without a secret (misconfigured production env), getToken() would throw
+  // and turn every protected route into a 500. Skip the optimistic guard
+  // instead — server actions and API routes still enforce the session.
+  if (!secret) {
+    console.warn(
+      "[proxy] NEXTAUTH_SECRET is missing — skipping optimistic route guard; server actions still enforce auth."
+    );
+    return NextResponse.next();
+  }
+
+  const token = await getToken({ req: request, secret });
 
   if (!token?.sub) {
     const signInUrl = new URL("/login", request.url);

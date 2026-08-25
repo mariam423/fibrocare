@@ -17,7 +17,6 @@ import {
   Alert01Icon,
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
-import { generateMedicalReport } from "@/lib/pdfGenerator";
 import { getReportData } from "@/app/actions";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
@@ -131,6 +130,9 @@ export default function ReportsPage() {
     if (!snapshot) return;
     setIsGenerating(true);
     try {
+      // Lazy-load jsPDF only when the user exports — keeps it out of the
+      // initial client bundle for the reports page.
+      const { generateMedicalReport } = await import("@/lib/pdfGenerator");
       const blob = await generateMedicalReport(
         {
           userName: snapshot.userName,

@@ -164,9 +164,16 @@ export async function updateUserName(newName: string) {
       return { success: false, error: "You must be signed in." };
     }
 
+    // Bound free-text input before it reaches the database (XSS-safe at
+    // render via React escaping; the cap prevents storage abuse).
+    const name = newName.trim();
+    if (name.length < 2 || name.length > 80) {
+      return { success: false, error: "Name must be between 2 and 80 characters." };
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { name: newName },
+      data: { name },
     });
 
     revalidatePath("/dashboard");
@@ -198,12 +205,20 @@ export async function savePainLog(
       ? Math.min(10, Math.max(0, painLevel))
       : 3;
 
-    const encryptedNotes = notes ? await encryptSensitiveData(notes) : undefined;
+    // Bound free-text fields (length caps only — content is rendered
+    // escaped and stored via Prisma's parameterized queries).
+    const safeMoodTag = String(moodTag ?? "").slice(0, 40);
+    const safeSymptoms = symptoms
+      .map((s) => String(s).slice(0, 60))
+      .filter((s) => s.trim().length > 0)
+      .slice(0, 20);
+    const safeNotes = notes ? notes.slice(0, 2000) : undefined;
+    const encryptedNotes = safeNotes ? await encryptSensitiveData(safeNotes) : undefined;
 
     await prisma.painLog.create({
       data: {
         painLevel: finalPainLevel,
-        moodTag,
+        moodTag: safeMoodTag,
         notes: encryptedNotes,
         userId: user.id,
       },
@@ -211,7 +226,7 @@ export async function savePainLog(
 
     // Persist preset/manual symptoms for today (idempotent upserts)
     const date = toIsoDateKey(new Date());
-    for (const symptom of symptoms) {
+    for (const symptom of safeSymptoms) {
       await prisma.symptomLog.upsert({
         where: {
           userId_symptom_date: { userId: user.id, symptom, date },
@@ -241,9 +256,18 @@ export async function updateUserProfile(name: string, email: string) {
       return { success: false, error: "You must be signed in." };
     }
 
+    const safeName = String(name ?? "").trim();
+    const safeEmail = String(email ?? "").trim().toLowerCase();
+    if (safeName.length < 2 || safeName.length > 80) {
+      return { success: false, error: "Name must be between 2 and 80 characters." };
+    }
+    if (!EMAIL_REGEX.test(safeEmail)) {
+      return { success: false, error: "Please enter a valid email address." };
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { name, email },
+      data: { name: safeName, email: safeEmail },
     });
 
     revalidatePath("/dashboard");
@@ -266,12 +290,15 @@ export async function updateHydration(amount: number) {
       return { success: false, error: "You must be signed in." };
     }
 
+    // Validate the increment: integers only, bounded per call, and the
+    // counter can never go below zero (the UI only sends ±1).
+    const delta = Number.isInteger(amount) ? Math.min(10, Math.max(-10, amount)) : 0;
+    const next = Math.max(0, user.hydrationCount + delta);
+
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        hydrationCount: {
-          increment: amount
-        }
+        hydrationCount: next
       }
     });
 
@@ -449,13 +476,19 @@ export async function toggleSymptom(symptom: string, date: string, active: boole
       return { success: false, error: "You must be signed in." };
     }
 
+    // Free-text input bound before it reaches the database.
+    const safeSymptom = String(symptom ?? "").trim().slice(0, 60);
+    if (!safeSymptom || !/^\d{4}-\d{2}-\d{2}$/.test(String(date ?? ""))) {
+      return { success: false, error: "Invalid symptom or date." };
+    }
+
     if (active) {
       await prisma.symptomLog.create({
-        data: { symptom, date, userId: user.id },
+        data: { symptom: safeSymptom, date, userId: user.id },
       });
     } else {
       await prisma.symptomLog.deleteMany({
-        where: { userId: user.id, symptom, date },
+        where: { userId: user.id, symptom: safeSymptom, date },
       });
     }
 
@@ -632,7 +665,13 @@ export async function getAiStatus() {
 async function encryptSensitiveData(text: string): Promise<string> {
   const key = process.env.HEALTH_DATA_ENCRYPTION_KEY;
   if (!key) {
-    // Fallback: return base64-encoded plaintext if no key configured (dev only)
+    // Dev-only fallback: base64 for local testing. Production must NEVER
+    // silently store readable health data — fail loudly instead.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "HEALTH_DATA_ENCRYPTION_KEY is not configured — refusing to store plaintext health notes."
+      );
+    }
     return Buffer.from(text).toString("base64");
   }
   const iv = crypto.randomBytes(12);

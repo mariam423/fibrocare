@@ -4,7 +4,10 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  // `env()` lets Vercel/any host point this at a real database via
+  // DATABASE_URL (e.g. Vercel Postgres). Local dev keeps the SQLite file via
+  // DATABASE_URL="file:./dev.db" in .env — see .env.example.
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -19,6 +22,21 @@ model User {
   resetTokens    PasswordResetToken[]
   sessions       Session[]
   symptomLogs    SymptomLog[]
+}
+
+/// Provider-agnostic billing state written by the webhook route
+/// (src/app/api/webhooks/billing/route.ts). One row per provider+external
+/// subscription id; upserted on every activation / deactivation event.
+model Subscription {
+  id               String   @id @default(cuid())
+  provider         String
+  externalId       String
+  plan             String
+  status           String
+  currentPeriodEnd String?
+  updatedAt        DateTime @updatedAt
+
+  @@unique([provider, externalId])
 }
 
 model Session {

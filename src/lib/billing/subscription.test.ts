@@ -81,13 +81,26 @@ describe("subscriptionFromWebhook", () => {
     expect(sub?.externalId).toBe("ls_9");
   });
 
-  it("cancellation events return to the free plan", () => {
+  it("cancellation events return to the free plan and keep the provider id", () => {
     const sub = subscriptionFromWebhook({
       provider: "stripe",
       type: "customer.subscription.deleted",
       data: { object: { id: "sub_1", status: "canceled" } },
     });
     expect(sub?.plan).toBe("free");
+    // The id must survive so the webhook store can upsert the same row.
+    expect(sub?.externalId).toBe("sub_1");
+    expect(sub?.provider).toBe("stripe");
+  });
+
+  it("lemon-squeezy cancellation keeps its id too", () => {
+    const sub = subscriptionFromWebhook({
+      provider: "lemon-squeezy",
+      meta: { event_name: "subscription_cancelled" },
+      data: { id: "ls_9", attributes: { status: "canceled" } },
+    });
+    expect(sub?.plan).toBe("free");
+    expect(sub?.externalId).toBe("ls_9");
   });
 
   it("returns null for irrelevant and malformed events", () => {

@@ -104,7 +104,7 @@ export function RecentLogsWidget({ logs, columns = 1 }: RecentLogsWidgetProps) {
                       )}
                       aria-label={t("recent.painAria", { level: log.painLevel })}
                     >
-                      {log.painLevel}
+                      <bdi>{log.painLevel}</bdi>
                     </div>
                   </div>
 

@@ -91,7 +91,7 @@ export function AiReflection({ note }: { note: string }) {
                 type="button"
                 onClick={reset}
                 aria-label={t("reflection.dismissAria")}
-                className="ml-auto rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="ms-auto rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <svg width="10" height="10" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path

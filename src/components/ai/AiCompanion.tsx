@@ -238,7 +238,7 @@ export function AiCompanion() {
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900",
+                    "absolute -bottom-0.5 -end-0.5 h-3 w-3 rounded-full border-2 border-white dark:border-slate-900",
                     isOffline ? "bg-slate-400" : "bg-emerald-400"
                   )}
                 />
@@ -332,7 +332,7 @@ export function AiCompanion() {
                     className={cn("flex", isUser ? "justify-end" : "justify-start")}
                   >
                     {!isUser && (
-                      <div className="mr-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-violet-500/10 ring-1 ring-primary/20">
+                      <div className="me-2 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-violet-500/10 ring-1 ring-primary/20">
                         <HugeiconsIcon
                           icon={ChatBotIcon}
                           className="h-3.5 w-3.5 text-primary"
@@ -487,7 +487,7 @@ function StreamingCaret({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <motion.span
       aria-hidden="true"
-      className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 rounded-full bg-primary"
+      className="ms-0.5 inline-block h-4 w-[2px] translate-y-0.5 rounded-full bg-primary"
       animate={{ opacity: [1, 0.2, 1] }}
       transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }}
     />

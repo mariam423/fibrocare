@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useHealth } from "@/context/HealthContext";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,31 @@ export default function ZenPage() {
   const toggleUltraDark = () => {
     setIsUltraDark((prev) => !prev);
   };
+
+  // Esc returns to the dashboard (same action as the header back button).
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // Never hijack Esc while the user is interacting with a control.
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        return;
+      }
+      e.preventDefault();
+      router.back();
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <RouteTransition>
@@ -114,6 +139,9 @@ export default function ZenPage() {
         {!isUltraDark && (
           <>
             <SoundscapeMixer />
+            <p className="text-xs text-slate-500">
+              {t("zen.shortcutHint")}
+            </p>
             <Button
               variant="ghost"
               onClick={() => setTheme("Sensitive")}

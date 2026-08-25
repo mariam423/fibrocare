@@ -81,7 +81,7 @@ function CustomTooltip({
     <div className="glass-surface rounded-xl border border-border px-4 py-3 shadow-beautiful-md">
       <p className="text-xs font-semibold text-muted-foreground mb-1">{label}</p>
       <p className="text-lg font-bold text-foreground">
-        {value}<span className="text-xs font-normal text-muted-foreground ms-0.5">{t("chart.painLevel")}</span>
+        <bdi>{value}</bdi><span className="text-xs font-normal text-muted-foreground ms-0.5">{t("chart.painLevel")}</span>
       </p>
       <p className={cn("text-xs font-medium mt-0.5", levelColor)}>
         {t(LEVEL_LABEL[level])} {t("logging.slider.label")}

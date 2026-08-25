@@ -896,6 +896,11 @@ export type TranslationKey =
   | "zen.sound.whiteNoise.description"
   | "zen.sound.deepHum.label"
   | "zen.sound.deepHum.description"
+  | "zen.pause"
+  | "zen.resume"
+  | "zen.pausedAria"
+  | "zen.volumeAria"
+  | "zen.shortcutHint"
   | "narration.title"
   | "narration.explain"
   | "narration.stop"
@@ -2218,6 +2223,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "zen.sound.whiteNoise.description": "Steady static",
     "zen.sound.deepHum.label": "Deep Hum",
     "zen.sound.deepHum.description": "Low grounding tone",
+    "zen.pause": "Pause",
+    "zen.resume": "Resume",
+    "zen.pausedAria": "Breathing paused",
+    "zen.volumeAria": "Ambient sound volume",
+    "zen.shortcutHint": "Space to pause/resume \u00b7 Esc to exit",
     "narration.title": "Your patterns, in plain words",
     "narration.explain": "Explain this to me",
     "narration.stop": "Stop",
@@ -3553,6 +3563,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "zen.sound.whiteNoise.description": "همهمة ثابتة",
     "zen.sound.deepHum.label": "طنين عميق",
     "zen.sound.deepHum.description": "نغمة أرضية منخفضة",
+    "zen.pause": "إيقاف مؤقت",
+    "zen.resume": "استئناف",
+    "zen.pausedAria": "تم إيقاف التنفس مؤقتًا",
+    "zen.volumeAria": "مستوى الصوت المحيط",
+    "zen.shortcutHint": "مسافة للإيقاف المؤقت \u00b7 Esc للخروج",
     "narration.title": "أنماطك، بكلمات بسيطة",
     "narration.explain": "اشرح لي هذا",
     "narration.stop": "إيقاف",

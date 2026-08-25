@@ -106,7 +106,7 @@ export function MedicationTrackerCard() {
                     aria-hidden="true"
                   />
                   <span className="text-xs text-muted-foreground truncate">
-                    {med.nextDose}
+                    <bdi>{med.nextDose}</bdi>
                   </span>
                 </div>
               </div>
@@ -132,7 +132,7 @@ export function MedicationTrackerCard() {
             aria-hidden="true"
           />
           <span className="text-xs font-medium text-emerald-300">
-            {t("medication.nextDose")} {getNextCountdown(MEDICATIONS.find((m) => !taken.has(m.id))?.nextDose ?? MEDICATIONS[0].nextDose)}
+            {t("medication.nextDose")} <bdi>{getNextCountdown(MEDICATIONS.find((m) => !taken.has(m.id))?.nextDose ?? MEDICATIONS[0].nextDose)}</bdi>
           </span>
         </div>
       </div>

@@ -88,7 +88,7 @@ export function FaqSection() {
                 <Accordion.Header>
                   <Accordion.Trigger
                     className={cn(
-                      "group flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-[15px] font-semibold text-foreground outline-none transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6",
+                      "group flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-[15px] font-semibold text-foreground outline-none transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6",
                       "cursor-pointer select-none"
                     )}
                   >

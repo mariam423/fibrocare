@@ -179,7 +179,7 @@ export function BodyMapBento() {
             <div
               role="group"
               aria-label="Body view"
-              className="absolute right-0 top-0 flex flex-col gap-1"
+              className="absolute end-0 top-0 flex flex-col gap-1"
             >
               {(["front", "back"] as const).map((v) => (
                 <button

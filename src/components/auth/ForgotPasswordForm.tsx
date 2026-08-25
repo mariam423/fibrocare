@@ -131,8 +131,7 @@ export function ForgotPasswordForm() {
         {isPending ? (
           <>
             <HugeiconsIcon
-              icon={Loading01Icon}
-              className="mr-2 h-5 w-5 animate-spin"
+              icon={Loading01Icon}                className="ms-2 h-5 w-5 animate-spin"
               aria-hidden="true"
             />
             Sending...

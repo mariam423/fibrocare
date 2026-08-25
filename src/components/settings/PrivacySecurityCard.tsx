@@ -180,7 +180,7 @@ export function PrivacySecurityCard() {
               <span
                 className={cn(
                   "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all",
-                  analyticsOptOut ? "left-[22px]" : "left-0.5"
+                  analyticsOptOut ? "start-[22px]" : "start-0.5"
                 )}
               />
             </button>

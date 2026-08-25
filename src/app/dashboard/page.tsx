@@ -580,7 +580,7 @@ export default function Home() {
                       {t("dashboard.weekly.avgPain")}
                     </p>
                     <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-                      <CountUp value={weeklyAvg} decimals={1} duration={1000} />
+                      <bdi><CountUp value={weeklyAvg} decimals={1} duration={1000} /></bdi>
                       <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>
@@ -589,7 +589,7 @@ export default function Home() {
                       {t("dashboard.weekly.daysLogged")}
                     </p>
                     <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-                      <CountUp value={loggedDays} duration={800} />
+                      <bdi><CountUp value={loggedDays} duration={800} /></bdi>
                     </p>
                   </div>
                   <div className="rounded-2xl border border-border bg-muted/60 p-3 backdrop-blur-md">
@@ -597,7 +597,7 @@ export default function Home() {
                       {t("dashboard.weekly.highest")}
                     </p>
                     <p className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-                      <CountUp value={highestPain} duration={900} />
+                      <bdi><CountUp value={highestPain} duration={900} /></bdi>
                       <span className="ms-0.5 text-xs font-normal text-muted-foreground">{t("dashboard.weekly.scale")}</span>
                     </p>
                   </div>

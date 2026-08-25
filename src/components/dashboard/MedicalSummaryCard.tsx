@@ -172,7 +172,7 @@ export function MedicalSummaryCard() {
                     {t("medical.avgPain")}
                   </p>
                   <p className="mt-1 text-xl font-bold text-foreground">
-                    {summary.stats.avgPain.toFixed(1)}
+                    <bdi>{summary.stats.avgPain.toFixed(1)}</bdi>
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-muted/60 p-3 text-center backdrop-blur-md">
@@ -180,7 +180,7 @@ export function MedicalSummaryCard() {
                     {t("medical.flareDays")}
                   </p>
                   <p className="mt-1 text-xl font-bold text-foreground">
-                    {summary.stats.flareUpDays}
+                    <bdi>{summary.stats.flareUpDays}</bdi>
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-muted/60 p-3 text-center backdrop-blur-md">
@@ -188,7 +188,7 @@ export function MedicalSummaryCard() {
                     {t("medical.logs")}
                   </p>
                   <p className="mt-1 text-xl font-bold text-foreground">
-                    {summary.stats.totalLogs}
+                    <bdi>{summary.stats.totalLogs}</bdi>
                   </p>
                 </div>
               </div>

@@ -53,6 +53,7 @@ export function SoundscapeMixer({ disabled = false }: { disabled?: boolean }) {
     whiteNoise: false,
     deepHum: false,
   });
+  const [volume, setVolume] = useState(70);
 
   const sounds = useMemo(
     () =>
@@ -65,6 +66,7 @@ export function SoundscapeMixer({ disabled = false }: { disabled?: boolean }) {
   );
 
   const ctxRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
   const stopHandlers = useRef<Map<SoundId, () => void>>(new Map());
 
   useEffect(() => {
@@ -75,8 +77,21 @@ export function SoundscapeMixer({ disabled = false }: { disabled?: boolean }) {
       handlers.clear();
       void contextRef.current?.close().catch(() => undefined);
       contextRef.current = null;
+      masterGainRef.current = null;
     };
   }, []);
+
+  /** Shared master gain — the volume slider rides on this node, so every
+   *  active sound is previewed/adjusted together. */
+  const getMasterGain = (ctx: AudioContext): GainNode => {
+    if (!masterGainRef.current) {
+      const master = ctx.createGain();
+      master.gain.value = volume / 100;
+      master.connect(ctx.destination);
+      masterGainRef.current = master;
+    }
+    return masterGainRef.current;
+  };
 
   const getContext = (): AudioContext => {
     if (!ctxRef.current) {
@@ -164,7 +179,7 @@ const SOUND_BUILDERS: Record<
     const gain = ctx.createGain();
     const connections = SOUND_BUILDERS[id](ctx, gain);
 
-    gain.connect(ctx.destination);
+    gain.connect(getMasterGain(ctx));
     connections.forEach(({ source }) => source.start());
 
     const stop = () => {
@@ -198,6 +213,18 @@ const SOUND_BUILDERS: Record<
     }
   };
 
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = Number(e.target.value);
+    setVolume(next);
+    const ctx = ctxRef.current;
+    const master = masterGainRef.current;
+    if (ctx && master) {
+      master.gain.setValueAtTime(next / 100, ctx.currentTime);
+    }
+  };
+
+  const hasActiveSound = Object.values(activeSounds).some(Boolean);
+
   return (
     <div
       className="grid grid-cols-2 gap-4 w-full max-w-xs"
@@ -213,12 +240,13 @@ const SOUND_BUILDERS: Record<
               onClick={() => toggleSound(sound.id)}
               disabled={disabled}
               aria-pressed={active}
+              aria-label={sound.label}
               title={sound.description}
               className={cn(
-                "w-full flex-col gap-1 rounded-xl py-6 transition-all",
+                "w-full flex-col gap-1 rounded-xl py-6 transition-all duration-300",
                 active
-                  ? "bg-white/20 border-white/40 text-white"
-                  : "bg-transparent border-white/10 text-slate-400"
+                  ? "bg-emerald-500/10 border-emerald-500/80 text-emerald-100 shadow-[0_0_24px_-6px_rgba(16,185,129,0.55)]"
+                  : "bg-transparent border-white/10 text-slate-400 hover:border-white/25 hover:text-slate-200"
               )}
             >
               <span className="flex items-center gap-2">
@@ -244,6 +272,27 @@ const SOUND_BUILDERS: Record<
           </SpotlightCard>
         );
       })}
+
+      {/* Volume preview — appears once a sound is selected and drives the
+          shared master gain in real time. */}
+      {hasActiveSound && (
+        <div className="col-span-2 flex items-center gap-3 px-1 pt-1">
+          <HugeiconsIcon
+            icon={volume === 0 ? VolumeMute01Icon : VolumeUpIcon}
+            className="h-4 w-4 shrink-0 text-emerald-300/80"
+            aria-hidden="true"
+          />
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={volume}
+            onChange={handleVolumeChange}
+            aria-label={t("zen.volumeAria")}
+            className="w-full accent-emerald-500"
+          />
+        </div>
+      )}
     </div>
   );
 }

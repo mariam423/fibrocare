@@ -147,7 +147,7 @@ export function SpoonTrackerBento() {
               </div>
             </div>
             <span className="text-sm font-semibold tabular-nums min-w-[3ch] text-center text-card-foreground">
-              {spoons}
+              <bdi>{spoons}</bdi>
             </span>
             <button
               type="button"
@@ -178,8 +178,7 @@ export function SpoonTrackerBento() {
                   )}
                 >
                   <span className="text-[11px] opacity-70 leading-none">
-                    {preset.delta > 0 ? "+" : ""}
-                    {preset.delta}
+                    <bdi>{preset.delta > 0 ? "+" : ""}{preset.delta}</bdi>
                   </span>
                   <span className="text-[11px] leading-tight truncate w-full text-center">{t(preset.tKey)}</span>
                 </motion.button>

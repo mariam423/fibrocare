@@ -53,7 +53,7 @@ export function PasswordField({
           required
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
-          className="h-12 w-full rounded-xl px-4 pr-12 text-base md:text-base"
+          className="h-12 w-full rounded-xl px-4 pe-12 text-base md:text-base"
         />
         <button
           type="button"

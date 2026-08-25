@@ -40,7 +40,7 @@ export function FluidSlider({ value, onValueChange }: FluidSliderProps) {
           )}
           aria-live="polite"
         >
-          {level} / 10
+          <bdi>{level} / 10</bdi>
         </div>
       </div>
 

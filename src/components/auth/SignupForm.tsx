@@ -5,12 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Loading01Icon } from "@hugeicons/core-free-icons";
+import {
+  Loading01Icon,
+  UserIcon,
+  Stethoscope02Icon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Magnetic } from "@/components/ui/Magnetic";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { registerUser } from "@/app/actions";
+
+type SignupRole = "PATIENT" | "DOCTOR";
 
 export function SignupForm() {
   const router = useRouter();
@@ -18,6 +22,7 @@ export function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupRole, setSignupRole] = useState<SignupRole>("PATIENT");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -43,7 +48,12 @@ export function SignupForm() {
     }
 
     startTransition(async () => {
-      const result = await registerUser({ name, email, password });
+      const result = await registerUser({
+        name,
+        email,
+        password,
+        signupRole,
+      });
 
       if (!result.success) {
         setError(result.error);
@@ -62,13 +72,71 @@ export function SignupForm() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push(signupRole === "DOCTOR" ? "/pro/doctor" : "/dashboard");
       router.refresh();
     });
   };
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
+      {/* Role Selection */}
+      <div className="space-y-2" role="group" aria-label="I am a">
+        <span className="block text-base font-medium text-foreground">
+          I am a
+        </span>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setSignupRole("PATIENT")}
+            className={`group flex flex-col items-center gap-2 rounded-xl border-2 px-4 py-4 text-center transition-all duration-200 ${
+              signupRole === "PATIENT"
+                ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
+            }`}
+            aria-pressed={signupRole === "PATIENT"}
+          >
+            <HugeiconsIcon
+              icon={UserIcon}
+              className={`h-6 w-6 transition-colors ${
+                signupRole === "PATIENT"
+                  ? "text-primary"
+                  : "text-muted-foreground group-hover:text-primary/60"
+              }`}
+              aria-hidden="true"
+            />
+            <span className="text-sm font-semibold leading-tight">
+              مريض
+            </span>
+            <span className="text-xs text-muted-foreground">Patient</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSignupRole("DOCTOR")}
+            className={`group flex flex-col items-center gap-2 rounded-xl border-2 px-4 py-4 text-center transition-all duration-200 ${
+              signupRole === "DOCTOR"
+                ? "border-primary bg-primary/10 text-foreground shadow-sm"
+                : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
+            }`}
+            aria-pressed={signupRole === "DOCTOR"}
+          >
+            <HugeiconsIcon
+              icon={Stethoscope02Icon}
+              className={`h-6 w-6 transition-colors ${
+                signupRole === "DOCTOR"
+                  ? "text-primary"
+                  : "text-muted-foreground group-hover:text-primary/60"
+              }`}
+              aria-hidden="true"
+            />
+            <span className="text-sm font-semibold leading-tight">
+              طبيب
+            </span>
+            <span className="text-xs text-muted-foreground">Doctor</span>
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label
           htmlFor="name"
@@ -76,7 +144,7 @@ export function SignupForm() {
         >
           Name
         </label>
-        <Input
+        <input
           id="name"
           name="name"
           type="text"
@@ -86,7 +154,7 @@ export function SignupForm() {
           required
           aria-describedby={error ? "signup-error" : undefined}
           aria-invalid={error ? true : undefined}
-          className="h-12 w-full rounded-xl px-4 text-base md:text-base"
+          className="h-12 w-full rounded-xl border border-border bg-card px-4 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-3 focus-visible:ring-emerald-500/25 md:text-base"
         />
       </div>
 
@@ -97,7 +165,7 @@ export function SignupForm() {
         >
           Email address
         </label>
-        <Input
+        <input
           id="email"
           name="email"
           type="email"
@@ -107,7 +175,7 @@ export function SignupForm() {
           required
           aria-describedby={error ? "signup-error" : undefined}
           aria-invalid={error ? true : undefined}
-          className="h-12 w-full rounded-xl px-4 text-base md:text-base"
+          className="h-12 w-full rounded-xl border border-border bg-card px-4 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-3 focus-visible:ring-emerald-500/25 md:text-base"
         />
       </div>
 
@@ -146,26 +214,24 @@ export function SignupForm() {
         </p>
       )}
 
-      <Magnetic strength={0.12}>
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="h-12 w-full rounded-xl text-base font-semibold"
-        >
-          {isPending ? (
-            <>
-              <HugeiconsIcon
-                icon={Loading01Icon}
-                className="ms-2 h-5 w-5 animate-spin"
-                aria-hidden="true"
-              />
-              Creating your account...
-            </>
-          ) : (
-            "Create account"
-          )}
-        </Button>
-      </Magnetic>
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="h-12 w-full rounded-xl text-base font-semibold"
+      >
+        {isPending ? (
+          <>
+            <HugeiconsIcon
+              icon={Loading01Icon}
+              className="ms-2 h-5 w-5 animate-spin"
+              aria-hidden="true"
+            />
+            Creating your account...
+          </>
+        ) : (
+          "Create account"
+        )}
+      </Button>
 
       <p className="text-center text-base text-muted-foreground">
         Already have an account?{" "}

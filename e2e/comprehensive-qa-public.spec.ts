@@ -9,6 +9,10 @@ import { test, expect, type Page } from "@playwright/test";
 
 /** Switch the app to Arabic via the header toggle. */
 async function switchToArabic(page: Page) {
+  // Wait for the nav to hydrate before checking for the toggle button.
+  const nav = page.getByRole("navigation", { name: "Primary" });
+  await expect(nav).toBeVisible({ timeout: 30_000 });
+
   for (let attempt = 0; attempt < 5; attempt++) {
     const toggle = page.getByRole("button", { name: "Switch to Arabic" });
     if ((await toggle.count()) === 0) {
@@ -19,7 +23,8 @@ async function switchToArabic(page: Page) {
       await toggle.click({ timeout: 10_000 });
     } catch {
       await page.reload({ waitUntil: "domcontentloaded" });
-      await page.waitForTimeout(1500);
+      // Re-wait for hydration after reload
+      await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible({ timeout: 30_000 });
       continue;
     }
     try {
@@ -129,33 +134,31 @@ test.describe("Auth flows QA", () => {
 
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(
-      page.getByText("Please enter your email and password")
+      page.getByText("Please enter your email and password.")
     ).toBeVisible({ timeout: 10_000 });
   });
 
   test("signup validates name required", async ({ page }) => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
-    // Wait for hydration before clicking
     await page.waitForSelector("#name", { timeout: 20_000 });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     await page.getByRole("button", { name: "Create account" }).click();
-    await expect(page.getByText("Please enter your name")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Please enter your name.")).toBeVisible({ timeout: 10_000 });
   });
 
   test("signup validates password mismatch", async ({ page }) => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
-    // Wait for hydration before filling
     await page.waitForSelector("#name", { timeout: 20_000 });
-    await page.waitForTimeout(1000);
-    
+    await page.waitForTimeout(2000);
+
     await page.locator("#name").fill("Test User");
     await page.locator("#email").fill("test@example.com");
     await page.locator("#password").fill("password123");
     await page.locator("#confirm-password").fill("differentpassword");
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page.getByText("Passwords do not match")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Passwords do not match.")).toBeVisible({ timeout: 10_000 });
   });
 
   test("login links to signup and forgot-password", async ({ page }) => {

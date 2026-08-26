@@ -33,10 +33,12 @@ export async function registerUser(input: {
   name: string;
   email: string;
   password: string;
+  signupRole?: "PATIENT" | "DOCTOR";
 }): Promise<RegisterResult> {
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
   const password = input.password;
+  const signupRole = input.signupRole === "DOCTOR" ? "DOCTOR" : "PATIENT";
 
   if (name.length < 2) {
     return { success: false, error: "Please enter your name." };
@@ -57,7 +59,9 @@ export async function registerUser(input: {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({ data: { name, email, passwordHash } });
+  await prisma.user.create({
+    data: { name, email, passwordHash, signupRole },
+  });
 
   return { success: true };
 }

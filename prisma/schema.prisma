@@ -15,6 +15,7 @@ model User {
   name                 String
   email                String                @unique
   role                 String                @default("free_user")
+  signupRole           String                @default("PATIENT")
   hydrationCount       Int                   @default(0)
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @default(now()) @updatedAt

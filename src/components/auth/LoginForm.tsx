@@ -44,7 +44,22 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         return;
       }
 
-      router.push(callbackUrl);
+      let targetUrl = callbackUrl;
+
+      // Role-based redirect: override callbackUrl for default dashboard redirect
+      if (callbackUrl === "/dashboard") {
+        try {
+          const { getCurrentUser } = await import("@/app/actions");
+          const user = await getCurrentUser();
+          if (user?.signupRole === "DOCTOR") {
+            targetUrl = "/pro/doctor";
+          }
+        } catch {
+          // Fall back to default callbackUrl
+        }
+      }
+
+      router.push(targetUrl);
       router.refresh();
     });
   };

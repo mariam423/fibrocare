@@ -41,16 +41,16 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
         <div className="w-full max-w-5xl">
           <div className="grid grid-cols-1 overflow-hidden rounded-3xl ring-1 ring-border glass-surface lg:grid-cols-[1.05fr_1fr]">
             {/* Calm visual panel */}
-            <div className="relative hidden lg:block min-h-[560px]">
+            <div className="relative hidden lg:block h-full w-full overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1400&q=80"
-                alt="A calm, softly lit spa setting with candles and folded towels"
+                src="/images/resources/auth-banner.png"
+                alt="FibroCare wellness illustration"
                 fill
                 priority
                 sizes="(min-width: 1024px) 50vw, 0vw"
-                className="object-cover"
+                className="object-cover object-[25%_35%]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
               {/* Breathing sage glow, echoing the app's calm identity */}
               <div
@@ -58,10 +58,10 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
                 className="breathe-glow absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[color-mix(in_oklab,#86ac8c_30%,transparent)] blur-2xl"
               />
 
-              {/* Floating glass chips over the photo */}
+              {/* Floating glass chip over the photo */}
               <div
                 aria-hidden="true"
-                className="animate-float-soft absolute right-8 top-10"
+                className="animate-float-soft absolute right-8 top-10 z-10"
               >
                 <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur-md">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
@@ -78,27 +78,7 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
                 </div>
               </div>
 
-              <div
-                aria-hidden="true"
-                className="animate-float-soft absolute bottom-40 right-6"
-                style={{ animationDelay: "1.4s" }}
-              >
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur-md">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                    <HugeiconsIcon icon={Shield01Icon} className="h-4 w-4 text-white" />
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-white">
-                      Private by default
-                    </span>
-                    <span className="block text-[11px] text-white/70">
-                      encrypted, never sold
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              <figure className="absolute inset-x-0 bottom-0 p-8">
+              <figure className="absolute inset-x-0 bottom-0 z-10 p-8">
                 <blockquote className="max-w-sm text-lg italic leading-relaxed text-white drop-shadow-md">
                   &ldquo;You are not broken. You are learning to move at your
                   body&rsquo;s pace.&rdquo;

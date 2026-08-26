@@ -2,7 +2,8 @@
 
 /**
  * Feature-gating hook: resolves the user's role from their subscription and
- * answers `canUse(feature)` plus a ready-to-render Pro preview state.
+ * DB role, then answers `canUse(feature)` plus a ready-to-render Pro preview
+ * state.
  *
  * Server-side routes should use `assertPermission` from `@/lib/auth/rbac`
  * directly; this hook powers the client UX (preview banner + pricing modal)
@@ -10,7 +11,7 @@
  * back to the free tier, never to a broken state.
  */
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import {
   FREE_SUBSCRIPTION,
   isProActive,
@@ -23,6 +24,7 @@ import {
   type Permission,
   type UserRole,
 } from "@/lib/auth/rbac";
+import { getUserRole } from "@/app/pro/actions";
 
 export interface ProFeatureState {
   role: UserRole;
@@ -50,6 +52,22 @@ const readSubscription = (): Subscription => {
   return subscriptionSnapshot;
 };
 
+/**
+ * Resolve the effective client-side role. The subscription store can only
+ * produce `guest | free_user | pro_user`, so we also fetch the DB role
+ * once on mount to pick up `"doctor"`. The DB role wins when it's
+ * `"doctor"` because no subscription state can produce that value.
+ */
+function resolveRole(
+  signedIn: boolean,
+  subscription: Subscription,
+  dbRole: UserRole | null
+): UserRole {
+  if (!signedIn) return "guest";
+  if (dbRole === "doctor") return "doctor";
+  return isProActive(subscription) ? "pro_user" : "free_user";
+}
+
 export function useProFeature(signedIn = true): ProFeatureState {
   const subscription = useSyncExternalStore(
     emptySubscribe,
@@ -57,8 +75,17 @@ export function useProFeature(signedIn = true): ProFeatureState {
     () => FREE_SUBSCRIPTION
   );
 
+  const [dbRole, setDbRole] = useState<UserRole | null>(null);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    getUserRole().then((result) => {
+      if (result.success) setDbRole(result.role);
+    });
+  }, [signedIn]);
+
   const isPro = isProActive(subscription);
-  const role: UserRole = !signedIn ? "guest" : isPro ? "pro_user" : "free_user";
+  const role = resolveRole(signedIn, subscription, dbRole);
 
   const canUse = useCallback(
     (feature: Permission) => hasPermission(role, feature),

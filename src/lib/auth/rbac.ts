@@ -1,13 +1,15 @@
 /**
  * Role-Based Access Control.
  *
- * Three roles, checked on both the feature level (client gating UI) and the
+ * Four roles, checked on both the feature level (client gating UI) and the
  * data level (server routes can call `assertPermission` before serving):
  *
  *   guest     — signed out: public content only.
  *   free_user — signed in: logging, dashboard, somatic toolkit, offline mode.
  *   pro_user  — signed in + active subscription: adds the AI-heavy and
  *               export features.
+ *   doctor    — verified medical professional: publishing content and
+ *               managing patient consultations.
  *
  * Health data itself (logs, symptoms) is never gated behind Pro: a patient
  * must always be able to read and record their own data. Pro gates only
@@ -16,7 +18,7 @@
 
 import { z } from "zod";
 
-export const userRoleSchema = z.enum(["guest", "free_user", "pro_user"]);
+export const userRoleSchema = z.enum(["guest", "free_user", "pro_user", "doctor"]);
 export type UserRole = z.infer<typeof userRoleSchema>;
 
 export const PERMISSIONS = [
@@ -28,6 +30,11 @@ export const PERMISSIONS = [
   "reports:pdf-export", // clinical PDF export
   "predictor:time-series", // weather/flare predictor
   "video:masterclasses", // guided video masterclasses
+  "doctor:publish", // publish articles and tips
+  "doctor:consultation", // manage patient consultations
+  "consultation:read", // read consultation threads
+  "consultation:write", // send messages in consultations
+  "consultation:ai-copilot", // access AI clinical copilot features
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -48,6 +55,24 @@ const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     "reports:pdf-export",
     "predictor:time-series",
     "video:masterclasses",
+    "consultation:read",
+    "consultation:write",
+    "consultation:ai-copilot",
+  ],
+  doctor: [
+    "health-data:read",
+    "health-data:write",
+    "toolkit:use",
+    "ai:companion",
+    "reports:clinical-brief",
+    "reports:pdf-export",
+    "predictor:time-series",
+    "video:masterclasses",
+    "doctor:publish",
+    "doctor:consultation",
+    "consultation:read",
+    "consultation:write",
+    "consultation:ai-copilot",
   ],
 };
 
@@ -58,6 +83,9 @@ export const PRO_FEATURES: Permission[] = [
   "reports:pdf-export",
   "predictor:time-series",
   "video:masterclasses",
+  "consultation:read",
+  "consultation:write",
+  "consultation:ai-copilot",
 ];
 
 export function roleFromSchemaValue(raw: unknown): UserRole {

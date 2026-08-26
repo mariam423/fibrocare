@@ -29,6 +29,9 @@ const PRO_PERKS_KEYS = [
   "pricing.pro.perk2",
   "pricing.pro.perk3",
   "pricing.pro.perk4",
+  "pricing.pro.perk5",
+  "pricing.pro.perk6",
+  "pricing.pro.perk7",
 ] as const;
 
 export interface PricingModalProps {

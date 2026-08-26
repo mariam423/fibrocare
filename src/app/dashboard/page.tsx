@@ -1,6 +1,6 @@
 "use client";
 import { ChartAreaIcon } from "@hugeicons/core-free-icons";
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -12,6 +12,11 @@ import {
   FireIcon,
   HandHelpingIcon,
   PlaySquareIcon,
+  Stethoscope02Icon,
+  Chatting01Icon,
+  AiMagicIcon,
+  ArrowRight01Icon,
+  FlashIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -41,6 +46,8 @@ import { RecentLogsWidget } from "@/components/dashboard/RecentLogsWidget";
 import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
 import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
 import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
+import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
+import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
@@ -52,7 +59,9 @@ import { EmpatheticToast } from "@/components/ui/EmpatheticToast";
 import { RecoveryPanel } from "@/components/support/RecoveryCards";
 import FlareEmergencyMode from "@/components/dashboard/FlareEmergencyMode";
 import AppHeader from "@/components/layout/AppHeader";
+import { AiStatusBadge } from "@/components/ai/AiStatusBadge";
 import { useDashboard } from "@/hooks/useDashboard";
+import { useProFeature } from "@/hooks/useProFeature";
 import { useMotionEnabled } from "@/hooks/useMotionEnabled";
 import type { PainTrendPoint } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -142,7 +151,28 @@ export default function Home() {
     recentLogs,
   } = useDashboard();
 
+  const { isPro } = useProFeature();
+
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const [loggingPreset, setLoggingPreset] = useState<string | null>(null);
+  const [doctorPosts, setDoctorPosts] = useState<
+    { id: string; title: string; content: string; tags: string; verifiedStatus: string; createdAt: Date | string; author: { id: string; name: string | null } }[]
+  >([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+
+  useEffect(() => {
+    import("@/app/pro/actions").then(({ getDoctorPosts }) => {
+      getDoctorPosts({ status: "verified", limit: 3 }).then((r) => {
+        setDoctorPosts(r.success ? (r.data ?? []) : []);
+        setLoadingPosts(false);
+      });
+    });
+  }, []);
 
   const handlePresetSelect = async (preset: Preset) => {
     setLocalPainLevel([preset.painLevel]);
@@ -217,7 +247,7 @@ export default function Home() {
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
                 <WordReveal
                   as="span"
-                  text={`${getTimeGreeting(t)},`}
+                  text={mounted ? `${getTimeGreeting(t)},` : `${t("dashboard.greeting.morning")},`}
                   amount={0.6}
                 />{" "}
                 <WordReveal
@@ -231,15 +261,15 @@ export default function Home() {
               </h1>
               <WordReveal
                 as="p"
-                text={`${getTodayLabel(locale)}. ${t("dashboard.todayMessage")}`}
-                className="mt-1 text-lg text-muted-foreground"
+                text={mounted ? `${getTodayLabel(locale)}. ${t("dashboard.todayMessage")}` : `${t("dashboard.todayMessage")}`}
+                className="mt-1 text-lg text-slate-500 dark:text-emerald-200/70"
                 delay={0.08}
                 amount={0.6}
               />
             </div>
             {streak > 0 && (
               <div
-                className="flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400 backdrop-blur-sm sm:self-auto"
+                className="flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-600/20 dark:border-emerald-400/25 bg-emerald-600/10 dark:bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 backdrop-blur-sm sm:self-auto"
                 aria-label={t("dashboard.streakAria", { count: streak })}
               >
                 <HugeiconsIcon icon={FireIcon} className="h-4 w-4" aria-hidden="true" />
@@ -249,13 +279,16 @@ export default function Home() {
                 </span>
               </div>
             )}
+            <div className="shrink-0 self-start sm:self-auto">
+              <AiStatusBadge />
+            </div>
           </div>
         </ScrollReveal>
         </motion.div>
 
         {/* ── Today ──────────────────────────────────── */}
         <ScrollReveal as="section" className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
             {t("dashboard.section.today")}
           </h2>
         </ScrollReveal>
@@ -458,7 +491,7 @@ export default function Home() {
 
         {/* ── Core Tools ─────────────────────────────── */}
         <ScrollReveal as="section" className="space-y-5 pt-2">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
             {t("dashboard.section.core")}
           </h2>
         </ScrollReveal>
@@ -481,7 +514,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <span className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform group-hover:-translate-y-0.5">
+              <span className="rounded-xl bg-emerald-600 dark:bg-emerald-500 px-4 py-2 text-sm font-bold text-white dark:text-slate-950 shadow-md dark:shadow-lg shadow-emerald-900/10 dark:shadow-emerald-500/20 transition-transform group-hover:-translate-y-0.5">
                 {t("dashboard.toolkitCard.cta")}
               </span>
             </div>
@@ -518,6 +551,153 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ── Pro: Doctors & Consultations ─────────────── */}
+        <ScrollReveal as="section" className="space-y-5 pt-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
+                {t("dashboard.pro.title")}
+              </h2>
+              {!isPro && (
+                <Link
+                  href="/pro"
+                  className="inline-flex items-center gap-1 rounded-full border border-emerald-600/30 dark:border-emerald-400/40 bg-emerald-600/10 dark:bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 transition-colors hover:bg-emerald-600/20 dark:hover:bg-emerald-500/25"
+                >
+                  <HugeiconsIcon icon={FlashIcon} className="h-2.5 w-2.5" aria-hidden="true" />
+                  {t("dashboard.pro.badgeText")}
+                </Link>
+              )}
+            </div>
+            <Link
+              href="/pro"
+              className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline"
+            >
+              {t("dashboard.pro.viewAll")}
+              <HugeiconsIcon icon={ArrowRight01Icon} className="h-3 w-3" aria-hidden="true" />
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        {/* Quick-action buttons */}
+        <ScrollReveal delay={0.05}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link href="/pro/doctor" className="group block">
+              <Card className="h-full transition-colors group-hover:bg-muted/50">
+                <CardContent className="flex items-center gap-4 py-5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                    <HugeiconsIcon icon={Stethoscope02Icon} className="h-6 w-6 text-primary" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.browseDoctors")}</p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70 line-clamp-1">{t("dashboard.pro.subtitle")}</p>
+                  </div>
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 shrink-0 text-slate-400 dark:text-emerald-200/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" aria-hidden="true" />
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/pro/consultations" className="group block">
+              <Card className="h-full transition-colors group-hover:bg-muted/50">
+                <CardContent className="flex items-center gap-4 py-5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                    <HugeiconsIcon icon={Chatting01Icon} className="h-6 w-6 text-primary" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.startConsultation")}</p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70 line-clamp-1">{t("consultation.symptomHelperDescription")}</p>
+                  </div>
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 shrink-0 text-slate-400 dark:text-emerald-200/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" aria-hidden="true" />
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Doctor Feed preview */}
+          <ScrollReveal delay={0.05}>
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <HugeiconsIcon icon={Stethoscope02Icon} className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <CardTitle className="text-base">{t("dashboard.pro.doctorFeed")}</CardTitle>
+                  </div>
+                  <Link
+                    href="/pro/doctor"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline"
+                  >
+                    {t("dashboard.pro.viewAll")}
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="h-3 w-3" aria-hidden="true" />
+                  </Link>
+                </div>
+                <CardDescription className="text-xs">
+                  {t("dashboard.pro.subtitle")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingPosts ? (
+                  <div className="flex items-center justify-center py-8">
+                    <HugeiconsIcon icon={Loading01Icon} className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : doctorPosts.length > 0 ? (
+                  <div className="space-y-3">
+                    {doctorPosts.map((post) => (
+                      <Link key={post.id} href="/pro/doctor" className="block group">
+                        <div className="rounded-xl border border-border p-3 transition-colors group-hover:bg-muted/50">
+                          <p className="text-sm font-medium line-clamp-1">{post.title}</p>
+                          <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{post.content}</p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-[11px] text-muted-foreground">{post.author.name ?? "Doctor"}</span>
+                            {post.tags && (
+                              <span className="text-[10px] rounded-full bg-primary/10 px-1.5 py-0.5 text-primary font-medium">
+                                {post.tags.split(",")[0]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center py-8">{t("doctor.noPosts")}</p>
+                )}
+              </CardContent>
+            </Card>
+          </ScrollReveal>
+
+          {/* AI Symptom Helper preview */}
+          <ScrollReveal delay={0.1}>
+            <Card className="h-full">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <HugeiconsIcon icon={AiMagicIcon} className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <CardTitle className="text-base">{t("dashboard.pro.symptomHelper")}</CardTitle>
+                  </div>
+                  <Link
+                    href="/pro/consultations"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline"
+                  >
+                    {t("dashboard.pro.viewAll")}
+                    <HugeiconsIcon icon={ArrowRight01Icon} className="h-3 w-3" aria-hidden="true" />
+                  </Link>
+                </div>
+                <CardDescription className="text-xs">
+                  {t("consultation.symptomHelperDescription")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PatientAssistant
+                  consultationId=""
+                  onStructured={() => {
+                    router.push("/pro/consultations/new");
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </ScrollReveal>
+        </div>
+
         {/* Gentle Support - full-width recovery tools */}
         <ScrollReveal as="section" className="space-y-4 overflow-visible" delay={0.05}>
           <div className="flex items-center gap-3">
@@ -549,7 +729,7 @@ export default function Home() {
 
         {/* ── Insights & Gentle Support ─────────────── */}
         <ScrollReveal as="section" className="space-y-5 pt-2">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
             {t("dashboard.section.insights")}
           </h2>
         </ScrollReveal>

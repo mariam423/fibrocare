@@ -133,11 +133,11 @@ function BodySilhouette({ view }: { view: BodyView }) {
   );
 }
 
-const PAIN_LEGEND = [
-  { label: "Mobility", color: "bg-teal-400", shadow: "shadow-[0_0_6px_rgba(45,212,191,0.5)]" },
-  { label: "Joints", color: "bg-yellow-400", shadow: "shadow-[0_0_6px_rgba(250,204,21,0.5)]" },
-  { label: "Muscles", color: "bg-orange-400", shadow: "shadow-[0_0_6px_rgba(251,146,60,0.5)]" },
-  { label: "Groups", color: "bg-emerald-800", shadow: "shadow-[0_0_6px_rgba(6,95,70,0.5)]" },
+const PAIN_LEGEND_KEYS = [
+  { tKey: "bodyMap.mobility" as const, color: "bg-teal-400", shadow: "shadow-[0_0_6px_rgba(45,212,191,0.5)]" },
+  { tKey: "bodyMap.joints" as const, color: "bg-yellow-400", shadow: "shadow-[0_0_6px_rgba(250,204,21,0.5)]" },
+  { tKey: "bodyMap.muscles" as const, color: "bg-orange-400", shadow: "shadow-[0_0_6px_rgba(251,146,60,0.5)]" },
+  { tKey: "bodyMap.groups" as const, color: "bg-emerald-800", shadow: "shadow-[0_0_6px_rgba(6,95,70,0.5)]" },
 ];
 
 export function BodyMapBento() {
@@ -188,13 +188,13 @@ export function BodyMapBento() {
                   onClick={() => setView(v)}
                   aria-pressed={view === v}
                   className={cn(
-                    "rounded-full border px-2 py-0.5 text-[10px] font-medium capitalize transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50 focus-visible:ring-offset-1",
+                    "rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50 focus-visible:ring-offset-1",
                     view === v
                       ? "border-teal-400/40 bg-teal-500/20 text-teal-200"
                       : "border-border/60 bg-transparent text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {v}
+                  {t(`bodyMap.${v}` as const)}
                 </button>
               ))}
             </div>
@@ -304,10 +304,10 @@ export function BodyMapBento() {
 
           {/* Pain legend */}
           <div className="flex items-center justify-center gap-4 pt-1">
-            {PAIN_LEGEND.map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
+            {PAIN_LEGEND_KEYS.map((item) => (
+              <div key={item.tKey} className="flex items-center gap-1.5">
                 <span className={cn("h-2 w-2 rounded-full", item.color, item.shadow)} />
-                <span className="text-[11px] text-muted-foreground font-medium">{item.label}</span>
+                <span className="text-[11px] text-muted-foreground font-medium">{t(item.tKey)}</span>
               </div>
             ))}
           </div>

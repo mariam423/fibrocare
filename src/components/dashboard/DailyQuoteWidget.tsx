@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { QuotesIcon } from "@hugeicons/core-free-icons";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,10 +25,12 @@ const DAILY_QUOTE_KEYS: TranslationKey[] = [
 
 export function DailyQuoteWidget() {
   const { t } = useLanguage();
-  const [quoteKey] = useState<TranslationKey>(() => {
+  const [quoteKey, setQuoteKey] = useState<TranslationKey>(DAILY_QUOTE_KEYS[0]);
+
+  useEffect(() => {
     const dayIndex = Math.floor(Date.now() / 86_400_000);
-    return DAILY_QUOTE_KEYS[dayIndex % DAILY_QUOTE_KEYS.length];
-  });
+    setQuoteKey(DAILY_QUOTE_KEYS[dayIndex % DAILY_QUOTE_KEYS.length]);
+  }, []);
 
   return (
     <DepthCard tilt={3} delay={0.12} float>

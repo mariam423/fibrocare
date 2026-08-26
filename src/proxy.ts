@@ -21,6 +21,7 @@ const PROTECTED_PREFIXES = [
   "/reports",
   "/profile",
   "/toolkit",
+  "/pro",
 ];
 
 function isProtectedPath(pathname: string): boolean {

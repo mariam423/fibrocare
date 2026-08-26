@@ -11,17 +11,22 @@ datasource db {
 }
 
 model User {
-  id             String               @id @default(cuid())
-  name           String
-  email          String               @unique
-  hydrationCount Int                  @default(0)
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @default(now()) @updatedAt
-  passwordHash   String?
-  logs           PainLog[]
-  resetTokens    PasswordResetToken[]
-  sessions       Session[]
-  symptomLogs    SymptomLog[]
+  id                   String                @id @default(cuid())
+  name                 String
+  email                String                @unique
+  role                 String                @default("free_user")
+  hydrationCount       Int                   @default(0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @default(now()) @updatedAt
+  passwordHash         String?
+  logs                 PainLog[]
+  resetTokens          PasswordResetToken[]
+  sessions             Session[]
+  symptomLogs          SymptomLog[]
+  doctorPosts          DoctorPost[]
+  patientConsultations Consultation[]        @relation("PatientConsultations")
+  doctorConsultations  Consultation[]        @relation("DoctorConsultations")
+  sentMessages         ConsultationMessage[]
 }
 
 /// Provider-agnostic billing state written by the webhook route
@@ -83,4 +88,49 @@ model SymptomLog {
   @@unique([userId, symptom, date])
   @@index([userId, date])
   @@index([symptom])
+}
+
+model DoctorPost {
+  id             String   @id @default(cuid())
+  title          String
+  content        String
+  tags           String   @default("")
+  verifiedStatus String   @default("pending")
+  authorId       String
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([verifiedStatus])
+}
+
+model Consultation {
+  id        String                @id @default(cuid())
+  patientId String
+  doctorId  String
+  subject   String
+  status    String                @default("open")
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  patient   User                  @relation("PatientConsultations", fields: [patientId], references: [id], onDelete: Cascade)
+  doctor    User                  @relation("DoctorConsultations", fields: [doctorId], references: [id], onDelete: Cascade)
+  messages  ConsultationMessage[]
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+}
+
+model ConsultationMessage {
+  id             String       @id @default(cuid())
+  consultationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+  consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([senderId])
 }

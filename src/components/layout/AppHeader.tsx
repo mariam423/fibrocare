@@ -14,9 +14,7 @@ import {
   LanguageCircleIcon,
   FlashIcon,
 } from "@hugeicons/core-free-icons";
-import { PricingModal } from "@/components/pricing/PricingModal";
 import { Button } from "@/components/ui/button";
-import { AiStatusBadge } from "@/components/ai/AiStatusBadge";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useHealth } from "@/context/HealthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -32,12 +30,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
   const { locale, setLocale, t } = useLanguage();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [pricingOpen, setPricingOpen] = useState(false);
 
-  // Close the mobile menu whenever the route changes — done by comparing
-  // with the previously rendered pathname during render (the React docs'
-  // "storing information from previous renders" pattern) instead of an
-  // effect, so no extra render pass is scheduled.
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
@@ -46,26 +39,26 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
 
   const NAV_LINKS = [
     { href: "/dashboard", label: t("nav.dashboard") },
-    { href: "/toolkit", label: t("nav.toolkit") },
-    { href: "/health-logs", label: t("nav.healthLogs") },
+    { href: "/pro/doctor", label: t("nav.doctorHub") },
+    { href: "/pro/consultations", label: t("nav.consultations") },
     { href: "/profile", label: t("nav.profile") },
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 inset-x-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-emerald-500/10">
       <div className="container mx-auto flex h-16 items-center justify-between px-6 sm:px-8 lg:px-12 max-w-6xl">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10">
             <HugeiconsIcon
               icon={HeartIcon}
-              className="h-5 w-5 text-emerald-400"
+              className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
               aria-hidden="true"
             />
           </div>
           <Link
             href="/dashboard"
-            className="text-xl font-semibold tracking-tight text-foreground whitespace-nowrap"
+            className="text-xl font-semibold tracking-tight text-slate-900 dark:text-foreground whitespace-nowrap"
           >
             FibroCare
           </Link>
@@ -88,7 +81,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
             </Button>
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-muted-foreground transition-colors hover:text-slate-900 dark:hover:text-foreground hover:bg-muted"
             >
               <HugeiconsIcon
                 icon={ArrowLeft01Icon}
@@ -101,7 +94,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
         ) : (
           <>
             <nav
-              className="hidden md:flex items-center gap-1 text-base font-medium text-muted-foreground"
+              className="hidden md:flex items-center gap-1 text-base font-medium text-slate-600 dark:text-slate-300"
               aria-label="Primary"
             >
               {NAV_LINKS.map((link) => (
@@ -109,7 +102,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "inline-flex items-center rounded-lg px-3 py-2 transition-colors hover:text-foreground hover:bg-muted",
+                    "inline-flex items-center rounded-lg px-3 py-2 transition-colors hover:text-slate-900 dark:hover:text-foreground hover:bg-muted",
                     pathname === link.href &&
                       "bg-primary/10 text-primary font-semibold"
                   )}
@@ -120,28 +113,16 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
               ))}
             </nav>
 
-            <div className="flex items-center gap-1.5">
-              <span className="hidden sm:inline-flex">
-                <AiStatusBadge />
-              </span>
-
+            <div className="flex items-center gap-3 shrink-0">
               {/* FibroCare Pro */}
-              <button
-                type="button"
-                onClick={() => setPricingOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                aria-haspopup="dialog"
+              <Link
+                href="/pro"
+                className="hidden sm:inline-flex items-center gap-1 rounded-full border border-emerald-600/30 dark:border-emerald-400/40 bg-emerald-600/10 dark:bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 transition-colors hover:bg-emerald-600/20 dark:hover:bg-emerald-500/25"
               >
                 <HugeiconsIcon icon={FlashIcon} className="h-3.5 w-3.5" aria-hidden="true" />
-                {t("pricing.pro.badge")}
-              </button>
-              <PricingModal
-                open={pricingOpen}
-                onClose={() => setPricingOpen(false)}
-                checkoutUrl={process.env.NEXT_PUBLIC_CHECKOUT_URL}
-              />
+                {t("nav.upgradePro")}
+              </Link>
 
-              {/* Smart Notification Center — bell + unread badge */}
               <NotificationBell />
 
               <Button
@@ -152,7 +133,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
               >
                 <HugeiconsIcon
                   icon={LanguageCircleIcon}
-                  className="h-5 w-5 text-muted-foreground"
+                  className="h-5 w-5 text-slate-500 dark:text-muted-foreground"
                   aria-hidden="true"
                 />
               </Button>
@@ -172,7 +153,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
                 ) : (
                   <HugeiconsIcon
                     icon={Moon02Icon}
-                    className="h-5 w-5 text-primary"
+                    className="h-5 w-5 text-slate-600"
                     aria-hidden="true"
                   />
                 )}
@@ -204,7 +185,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
       >
         <div className="overflow-hidden">
           <nav
-            className="flex flex-col gap-1 px-6 pb-3 pt-2 sm:px-8 lg:px-12 bg-background/95 backdrop-blur-xl"
+            className="flex flex-col gap-1 px-6 pb-3 pt-2 sm:px-8 lg:px-12 bg-white/95 dark:bg-background/95 backdrop-blur-xl"
             aria-label="Mobile"
           >
             {NAV_LINKS.map((link) => (
@@ -221,6 +202,14 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/pro"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-emerald-700 dark:text-emerald-300 transition-colors hover:bg-emerald-600/10 dark:hover:bg-emerald-500/10"
+            >
+              <HugeiconsIcon icon={FlashIcon} className="h-4 w-4" aria-hidden="true" />
+              {t("nav.upgradePro")}
+            </Link>
           </nav>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -69,7 +70,7 @@ function CheckInMockup({
   ];
 
   return (
-    <div className="surface-crisp glow-card relative overflow-hidden rounded-[2rem] shadow-beautiful-lg">
+    <div className="surface-crisp glow-card relative overflow-hidden rounded-[2rem] shadow-beautiful-lg bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-emerald-500/20">
       {/* Window chrome */}
       <div className="flex items-center gap-1.5 border-b border-border/60 px-5 py-4">
         <span className="h-2.5 w-2.5 rounded-full bg-foreground/15" aria-hidden="true" />
@@ -97,7 +98,7 @@ function CheckInMockup({
             <p className="text-sm font-semibold text-foreground sm:text-base">
               {t("landing.hero.checkinTitle")}
             </p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70">
               {t("landing.hero.mockupSub")}
             </p>
           </div>
@@ -109,7 +110,7 @@ function CheckInMockup({
         <div className="mt-5 space-y-3.5">
           {rows.map((row) => (
             <div key={row.label} className="flex items-center gap-3">
-              <span className="w-16 text-xs font-medium text-muted-foreground">
+              <span className="w-16 text-xs font-medium text-slate-600 dark:text-emerald-200/80">
                 {row.label}
               </span>
               <div
@@ -171,87 +172,115 @@ export function LandingHero() {
         variants={heroContainer}
         className="relative z-50 mx-auto max-w-6xl"
       >
-        {/* Centered headline block */}
-        <div className="mx-auto max-w-3xl text-center">
-          <motion.div variants={heroItem}>
-            <span className="group inline-flex items-center gap-2 rounded-full border border-primary/15 bg-background/60 px-3.5 py-1.5 text-[13px] font-medium text-primary backdrop-blur-sm transition-all duration-300 hover:border-primary/25 hover:bg-primary/10 hover:shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--primary)_45%,transparent)] dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-              <HugeiconsIcon icon={HeartPulseIcon} className="h-4 w-4" aria-hidden="true" />
-              {t("landing.hero.badge")}
-            </span>
-          </motion.div>
+        {/* 2-column: Text + Image */}
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8 md:gap-12">
+          {/* Column 1 — Text & CTAs */}
+          <div className="text-center md:text-start">
+            <motion.div variants={heroItem}>
+              <span className="group inline-flex items-center gap-2 rounded-full border border-primary/15 bg-background/60 px-3.5 py-1.5 text-[13px] font-medium text-primary backdrop-blur-sm transition-all duration-300 hover:border-primary/25 hover:bg-primary/10 hover:shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--primary)_45%,transparent)] dark:bg-background/40 dark:backdrop-blur-xl dark:hover:border-emerald-400/30 dark:hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                <HugeiconsIcon icon={HeartPulseIcon} className="h-4 w-4" aria-hidden="true" />
+                {t("landing.hero.badge")}
+              </span>
+            </motion.div>
 
-          <motion.h1
-            id="hero-heading"
-            variants={heroHeading}
-            className="mx-auto mt-7 max-w-[17ch] text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
-          >
-            <MaskedReveal
-              text={t("landing.hero.heading")}
-              wordClassName="hero-heading-gradient"
-              stagger={0.07}
-            />
-          </motion.h1>
+            <motion.h1
+              id="hero-heading"
+              variants={heroHeading}
+              className="mx-auto mt-7 max-w-[17ch] text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl md:mx-0"
+            >
+              <MaskedReveal
+                text={t("landing.hero.heading")}
+                wordClassName="hero-heading-gradient"
+                stagger={0.07}
+              />
+            </motion.h1>
 
-          <motion.p
+            <motion.p
+              variants={heroItem}
+              className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-200/90 sm:text-lg md:mx-0"
+            >
+              {t("landing.hero.subheading")}
+            </motion.p>
+
+            <motion.div variants={heroItem}>
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                <Magnetic strength={0.15} hoverScale={1.02} tapScale={0.97}>
+                  <Button
+                    size="lg"
+                    nativeButton={false}
+                    className="rounded-full px-7 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold shadow-md dark:shadow-lg shadow-emerald-900/10 dark:shadow-emerald-500/20 transition-all"
+                    render={<Link href="/signup" />}
+                  >
+                    {t("landing.start")}
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      data-icon="inline-end"
+                      className="rtl:scale-x-[-1]"
+                      aria-hidden="true"
+                    />
+                  </Button>
+                </Magnetic>
+                <Pressable hoverScale={1.02} tapScale={0.97} className="rounded-full">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    nativeButton={false}
+                    className="rounded-full surface-crisp border-transparent"
+                    render={<a href="#how" />}
+                  >
+                    {t("landing.hero.seeHow")}
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
+                      data-icon="inline-end"
+                      className="rtl:scale-y-[-1]"
+                      aria-hidden="true"
+                    />
+                  </Button>
+                </Pressable>
+              </div>
+            </motion.div>
+
+            <motion.ul
+              variants={heroItem}
+              className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:justify-start"
+            >
+              {PROOF_ITEMS.map((item) => (
+                <li key={item} className="flex items-center gap-1.5 text-[13px] text-slate-500 dark:text-slate-200/80">
+                  <HugeiconsIcon
+                    icon={CheckmarkCircle01Icon}
+                    className="h-3.5 w-3.5 text-primary/70"
+                    aria-hidden="true"
+                  />
+                  {t(item)}
+                </li>
+              ))}
+            </motion.ul>
+          </div>
+
+          {/* Column 2 — Visual Asset */}
+          <motion.div
             variants={heroItem}
-            className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+            className="flex items-center justify-center"
           >
-            {t("landing.hero.subheading")}
-          </motion.p>
-
-          <motion.div variants={heroItem}>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <Magnetic strength={0.15} hoverScale={1.02} tapScale={0.97}>
-                <Button
-                  size="lg"
-                  nativeButton={false}
-                  className="rounded-full px-7"
-                  render={<Link href="/signup" />}
-                >
-                  {t("landing.start")}
-                  <HugeiconsIcon
-                    icon={ArrowRight01Icon}
-                    data-icon="inline-end"
-                    className="rtl:scale-x-[-1]"
-                    aria-hidden="true"
-                  />
-                </Button>
-              </Magnetic>
-              <Pressable hoverScale={1.02} tapScale={0.97} className="rounded-full">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  nativeButton={false}
-                  className="rounded-full surface-crisp border-transparent"
-                  render={<a href="#how" />}
-                >
-                  {t("landing.hero.seeHow")}
-                  <HugeiconsIcon
-                    icon={ArrowDown01Icon}
-                    data-icon="inline-end"
-                    className="rtl:scale-y-[-1]"
-                    aria-hidden="true"
-                  />
-                </Button>
-              </Pressable>
+            <div className="relative animate-float-soft">
+              {/* Background glow */}
+              <div
+                aria-hidden="true"
+                className="absolute -inset-4 rounded-full bg-emerald-500/5 dark:bg-emerald-500/8 blur-3xl pointer-events-none -z-10"
+              />
+              {/* Glassmorphic card */}
+              <div className="relative p-4 rounded-3xl bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-emerald-500/20 shadow-sm shadow-emerald-900/5 dark:shadow-[0_0_50px_-12px_rgba(16,185,129,0.25)] backdrop-blur-md">
+                <Image
+                  src="/images/resources/fibromyalgia-pain-points.png"
+                  alt="Fibromyalgia pain points illustration showing areas of the body commonly affected"
+                  width={512}
+                  height={512}
+                  priority
+                  className="object-contain drop-shadow-xl max-h-[380px] w-auto mx-auto"
+                />
+              </div>
             </div>
           </motion.div>
-
-          <motion.ul
-            variants={heroItem}
-            className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
-          >
-            {PROOF_ITEMS.map((item) => (
-              <li key={item} className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-                <HugeiconsIcon
-                  icon={CheckmarkCircle01Icon}
-                  className="h-3.5 w-3.5 text-primary/70"
-                  aria-hidden="true"
-                />
-                {t(item)}
-              </li>
-            ))}
-          </motion.ul>
         </div>
 
         {/* Product mockup floating over the front hill */}
@@ -272,7 +301,7 @@ export function LandingHero() {
                         <span className="block text-sm font-semibold text-foreground">
                           {t("landing.hero.minutes")}
                         </span>
-                        <span className="block text-[11px] text-muted-foreground">
+                        <span className="block text-[11px] text-slate-500 dark:text-emerald-200/70">
                           {t("landing.hero.daily")}
                         </span>
                       </span>
@@ -292,7 +321,7 @@ export function LandingHero() {
                         <span className="block text-sm font-semibold text-foreground">
                           {t("landing.hero.doctorReady")}
                         </span>
-                        <span className="block text-[11px] text-muted-foreground">
+                        <span className="block text-[11px] text-slate-500 dark:text-emerald-200/70">
                           {t("landing.hero.pdf")}
                         </span>
                       </span>

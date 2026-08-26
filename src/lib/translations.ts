@@ -12,6 +12,9 @@ export type TranslationKey =
   | "nav.profile"  | "nav.toolkit"
 
   | "nav.backToDashboard"
+  | "nav.doctorHub"
+  | "nav.consultations"
+  | "nav.upgradePro"
   | "nav.language"
   | "nav.switchToArabic"
   | "nav.switchToEnglish"
@@ -480,6 +483,15 @@ export type TranslationKey =
   | "dashboard.streakAria"
   | "dashboard.section.today"
   | "dashboard.section.core"
+  | "dashboard.section.pro"
+  | "dashboard.pro.title"
+  | "dashboard.pro.subtitle"
+  | "dashboard.pro.doctorFeed"
+  | "dashboard.pro.symptomHelper"
+  | "dashboard.pro.viewAll"
+  | "dashboard.pro.browseDoctors"
+  | "dashboard.pro.startConsultation"
+  | "dashboard.pro.badgeText"
   | "dashboard.section.insights"
   | "dashboard.toolkitCard.title"
   | "dashboard.toolkitCard.desc"
@@ -541,6 +553,9 @@ export type TranslationKey =
   | "pricing.pro.perk2"
   | "pricing.pro.perk3"
   | "pricing.pro.perk4"
+  | "pricing.pro.perk5"
+  | "pricing.pro.perk6"
+  | "pricing.pro.perk7"
   | "pricing.upgradeCta"
   | "pricing.comingSoon"
   | "pricing.footnote"
@@ -868,6 +883,12 @@ export type TranslationKey =
   | "spoonTracker.preset.rest"
   | "spoonTracker.preset.nap"
   | "bodyMap.title"
+  | "bodyMap.front"
+  | "bodyMap.back"
+  | "bodyMap.mobility"
+  | "bodyMap.joints"
+  | "bodyMap.muscles"
+  | "bodyMap.groups"
   | "bodyMap.subtitle"
   | "bodyMap.emptyHint"
   | "bodyMap.point.neck"
@@ -1336,7 +1357,82 @@ export type TranslationKey =
   | "notification.zen.reminder.title"
   | "notification.zen.reminder.message"
   | "notification.dailyLog.reminder.title"
-  | "notification.dailyLog.reminder.message";
+  | "notification.dailyLog.reminder.message"
+  | "doctor.title"
+  | "doctor.subtitle"
+  | "doctor.newPost"
+  | "doctor.editPost"
+  | "doctor.postTitle"
+  | "doctor.postContent"
+  | "doctor.postTags"
+  | "doctor.publish"
+  | "doctor.draft"
+  | "doctor.aiAssist"
+  | "doctor.aiAssistDescription"
+  | "doctor.aiGenerating"
+  | "doctor.aiDisclaimer"
+  | "doctor.verified"
+  | "doctor.pending"
+  | "doctor.rejected"
+  | "doctor.noPosts"
+  | "doctor.feedTitle"
+  | "doctor.feedSubtitle"
+  | "doctor.readMore"
+  | "doctor.backToDashboard"
+  | "doctor.dashboardTitle"
+  | "doctor.dashboardSubtitle"
+  | "doctor.totalPosts"
+  | "doctor.publishedCount"
+  | "doctor.pendingCount"
+  | "consultation.title"
+  | "consultation.subtitle"
+  | "consultation.newConsultation"
+  | "consultation.subject"
+  | "consultation.selectDoctor"
+  | "consultation.startThread"
+  | "consultation.open"
+  | "consultation.closed"
+  | "consultation.messages"
+  | "consultation.typeMessage"
+  | "consultation.hide"
+  | "consultation.dismiss"
+  | "consultation.structuredMessage"
+  | "consultation.suggestedQuestions"
+  | "consultation.noMessages"
+  | "consultation.unknown"
+  | "consultation.patientLabel"
+  | "consultation.doctorLabel"
+  | "consultation.send"
+  | "consultation.noConsultations"
+  | "consultation.patientAssistant"
+  | "consultation.patientAssistantDescription"
+  | "consultation.clinicalSummary"
+  | "consultation.clinicalSummaryDescription"
+  | "consultation.aiDraft"
+  | "consultation.aiDraftDescription"
+  | "consultation.aiDisclaimer"
+  | "consultation.symptomHelper"
+  | "consultation.symptomHelperDescription"
+  | "consultation.symptomPlaceholder"
+  | "consultation.noDoctorsAvailable"
+  | "consultation.selectDoctorPlaceholder"
+  | "consultation.subjectPlaceholder"
+  | "consultation.backToList"
+  | "consultation.clinicalMemo"
+  | "consultation.suggestedResponse"
+  | "consultation.useDraft"
+  | "pro.page.title"
+  | "pro.page.subtitle"
+  | "pro.page.doctorHubTitle"
+  | "pro.page.doctorHubDesc"
+  | "pro.page.consultationsTitle"
+  | "pro.page.consultationsDesc"
+  | "pro.page.aiCopilotTitle"
+  | "pro.page.aiCopilotDesc"
+  | "pro.page.cta"
+  | "pro.page.doctorHubBadge"
+  | "pro.page.consultationsBadge"
+  | "pro.page.aiCopilotBadge";
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -1346,6 +1442,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.profile": "Profile",
     "nav.toolkit": "Toolkit",
     "nav.backToDashboard": "Back to Dashboard",
+    "nav.doctorHub": "Doctor Hub",
+    "nav.consultations": "Consultations",
+    "nav.upgradePro": "Upgrade Pro",
     "nav.language": "Language",
     "nav.switchToArabic": "Switch to Arabic",
     "nav.switchToEnglish": "Switch to English",
@@ -1867,8 +1966,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pricing.pro.period": "/ month",
     "pricing.pro.perk1": "Empathic AI Companion with your health memory",
     "pricing.pro.perk2": "Doctor-ready clinical brief & PDF export",
-    "pricing.pro.perk3": "Time-series flare & weather predictor",
-    "pricing.pro.perk4": "Guided video masterclasses",
+    "pricing.pro.perk3": "Doctor Hub: publish verified health articles",
+    "pricing.pro.perk4": "Direct consultations with your doctor",
+    "pricing.pro.perk5": "AI Copilot for clinical summaries & symptom structuring",
+    "pricing.pro.perk6": "Time-series flare & weather predictor",
+    "pricing.pro.perk7": "Guided video masterclasses",
     "pricing.upgradeCta": "Upgrade to Pro",
     "pricing.comingSoon": "Coming soon",
     "pricing.footnote": "Cancel anytime. Your health data never leaves your device unless you export it yourself.",
@@ -2197,6 +2299,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "spoonTracker.preset.rest": "Rest",
     "spoonTracker.preset.nap": "Nap",
     "bodyMap.title": "Pain Map",
+    "bodyMap.front": "Front",
+    "bodyMap.back": "Back",
+    "bodyMap.mobility": "Mobility",
+    "bodyMap.joints": "Joints",
+    "bodyMap.muscles": "Muscles",
+    "bodyMap.groups": "Groups",
     "bodyMap.subtitle": "Tap areas where you feel pain",
     "bodyMap.emptyHint": "Tap a body area to mark pain",
     "bodyMap.point.neck": "Neck",
@@ -2342,6 +2450,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "video.unavailable": "The video guide is unavailable right now, so here are the steps instead.",
     "dashboard.section.today": "Today",
     "dashboard.section.core": "Core tools",
+    "dashboard.section.pro": "Doctors & Consultations",
+    "dashboard.pro.title": "Centers for Doctors and Medical Consultations",
+    "dashboard.pro.subtitle": "Trusted medical content from verified doctors and direct consultations.",
+    "dashboard.pro.doctorFeed": "Latest from Doctors",
+    "dashboard.pro.symptomHelper": "AI Symptom Helper",
+    "dashboard.pro.viewAll": "View All",
+    "dashboard.pro.browseDoctors": "Browse Doctor Articles",
+    "dashboard.pro.startConsultation": "Start Consultation or Chat with Doctor",
+    "dashboard.pro.badgeText": "Pro",
     "dashboard.section.insights": "Insights & gentle support",
     "dashboard.toolkitCard.title": "Somatic Toolkit & Exercises",
     "dashboard.toolkitCard.desc": "Gentle exercises matched to today's energy, calming offline audio, breathing guides, sleep & HRV, and medication safety.",
@@ -2678,6 +2795,81 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "meta.ogDescription":
       "Daily check-ins that turn invisible symptoms into clear patterns, calmer days, and reports your care team can actually use.",
     "meta.ogImageAlt": "FibroCare - Your pain is real. Your pace is yours.",
+    "doctor.title": "Doctor Hub",
+    "doctor.subtitle": "Publish verified health insights for patients",
+    "doctor.newPost": "New Article",
+    "doctor.editPost": "Edit Article",
+    "doctor.postTitle": "Article Title",
+    "doctor.postContent": "Article Content",
+    "doctor.postTags": "Tags (comma-separated)",
+    "doctor.publish": "Publish",
+    "doctor.draft": "Save Draft",
+    "doctor.aiAssist": "AI Publishing Assistant",
+    "doctor.aiAssistDescription": "Describe your clinical idea or paste raw notes — the AI will format them into a structured, evidence-backed patient guidance article.",
+    "doctor.aiGenerating": "Generating article draft…",
+    "doctor.aiDisclaimer": "AI provides informational summaries only and does not replace direct clinical judgment.",
+    "doctor.verified": "Verified",
+    "doctor.pending": "Pending Review",
+    "doctor.rejected": "Rejected",
+    "doctor.noPosts": "No articles published yet. Start writing to share your expertise with patients.",
+    "doctor.feedTitle": "Doctor Insights",
+    "doctor.feedSubtitle": "Verified health guidance from licensed professionals",
+    "doctor.readMore": "Read Full Article",
+    "doctor.backToDashboard": "Back to Dashboard",
+    "doctor.dashboardTitle": "Doctor Publishing Dashboard",
+    "doctor.dashboardSubtitle": "Create and manage patient-facing health content",
+    "doctor.totalPosts": "Total Articles",
+    "doctor.publishedCount": "Published",
+    "doctor.pendingCount": "Pending Review",
+    "consultation.title": "Consultations",
+    "consultation.subtitle": "Secure messaging with your care team",
+    "consultation.newConsultation": "New Consultation",
+    "consultation.subject": "Subject",
+    "consultation.selectDoctor": "Select a Doctor",
+    "consultation.startThread": "Start Conversation",
+    "consultation.open": "Open",
+    "consultation.closed": "Closed",
+    "consultation.messages": "Messages",
+    "consultation.typeMessage": "Type your message…",
+    "consultation.hide": "Hide",
+    "consultation.dismiss": "Dismiss",
+    "consultation.structuredMessage": "Structured Message",
+    "consultation.suggestedQuestions": "Suggested questions:",
+    "consultation.noMessages": "No messages yet. Start the conversation below.",
+    "consultation.unknown": "Unknown",
+    "consultation.patientLabel": "Patient",
+    "consultation.doctorLabel": "Doctor",
+    "consultation.send": "Send",
+    "consultation.noConsultations": "No consultations yet. Start a conversation with a verified doctor.",
+    "consultation.patientAssistant": "Symptom Structurer",
+    "consultation.patientAssistantDescription": "AI helps you organize your symptoms, medication history, and concerns into a clear, professional message for your doctor.",
+    "consultation.clinicalSummary": "Clinical Summary Memo",
+    "consultation.clinicalSummaryDescription": "AI-generated 30-day symptom and medication digest for the doctor.",
+    "consultation.aiDraft": "AI Response Draft",
+    "consultation.aiDraftDescription": "AI suggests a draft response based on the patient's message and clinical history.",
+    "consultation.aiDisclaimer": "AI provides informational summaries only and does not replace direct clinical judgment.",
+    "consultation.symptomHelper": "Structure My Symptoms",
+    "consultation.symptomHelperDescription": "Describe how you're feeling and the AI will help you communicate it clearly to your doctor.",
+    "consultation.symptomPlaceholder": "Describe how you've been feeling lately — your pain, sleep, energy, mood, any changes…",
+    "consultation.noDoctorsAvailable": "No verified doctors available at this time.",
+    "consultation.selectDoctorPlaceholder": "Select a doctor…",
+    "consultation.subjectPlaceholder": "e.g., Follow-up on medication adjustment",
+    "consultation.backToList": "Back to Consultations",
+    "consultation.clinicalMemo": "Clinical Summary",
+    "consultation.suggestedResponse": "Suggested Response",
+    "consultation.useDraft": "Use This Draft",
+    "pro.page.title": "FibroCare Pro",
+    "pro.page.subtitle": "Unlock the full power of AI-assisted fibromyalgia management with your care team.",
+    "pro.page.doctorHubTitle": "Doctor Hub",
+    "pro.page.doctorHubDesc": "A dedicated space for verified doctors to publish trusted health articles and guidance for fibromyalgia patients.",
+    "pro.page.consultationsTitle": "Direct Doctor Consultations",
+    "pro.page.consultationsDesc": "A secure messaging room between you and your treating doctor — discuss symptoms, treatments, and progress privately.",
+    "pro.page.aiCopilotTitle": "AI Medical Copilot",
+    "pro.page.aiCopilotDesc": "AI-powered tools that summarize your 30-day health data for the doctor and help you structure medical questions with precision.",
+    "pro.page.cta": "Upgrade to Pro",
+    "pro.page.doctorHubBadge": "Doctor Hub",
+    "pro.page.consultationsBadge": "Consultations",
+    "pro.page.aiCopilotBadge": "AI Copilot",
   },
   ar: {
     "nav.dashboard": "اللوحة الرئيسية",
@@ -2686,6 +2878,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.profile": "الملف الشخصي",
     "nav.toolkit": "حقيبة العناية",
     "nav.backToDashboard": "العودة للوحة التحكم",
+    "nav.doctorHub": "قسم الأطباء",
+    "nav.consultations": "الاستشارات",
+    "nav.upgradePro": "ترقية Pro",
     "nav.language": "اللغة",
     "nav.switchToArabic": "التبديل إلى العربية",
     "nav.switchToEnglish": "التبديل إلى الإنجليزية",
@@ -3207,8 +3402,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pricing.pro.period": "/ شهريًا",
     "pricing.pro.perk1": "رفيق الذكاء الاصطناعي المتعاطف بذاكرة صحتك",
     "pricing.pro.perk2": "الملخص السريري للطبيب وتصدير PDF",
-    "pricing.pro.perk3": "متوقع النوبات والطقس بالسلاسل الزمنية",
-    "pricing.pro.perk4": "ماجستركلاسات الفيديو الموجّهة",
+    "pricing.pro.perk3": "قسم الأطباء المخصص لنشر النصائح والمقالات الطبية الموثوقة",
+    "pricing.pro.perk4": "التواصل المباشر مع الطبيب: غرفة شات آمنة",
+    "pricing.pro.perk5": "المساعد الذكي الطبي لتلخيص الحالة وصياغة الأسئلة",
+    "pricing.pro.perk6": "متوقع النوبات والطقس بالسلاسل الزمنية",
+    "pricing.pro.perk7": "ماجستركلاسات الفيديو الموجّهة",
     "pricing.upgradeCta": "الترقية إلى برو",
     "pricing.comingSoon": "قريبًا",
     "pricing.footnote": "يمكنك الإلغاء في أي وقت. بياناتك الصحية لا تغادر جهازك ما لم تصدّرها بنفسك.",
@@ -3539,6 +3737,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "spoonTracker.preset.rest": "راحة",
     "spoonTracker.preset.nap": "قيلولة",
     "bodyMap.title": "خريطة الألم",
+    "bodyMap.front": "أمامي",
+    "bodyMap.back": "خلفي",
+    "bodyMap.mobility": "الحركة",
+    "bodyMap.joints": "المفاصل",
+    "bodyMap.muscles": "العضلات",
+    "bodyMap.groups": "المجموعات",
     "bodyMap.subtitle": "اضغط على المناطق التي تشعر فيها بالألم",
     "bodyMap.emptyHint": "اضغط على منطقة في الجسم لتحديد الألم",
     "bodyMap.point.neck": "الرقبة",
@@ -3684,6 +3888,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "video.unavailable": "الفيديو الموجّه غير متاح الآن — إليك الخطوات بدلًا منه.",
     "dashboard.section.today": "اليوم",
     "dashboard.section.core": "الأدوات الأساسية",
+    "dashboard.section.pro": "الأطباء والاستشارات",
+    "dashboard.pro.title": "مركز الأطباء والاستشارات الطبية",
+    "dashboard.pro.subtitle": "محتوى طبي موثوق من أطباء موثقين واستشارات مباشرة.",
+    "dashboard.pro.doctorFeed": "آخر من الأطباء",
+    "dashboard.pro.symptomHelper": "المساعد الذكي للأعراض",
+    "dashboard.pro.viewAll": "عرض الكل",
+    "dashboard.pro.browseDoctors": "تصفح مقالات الأطباء",
+    "dashboard.pro.startConsultation": "بدء استشارة أو شات مع طبيب",
+    "dashboard.pro.badgeText": "Pro",
     "dashboard.section.insights": "الرؤى والدعم الهادئ",
     "dashboard.toolkitCard.title": "حقيبة العناية والتمرين",
     "dashboard.toolkitCard.desc": "تمارين لطيفة تناسب طاقة اليوم، وصوت مهدّئ دون اتصال، وأدلة تنفس، والنوم وHRV، وسلامة الأدوية.",
@@ -4020,5 +4233,80 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "meta.ogDescription":
       "تسجيلات يومية تحوّل الأعراض الخفية إلى أنماط واضحة، وأيام أكثر هدوءًا، وتقارير يفيد بها فريق رعايتك فعلًا.",
     "meta.ogImageAlt": "فيبروكير - ألمُك حقيقي. وإيقاعُك ملكُك.",
+    "doctor.title": "مركز الأطباء",
+    "doctor.subtitle": "نشر رؤى صحية موثقة للمرضى",
+    "doctor.newPost": "مقال جديد",
+    "doctor.editPost": "تعديل المقال",
+    "doctor.postTitle": "عنوان المقال",
+    "doctor.postContent": "محتوى المقال",
+    "doctor.postTags": "الوسوم (مفصولة بفاصلة)",
+    "doctor.publish": "نشر",
+    "doctor.draft": "حفظ كمسودة",
+    "doctor.aiAssist": "مساعد النشر بالذكاء الاصطناعي",
+    "doctor.aiAssistDescription": "صف فكرتك السريرية أو الصق ملاحظاتك الخام — سيقوم الذكاء الاصطناعي بتنسيقها إلى مقال إرشادي موثق للمرضى.",
+    "doctor.aiGenerating": "جارٍ إنشاء مسودة المقال…",
+    "doctor.aiDisclaimer": "يوفر الذكاء الاصطناعي ملخصات معلوماتية فقط ولا يحل محل الحكم السريري المباشر.",
+    "doctor.verified": "موثق",
+    "doctor.pending": "قيد المراجعة",
+    "doctor.rejected": "مرفوض",
+    "doctor.noPosts": "لم يتم نشر مقالات بعد. ابدأ بالكتابة لمشاركة خبراتك مع المرضى.",
+    "doctor.feedTitle": "رؤى الأطباء",
+    "doctor.feedSubtitle": "إرشادات صحية موثقة من متخصصين مرخصين",
+    "doctor.readMore": "قراءة المقال كاملاً",
+    "doctor.backToDashboard": "العودة للوحة التحكم",
+    "doctor.dashboardTitle": "لوحة نشر الأطباء",
+    "doctor.dashboardSubtitle": "إنشاء وإدارة محتوى صحي موجه للمرضى",
+    "doctor.totalPosts": "إجمالي المقالات",
+    "doctor.publishedCount": "منشور",
+    "doctor.pendingCount": "قيد المراجعة",
+    "consultation.title": "الاستشارات",
+    "consultation.subtitle": "رسائل آمنة مع فريق رعايتك",
+    "consultation.newConsultation": "استشارة جديدة",
+    "consultation.subject": "الموضوع",
+    "consultation.selectDoctor": "اختر طبيبًا",
+    "consultation.startThread": "بدء محادثة",
+    "consultation.open": "مفتوح",
+    "consultation.closed": "مغلق",
+    "consultation.messages": "الرسائل",
+    "consultation.typeMessage": "اكتب رسالتك…",
+    "consultation.hide": "إخفاء",
+    "consultation.dismiss": "إغلاق",
+    "consultation.structuredMessage": "رسالة منظمة",
+    "consultation.suggestedQuestions": "أسئلة مقترحة:",
+    "consultation.noMessages": "لا توجد رسائل بعد. ابدأ المحادثة أدناه.",
+    "consultation.unknown": "غير معروف",
+    "consultation.patientLabel": "المريض",
+    "consultation.doctorLabel": "الطبيب",
+    "consultation.send": "إرسال",
+    "consultation.noConsultations": "لا توجد استشارات بعد. ابدأ محادثة مع طبيب موثق.",
+    "consultation.patientAssistant": "منظم الأعراض",
+    "consultation.patientAssistantDescription": "يساعدك الذكاء الاصطناعي في تنظيم أعراضك وتاريخ أدويتك ومخاوفك في رسالة واضحة واحترافية لطبيبك.",
+    "consultation.clinicalSummary": "ملخص سريري",
+    "consultation.clinicalSummaryDescription": "ملخص للأعراض والأدوية خلال 30 يومًا مولّد بالذكاء الاصطناعي للطبيب.",
+    "consultation.aiDraft": "مسودة رد بالذكاء الاصطناعي",
+    "consultation.aiDraftDescription": "يقترح الذكاء الاصطناعي مسودة رد بناءً على رسالة المريض وسجله السريري.",
+    "consultation.aiDisclaimer": "يوفر الذكاء الاصطناعي ملخصات معلوماتية فقط ولا يحل محل الحكم السريري المباشر.",
+    "consultation.symptomHelper": "هيكلة أعراضي",
+    "consultation.symptomHelperDescription": "صف شعورك وسيساعدك الذكاء الاصطناعي في التواصل بشكل واضح مع طبيبك.",
+    "consultation.symptomPlaceholder": "صف كيف تشعر مؤخراً — الأسباب، النوم، الطاقة، أي تغييرات…",
+    "consultation.noDoctorsAvailable": "لا يوجد أطباء متاحون حالياً.",
+    "consultation.selectDoctorPlaceholder": "اختر طبيباً…",
+    "consultation.subjectPlaceholder": "مثال: متابعة تعديل الأدوية",
+    "consultation.backToList": "العودة للاستشارات",
+    "consultation.clinicalMemo": "مذكرة سريرية",
+    "consultation.suggestedResponse": "رد مقترح",
+    "consultation.useDraft": "استخدام هذه المسودة",
+    "pro.page.title": "فيبروكير برو",
+    "pro.page.subtitle": "افتح القوة الكاملة لإدارة الفبروميالغيا بالذكاء الاصطناعي مع فريق رعايتك.",
+    "pro.page.doctorHubTitle": "قسم الأطباء المخصص",
+    "pro.page.doctorHubDesc": "مساحة مخصصة للأطباء الموثقين لنشر مقالات وإرشادات صحية موثوقة لمرضى الفبروميالغيا.",
+    "pro.page.consultationsTitle": "التواصل المباشر مع الطبيب",
+    "pro.page.consultationsDesc": "غرفة شات آمنة بينك وطبيبك المعالج — ناقش الأعراض والعلاجات والتقدم بخصوصية.",
+    "pro.page.aiCopilotTitle": "المساعد الذكي الطبي",
+    "pro.page.aiCopilotDesc": "أدوات مدعومة بالذكاء الاصطناعي تلخص بيانات صحتك لـ 30 يومًا للطبيب وتساعدك في صياغة الأسئلة الطبية بدقة.",
+    "pro.page.cta": "الترقية إلى برو",
+    "pro.page.doctorHubBadge": "قسم الأطباء",
+    "pro.page.consultationsBadge": "الاستشارات",
+    "pro.page.aiCopilotBadge": "المساعد الذكي",
   },
 };

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/build-sw.mjs",
+    "build": "prisma generate && next build && node scripts/build-sw.mjs",
     "build:sw": "node scripts/build-sw.mjs",
     "start": "next start",
     "lint": "eslint",
@@ -20,7 +20,8 @@
     "check:pwa": "node scripts/check-pwa-static.mjs",
     "check:pwa:prompt": "node scripts/verify-pwa-prompt.mjs",
     "build:verify": "npm run build && npm run check:a11y",
-    "prod-audit": "node scripts/prod-audit.mjs"
+    "prod-audit": "node scripts/prod-audit.mjs",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.37",

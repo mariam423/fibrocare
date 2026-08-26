@@ -9,7 +9,6 @@ import {
   ExternalLinkIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { requestPasswordReset } from "@/app/actions";
 
 export function ForgotPasswordForm() {
@@ -99,7 +98,7 @@ export function ForgotPasswordForm() {
         >
           Email address
         </label>
-        <Input
+        <input
           id="email"
           name="email"
           type="email"
@@ -109,7 +108,7 @@ export function ForgotPasswordForm() {
           required
           aria-describedby={error ? "forgot-error" : undefined}
           aria-invalid={error ? true : undefined}
-          className="h-12 w-full rounded-xl px-4 text-base md:text-base"
+          className="h-12 w-full rounded-xl border border-border bg-card px-4 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-3 focus-visible:ring-emerald-500/25 md:text-base"
         />
       </div>
 

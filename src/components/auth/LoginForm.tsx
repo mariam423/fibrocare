@@ -7,8 +7,6 @@ import { signIn } from "next-auth/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Magnetic } from "@/components/ui/Magnetic";
 import { PasswordField } from "@/components/auth/PasswordField";
 
 interface LoginFormProps {
@@ -73,7 +71,7 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         >
           Email address
         </label>
-        <Input
+        <input
           id="email"
           name="email"
           type="email"
@@ -83,7 +81,7 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
           required
           aria-describedby={error ? "login-error" : undefined}
           aria-invalid={error ? true : undefined}
-          className="h-12 w-full rounded-xl px-4 text-base md:text-base"
+          className="h-12 w-full rounded-xl border border-border bg-card px-4 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-3 focus-visible:ring-emerald-500/25 md:text-base"
         />
       </div>
 
@@ -116,26 +114,24 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         </Link>
       </div>
 
-      <Magnetic strength={0.12}>
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="h-12 w-full rounded-xl text-base font-semibold"
-        >
-          {isPending ? (
-            <>
-              <HugeiconsIcon
-                icon={Loading01Icon}
-                className="ms-2 h-5 w-5 animate-spin"
-                aria-hidden="true"
-              />
-              Signing in...
-            </>
-          ) : (
-            "Sign in"
-          )}
-        </Button>
-        </Magnetic>
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="h-12 w-full rounded-xl text-base font-semibold"
+      >
+        {isPending ? (
+          <>
+            <HugeiconsIcon
+              icon={Loading01Icon}
+              className="ms-2 h-5 w-5 animate-spin"
+              aria-hidden="true"
+            />
+            Signing in...
+          </>
+        ) : (
+          "Sign in"
+        )}
+      </Button>
 
       <p className="text-center text-base text-muted-foreground">
         New to FibroCare?{" "}

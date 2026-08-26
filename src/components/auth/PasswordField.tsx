@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { EyeIcon, EyeOffIcon } from "@hugeicons/core-free-icons";
-import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface PasswordFieldProps {
@@ -43,7 +42,7 @@ export function PasswordField({
         {label}
       </label>
       <div className="relative">
-        <Input
+        <input
           id={id}
           name={id}
           type={visible ? "text" : "password"}
@@ -53,7 +52,7 @@ export function PasswordField({
           required
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
-          className="h-12 w-full rounded-xl px-4 pe-12 text-base md:text-base"
+          className="h-12 w-full rounded-xl border border-border bg-card px-4 pe-12 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-emerald-500 focus-visible:ring-3 focus-visible:ring-emerald-500/25 md:text-base"
         />
         <button
           type="button"

@@ -98,6 +98,33 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
     <td align="center"><strong>Profile</strong></td>
     <td align="center"><strong>Zen Portal</strong></td>
   </tr>
+  <tr>
+    <td align="center" colspan="2"><hr></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/app-homepage.png" width="400" alt="Homepage"></td>
+    <td align="center"><img src="public/images/app-dashboard.png" width="400" alt="Dashboard"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Homepage</strong></td>
+    <td align="center"><strong>Dashboard</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/app-login.png" width="400" alt="Login"></td>
+    <td align="center"><img src="public/images/app-signup.png" width="400" alt="Signup"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Login</strong></td>
+    <td align="center"><strong>Signup</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/app-toolkit.png" width="400" alt="Toolkit"></td>
+    <td align="center"><img src="public/images/app-zen.png" width="400" alt="Zen Portal"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Toolkit</strong></td>
+    <td align="center"><strong>Zen Portal</strong></td>
+  </tr>
 </table>
 
 ---

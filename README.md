@@ -66,67 +66,31 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ## 📸 Screenshots
 
-<table align="center">
-  <tr>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20113900.png" width="400" alt="Dashboard"></td>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142001.png" width="400" alt="Health Tracking"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Dashboard Overview</strong></td>
-    <td align="center"><strong>Health Tracking</strong></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142124.png" width="400" alt="AI Insights"></td>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142238.png" width="400" alt="Resources"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>AI Insights</strong></td>
-    <td align="center"><strong>Resources</strong></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142310.png" width="400" alt="Toolkit"></td>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142339.png" width="400" alt="Reports"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Toolkit</strong></td>
-    <td align="center"><strong>Reports</strong></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142450.png" width="400" alt="Profile"></td>
-    <td align="center"><img src="public/images/Screenshot_27-8-2026_113940_localhost.jpeg" width="400" alt="Zen Portal"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Profile</strong></td>
-    <td align="center"><strong>Zen Portal</strong></td>
-  </tr>
-  <tr>
-    <td align="center" colspan="2"><hr></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/app-homepage.png" width="400" alt="Homepage"></td>
-    <td align="center"><img src="public/images/app-dashboard.png" width="400" alt="Dashboard"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Homepage</strong></td>
-    <td align="center"><strong>Dashboard</strong></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/app-login.png" width="400" alt="Login"></td>
-    <td align="center"><img src="public/images/app-signup.png" width="400" alt="Signup"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Login</strong></td>
-    <td align="center"><strong>Signup</strong></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/app-toolkit.png" width="400" alt="Toolkit"></td>
-    <td align="center"><img src="public/images/app-zen.png" width="400" alt="Zen Portal"></td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Toolkit</strong></td>
-    <td align="center"><strong>Zen Portal</strong></td>
-  </tr>
-</table>
+Here is a quick look at the **FibroCare** interface:
+
+### Homepage / Loading
+![Loading Page](public/images/Loading%20page.png)
+
+### Health Tracking
+![Health Tracking](public/images/Health%20Tracking.png)
+
+### Weekly Progress & Analytics
+![Weekly Progress & Analytics](public/images/Weekly%20Progress%20&%20Analytics.png)
+
+### AI Clinical Insights
+![AI Clinical Insights](public/images/AI%20Clinical%20Insights.png)
+
+### Care Resources
+![Care Resources](public/images/Care%20Resources.png)
+
+### Toolkit
+![Toolkit](public/images/Toolkit.png)
+
+### Doctor Hub
+![Doctor Hub](public/images/Doctor%20Hub.png)
+
+### Login
+![Login](public/images/Log%20in.jpeg)
 
 ---
 

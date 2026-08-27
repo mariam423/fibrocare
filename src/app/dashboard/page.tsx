@@ -42,6 +42,7 @@ import { AiReflection } from "@/components/ai/AiReflection";
 import { MedicalSummaryCard } from "@/components/dashboard/MedicalSummaryCard";
 import { TodayContextWidget } from "@/components/dashboard/TodayContextWidget";
 import { DailyQuoteWidget } from "@/components/dashboard/DailyQuoteWidget";
+import { MotivationWidget } from "@/components/dashboard/MotivationWidget";
 import { RecentLogsWidget } from "@/components/dashboard/RecentLogsWidget";
 import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
 import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
@@ -440,6 +441,9 @@ export default function Home() {
 
             {/* Daily Quote / Affirmation */}
             <DailyQuoteWidget />
+
+            {/* Dynamic bilingual spiritual motivation */}
+            <MotivationWidget />
 
             {/* Recent Logs Summary */}
             <RecentLogsWidget logs={recentLogs.slice(0, 2)} />

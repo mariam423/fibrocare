@@ -47,6 +47,7 @@ import { RecentLogsWidget } from "@/components/dashboard/RecentLogsWidget";
 import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
 import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
 import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
+import { PostMealFatigueCard } from "@/components/dashboard/PostMealFatigueCard";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
@@ -525,7 +526,7 @@ export default function Home() {
           </Link>
 
         {/* Middle Row: Daily Energy, Pain Map, Medications */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch w-full">
           <div className="min-h-0">
             <DepthCard className="h-full" delay={0} animateIn hover={false}>
               <Card className="h-full">
@@ -549,6 +550,15 @@ export default function Home() {
               <Card className="h-full">
                 <CardContent className="flex flex-1 flex-col p-0">
                   <MedicationTrackerCard />
+                </CardContent>
+              </Card>
+            </DepthCard>
+          </div>
+          <div className="min-h-0">
+            <DepthCard className="h-full" delay={0.15} animateIn hover={false}>
+              <Card className="h-full">
+                <CardContent className="flex flex-1 flex-col p-0">
+                  <PostMealFatigueCard />
                 </CardContent>
               </Card>
             </DepthCard>

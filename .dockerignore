@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.*
+.yarn
+
+# Build artifacts
+.next
+.next-*
+out
+dist
+
+# Environment files (never ship secrets in image)
+.env*
+!.env.example
+
+# Development / test files
+.git
+.gitignore
+.vscode
+.idea
+*.md
+!README.md
+*.test.*
+*.spec.*
+playwright*
+tests/
+e2e/
+coverage/
+playwright-report/
+test-results/
+
+# Database files
+*.db
+*.db-journal
+
+# Logs
+*.log
+*.log.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github/
+.vercel/
+
+# Build scripts (not needed in container)
+scripts/
+docs/

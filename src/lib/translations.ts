@@ -1324,6 +1324,23 @@ export type TranslationKey =
   | "landing.footer.madeWith"
   | "landing.footer.disclaimer"
   | "landing.footer.copyright"
+  | "postMeal.title"
+  | "postMeal.subtitle"
+  | "postMeal.mealLabel"
+  | "postMeal.fatigueLabel"
+  | "postMeal.log"
+  | "postMeal.saved"
+  | "postMeal.recent"
+  | "postMeal.undoAria"
+  | "postMeal.meal.breakfast"
+  | "postMeal.meal.lunch"
+  | "postMeal.meal.dinner"
+  | "postMeal.meal.snack"
+  | "postMeal.fatigue.none"
+  | "postMeal.fatigue.mild"
+  | "postMeal.fatigue.moderate"
+  | "postMeal.fatigue.high"
+  | "postMeal.fatigue.severe"
   | "notification.title"
   | "notification.empty"
   | "notification.markAllRead"
@@ -2517,6 +2534,23 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "somatic.breathing.idle": "Ready when you are",
     "somatic.breathing.idleHint": "tap start to begin",
     "somatic.breathing.cycle": "cycle",
+    "postMeal.title": "Post-Meal Fatigue",
+    "postMeal.subtitle": "Track how meals affect your energy",
+    "postMeal.mealLabel": "Meal Type",
+    "postMeal.fatigueLabel": "Fatigue Level",
+    "postMeal.log": "Log Meal Fatigue",
+    "postMeal.saved": "Logged!",
+    "postMeal.recent": "Recent Logs",
+    "postMeal.undoAria": "Undo last entry",
+    "postMeal.meal.breakfast": "Breakfast",
+    "postMeal.meal.lunch": "Lunch",
+    "postMeal.meal.dinner": "Dinner",
+    "postMeal.meal.snack": "Snack",
+    "postMeal.fatigue.none": "None",
+    "postMeal.fatigue.mild": "Mild",
+    "postMeal.fatigue.moderate": "Moderate",
+    "postMeal.fatigue.high": "High",
+    "postMeal.fatigue.severe": "Severe",
     "rescue.title": "AI Rescue Recommendation",
     "rescue.subtitle": "A quiet, single-action tip shaped by today's pain, energy, and weather.",
     "rescue.generate": "Generate Recommendation",
@@ -3955,6 +3989,23 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "somatic.breathing.idle": "جاهز متى شئت",
     "somatic.breathing.idleHint": "اضغط ابدأ للانطلاق",
     "somatic.breathing.cycle": "دورة",
+    "postMeal.title": "إرهاق ما بعد الوجبة",
+    "postMeal.subtitle": "تتبع تأثير الوجبات على طاقتك",
+    "postMeal.mealLabel": "نوع الوجبة",
+    "postMeal.fatigueLabel": "مستوى الإرهاق",
+    "postMeal.log": "تسجيل إرهاق الوجبة",
+    "postMeal.saved": "تم التسجيل!",
+    "postMeal.recent": "السجلات الأخيرة",
+    "postMeal.undoAria": "التراجع عن آخر إدخال",
+    "postMeal.meal.breakfast": "فطور",
+    "postMeal.meal.lunch": "غداء",
+    "postMeal.meal.dinner": "عشاء",
+    "postMeal.meal.snack": "وجبة خفيفة",
+    "postMeal.fatigue.none": "لا إرهاق",
+    "postMeal.fatigue.mild": "خفيف",
+    "postMeal.fatigue.moderate": "متوسط",
+    "postMeal.fatigue.high": "شديد",
+    "postMeal.fatigue.severe": "حاد",
     "rescue.title": "توصية الإنقاذ الذكية",
     "rescue.subtitle": "نصيحة هادئة بفعل واحد، مصمّمة حسب ألمك وطاقتك وطقس اليوم.",
     "rescue.generate": "توليد التوصية",

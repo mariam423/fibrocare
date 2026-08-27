@@ -49,6 +49,9 @@ const nextConfig: NextConfig = {
   // run its own isolated build cache (e.g., `.next-live`) alongside the main
   // dev server, which Next refuses to share. Production/unset stays `.next`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Standalone output for Docker/Azure deployment — copies only the files
+  // needed to run the app, reducing image size significantly.
+  output: "standalone",
   experimental: {
     viewTransition: true,
   },

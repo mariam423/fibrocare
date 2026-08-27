@@ -39,6 +39,7 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ### 📊 Advanced Health Telemetry
 - **Comprehensive Pain Dashboard** — interactive charts (Recharts) tracking pain levels, fatigue, sleep quality, mood, and medication adherence over time.
+- **Post-Meal Fatigue & Symptom Tracking** — clean, dark-themed bento card for logging how meals affect fibromyalgia symptoms, with meal type selection (breakfast, lunch, dinner, snack) and five-level fatigue scale (none → severe).
 - **Flare Detection & Weather Correlation** — real-time OpenWeather API integration cross-referenced with logged flares, with barometric pressure trend analysis.
 - **Automatic Fallback Indicators** — when live weather data is unavailable, deterministic estimated weather ensures the dashboard always renders usable data.
 

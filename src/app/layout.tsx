@@ -50,6 +50,22 @@ export async function generateMetadata(): Promise<Metadata> {
       template: isAr ? "%s | فيبروكير" : "%s | FibroCare",
     },
     description: t["meta.description"],
+    keywords: [
+      "fibromyalgia tracker",
+      "chronic pain management",
+      "pain diary app",
+      "spoon theory tracker",
+      "flare detection",
+      "health dashboard",
+      "AI health assistant",
+      "فيبروميالغيا",
+      "تتبع الألم المزمن",
+      "سجل النوبات",
+      "تطبيق صحي",
+    ],
+    authors: [{ name: "FibroCare", url: baseUrl }],
+    creator: "FibroCare",
+    publisher: "FibroCare",
     manifest: "/manifest.json",
     applicationName: "FibroCare",
     appleWebApp: {
@@ -59,6 +75,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     formatDetection: {
       telephone: false,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
     icons: {
       icon: [
@@ -82,6 +109,10 @@ export async function generateMetadata(): Promise<Metadata> {
       title: t["meta.ogTitle"],
       description: t["meta.ogDescription"],
       images: [ogImageEn, ogImageAr],
+      creator: "@fibrocare",
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
     },
   };
 }

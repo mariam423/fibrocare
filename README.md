@@ -65,20 +65,40 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ## 📸 Screenshots
 
-<div align="center">
-
-| | |
-|:---:|:---:|
-| ![Dashboard](public/images/Screenshot%202026-08-27%20113900.png) | ![Health Tracking](public/images/Screenshot%202026-08-27%20142001.png) |
-| **Dashboard Overview** | **Health Tracking** |
-| ![AI Insights](public/images/Screenshot%202026-08-27%20142124.png) | ![Resources](public/images/Screenshot%202026-08-27%20142238.png) |
-| **AI Insights** | **Resources** |
-| ![Toolkit](public/images/Screenshot%202026-08-27%20142310.png) | ![Reports](public/images/Screenshot%202026-08-27%20142339.png) |
-| **Toolkit** | **Reports** |
-| ![Profile](public/images/Screenshot%202026-08-27%20142450.png) | ![Zen Portal](public/images/Screenshot_27-8-2026_113940_localhost.jpeg) |
-| **Profile** | **Zen Portal** |
-
-</div>
+<table align="center">
+  <tr>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20113900.png" width="400" alt="Dashboard"></td>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142001.png" width="400" alt="Health Tracking"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Dashboard Overview</strong></td>
+    <td align="center"><strong>Health Tracking</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142124.png" width="400" alt="AI Insights"></td>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142238.png" width="400" alt="Resources"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>AI Insights</strong></td>
+    <td align="center"><strong>Resources</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142310.png" width="400" alt="Toolkit"></td>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142339.png" width="400" alt="Reports"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Toolkit</strong></td>
+    <td align="center"><strong>Reports</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/Screenshot%202026-08-27%20142450.png" width="400" alt="Profile"></td>
+    <td align="center"><img src="public/images/Screenshot_27-8-2026_113940_localhost.jpeg" width="400" alt="Zen Portal"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Profile</strong></td>
+    <td align="center"><strong>Zen Portal</strong></td>
+  </tr>
+</table>
 
 ---
 

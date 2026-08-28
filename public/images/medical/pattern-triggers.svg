@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Spotting symptom patterns</title>
+  <desc id="desc">A scatter plot and weekly summary showing how daily check-in data is analyzed to reveal the personal patterns and triggers behind fibromyalgia flares.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="trend" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7FB5A5"/>
+      <stop offset="100%" stop-color="#5E9C84"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">YOUR DATA REVEALS YOUR PATTERNS</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Pain, energy, sleep and activity over time</text>
+
+  <!-- Scatter plot -->
+  <g>
+    <rect x="66" y="120" width="330" height="250" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="231" y="146" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Pain vs. activity</text>
+    <!-- axes -->
+    <line x1="100" y1="330" x2="366" y2="330" stroke="#2C4A44" stroke-width="1.4"/>
+    <line x1="100" y1="330" x2="100" y2="160" stroke="#2C4A44" stroke-width="1.4"/>
+    <text x="233" y="352" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6E8A7C">Activity level &#8594;</text>
+    <text x="88" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6E8A7C" transform="rotate(-90 88 245)">Pain &#8594;</text>
+    <!-- scatter points -->
+    <g fill="#7FB5A5">
+      <circle cx="120" cy="300" r="5"/>
+      <circle cx="140" cy="285" r="5"/>
+      <circle cx="165" cy="290" r="5"/>
+      <circle cx="190" cy="270" r="5"/>
+      <circle cx="215" cy="255" r="5"/>
+      <circle cx="245" cy="240" r="5"/>
+      <circle cx="270" cy="225" r="5"/>
+      <circle cx="295" cy="235" r="5"/>
+      <circle cx="320" cy="215" r="5"/>
+      <circle cx="345" cy="200" r="5"/>
+    </g>
+    <!-- trend line -->
+    <line x1="110" y1="298" x2="355" y2="198" stroke="url(#trend)" stroke-width="2.6" stroke-linecap="round"/>
+    <!-- annotation -->
+    <path d="M292 205 q20 -34 44 -38 M336 178 l14 -4 M330 176 l2 14" stroke="#C98C5A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <text x="300" y="172" font-family="Arial, sans-serif" font-size="10" fill="#C98C5A">push &#8594; flare</text>
+  </g>
+
+  <!-- Right panel: weekly readout -->
+  <g transform="translate(0 0)">
+    <rect x="424" y="120" width="248" height="250" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="548" y="148" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">What the week shows</text>
+
+    <!-- mini bar chart -->
+    <g>
+      <rect x="452" y="180" width="24" height="34" rx="4" fill="#2A463F"/>
+      <rect x="488" y="170" width="24" height="44" rx="4" fill="#3A574B"/>
+      <rect x="524" y="196" width="24" height="18" rx="4" fill="#2A463F"/>
+      <rect x="560" y="164" width="24" height="50" rx="4" fill="#5E9C84"/>
+      <rect x="596" y="210" width="24" height="4" rx="2" fill="#2A563F"/>
+      <text x="448" y="242" font-family="Arial, sans-serif" font-size="10" fill="#CBE3CF" font-weight="700">Energy low</text>
+      <text x="448" y="256" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">when pain is high</text>
+    </g>
+
+    <!-- trigger callout -->
+    <rect x="452" y="276" width="192" height="60" rx="12" fill="#2C2A20" stroke="#6A5A3A" stroke-width="1"/>
+    <text x="548" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#F1E0A8">Trigger found</text>
+    <text x="548" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#C9A54E">Late workouts &#8594; next-day flare</text>
+    <text x="548" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#C9A54E">try earlier, lighter pacing</text>
+  </g>
+
+  <!-- Bottom strip -->
+  <rect x="66" y="396" width="606" height="46" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+  <text x="120" y="424" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">&#10003; Daily check-ins</text>
+  <text x="320" y="424" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">&#10003; Correlations</text>
+  <text x="520" y="424" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">&#10003; Weekly summary</text>
+</svg>

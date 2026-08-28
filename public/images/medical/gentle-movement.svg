@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Restorative movement for fibromyalgia</title>
+  <desc id="desc">Line-art diagram of a person in child's pose restorative yoga position, showing gentle low-impact movement guidance for fibromyalgia.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">GENTLE RESTORATIVE MOVEMENT</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Slow, supported movement that respects pain limits</text>
+
+  <!-- Ground plane -->
+  <line x1="120" y1="400" x2="600" y2="400" stroke="#2C4A44" stroke-width="2"/>
+  <line x1="130" y1="412" x2="180" y2="412" stroke="#1E332F" stroke-width="1"/>
+  <line x1="250" y1="412" x2="300" y2="412" stroke="#1E332F" stroke-width="1"/>
+  <line x1="410" y1="412" x2="460" y2="412" stroke="#1E332F" stroke-width="1"/>
+  <line x1="540" y1="412" x2="590" y2="412" stroke="#1E332F" stroke-width="1"/>
+
+  <!-- Body: child's pose = kneeling, torso folded forward over thighs, arms extended -->
+  <g stroke="#8FBF9B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- legs (folded, kneeling) -->
+    <path d="M320 400 L320 360"/>
+    <path d="M400 400 L400 360"/>
+    <path d="M320 360 q-40 -6 -70 6"/>
+    <path d="M400 360 q40 -6 70 6"/>
+    <!-- hips folded over -->
+    <path d="M320 360 q0 -34 40 -40 q40 6 40 40"/>
+    <!-- torso folded forward -->
+    <path d="M360 320 q-6 -70 10 -120 q26 -24 52 0 q18 42 8 130 q-16 22 -70 10 z"/>
+    <!-- arms extended forward -->
+    <path d="M430 210 q46 -10 78 6 q10 22 -6 34 q-40 12 -86 -4"/>
+    <path d="M430 222 q40 -10 72 6 q6 20 -8 30"/>
+    <!-- head resting -->
+    <circle cx="392" cy="168" r="26"/>
+  </g>
+
+  <!-- Breathing glow -->
+  <g stroke="#7FB5A5" stroke-opacity="0.3" stroke-width="1.4" fill="none">
+    <circle cx="392" cy="196" r="36"/>
+    <circle cx="392" cy="196" r="48"/>
+  </g>
+
+  <!-- Movement arrows (subtle sway) -->
+  <g stroke="#5E9C84" stroke-opacity="0.7" stroke-width="1.6" fill="none">
+    <path d="M330 250 c-16 6 -20 20 -12 32"/>
+    <path d="M452 260 c16 6 20 20 12 32"/>
+  </g>
+
+  <!-- Right panel: guidance -->
+  <g transform="translate(0 0)">
+    <rect x="520" y="120" width="150" height="60" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="595" y="146" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Pace yourself</text>
+    <text x="595" y="166" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">Short sessions</text>
+
+    <rect x="520" y="196" width="150" height="60" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="595" y="222" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Stay gentle</text>
+    <text x="595" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">No forcing through pain</text>
+
+    <rect x="520" y="272" width="150" height="60" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="595" y="298" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Stay consistent</text>
+    <text x="595" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">Daily, not intense</text>
+  </g>
+
+  <text x="360" y="458" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6E8A7C">Stretching, walking, swimming and restorative yoga &#8212; movement that eases, not flares</text>
+</svg>

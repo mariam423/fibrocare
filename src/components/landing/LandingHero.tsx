@@ -70,13 +70,13 @@ function CheckInMockup({
   ];
 
   return (
-    <div className="surface-crisp glow-card relative overflow-hidden rounded-[2rem] shadow-beautiful-lg bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-emerald-500/20">
+    <div className="surface-crisp glow-card relative overflow-hidden rounded-[2rem] shadow-beautiful-lg bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-emerald-500/20 ring-1 ring-black/5 dark:ring-white/5">
       {/* Window chrome */}
-      <div className="flex items-center gap-1.5 border-b border-border/60 px-5 py-4">
+      <div className="flex items-center gap-1.5 border-b border-border/60 px-5 py-4 bg-muted/30">
         <span className="h-2.5 w-2.5 rounded-full bg-foreground/15" aria-hidden="true" />
         <span className="h-2.5 w-2.5 rounded-full bg-primary/25" aria-hidden="true" />
         <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/20" aria-hidden="true" />
-        <span className="ms-3 text-xs font-medium text-muted-foreground">FibroCare</span>
+        <span className="ms-3 text-xs font-medium text-muted-foreground opacity-80">FibroCare</span>
         <span className="ms-auto inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
           <span className="relative flex h-1.5 w-1.5">
             <span
@@ -94,20 +94,20 @@ function CheckInMockup({
 
       <div className="p-5 sm:p-7">
         <div className="flex items-center justify-between gap-4">
-          <div>
+          <div className="space-y-1">
             <p className="text-sm font-semibold text-foreground sm:text-base">
               {t("landing.hero.checkinTitle")}
             </p>
-            <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70">
+            <p className="text-xs text-slate-500 dark:text-emerald-200/70">
               {t("landing.hero.mockupSub")}
             </p>
           </div>
-          <span className="icon-badge h-9 w-9 shrink-0 rounded-xl">
+          <span className="icon-badge h-9 w-9 shrink-0 rounded-xl bg-primary/10 text-primary">
             <HugeiconsIcon icon={HeartPulseIcon} className="h-4 w-4" aria-hidden="true" />
           </span>
         </div>
 
-        <div className="mt-5 space-y-3.5">
+        <div className="mt-6 space-y-4">
           {rows.map((row) => (
             <div key={row.label} className="flex items-center gap-3">
               <span className="w-16 text-xs font-medium text-slate-600 dark:text-emerald-200/80">
@@ -119,7 +119,7 @@ function CheckInMockup({
               >
                 {motionEnabled ? (
                   <motion.div
-                    className="h-full rounded-full bg-primary/75"
+                    className="h-full rounded-full bg-primary/75 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                     initial={{ width: 0 }}
                     animate={{ width: row.width }}
                     transition={{ duration: 1.1, ease: EASE_OUT, delay: 0.6 }}

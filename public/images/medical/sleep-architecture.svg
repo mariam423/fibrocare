@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Fragmented sleep architecture in fibromyalgia</title>
+  <desc id="desc">A hypnogram chart comparing healthy sleep with fibromyalgia sleep, showing frequent awakenings, reduced deep restorative sleep, and an unrefreshed morning.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="480" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">SLEEP ARCHITECTURE</text>
+  <text x="360" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Overnight hypnogram &#8212; healthy vs. fibromyalgia</text>
+
+  <!-- Y axis labels -->
+  <g font-family="Arial, sans-serif" font-size="11" fill="#6E8A7C" text-anchor="start">
+    <text x="66" y="128">Awake</text>
+    <text x="66" y="156">REM</text>
+    <text x="66" y="222">Light (N1-N2)</text>
+    <text x="66" y="270">Deep (N3)</text>
+  </g>
+
+  <!-- Grid lines -->
+  <g stroke="#1E332F" stroke-width="1">
+    <line x1="150" y1="120" x2="660" y2="120"/>
+    <line x1="150" y1="150" x2="660" y2="150"/>
+    <line x1="150" y1="216" x2="660" y2="216"/>
+    <line x1="150" y1="264" x2="660" y2="264"/>
+  </g>
+
+  <!-- Time axis -->
+  <g font-family="Arial, sans-serif" font-size="10" fill="#6E8A7C" text-anchor="middle">
+    <text x="150" y="414">11pm</text>
+    <text x="210" y="414">12</text>
+    <text x="270" y="414">1</text>
+    <text x="330" y="414">2</text>
+    <text x="390" y="414">3</text>
+    <text x="450" y="414">4</text>
+    <text x="510" y="414">5</text>
+    <text x="570" y="414">6</text>
+    <text x="630" y="414">7</text>
+  </g>
+
+  <!-- Healthy sleep trace (top, emerald) -->
+  <polyline points="150,120 150,148 160,148 160,120 170,120 170,210 200,210 200,120 205,120 205,156 240,156 240,264 300,264 300,150 315,150 315,236 355,236 355,264 410,264 410,150 420,150 420,156 460,156 460,120 470,120 470,210 520,210 520,120 530,120 530,254 580,254 580,120 590,120 590,150 620,150 620,264 660,264"
+    fill="none" stroke="#7FB5A5" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="405" y="96" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#7FB5A5">Healthy &#8212; deep sleep preserved</text>
+
+  <!-- Fibromyalgia trace (bottom, amber) -->
+  <polyline points="150,264 150,150 158,150 158,264 166,264 166,140 170,140 170,264 178,264 178,150 184,150 184,264 198,264 198,120 204,120 204,264 214,264 214,160 220,160 220,264 230,264 230,130 236,130 236,264 246,264 246,155 252,155 252,264 264,264 264,125 270,125 270,264 284,264 284,150 290,150 290,264 300,264 300,135 306,135 306,264 318,264 318,160 324,160 324,264 334,264 334,120 340,120 340,264 352,264 352,150 358,150 358,264 372,264 372,130 378,130 378,264 390,264 390,155 396,155 396,264 408,264 408,125 414,125 414,264 428,264 428,150 434,150 434,264 446,264 446,140 452,140 452,264 464,264 464,160 470,160 470,264 484,264 484,120 490,120 490,264 502,264 502,150 508,150 508,264 520,264 520,135 526,135 526,264 540,264 540,160 546,160 546,264 558,264 558,125 564,125 564,264 576,264 576,150 582,150 582,264 596,264 596,140 602,140 602,264 612,264 612,155 618,155 618,264 632,264 632,125 640,125 640,264 660,264"
+    fill="none" stroke="#D97E32" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <text x="405" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#D97E32">Fibromyalgia &#8212; fragmented, low deep sleep</text>
+
+  <!-- Annotation: frequent awakenings -->
+  <g stroke="#D97E32" stroke-opacity="0.8" stroke-width="1.2" stroke-dasharray="3 3">
+    <line x1="150" y1="274" x2="660" y2="274"/>
+  </g>
+  <text x="232" y="320" font-family="Arial, sans-serif" font-size="11" fill="#C98C5A">&#9650; many brief awakenings</text>
+
+  <!-- Morning note -->
+  <rect x="190" y="344" width="420" height="46" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+  <text x="260" y="368" font-family="Arial, sans-serif" font-size="12" fill="#E8F0EB">Waking unrefreshed even after 7&#8211;8 hours</text>
+  <text x="400" y="382" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC" text-anchor="end">Normal deep-sleep stage is rarely reached or maintained</text>
+
+  <!-- Icon: crescent moon -->
+  <path d="M590 376 a22 22 0 1 1 18 -34 a26 26 0 1 0 -18 34z" fill="#7FB5A5" opacity="0.9"/>
+</svg>

@@ -10,6 +10,7 @@ import {
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -23,6 +24,7 @@ interface Benefit {
   title: TranslationKey;
   copy: TranslationKey;
   icon: IconSvgElement;
+  image?: string;
   /** Optional small pill (e.g. "New") pinned to the top of the card. */
   pill?: TranslationKey;
   large?: boolean;
@@ -33,6 +35,7 @@ const BENEFITS: Benefit[] = [
     title: "landing.benefits.checkinsTitle",
     copy: "landing.benefits.checkinsCopy",
     icon: ZapIcon,
+    image: "/images/medical/daily-checkin.svg",
     pill: "landing.benefits.pill.core",
     large: true,
   },
@@ -40,22 +43,26 @@ const BENEFITS: Benefit[] = [
     title: "landing.benefits.patternsTitle",
     copy: "landing.benefits.patternsCopy",
     icon: ChartHistogramIcon,
+    image: "/images/medical/pattern-triggers.svg",
   },
   {
     title: "landing.benefits.reportTitle",
     copy: "landing.benefits.reportCopy",
     icon: File01Icon,
+    image: "/images/medical/care-summary.svg",
   },
   {
     title: "landing.benefits.toolsTitle",
     copy: "landing.benefits.toolsCopy",
     icon: FlowerIcon,
+    image: "/images/medical/symptom-toolkit.svg",
     pill: "landing.benefits.pill.new",
   },
   {
     title: "landing.benefits.privacyTitle",
     copy: "landing.benefits.privacyCopy",
     icon: Shield01Icon,
+    image: "/images/medical/privacy-shield.svg",
   },
 ];
 
@@ -71,23 +78,39 @@ function BenefitCard({ benefit, className }: { benefit: Benefit; className?: str
         className
       )}
     >
-      <div className="flex items-start justify-between gap-4">
-        <span className="icon-badge h-11 w-11 rounded-2xl transition-transform duration-300 ease-out hover:scale-105">
-          <HugeiconsIcon icon={Icon} className="h-5 w-5" aria-hidden="true" />
-        </span>
-        {benefit.pill && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
-            {t(benefit.pill)}
-          </span>
+      <div className="flex flex-col h-full">
+        {benefit.image && (
+          <div className={cn(
+            "relative mb-6 overflow-hidden rounded-2xl",
+            benefit.large ? "h-40" : "h-24"
+          )}>
+            <Image
+              src={benefit.image}
+              alt={t(benefit.title)}
+              fill
+              className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+          </div>
         )}
-      </div>
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-          {t(benefit.title)}
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-          {t(benefit.copy)}
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <span className="icon-badge h-11 w-11 rounded-2xl transition-transform duration-300 ease-out hover:scale-105">
+            <HugeiconsIcon icon={Icon} className="h-5 w-5" aria-hidden="true" />
+          </span>
+          {benefit.pill && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
+              {t(benefit.pill)}
+            </span>
+          )}
+        </div>
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+            {t(benefit.title)}
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+            {t(benefit.copy)}
+          </p>
+        </div>
       </div>
     </SpotlightCard>
   );

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Daily symptom check-in</title>
+  <desc id="desc">A daily check-in screen with rating sliders for pain, energy, sleep, mood and activity, letting you log symptoms in about a minute.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <!-- Phone frame -->
+  <rect x="230" y="56" width="260" height="380" rx="30" fill="#0E1A18" stroke="#2C4A44" stroke-width="2"/>
+  <rect x="328" y="66" width="64" height="5" rx="2.5" fill="#2C4A44"/>
+
+  <!-- Header -->
+  <text x="360" y="102" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#E8F0EB">Daily Check-In</text>
+  <text x="360" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">About a minute a day</text>
+
+  <!-- Slider rows -->
+  <g>
+    <!-- Pain -->
+    <rect x="252" y="138" width="216" height="56" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="268" y="162" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#CBE3CF">Pain</text>
+    <line x1="268" y1="182" x2="452" y2="182" stroke="#1E332F" stroke-width="5" stroke-linecap="round"/>
+    <line x1="268" y1="182" x2="352" y2="182" stroke="#7FB5A5" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="352" cy="182" r="8" fill="#9CC6A4" stroke="#0E1817" stroke-width="2"/>
+
+    <!-- Energy -->
+    <rect x="252" y="206" width="216" height="56" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="268" y="230" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#CBE3CF">Energy</text>
+    <line x1="268" y1="250" x2="452" y2="250" stroke="#1E332F" stroke-width="5" stroke-linecap="round"/>
+    <line x1="268" y1="250" x2="300" y2="250" stroke="#7FB5A5" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="300" cy="250" r="8" fill="#9CC6A4" stroke="#0E1817" stroke-width="2"/>
+
+    <!-- Sleep -->
+    <rect x="252" y="274" width="216" height="56" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="268" y="298" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#CBE3CF">Sleep quality</text>
+    <line x1="268" y1="318" x2="452" y2="318" stroke="#1E332F" stroke-width="5" stroke-linecap="round"/>
+    <line x1="268" y1="318" x2="400" y2="318" stroke="#7FB5A5" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="400" cy="318" r="8" fill="#9CC6A4" stroke="#0E1817" stroke-width="2"/>
+  </g>
+
+  <!-- Mood chips -->
+  <text x="360" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#CBE3CF">Mood</text>
+  <g font-family="Arial, sans-serif" font-size="12">
+    <text x="278" y="386" text-anchor="middle" fill="#6E8A7C">&#9785;</text>
+    <text x="306" y="386" text-anchor="middle" fill="#6E8A7C">&#9786;</text>
+    <rect x="332" y="374" width="26" height="26" rx="13" fill="#1A3A2C" stroke="#2CAA6A" stroke-width="1.5"/>
+    <text x="346" y="392" text-anchor="middle" fill="#8FD0AC">&#9786;</text>
+    <text x="376" y="386" text-anchor="middle" fill="#6E8A7C">&#9786;</text>
+    <text x="402" y="386" text-anchor="middle" fill="#6E8A7C">&#9786;</text>
+  </g>
+
+  <!-- Submit -->
+  <rect x="252" y="408" width="216" height="20" rx="10" fill="#1A3A2C" stroke="#2CAA6A" stroke-width="1.4"/>
+  <text x="360" y="422" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#8FD0AC">SAVE CHECK-IN</text>
+
+  <!-- Side annotations -->
+  <text x="360" y="466" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6E8A7C">Log symptoms quickly &#8212; trends build over time</text>
+</svg>

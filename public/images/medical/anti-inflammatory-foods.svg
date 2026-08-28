@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Anti-inflammatory food plate</title>
+  <desc id="desc">A healthy plate diagram showing anti-inflammatory food groups recommended for fibromyalgia: colorful vegetables, fruit, fish, nuts, olive oil and whole grains.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">ANTI-INFLAMMATORY FOOD PLATE</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Mediterranean-style eating pattern for fibromyalgia</text>
+
+  <!-- Plate -->
+  <circle cx="270" cy="290" r="180" fill="#12231F" stroke="#2C4A44" stroke-width="3"/>
+  <circle cx="270" cy="290" r="158" fill="none" stroke="#1E332F" stroke-width="1.5"/>
+
+  <!-- Plate wedge segments -->
+  <!-- Vegetables (bottom-left, emerald) -->
+  <path d="M270 290 L270 132 A158 158 0 0 1 400 216 Z" fill="#2A463F" opacity="0.9"/>
+  <!-- Fruits (right, sage) -->
+  <path d="M400 216 A158 158 0 0 1 384 438 L270 290 Z" fill="#3A574B" opacity="0.9"/>
+  <!-- Whole grains (bottom-center, amber) -->
+  <path d="M270 290 L384 438 A158 158 0 0 1 238 440 L270 290 Z" fill="#5A4A2E" opacity="0.85"/>
+  <!-- Legumes/nuts (left) -->
+  <path d="M270 290 L238 440 A158 158 0 0 1 140 330 L270 290 Z" fill="#4A3A26" opacity="0.85"/>
+  <!-- Fish & olive oil (top-left) -->
+  <path d="M270 290 L140 330 A158 158 0 0 1 112 212 L270 290 Z" fill="#2E4A5A" opacity="0.9"/>
+  <path d="M270 290 L112 212 A158 158 0 0 1 270 132 Z" fill="#2A463F" opacity="0.85"/>
+
+  <!-- Food vignettes -->
+  <!-- Leafy greens -->
+  <path d="M300 176 c18 -4 34 2 40 18 c-16 2 -30 -4 -40 -18z M316 196 c12 -2 24 2 28 12 c-12 2 -22 -2 -28 -12z" fill="#9CC6A4"/>
+  <!-- Fish -->
+  <path d="M180 250 c24 -10 60 -10 84 0 l0 22 c-24 10 -60 10 -84 0 z" fill="#7FB5A5"/>
+  <path d="M264 250 c18 0 18 22 0 22 z" fill="#7FB5A5"/>
+  <circle cx="258" cy="254" r="2.4" fill="#0E1817"/>
+  <circle cx="258" cy="266" r="2.4" fill="#0E1817"/>
+  <circle cx="252" cy="260" r="2.4" fill="#0E1817"/>
+  <!-- Olive oil drop -->
+  <ellipse cx="150" cy="180" rx="10" ry="16" fill="#D9B56A"/>
+  <!-- Berries -->
+  <circle cx="330" cy="330" r="7" fill="#C77A6A"/>
+  <circle cx="346" cy="334" r="7" fill="#C77A6A"/>
+  <circle cx="338" cy="318" r="7" fill="#7FB5A5"/>
+  <!-- Whole grains -->
+  <ellipse cx="300" cy="400" rx="16" ry="10" fill="#D9B56A"/>
+  <ellipse cx="326" cy="402" rx="14" ry="8" fill="#C9A54E"/>
+  <!-- Nuts -->
+  <ellipse cx="200" cy="392" rx="10" ry="13" fill="#B58A4A" transform="rotate(20 200 392)"/>
+  <ellipse cx="216" cy="388" rx="10" ry="13" fill="#C9A54E" transform="rotate(-10 216 388)"/>
+
+  <!-- Plate labels -->
+  <g font-family="Arial, sans-serif" font-size="11" fill="#E8F0EB" text-anchor="middle">
+    <text x="330" y="226" font-weight="700">Vegetables</text>
+    <text x="330" y="240" font-size="10" fill="#A5B8AC">cruciferous &amp; leafy</text>
+    <text x="342" y="366" font-weight="700">Fruit &amp; berries</text>
+    <text x="296" y="420" font-weight="700">Whole grains</text>
+    <text x="188" y="392" font-weight="700">Legumes</text>
+    <text x="208" y="262" font-weight="700">Fish &amp; olive oil</text>
+    <text x="210" y="276" font-size="10" fill="#A5B8AC">omega-3 fats</text>
+  </g>
+
+  <!-- Right panel: what to limit -->
+  <g transform="translate(0 0)">
+    <rect x="486" y="150" width="196" height="86" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="584" y="178" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#C98C5A">May limit</text>
+    <text x="584" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#A5B8AC">Processed &amp; fried foods</text>
+    <text x="584" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#A5B8AC">Added sugars &amp; excess alcohol</text>
+
+    <rect x="486" y="256" width="196" height="96" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="584" y="284" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#CBE3CF">Stay hydrated</text>
+    <text x="584" y="308" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#A5B8AC">Water throughout the day</text>
+    <text x="584" y="326" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">Dehydration worsens fatigue</text>
+
+    <rect x="486" y="372" width="196" height="64" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="584" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Personal triggers</text>
+    <text x="584" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">Keep a food-symptom log</text>
+  </g>
+
+  <text x="360" y="464" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6E8A7C">No single diet cures fibromyalgia &#8212; a whole-food pattern supports energy and lessens flares</text>
+</svg>

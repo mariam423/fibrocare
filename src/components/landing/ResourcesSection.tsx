@@ -18,12 +18,15 @@ import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 
+import Image from "next/image";
+
 interface ResourceCard {
   href: string;
   category: TranslationKey;
   title: TranslationKey;
   copy: TranslationKey;
   icon: typeof BookOpen01Icon;
+  thumbnail: string;
   tint: string;
 }
 
@@ -34,6 +37,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.about",
     copy: "about.overview",
     icon: BookOpen01Icon,
+    thumbnail: "/images/medical/trigger-points.svg",
     tint: "oklab(0.55 0.06 150)",
   },
   {
@@ -42,6 +46,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.diagnosis",
     copy: "diagnosis.subtitle",
     icon: StethoscopeIcon,
+    thumbnail: "/images/medical/diagnosis-criteria.svg",
     tint: "oklab(0.55 0.06 280)",
   },
   {
@@ -50,6 +55,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.treatment",
     copy: "treatment.subtitle",
     icon: HeartPulseIcon,
+    thumbnail: "/images/medical/treatment-management.svg",
     tint: "oklab(0.58 0.06 45)",
   },
   {
@@ -58,6 +64,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.exercises",
     copy: "exercises.subtitle",
     icon: YogaIcon,
+    thumbnail: "/images/medical/gentle-movement.svg",
     tint: "oklab(0.55 0.05 190)",
   },
   {
@@ -66,6 +73,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.nutrition",
     copy: "nutrition.subtitle",
     icon: AppleIcon,
+    thumbnail: "/images/medical/anti-inflammatory-foods.svg",
     tint: "oklab(0.56 0.06 120)",
   },
   {
@@ -74,6 +82,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.faq",
     copy: "faq.subtitle",
     icon: BubbleChatQuestionIcon,
+    thumbnail: "/images/medical/pain-pathway.svg",
     tint: "oklab(0.56 0.05 230)",
   },
 ];
@@ -126,37 +135,47 @@ export function ResourcesSection() {
               <ScrollReveal key={resource.href} delay={(i % 3) * 0.08} className="h-full">
                 <SpotlightCard
                   as="article"
-                  className="surface-crisp hover-lift glow-card group flex h-full flex-col rounded-3xl border-border p-6 sm:p-7"
+                  className="surface-crisp hover-lift glow-card group flex h-full flex-col rounded-3xl border-border overflow-hidden"
                 >
-                  <span
-                    className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-foreground ring-1 ring-border"
-                    style={{ backgroundColor: `color-mix(in srgb, ${resource.tint} 16%, transparent)` }}
-                  >
-                    {t(resource.category)}
-                  </span>
-                  <div className="mt-5 flex items-start justify-between gap-4">
-                    <span className="icon-badge h-10 w-10 rounded-xl transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105">
-                      <HugeiconsIcon icon={Icon} className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold tracking-tight text-foreground">
-                    {t(resource.title)}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {t(resource.copy)}
-                  </p>
-                  <Link
-                    href={resource.href}
-                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-                    aria-label={`${t("landing.resources.card.readGuide")}: ${t(resource.title)}`}
-                  >
-                    {t("landing.resources.card.readGuide")}
-                    <HugeiconsIcon
-                      icon={ArrowRight01Icon}
-                      className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 rtl:scale-x-[-1] rtl:group-hover:-translate-x-0.5"
-                      aria-hidden="true"
+                  <div className="relative aspect-video w-full overflow-hidden">
+                    <Image
+                      src={resource.thumbnail}
+                      alt={t(resource.title)}
+                      fill
+                      className="object-cover"
                     />
-                  </Link>
+                  </div>
+                  <div className="p-6 sm:p-7">
+                    <span
+                      className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-foreground ring-1 ring-border"
+                      style={{ backgroundColor: `color-mix(in srgb, ${resource.tint} 16%, transparent)` }}
+                    >
+                      {t(resource.category)}
+                    </span>
+                    <div className="mt-5 flex items-start justify-between gap-4">
+                      <span className="icon-badge h-10 w-10 rounded-xl transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105">
+                        <HugeiconsIcon icon={Icon} className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold tracking-tight text-foreground">
+                      {t(resource.title)}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {t(resource.copy)}
+                    </p>
+                    <Link
+                      href={resource.href}
+                      className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                      aria-label={`${t("landing.resources.card.readGuide")}: ${t(resource.title)}`}
+                    >
+                      {t("landing.resources.card.readGuide")}
+                      <HugeiconsIcon
+                        icon={ArrowRight01Icon}
+                        className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 rtl:scale-x-[-1] rtl:group-hover:-translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </div>
                 </SpotlightCard>
               </ScrollReveal>
             );

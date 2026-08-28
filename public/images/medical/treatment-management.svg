@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Fibromyalgia treatment and management</title>
+  <desc id="desc">Diagram of a multidisciplinary approach to fibromyalgia: medication, gentle exercise, sleep and stress management, and nutrition working together around a personalized care plan.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.6">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">A MULTIDISCIPLINARY APPROACH</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Few things help more than any one thing alone</text>
+
+  <!-- Central hub -->
+  <circle cx="360" cy="250" r="72" fill="#1A2F29" stroke="#7FB5A5" stroke-width="2"/>
+  <text x="360" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#CBE3CF">Personalized</text>
+  <text x="360" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#CBE3CF">Care Plan</text>
+  <text x="360" y="282" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">built with your doctor</text>
+
+  <!-- Four surrounding modules -->
+  <g>
+    <!-- Medication (top) -->
+    <rect x="290" y="96" width="140" height="58" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="360" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">Medication</text>
+    <text x="360" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">as prescribed</text>
+    <line x1="360" y1="154" x2="360" y2="178" stroke="#8FBF9B" stroke-opacity="0.5" stroke-width="1.6" stroke-dasharray="3 3"/>
+
+    <!-- Gentle exercise (right) -->
+    <rect x="512" y="222" width="140" height="58" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="582" y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">Gentle exercise</text>
+    <text x="582" y="266" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">paced activity</text>
+    <line x1="512" y1="250" x2="434" y2="250" stroke="#8FBF9B" stroke-opacity="0.5" stroke-width="1.6" stroke-dasharray="3 3"/>
+
+    <!-- Sleep & stress (bottom) -->
+    <rect x="290" y="354" width="140" height="58" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="360" y="376" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">Sleep &amp; stress</text>
+    <text x="360" y="398" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">mindfulness, CBT</text>
+    <line x1="360" y1="354" x2="360" y2="324" stroke="#8FBF9B" stroke-opacity="0.5" stroke-width="1.6" stroke-dasharray="3 3"/>
+
+    <!-- Nutrition (left) -->
+    <rect x="68" y="222" width="140" height="58" rx="14" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="138" y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#CBE3CF">Nutrition</text>
+    <text x="138" y="266" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">anti-inflammatory</text>
+    <line x1="208" y1="250" x2="286" y2="250" stroke="#8FBF9B" stroke-opacity="0.5" stroke-width="1.6" stroke-dasharray="3 3"/>
+  </g>
+
+  <!-- Small icon dots at each spoke -->
+  <g>
+    <circle cx="360" cy="174" r="4" fill="#7FB5A5"/>
+    <circle cx="438" cy="250" r="4" fill="#7FB5A5"/>
+    <circle cx="360" cy="326" r="4" fill="#7FB5A5"/>
+    <circle cx="282" cy="250" r="4" fill="#7FB5A5"/>
+  </g>
+
+  <!-- Bottom note -->
+  <rect x="170" y="420" width="380" height="34" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+  <text x="360" y="442" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#E8F0EB">Together, these ease symptoms and improve daily function</text>
+</svg>

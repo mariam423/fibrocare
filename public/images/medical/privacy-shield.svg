@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Your health data stays private</title>
+  <desc id="desc">A shield-and-key diagram showing that personal symptom data is encrypted, kept secure and never sold, with control over who sees it.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22463B"/>
+      <stop offset="100%" stop-color="#1A332C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">YOUR DATA, UNDER YOUR CONTROL</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Health information is sensitive &#8212; it deserves real protection</text>
+
+  <!-- Shield -->
+  <g>
+    <path d="M360 110 L470 150 L470 240 Q470 330 360 366 Q250 330 250 240 L250 150 Z" fill="url(#shield)" stroke="#7FB5A5" stroke-opacity="0.6" stroke-width="2"/>
+    <path d="M360 190 L410 242 L450 170 L470 196 L408 268 L380 238 L360 262 L336 236 L308 266 L250 194 L268 168 L336 224 Z" fill="#8FD0AC" opacity="0.85"/>
+    <text x="360" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#CBE3CF">Encrypted &amp; secure</text>
+    <text x="360" y="408" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#A5B8AC">your notes are not for sale</text>
+  </g>
+
+  <!-- Right panel: control points -->
+  <g transform="translate(0 0)">
+    <rect x="500" y="150" width="180" height="52" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="590" y="174" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">You decide</text>
+    <text x="590" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">who sees what</text>
+
+    <rect x="500" y="216" width="180" height="52" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="590" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Export anytime</text>
+    <text x="590" y="256" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">portable, shareable report</text>
+
+    <rect x="500" y="282" width="180" height="52" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="590" y="306" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Delete on request</text>
+    <text x="590" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">full data removal</text>
+
+    <rect x="500" y="348" width="180" height="52" rx="12" fill="#12231F" stroke="#2C4A44" stroke-width="1"/>
+    <text x="590" y="372" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">No selling</text>
+    <text x="590" y="388" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">never traded to advertisers</text>
+  </g>
+
+  <!-- Connecting line -->
+  <line x1="472" y1="260" x2="500" y2="260" stroke="#8FBF9B" stroke-opacity="0.5" stroke-width="1.6" stroke-dasharray="4 4"/>
+
+  <text x="360" y="446" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6E8A7C">Strong protection by default &#8212; because trust matters in healthcare</text>
+</svg>

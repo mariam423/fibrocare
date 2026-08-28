@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Fibromyalgia symptom toolkit</title>
+  <desc id="desc">A grid of practical toolkit tools for managing fibromyalgia: stress breaks, breathing, gentle stretches, pacing, a pain and activity journal, and soothing routines.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="480" fill="url(#bg)"/>
+  <rect width="720" height="480" fill="url(#glow)"/>
+
+  <text x="360" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#E8F0EB" letter-spacing="1">PRACTICAL TOOLS, BUILT IN</text>
+  <text x="360" y="62" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Small daily tools that help you live with fibromyalgia</text>
+
+  <!-- 3x2 grid of tools -->
+  <g>
+    <!-- Breathing -->
+    <rect x="60" y="110" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <g stroke="#7FB5A5" stroke-width="2" fill="none">
+      <circle cx="155" cy="158" r="14"/>
+      <circle cx="155" cy="158" r="24"/>
+    </g>
+    <text x="155" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Breathing</text>
+    <text x="155" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">calm the nervous system</text>
+
+    <!-- Stretch -->
+    <rect x="265" y="110" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <path d="M360 146 q40 -14 54 6 q-18 12 -40 4 q-24 10 -44 0 q14 -12 30 -10z" fill="#7FB5A5" opacity="0.8"/>
+    <text x="360" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Gentle stretch</text>
+    <text x="360" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">release tight muscles</text>
+
+    <!-- Pacing -->
+    <rect x="470" y="110" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <path d="M570 156 l0 18 M570 156 h26 l-14 14 M570 156 l8 10" stroke="#7FB5A5" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="565" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Pacing</text>
+    <text x="565" y="212" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">break activity into steps</text>
+
+    <!-- Journal -->
+    <rect x="60" y="240" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <rect x="140" y="262" width="30" height="36" rx="4" fill="none" stroke="#7FB5A5" stroke-width="1.6"/>
+    <line x1="146" y1="274" x2="164" y2="274" stroke="#7FB5A5" stroke-width="1.6"/>
+    <line x1="146" y1="282" x2="164" y2="282" stroke="#7FB5A5" stroke-width="1.6"/>
+    <line x1="146" y1="290" x2="160" y2="290" stroke="#7FB5A5" stroke-width="1.6"/>
+    <text x="155" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Pain &amp; activity log</text>
+    <text x="155" y="336" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">spot what helps</text>
+
+    <!-- Sleep routine -->
+    <rect x="265" y="240" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <path d="M376 292 a18 18 0 1 1 14 -27 a22 22 0 1 0 5 40 a18 18 0 0 1 -19 -13z" fill="#7FB5A5"/>
+    <text x="360" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Sleep routine</text>
+    <text x="360" y="336" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">protect restorative rest</text>
+
+    <!-- Soothing -->
+    <rect x="470" y="240" width="190" height="110" rx="16" fill="#12231F" stroke="#2C4A44" stroke-width="1.4"/>
+    <path d="M565 270 q12 -8 22 0 q10 -8 20 0 l-6 20 q-12 -5 -30 0 z" fill="#7FB5A5" opacity="0.85"/>
+    <line x1="563" y1="298" x2="597" y2="298" stroke="#7FB5A5" stroke-width="1.6"/>
+    <text x="565" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#E8F0EB">Soothing routines</text>
+    <text x="565" y="336" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#A5B8AC">warmth, rest, comfort</text>
+  </g>
+
+  <text x="360" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6E8A7C">A growing kit of gentle, evidence-informed supports all in one place</text>
+</svg>

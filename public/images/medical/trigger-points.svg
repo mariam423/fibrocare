@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720 720" role="img" aria-labelledby="title desc">
+  <title id="title">Fibromyalgia tender point locations</title>
+  <desc id="desc">Front and back medical body diagram showing the eighteen official fibromyalgia tender points: occiput, low cervical, trapezius, supraspinatus, second rib, lateral epicondyle, gluteal, greater trochanter, and knee.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1312"/>
+      <stop offset="100%" stop-color="#0E1817"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.6">
+      <stop offset="0%" stop-color="#8FBF9B" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#8FBF9B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#9CC6A4"/>
+      <stop offset="55%" stop-color="#8FBF9B"/>
+      <stop offset="100%" stop-color="#7FB5A5"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="720" fill="url(#bg)"/>
+  <rect width="720" height="720" fill="url(#glow)"/>
+
+  <!-- Header -->
+  <text x="360" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#E8F0EB" letter-spacing="1">FIBROMYALGIA TENDER POINT MAP</text>
+  <text x="360" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">The 18 official sites · American College of Rheumatology criteria</text>
+
+  <!-- Column labels -->
+  <text x="205" y="104" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#7FB5A5">ANTERIOR</text>
+  <text x="515" y="104" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#7FB5A5">POSTERIOR</text>
+
+  <!-- Body outlines -->
+  <g stroke="#2C4A44" stroke-width="1.5" fill="none" opacity="0.9">
+    <!-- Anterior body -->
+    <path d="M205 120
+      c0 -14 10 -22 30 -22
+      c22 0 34 10 34 26
+      c0 8 -3 14 -8 18
+      l0 12
+      a20 20 0 0 0 12 18
+      l0 12
+      c-8 4 -14 12 -16 22
+      l-6 60
+      c-2 26 -6 44 -10 54
+      l0 150
+      c0 10 -5 18 -14 22
+      l-2 40
+      c0 6 -6 10 -12 9
+      c-7 -1 -10 -6 -9 -11
+      l6 -34
+      c-18 0 -36 0 -54 0
+      l6 38
+      c1 5 -2 9 -9 9
+      c-6 0 -12 -3 -12 -9
+      l-2 -44
+      c-9 -3 -14 -10 -14 -20
+      l0 -150
+      c-4 -12 -8 -30 -10 -56
+      l-6 -58
+      c-2 -11 -8 -20 -16 -25
+      l0 -12
+      a20 20 0 0 0 12 -18
+      l0 -12
+      c-5 -4 -8 -10 -8 -18
+      c0 -16 12 -26 34 -26
+      c20 0 30 8 30 22
+      z" transform="translate(-30 0)"/>
+
+    <!-- Posterior body -->
+    <path d="M515 120
+      c0 -14 10 -22 30 -22
+      c22 0 34 10 34 26
+      c0 8 -3 14 -8 18
+      l0 12
+      a20 20 0 0 0 12 18
+      l0 12
+      c-8 4 -14 12 -16 22
+      l-6 60
+      c-2 26 -6 44 -10 54
+      l0 150
+      c0 10 -5 18 -14 22
+      l-2 40
+      c0 6 -6 10 -12 9
+      c-7 -1 -10 -6 -9 -11
+      l6 -34
+      c-18 0 -36 0 -54 0
+      l6 38
+      c1 5 -2 9 -9 9
+      c-6 0 -12 -3 -12 -9
+      l-2 -44
+      c-9 -3 -14 -10 -14 -20
+      l0 -150
+      c-4 -12 -8 -30 -10 -56
+      l-6 -58
+      c-2 -11 -8 -20 -16 -25
+      l0 -12
+      a20 20 0 0 0 12 -18
+      l0 -12
+      c-5 -4 -8 -10 -8 -18
+      c0 -16 12 -26 34 -26
+      c20 0 30 8 30 22
+      z" transform="translate(340 0)"/>
+  </g>
+
+  <!-- Facial / head hint (necks) -->
+  <g fill="#2C4A44" opacity="0.8">
+    <circle cx="205" cy="112" r="16"/>
+    <circle cx="515" cy="112" r="16"/>
+  </g>
+
+  <!-- Tender point markers: [cx, cy, id] -->
+  <g>
+    <!-- OCCIPUT (anterior=front neck, posterior=back of head) -->
+    <circle cx="205" cy="120" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="515" cy="96" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- LOW CERVICAL (both same) -->
+    <circle cx="190" cy="164" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="220" cy="164" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="500" cy="164" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="530" cy="164" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- TRAPEZIUS -->
+    <circle cx="175" cy="196" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="235" cy="196" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="485" cy="196" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="545" cy="196" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- SUPRASPINATUS (shoulder) -->
+    <circle cx="163" cy="240" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="247" cy="240" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="473" cy="240" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="557" cy="240" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- SECOND RIB (upper chest) -->
+    <circle cx="183" cy="300" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="227" cy="300" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- LATERAL EPICONDYLE (outer elbow) -->
+    <circle cx="150" cy="330" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="260" cy="330" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="460" cy="330" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="570" cy="330" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- GLUTEAL -->
+    <circle cx="177" cy="580" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="233" cy="580" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="487" cy="580" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="543" cy="580" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- GREATER TROCHANTER -->
+    <circle cx="163" cy="640" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="247" cy="640" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="473" cy="640" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="557" cy="640" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+
+    <!-- KNEE (medial fat pad) -->
+    <circle cx="173" cy="688" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="237" cy="688" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="483" cy="688" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+    <circle cx="547" cy="688" r="9" fill="url(#dot)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1"/>
+  </g>
+
+  <!-- Connecting glow lines for the posterior chain -->
+  <g stroke="#8FBF9B" stroke-opacity="0.18" stroke-width="1">
+    <polyline points="515,96 515,164 500,196 473,240 460,330 487,580 473,640 483,688" fill="none"/>
+    <polyline points="515,96 530,164 545,196 557,240 570,330 543,580 557,640 547,688" fill="none"/>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(0 726)">
+    <circle cx="24" cy="-8" r="6" fill="url(#dot)"/>
+    <text x="38" y="-5" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Tender point</text>
+    <line x1="130" y1="-8" x2="170" y2="-8" stroke="#2C4A44" stroke-width="2"/>
+    <text x="178" y="-5" font-family="Arial, sans-serif" font-size="12" fill="#A5B8AC">Bilateral (both sides)</text>
+  </g>
+</svg>

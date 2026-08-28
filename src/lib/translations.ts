@@ -1449,7 +1449,64 @@ export type TranslationKey =
   | "pro.page.cta"
   | "pro.page.doctorHubBadge"
   | "pro.page.consultationsBadge"
-  | "pro.page.aiCopilotBadge";
+  | "pro.page.aiCopilotBadge"
+  | "symptomTracker.title"
+  | "symptomTracker.subtitle"
+  | "symptomTracker.selectSymptoms"
+  | "symptomTracker.notes"
+  | "symptomTracker.notesPlaceholder"
+  | "symptomTracker.generateReport"
+  | "symptomTracker.collapseAll"
+  | "symptomTracker.expandAll"
+  | "symptomTracker.clearAll"
+  | "symptomTracker.totalChecked"
+  | "symptomTracker.category.pain"
+  | "symptomTracker.category.physical"
+  | "symptomTracker.category.postExertional"
+  | "symptomTracker.category.headFaceJaw"
+  | "symptomTracker.category.sensory"
+  | "symptomTracker.pain.neckShoulders"
+  | "symptomTracker.pain.upperBack"
+  | "symptomTracker.pain.lowerBackHips"
+  | "symptomTracker.pain.armsElbows"
+  | "symptomTracker.pain.legsKnees"
+  | "symptomTracker.pain.chestWall"
+  | "symptomTracker.physical.severeFatigue"
+  | "symptomTracker.physical.morningStiffness"
+  | "symptomTracker.physical.sleepDisturbances"
+  | "symptomTracker.physical.numbnessTingling"
+  | "symptomTracker.physical.rls"
+  | "symptomTracker.physical.burningColdSensations"
+  | "symptomTracker.postExertional.postShower"
+  | "symptomTracker.postExertional.postMeal"
+  | "symptomTracker.postExertional.exhaustionGoingOut"
+  | "symptomTracker.head.fibroFog"
+  | "symptomTracker.head.memoryLapses"
+  | "symptomTracker.head.tensionHeadaches"
+  | "symptomTracker.head.tmjJawPain"
+  | "symptomTracker.head.facialTension"
+  | "symptomTracker.sensory.lightNoise"
+  | "symptomTracker.sensory.ibsDigestive"
+  | "symptomTracker.sensory.palpitationsDizziness"
+  | "symptomTracker.sensory.moodAnxiety"
+  | "doctorReport.title"
+  | "doctorReport.subtitle"
+  | "doctorReport.close"
+  | "doctorReport.patientInfo"
+  | "doctorReport.date"
+  | "doctorReport.painLevel"
+  | "doctorReport.energyMood"
+  | "doctorReport.checkedSymptoms"
+  | "doctorReport.category"
+  | "doctorReport.notes"
+  | "doctorReport.noSymptoms"
+  | "doctorReport.noNotes"
+  | "doctorReport.noSymptomsMessage"
+  | "doctorReport.noNotesMessage"
+  | "doctorReport.copyToClipboard"
+  | "doctorReport.copied"
+  | "doctorReport.printReport"
+  | "doctorReport.disclaimer";
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -2904,6 +2961,63 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pro.page.doctorHubBadge": "Doctor Hub",
     "pro.page.consultationsBadge": "Consultations",
     "pro.page.aiCopilotBadge": "AI Copilot",
+    "symptomTracker.title": "Symptom Checklist",
+    "symptomTracker.subtitle": "Track your symptoms to remember everything for your next doctor visit",
+    "symptomTracker.selectSymptoms": "Select all that apply",
+    "symptomTracker.notes": "Additional Notes",
+    "symptomTracker.notesPlaceholder": "Add any details, triggers, or observations for your doctor...",
+    "symptomTracker.generateReport": "Generate Doctor Summary Report",
+    "symptomTracker.collapseAll": "Collapse All",
+    "symptomTracker.expandAll": "Expand All",
+    "symptomTracker.clearAll": "Clear All",
+    "symptomTracker.totalChecked": "{count} symptoms checked",
+    "symptomTracker.category.pain": "Pain Locations & Widespread Pain",
+    "symptomTracker.category.physical": "General Physical & Neurological Symptoms",
+    "symptomTracker.category.postExertional": "Post-Exertional & Trigger Fatigue",
+    "symptomTracker.category.headFaceJaw": "Head, Face & Jaw",
+    "symptomTracker.category.sensory": "Sensory & Associated Sensitivities",
+    "symptomTracker.pain.neckShoulders": "Neck & Shoulders",
+    "symptomTracker.pain.upperBack": "Upper Back",
+    "symptomTracker.pain.lowerBackHips": "Lower Back & Hips",
+    "symptomTracker.pain.armsElbows": "Arms & Elbows",
+    "symptomTracker.pain.legsKnees": "Legs & Knees",
+    "symptomTracker.pain.chestWall": "Chest Wall",
+    "symptomTracker.physical.severeFatigue": "Severe Fatigue",
+    "symptomTracker.physical.morningStiffness": "Morning Stiffness",
+    "symptomTracker.physical.sleepDisturbances": "Sleep Disturbances / Insomnia",
+    "symptomTracker.physical.numbnessTingling": "Numbness & Tingling in Hands/Feet",
+    "symptomTracker.physical.rls": "Restless Legs Syndrome (RLS)",
+    "symptomTracker.physical.burningColdSensations": "Burning / Cold Sensations in Legs",
+    "symptomTracker.postExertional.postShower": "Post-Shower Fatigue",
+    "symptomTracker.postExertional.postMeal": "Post-Meal Fatigue & Flare-Ups",
+    "symptomTracker.postExertional.exhaustionGoingOut": "Exhaustion After Going Out",
+    "symptomTracker.head.fibroFog": "Fibro Fog & Concentration Issues",
+    "symptomTracker.head.memoryLapses": "Memory Lapses",
+    "symptomTracker.head.tensionHeadaches": "Tension Headaches & Migraines",
+    "symptomTracker.head.tmjJawPain": "TMJ / Jaw Pain",
+    "symptomTracker.head.facialTension": "Facial Tension & Eye Strain",
+    "symptomTracker.sensory.lightNoise": "Sensitivity to Light / Noise / Temperature",
+    "symptomTracker.sensory.ibsDigestive": "IBS & Digestive Issues",
+    "symptomTracker.sensory.palpitationsDizziness": "Palpitations / Dizziness",
+    "symptomTracker.sensory.moodAnxiety": "Mood Changes & Anxiety",
+    "doctorReport.title": "Doctor Visit Summary Report",
+    "doctorReport.subtitle": "Your symptom summary for your healthcare provider",
+    "doctorReport.close": "Close",
+    "doctorReport.patientInfo": "Patient Information",
+    "doctorReport.date": "Date",
+    "doctorReport.painLevel": "Pain Level",
+    "doctorReport.energyMood": "Energy & Mood",
+    "doctorReport.checkedSymptoms": "Reported Symptoms",
+    "doctorReport.category": "Category",
+    "doctorReport.notes": "Patient Notes",
+    "doctorReport.noSymptoms": "No symptoms selected",
+    "doctorReport.noNotes": "No notes added",
+    "doctorReport.noSymptomsMessage": "The patient has not selected any symptoms for this visit.",
+    "doctorReport.noNotesMessage": "No additional notes were provided.",
+    "doctorReport.copyToClipboard": "Copy to Clipboard",
+    "doctorReport.copied": "Copied!",
+    "doctorReport.printReport": "Print Report",
+    "doctorReport.disclaimer": "This report was generated by the patient using FibroCare and is not a medical diagnosis. Please review with your healthcare provider.",
   },
   ar: {
     "nav.dashboard": "اللوحة الرئيسية",
@@ -4359,5 +4473,62 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "pro.page.doctorHubBadge": "قسم الأطباء",
     "pro.page.consultationsBadge": "الاستشارات",
     "pro.page.aiCopilotBadge": "المساعد الذكي",
+    "symptomTracker.title": "قائمة الأعراض",
+    "symptomTracker.subtitle": "تتبع أعراضك لتتذكّر كل شيء في زيارة طبيبك القادمة",
+    "symptomTracker.selectSymptoms": "اختر ما ينطبق عليك",
+    "symptomTracker.notes": "ملاحظات إضافية",
+    "symptomTracker.notesPlaceholder": "أضف أي تفاصيل أو محفزات أو ملاحظات لطبيبك...",
+    "symptomTracker.generateReport": "إنشاء تقرير زيارة الطبيب",
+    "symptomTracker.collapseAll": "طي الكل",
+    "symptomTracker.expandAll": "توسيع الكل",
+    "symptomTracker.clearAll": "مسح الكل",
+    "symptomTracker.totalChecked": "{count} أعراض محددة",
+    "symptomTracker.category.pain": "مواقع الألم والألم المنتشر",
+    "symptomTracker.category.physical": "الأعراض الجسدية والعصبية العامة",
+    "symptomTracker.category.postExertional": "إرهاق ما بعد النشاط والمحفزات",
+    "symptomTracker.category.headFaceJaw": "الرأس والوجه والفك",
+    "symptomTracker.category.sensory": "الحساسيات الحسية والمرتبطة",
+    "symptomTracker.pain.neckShoulders": "الرقبة والكتفين",
+    "symptomTracker.pain.upperBack": "الظهر العلوي",
+    "symptomTracker.pain.lowerBackHips": "الظهر السفلي والورك",
+    "symptomTracker.pain.armsElbows": "الذراعين والمرفقين",
+    "symptomTracker.pain.legsKnees": "الساقين والركبتين",
+    "symptomTracker.pain.chestWall": "جدار الصدر",
+    "symptomTracker.physical.severeFatigue": "إرهاق شديد",
+    "symptomTracker.physical.morningStiffness": "تيبس الصباح",
+    "symptomTracker.physical.sleepDisturbances": "اضطرابات النوم / الأرق",
+    "symptomTracker.physical.numbnessTingling": "تنميل وخدر في اليدين/القدمين",
+    "symptomTracker.physical.rls": "متلازمة تململ الساقين",
+    "symptomTracker.physical.burningColdSensations": "إحساس بالحرقان/البرودة في الساقين",
+    "symptomTracker.postExertional.postShower": "إرهاق ما بعد الاستحمام",
+    "symptomTracker.postExertional.postMeal": "إرهاق ونوبات ما بعد الوجبات",
+    "symptomTracker.postExertional.exhaustionGoingOut": "إرهاق بعد الخروج من المنزل",
+    "symptomTracker.head.fibroFog": "ضباب الألياف ومشاكل التركيز",
+    "symptomTracker.head.memoryLapses": "فراغات الذاكرة",
+    "symptomTracker.head.tensionHeadaches": "صداع التوتر والشقيقة",
+    "symptomTracker.head.tmjJawPain": "ألم الفك / TMJ",
+    "symptomTracker.head.facialTension": "توتر الوجه وإجهاد العينين",
+    "symptomTracker.sensory.lightNoise": "حساسية للضوء / الضوضاء / درجة الحرارة",
+    "symptomTracker.sensory.ibsDigestive": "القولون العصبي ومشاكل الجهاز الهضمي",
+    "symptomTracker.sensory.palpitationsDizziness": "خفقان / دوخة",
+    "symptomTracker.sensory.moodAnxiety": "تغيرات المزاج والقلق",
+    "doctorReport.title": "تقرير زيارة الطبيب",
+    "doctorReport.subtitle": "ملخص أعراضك لطبيب الرعاية الصحية",
+    "doctorReport.close": "إغلاق",
+    "doctorReport.patientInfo": "معلومات المريض",
+    "doctorReport.date": "التاريخ",
+    "doctorReport.painLevel": "مستوى الألم",
+    "doctorReport.energyMood": "الطاقة والمزاج",
+    "doctorReport.checkedSymptoms": "الأعراض المُبلّغ عنها",
+    "doctorReport.category": "الفئة",
+    "doctorReport.notes": "ملاحظات المريض",
+    "doctorReport.noSymptoms": "لم يتم اختيار أي أعراض",
+    "doctorReport.noNotes": "لم تُضف ملاحظات",
+    "doctorReport.noSymptomsMessage": "لم يحدد المريض أي أعراض لهذه الزيارة.",
+    "doctorReport.noNotesMessage": "لم تُقدم أي ملاحظات إضافية.",
+    "doctorReport.copyToClipboard": "نسخ إلى الحافظة",
+    "doctorReport.copied": "تم النسخ!",
+    "doctorReport.printReport": "طباعة التقرير",
+    "doctorReport.disclaimer": "تم إنشاء هذا التقرير بواسطة المريض باستخدام فيبروكير وهو ليس تشخيصًا طبيًا. يرجى مراجعته مع مقدم الرعاية الصحية.",
   },
 };

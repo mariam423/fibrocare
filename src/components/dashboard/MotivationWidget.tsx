@@ -197,19 +197,19 @@ const SUPPLICATIONS: MotivationItem[] = [
   {
     kind: "dua",
     reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
-    ar: "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ، اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ",
+    ar: "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ, اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ",
     en: "O Allah, I ask You from Your bounty. O Allah, protect me from the accursed Satan.",
   },
   {
     kind: "dua",
     reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
-    ar: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْكَرَبِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْهَرَمِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
+    ar: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْكَرَبِ, وَالْعَجْزِ وَالْكَسَلِ, وَالْبُخْلِ وَالْهَرَمِ, وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
     en: "O Allah, I seek refuge in You from worry and grief, incapacity and laziness, stinginess and old age, the burden of debt, and domination by others.",
   },
   {
     kind: "dua",
     reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
-    ar: "اللَّهُمَّ اشْفِ سَقَمِي، وَأَصْلِحْ شَأْنِي، وَاحْفَظْنِي مِنْ بَلَائِي",
+    ar: "اللَّهُمَّ اشْفِ سَقَمِي, وَأَصْلِحْ شَأْنِي, وَاحْفَظْنِي مِنْ بَلَائِي",
     en: "O Allah, heal my illness, rectify my affairs, and protect me from my trial.",
   },
   {
@@ -224,13 +224,13 @@ const STORIES: MotivationItem[] = [
   {
     kind: "story",
     reference: "قِصَّةُ أَيُّوبَ عَلَيْهِ السَّلَامُ — سُورَةُ الْأَنْبِيَاءِ ٢١:٨٣",
-    ar: "يَدْعُونَا قِصَّةُ أَيُّوبَ عَلَيْهِ السَّلَامُ إِلَى رَفْعِ الشَّكْوَى إِلَى اللَّهِ بِأَدَبٍ، وَالتَّمَسُّكِ بِالرَّجَاءِ فِي أَثْقَلِ الأَيَّامِ.",
+    ar: "يَدْعُونَا قِصَّةُ أَيُّوبَ عَلَيْهِ السَّلَامُ إِلَى رَفْعِ الشَّكْوَى إِلَى اللَّهِ بِأَدَبٍ, وَالتَّمَسُّكِ بِالرَّجَاءِ فِي أَثْقَلِ الأَيَّامِ.",
     en: "The story of Ayyub teaches us to bring our pain to Allah with humility and to hold on to hope through the heaviest days.",
   },
   {
     kind: "story",
     reference: "قِصَّةُ يَعْقُوبَ عَلَيْهِ السَّلَامُ — سُورَةُ يُوسُفَ ١٢:٨٦",
-    ar: "يُذَكِّرُنَا صَبْرُ يَعْقُوبَ عَلَيْهِ السَّلَامُ أَنَّ الْحُزْنَ لَا يُنْقِصُ الإِيمَانَ، وَأَنَّ بَثَّ الْهَمِّ إِلَى اللَّهِ بَابٌ مِنْ أَبْوَابِ الرَّجَاءِ.",
+    ar: "يُذَكِّرُنَا صَبْرُ يَعْقُوبَ عَلَيْهِ السَّلَامُ أَنَّ الْحُزْنَ لَا يُنْقِصُ الإِيمَانَ, وَأَنَّ بَثَّ الْهَمِّ إِلَى اللَّهِ بَابٌ مِنْ أَبْوَابِ الرَّجَاءِ.",
     en: "The patience of Yaqub reminds us that grief does not diminish faith, and that turning our sorrow to Allah can be an opening to hope.",
   },
   {
@@ -242,7 +242,7 @@ const STORIES: MotivationItem[] = [
   {
     kind: "story",
     reference: "قِصَّةُ نُوحَ عَلَيْهِ السَّلَامُ — سُورَةُ نُوحٍ ٧١:٥–٧",
-    ar: "صَبَرَ نُوحُ عَلَيْهِ السَّلَامُ أَلْفَيْ عَامٍ يَدْعُو قَوْمَهُ، فَعَلَّمَنَا أَنَّ الصَّبْرَ الْمُمْتَدِّ مَعَ الدُّعَاءِ مِنْ أَعْظَمِ الْعِبَادَاتِ، وَأَنَّ الْمُحَافَظَةَ عَلَى الْأَمَلِ مَعَ طُولِ الابْتِلَاءِ نِعْمَةٌ مِنَ اللَّهِ.",
+    ar: "صَبَرَ نُوحُ عَلَيْهِ السَّلَامُ أَلْفَيْ عَامٍ يَدْعُو قَوْمَهُ, فَعَلَّمَنَا أَنَّ الصَّبْرَ الْمُمْتَدِّ مَعَ الدُّعَاءِ مِنْ أَعْظَمِ الْعِبَادَاتِ, وَأَنَّ الْمُحَافَظَةَ عَلَى الْأَمَلِ مَعَ طُولِ الابْتِلَاءِ نِعْمَةٌ مِنَ اللَّهِ.",
     en: "Nuh (Noah) endured 950 years calling his people, teaching us that sustained patience with supplication is among the greatest acts of worship, and that maintaining hope through prolonged trials is a blessing from Allah.",
   },
   {
@@ -269,7 +269,7 @@ const WISDOMS: MotivationItem[] = [
   {
     kind: "wisdom",
     reference: "حِكْمَةٌ فِي الرَّحْمَةِ بِالنَّفْسِ",
-    ar: "لَيْسَ الْمَقْصُودُ مِنَ الشِّفَاءِ أَلَّا تَشْعُرَ بِالْأَلَمِ قَطّ، بَلْ أَنْ تَعِيشَ مَعَهُ وَتَجِدَ فِي كُلِّ يَوْمٍ سَبَبًا لِلرَّجَاءِ.",
+    ar: "لَيْسَ الْمَقْصُودُ مِنَ الشِّفَاءِ أَلَّا تَشْعُرَ بِالْأَلَمِ قَطّ, بَلْ أَنْ تَعِيشَ مَعَهُ وَتَجِدَ فِي كُلِّ يَوْمٍ سَبَبًا لِلرَّجَاءِ.",
     en: "Healing is not about never feeling pain, but about living with it and finding a reason for hope each day.",
   },
   {
@@ -281,7 +281,7 @@ const WISDOMS: MotivationItem[] = [
   {
     kind: "wisdom",
     reference: "حِكْمَةٌ فِي الصَّبْرِ",
-    ar: "إِذَا أَثْقَلَكَ الْيَوْمُ، فَاذْكُرْ أَنَّ الشَّمْسَ لَا تَشْرِقُ إِلَّا بَعْدَ أَظْلَمِ لَيْلَةٍ.",
+    ar: "إِذَا أَثْقَلَكَ الْيَوْمُ, فَاذْكُرْ أَنَّ الشَّمْسَ لَا تَشْرِقُ إِلَّا بَعْدَ أَظْلَمِ لَيْلَةٍ.",
     en: "When today feels heavy, remember: the sun only rises after the darkest night.",
   },
   {
@@ -299,7 +299,7 @@ const WISDOMS: MotivationItem[] = [
   {
     kind: "wisdom",
     reference: "حِكْمَةٌ يَوْمِيَّةٌ",
-    ar: "الصَّبْرُ لَيْسَ سُكُوتًا عَنِ الدُّعَاءِ، بَلْ هُوَ الِاثْبَاتُ مَعَ الدُّعَاءِ.",
+    ar: "الصَّبْرُ لَيْسَ سُكُوتًا عَنِ الدُّعَاءِ, بَلْ هُوَ الِاثْبَاتُ مَعَ الدُّعَاءِ.",
     en: "Patience is not silence from prayer; it is persistence in prayer.",
   },
   {
@@ -315,28 +315,6 @@ const WISDOMS: MotivationItem[] = [
     en: "Rest is not weakness; it is the strength of one who knows that stopping holds wisdom and patience holds light.",
   },
 ];
-
-/* ─── Interleave: round-robin across all 5 categories so the user
-       sees a different kind within the first few clicks ─────────── */
-
-function interleave(...arrays: MotivationItem[][]): MotivationItem[] {
-  const maxLen = Math.max(...arrays.map((a) => a.length));
-  const result: MotivationItem[] = [];
-  for (let i = 0; i < maxLen; i++) {
-    for (const arr of arrays) {
-      if (i < arr.length) result.push(arr[i]);
-    }
-  }
-  return result;
-}
-
-const MOTIVATIONS = interleave(
-  QURAN_VERSES,
-  HADITHS,
-  SUPPLICATIONS,
-  STORIES,
-  WISDOMS
-);
 
 /* ─── Kind metadata: labels, colors, and per-kind icons ──────────── */
 
@@ -416,11 +394,23 @@ const LABELS = {
 
 const NOTIFICATION_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
+/* ─── Rotation Logic ────────────────────────────────────────────────── */
+
+const CATEGORIES: MotivationKind[] = ["quran", "hadith", "dua", "story", "wisdom"];
+
+const DATA_MAP: Record<MotivationKind, MotivationItem[]> = {
+  quran: QURAN_VERSES,
+  hadith: HADITHS,
+  dua: SUPPLICATIONS,
+  story: STORIES,
+  wisdom: WISDOMS,
+};
+
 /* ─── Component ──────────────────────────────────────────────────── */
 
 export function MotivationWidget() {
   const { locale } = useLanguage();
-  const [index, setIndex] = useState(0);
+  const [rotationCount, setRotationCount] = useState(0);
   const [showArabic, setShowArabic] = useState(locale === "ar");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(
@@ -432,7 +422,15 @@ export function MotivationWidget() {
     null
   );
   const copy = LABELS[locale];
-  const item = useMemo(() => MOTIVATIONS[index], [index]);
+
+  const item = useMemo(() => {
+    const categoryIndex = rotationCount % CATEGORIES.length;
+    const category = CATEGORIES[categoryIndex];
+    const items = DATA_MAP[category];
+    const itemIndex = Math.floor(rotationCount / CATEGORIES.length) % items.length;
+    return items[itemIndex];
+  }, [rotationCount]);
+
   const kindMeta = KIND_META[item.kind];
 
   const prefersReducedMotion =
@@ -445,7 +443,7 @@ export function MotivationWidget() {
   // ── Auto-rotate every 20 seconds ──
   useEffect(() => {
     const timer = window.setInterval(
-      () => setIndex((v) => (v + 1) % MOTIVATIONS.length),
+      () => setRotationCount((v) => v + 1),
       20_000
     );
     return () => window.clearInterval(timer);
@@ -493,7 +491,7 @@ export function MotivationWidget() {
   );
 
   const next = useCallback(
-    () => setIndex((v) => (v + 1) % MOTIVATIONS.length),
+    () => setRotationCount((v) => v + 1),
     []
   );
 
@@ -562,7 +560,7 @@ export function MotivationWidget() {
         <div className="min-h-[14rem] rounded-2xl border border-border/70 bg-card/70 p-5 sm:p-7">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={`${index}-${showArabic ? "ar" : "en"}`}
+              key={`${rotationCount}-${showArabic ? "ar" : "en"}`}
               initial={{ opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.98 }}

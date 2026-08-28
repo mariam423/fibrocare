@@ -48,6 +48,7 @@ import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
 import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
 import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
 import { PostMealFatigueSection } from "@/components/dashboard/PostMealFatigueSection";
+import { SymptomTracker } from "@/components/logging/SymptomTracker";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
@@ -401,6 +402,9 @@ export default function Home() {
 
                   {/* Post-Meal Fatigue Tracking */}
                   <PostMealFatigueSection />
+
+                  {/* Comprehensive Symptom Checklist */}
+                  <SymptomTracker patientName={userName} />
 
                   {/* Save */}
                   <div className="border-t border-border pt-8 space-y-4">

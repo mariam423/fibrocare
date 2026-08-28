@@ -9,6 +9,10 @@ import {
   SparklesIcon,
   BellIcon,
   BellOffIcon,
+  BookmarkCheck01Icon,
+  Compass01Icon,
+  HeartHandshakeIcon,
+  Shield01Icon,
 } from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
@@ -25,12 +29,9 @@ type MotivationItem = {
   en: string;
 };
 
-/* ─── Content Array ──────────────────────────────────────────────── */
+/* ─── Raw Content (grouped for maintainability) ──────────────────── */
 
-const MOTIVATIONS: MotivationItem[] = [
-  /* ═══════════════════════════════════════════════════════════════════
-     QUR'ANIC VERSES (with full Tashkeel)
-     ═══════════════════════════════════════════════════════════════════ */
+const QURAN_VERSES: MotivationItem[] = [
   {
     kind: "quran",
     reference: "سُورَةُ الشَّرْحِ ٩٤:٥–٦",
@@ -115,10 +116,9 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ ۚ إِنَّ الَّذِينَ يَسْتَكْبِرُونَ عَنْ عِبَادَتِي سَيَدْخُلُونَ جَهَنَّمَ دَاخِرِينَ",
     en: "And your Lord says: 'Call upon Me; I will respond to you.' Indeed, those who disdain My worship will enter Hell humbled.",
   },
+];
 
-  /* ═══════════════════════════════════════════════════════════════════
-     PROPHETIC HADITHS (with authentic references)
-     ═══════════════════════════════════════════════════════════════════ */
+const HADITHS: MotivationItem[] = [
   {
     kind: "hadith",
     reference: "صَحِيحُ مُسْلِمٍ ٢٩٩٩",
@@ -161,10 +161,9 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "مَا يُصِيبُ الْمُؤْمِنَ أَلَمٌ وَلَا نَصَبٌ وَلَا هَمٌّ وَلَا حُزْنٌ وَلَا غَمٌّ حَتَّى الشَّوْكَةِ يُشَاكُهَا إِلَّا كَفَّرَ اللَّهُ بِهَا مِنْ خَطَايَاهُ",
     en: "No pain, exhaustion, worry, sorrow, or distress befalls a believer—including a thorn's prick—except that Allah erases some of their sins through it.",
   },
+];
 
-  /* ═══════════════════════════════════════════════════════════════════
-     SUPPLICATIONS (أدعية الشفاء والصبر)
-     ═══════════════════════════════════════════════════════════════════ */
+const SUPPLICATIONS: MotivationItem[] = [
   {
     kind: "dua",
     reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
@@ -219,10 +218,9 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "اللَّهُمَّ رَحْمَتَكَ أَرْجُو فَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ وَأَصْلِحْ لِي شَأْنِي كُلَّهُ لَا إِلَهَ إِلَّا أَنْتَ",
     en: "O Allah, I hope for Your mercy. Do not leave me to myself for the blink of an eye. Rectify all my affairs. There is no god but You.",
   },
+];
 
-  /* ═══════════════════════════════════════════════════════════════════
-     STORIES OF PROPHETS (قصص الأنبياء في الصبر)
-     ═══════════════════════════════════════════════════════════════════ */
+const STORIES: MotivationItem[] = [
   {
     kind: "story",
     reference: "قِصَّةُ أَيُّوبَ عَلَيْهِ السَّلَامُ — سُورَةُ الْأَنْبِيَاءِ ٢١:٨٣",
@@ -253,10 +251,9 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "قَالَ يَعْقُوبُ: يَا بَنِيَّ اذْهَبُوا فَتَحَسَّسُوا مِنْ يُوسُفَ وَأَخِيهِ وَلَا تَيْأَسُوا مِنْ رَوْحِ اللَّهِ ۖ إِنَّهُ لَا يَيْأَسُ مِنْ رَوْحِ اللَّهِ إِلَّا الْقَوْمُ الْكَافِرُونَ",
     en: "Yaqub said: 'O my sons, go and find out about Yusuf and his brother, and despair not of Allah's mercy. Indeed, none despairs of Allah's mercy except the disbelieving people.'",
   },
+];
 
-  /* ═══════════════════════════════════════════════════════════════════
-     WISDOM & CONTEMPORARY REFLECTIONS (حكمة معاصرة)
-     ═══════════════════════════════════════════════════════════════════ */
+const WISDOMS: MotivationItem[] = [
   {
     kind: "wisdom",
     reference: "حِكْمَةٌ مُعَاصِرَةٌ",
@@ -314,44 +311,75 @@ const MOTIVATIONS: MotivationItem[] = [
   {
     kind: "wisdom",
     reference: "تَذْكِيرٌ بِقِيمَةِ الرَّاحةِ",
-    ar: "الرِّاحةُ لَيْسَتْ ضَعْفًا؛ هِيَ قُوَّةُ مَنْ يَعْرِفُ أَنَّ فِي التَّوْقِفِ حِكْمَةً وَفِي الصَّبْرِ نُورًا.",
+    ar: "الرَّاحَةُ لَيْسَتْ ضَعْفًا؛ هِيَ قُوَّةُ مَنْ يَعْرِفُ أَنَّ فِي التَّوْقِفِ حِكْمَةً وَفِي الصَّبْرِ نُورًا.",
     en: "Rest is not weakness; it is the strength of one who knows that stopping holds wisdom and patience holds light.",
   },
 ];
 
-/* ─── UI Labels ──────────────────────────────────────────────────── */
+/* ─── Interleave: round-robin across all 5 categories so the user
+       sees a different kind within the first few clicks ─────────── */
+
+function interleave(...arrays: MotivationItem[][]): MotivationItem[] {
+  const maxLen = Math.max(...arrays.map((a) => a.length));
+  const result: MotivationItem[] = [];
+  for (let i = 0; i < maxLen; i++) {
+    for (const arr of arrays) {
+      if (i < arr.length) result.push(arr[i]);
+    }
+  }
+  return result;
+}
+
+const MOTIVATIONS = interleave(
+  QURAN_VERSES,
+  HADITHS,
+  SUPPLICATIONS,
+  STORIES,
+  WISDOMS
+);
+
+/* ─── Kind metadata: labels, colors, and per-kind icons ──────────── */
 
 const KIND_META: Record<
   MotivationKind,
-  { en: string; ar: string; color: string }
+  { en: string; ar: string; color: string; icon: typeof BookOpen01Icon }
 > = {
   quran: {
     en: "Qur'an",
     ar: "القرآن الكريم",
     color:
       "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    icon: BookOpen01Icon,
   },
   hadith: {
     en: "Hadith",
     ar: "حديث شريف",
     color: "border-primary/30 bg-primary/10 text-primary",
+    icon: Shield01Icon,
   },
   dua: {
     en: "Supplication",
     ar: "دعاء",
-    color: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    color:
+      "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    icon: HeartHandshakeIcon,
   },
   story: {
     en: "Story of Patience",
     ar: "قصة في الصبر",
-    color: "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+    color:
+      "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+    icon: BookmarkCheck01Icon,
   },
   wisdom: {
     en: "Wisdom",
     ar: "حكمة",
     color: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    icon: Compass01Icon,
   },
 };
+
+/* ─── UI Labels ──────────────────────────────────────────────────── */
 
 const LABELS = {
   en: {
@@ -365,7 +393,8 @@ const LABELS = {
     notificationsOn: "Reminders on",
     notificationsOff: "Reminders off",
     notificationTitle: "FibroCare Reminder",
-    notificationBody: "Take a moment for yourself — breathe, stretch, and remember: you are stronger than you think.",
+    notificationBody:
+      "Take a moment for yourself — breathe, stretch, and remember: you are stronger than you think.",
   },
   ar: {
     title: "تحفيز",
@@ -378,7 +407,8 @@ const LABELS = {
     notificationsOn: "التذكيرات مفعّلة",
     notificationsOff: "التذكيرات معطّلة",
     notificationTitle: "تذكير فيبرو كير",
-    notificationBody: "خصّص لحظة لنفسك — تنفّس، تمطّج، وتذكّر: أقوى مما تظن.",
+    notificationBody:
+      "خصّص لحظة لنفسك — تنفّس، تمطّج، وتذكّر: أقوى مما تظن.",
   },
 } as const;
 
@@ -431,7 +461,6 @@ export function MotivationWidget() {
       return;
     }
 
-    // Fire one immediately when enabled
     showNotification(copy.notificationTitle, copy.notificationBody);
 
     notificationTimerRef.current = setInterval(() => {
@@ -474,7 +503,6 @@ export function MotivationWidget() {
       return;
     }
 
-    // Request permission if needed
     if (
       typeof Notification !== "undefined" &&
       Notification.permission === "default"
@@ -563,9 +591,10 @@ export function MotivationWidget() {
                 </p>
               )}
 
+              {/* Source line — uses the kind-specific icon */}
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <HugeiconsIcon
-                  icon={BookOpen01Icon}
+                  icon={kindMeta.icon}
                   className="h-3.5 w-3.5"
                   aria-hidden="true"
                 />
@@ -638,7 +667,8 @@ export function MotivationWidget() {
                 icon={notificationsEnabled ? BellIcon : BellOffIcon}
                 className={cn(
                   "h-4 w-4 transition-transform duration-300",
-                  notificationsEnabled && "animate-[bellRing_0.5s_ease-in-out]"
+                  notificationsEnabled &&
+                    "animate-[bellRing_0.5s_ease-in-out]"
                 )}
                 aria-hidden="true"
               />

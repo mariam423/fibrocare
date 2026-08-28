@@ -48,6 +48,7 @@ import { SpoonTrackerBento } from "@/components/dashboard/SpoonTrackerBento";
 import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
 import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
 import { PostMealFatigueCard } from "@/components/dashboard/PostMealFatigueCard";
+import { PostMealFatigueSection } from "@/components/dashboard/PostMealFatigueSection";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
@@ -398,6 +399,9 @@ export default function Home() {
                     {/* AI journal reflection on the note */}
                     <AiReflection note={notes} />
                   </section>
+
+                  {/* Post-Meal Fatigue Tracking */}
+                  <PostMealFatigueSection />
 
                   {/* Save */}
                   <div className="border-t border-border pt-8 space-y-4">

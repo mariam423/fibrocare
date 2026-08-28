@@ -7,6 +7,8 @@ import {
   BookOpen01Icon,
   Refresh01Icon,
   SparklesIcon,
+  BellIcon,
+  BellOffIcon,
 } from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
@@ -95,6 +97,24 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "لَنَبْلُوَنَّكُمْ بِشَيْءٍ مِنَ الْخَوْفِ وَالْجُوعِ وَنَقْصٍ مِنَ الْأَمْوَالِ وَالْأَنْفُسِ وَالثَّمَرَاتِ ۗ وَبَشِّرِ الصَّابِرِينَ ۝ الَّذِينَ إِذَا أَصَابَتْهُمْ مُصِيبَةٌ قَالُوا إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ",
     en: "We will surely test you with something of fear, hunger, and a loss of wealth, lives, and fruits. But give good tidings to the patient—who, when disaster strikes them, say: 'Indeed, we belong to Allah, and indeed, to Him we will return.'",
   },
+  {
+    kind: "quran",
+    reference: "سُورَةُ الْبَقَرَةِ ٢:٢١٤",
+    ar: "أَمْ حَسِبْتُمْ أَن تَدْخُلُوا الْجَنَّةَ وَلَمَّا يَأْتِكُمْ مَّثَلُ الَّذِينَ خَلَوْا مِن قَبْلِكُم ۖ مَّسَّتْهُمُ الْبَأْسَاءُ وَالضَّرَّاءُ وَزُلْزِلُوا حَتَّىٰ يَقُولَ الرَّسُولُ وَالَّذِينَ آمَنُوا مَعَهُ مَتَىٰ نَصْرُ اللَّهِ",
+    en: "Or did you think that you would enter Paradise while such trials had not yet come to you as came to those who passed before you? They were touched by poverty and hardship and were shaken until the Messenger and those who believed with him said: 'When will the help of Allah come?'",
+  },
+  {
+    kind: "quran",
+    reference: "سُورَةُ الْعَنْكَبُوتِ ٢٩:٦٩",
+    ar: "وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا ۚ وَإِنَّ اللَّهَ لَمَعَ الْمُحْسِنِينَ",
+    en: "And those who strive for Us—We will surely guide them to Our ways. Indeed, Allah is with those who do good.",
+  },
+  {
+    kind: "quran",
+    reference: "سُورَةُ غَافِرٍ ٤٠:٦٠",
+    ar: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ ۚ إِنَّ الَّذِينَ يَسْتَكْبِرُونَ عَنْ عِبَادَتِي سَيَدْخُلُونَ جَهَنَّمَ دَاخِرِينَ",
+    en: "And your Lord says: 'Call upon Me; I will respond to you.' Indeed, those who disdain My worship will enter Hell humbled.",
+  },
 
   /* ═══════════════════════════════════════════════════════════════════
      PROPHETIC HADITHS (with authentic references)
@@ -126,8 +146,20 @@ const MOTIVATIONS: MotivationItem[] = [
   {
     kind: "hadith",
     reference: "صَحِيحُ الْبُخَارِيِّ ٧٤٠٥",
-    ar: "وَعَنْ أَبِي هُرَيْرَةَ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُصِبْ مِنْهُ",
-    en: "The Messenger of Allah ﷺ said: Whomever Allah intends good for, He afflicts him with trials.",
+    ar: "مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُصِبْ مِنْهُ",
+    en: "Whomever Allah intends good for, He afflicts him with trials.",
+  },
+  {
+    kind: "hadith",
+    reference: "صَحِيحُ الْبُخَارِيِّ ٥٦٤٥",
+    ar: "إِذَا مَرِضَ الْعَبْدُ أَوْ سَافَرَ كُتِبَ لَهُ مَا كَانَ يَعْمَلُ مُقِيمًا صَاحِبًا",
+    en: "When a servant falls ill or travels, it is recorded for them what they used to do when they were settled and at home.",
+  },
+  {
+    kind: "hadith",
+    reference: "صَحِيحُ مُسْلِمٍ ٢٥٧٦",
+    ar: "مَا يُصِيبُ الْمُؤْمِنَ أَلَمٌ وَلَا نَصَبٌ وَلَا هَمٌّ وَلَا حُزْنٌ وَلَا غَمٌّ حَتَّى الشَّوْكَةِ يُشَاكُهَا إِلَّا كَفَّرَ اللَّهُ بِهَا مِنْ خَطَايَاهُ",
+    en: "No pain, exhaustion, worry, sorrow, or distress befalls a believer—including a thorn's prick—except that Allah erases some of their sins through it.",
   },
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -169,6 +201,24 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ، اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ",
     en: "O Allah, I ask You from Your bounty. O Allah, protect me from the accursed Satan.",
   },
+  {
+    kind: "dua",
+    reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
+    ar: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْكَرَبِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْهَرَمِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
+    en: "O Allah, I seek refuge in You from worry and grief, incapacity and laziness, stinginess and old age, the burden of debt, and domination by others.",
+  },
+  {
+    kind: "dua",
+    reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
+    ar: "اللَّهُمَّ اشْفِ سَقَمِي، وَأَصْلِحْ شَأْنِي، وَاحْفَظْنِي مِنْ بَلَائِي",
+    en: "O Allah, heal my illness, rectify my affairs, and protect me from my trial.",
+  },
+  {
+    kind: "dua",
+    reference: "أَدْعِيَةُ مِنَ السُّنَّةِ",
+    ar: "اللَّهُمَّ رَحْمَتَكَ أَرْجُو فَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ وَأَصْلِحْ لِي شَأْنِي كُلَّهُ لَا إِلَهَ إِلَّا أَنْتَ",
+    en: "O Allah, I hope for Your mercy. Do not leave me to myself for the blink of an eye. Rectify all my affairs. There is no god but You.",
+  },
 
   /* ═══════════════════════════════════════════════════════════════════
      STORIES OF PROPHETS (قصص الأنبياء في الصبر)
@@ -196,6 +246,12 @@ const MOTIVATIONS: MotivationItem[] = [
     reference: "قِصَّةُ نُوحَ عَلَيْهِ السَّلَامُ — سُورَةُ نُوحٍ ٧١:٥–٧",
     ar: "صَبَرَ نُوحُ عَلَيْهِ السَّلَامُ أَلْفَيْ عَامٍ يَدْعُو قَوْمَهُ، فَعَلَّمَنَا أَنَّ الصَّبْرَ الْمُمْتَدِّ مَعَ الدُّعَاءِ مِنْ أَعْظَمِ الْعِبَادَاتِ، وَأَنَّ الْمُحَافَظَةَ عَلَى الْأَمَلِ مَعَ طُولِ الابْتِلَاءِ نِعْمَةٌ مِنَ اللَّهِ.",
     en: "Nuh (Noah) endured 950 years calling his people, teaching us that sustained patience with supplication is among the greatest acts of worship, and that maintaining hope through prolonged trials is a blessing from Allah.",
+  },
+  {
+    kind: "story",
+    reference: "قِصَّةُ يُوسُفَ عَلَيْهِ السَّلَامُ — سُورَةُ يُوسُفَ ١٢:٨٧",
+    ar: "قَالَ يَعْقُوبُ: يَا بَنِيَّ اذْهَبُوا فَتَحَسَّسُوا مِنْ يُوسُفَ وَأَخِيهِ وَلَا تَيْأَسُوا مِنْ رَوْحِ اللَّهِ ۖ إِنَّهُ لَا يَيْأَسُ مِنْ رَوْحِ اللَّهِ إِلَّا الْقَوْمُ الْكَافِرُونَ",
+    en: "Yaqub said: 'O my sons, go and find out about Yusuf and his brother, and despair not of Allah's mercy. Indeed, none despairs of Allah's mercy except the disbelieving people.'",
   },
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -249,6 +305,18 @@ const MOTIVATIONS: MotivationItem[] = [
     ar: "الصَّبْرُ لَيْسَ سُكُوتًا عَنِ الدُّعَاءِ، بَلْ هُوَ الِاثْبَاتُ مَعَ الدُّعَاءِ.",
     en: "Patience is not silence from prayer; it is persistence in prayer.",
   },
+  {
+    kind: "wisdom",
+    reference: "حِكْمَةٌ فِي التَّقَلُّبِ",
+    ar: "لَيْسَ كُلُّ يَوْمٍ مِثْلَ الْأَخَرِ؛ فَالْيَوْمَ الْعَسِيرُ مُمْكِنٌ أَنْ يَكُونَ بَابًا لِيَوْمٍ أَحْلَى.",
+    en: "Not every day is like the next; a difficult day may be the doorway to a sweeter one.",
+  },
+  {
+    kind: "wisdom",
+    reference: "تَذْكِيرٌ بِقِيمَةِ الرَّاحةِ",
+    ar: "الرِّاحةُ لَيْسَتْ ضَعْفًا؛ هِيَ قُوَّةُ مَنْ يَعْرِفُ أَنَّ فِي التَّوْقِفِ حِكْمَةً وَفِي الصَّبْرِ نُورًا.",
+    en: "Rest is not weakness; it is the strength of one who knows that stopping holds wisdom and patience holds light.",
+  },
 ];
 
 /* ─── UI Labels ──────────────────────────────────────────────────── */
@@ -294,6 +362,10 @@ const LABELS = {
     arabic: "العربية",
     source: "Source",
     note: "Take what comforts you; rest is part of healing.",
+    notificationsOn: "Reminders on",
+    notificationsOff: "Reminders off",
+    notificationTitle: "FibroCare Reminder",
+    notificationBody: "Take a moment for yourself — breathe, stretch, and remember: you are stronger than you think.",
   },
   ar: {
     title: "تحفيز",
@@ -303,8 +375,16 @@ const LABELS = {
     arabic: "العربية",
     source: "المصدر",
     note: "خُذْ ما يُطَمْئِنُكَ؛ فالرَّاحَةُ جزءٌ من التعافي.",
+    notificationsOn: "التذكيرات مفعّلة",
+    notificationsOff: "التذكيرات معطّلة",
+    notificationTitle: "تذكير فيبرو كير",
+    notificationBody: "خصّص لحظة لنفسك — تنفّس، تمطّج، وتذكّر: أقوى مما تظن.",
   },
 } as const;
+
+/* ─── Notification Interval (ms) ────────────────────────────────── */
+
+const NOTIFICATION_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 /* ─── Component ──────────────────────────────────────────────────── */
 
@@ -312,6 +392,15 @@ export function MotivationWidget() {
   const { locale } = useLanguage();
   const [index, setIndex] = useState(0);
   const [showArabic, setShowArabic] = useState(locale === "ar");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [hasNotificationPermission, setHasNotificationPermission] = useState(
+    () =>
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+  );
+  const notificationTimerRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
   const copy = LABELS[locale];
   const item = useMemo(() => MOTIVATIONS[index], [index]);
   const kindMeta = KIND_META[item.kind];
@@ -323,7 +412,7 @@ export function MotivationWidget() {
   // Sync toggle to locale changes
   useEffect(() => setShowArabic(locale === "ar"), [locale]);
 
-  // Auto-rotate every 20 seconds
+  // ── Auto-rotate every 20 seconds ──
   useEffect(() => {
     const timer = window.setInterval(
       () => setIndex((v) => (v + 1) % MOTIVATIONS.length),
@@ -332,10 +421,81 @@ export function MotivationWidget() {
     return () => window.clearInterval(timer);
   }, []);
 
+  // ── Browser Notification scheduling ──
+  useEffect(() => {
+    if (!notificationsEnabled || !hasNotificationPermission) {
+      if (notificationTimerRef.current) {
+        clearInterval(notificationTimerRef.current);
+        notificationTimerRef.current = null;
+      }
+      return;
+    }
+
+    // Fire one immediately when enabled
+    showNotification(copy.notificationTitle, copy.notificationBody);
+
+    notificationTimerRef.current = setInterval(() => {
+      showNotification(copy.notificationTitle, copy.notificationBody);
+    }, NOTIFICATION_INTERVAL_MS);
+
+    return () => {
+      if (notificationTimerRef.current) {
+        clearInterval(notificationTimerRef.current);
+        notificationTimerRef.current = null;
+      }
+    };
+  }, [notificationsEnabled, hasNotificationPermission, locale]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const showNotification = useCallback(
+    (title: string, body: string) => {
+      if (
+        typeof Notification === "undefined" ||
+        Notification.permission !== "granted"
+      )
+        return;
+      // eslint-disable-next-line no-new
+      new Notification(title, {
+        body,
+        icon: "/favicon.ico",
+        tag: "fibrocare-motivation",
+      });
+    },
+    []
+  );
+
   const next = useCallback(
     () => setIndex((v) => (v + 1) % MOTIVATIONS.length),
     []
   );
+
+  const toggleNotifications = useCallback(async () => {
+    if (notificationsEnabled) {
+      setNotificationsEnabled(false);
+      return;
+    }
+
+    // Request permission if needed
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "default"
+    ) {
+      try {
+        const permission = await Notification.requestPermission();
+        setHasNotificationPermission(permission === "granted");
+        if (permission !== "granted") return;
+      } catch {
+        return;
+      }
+    }
+
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      setHasNotificationPermission(true);
+      setNotificationsEnabled(true);
+    }
+  }, [notificationsEnabled]);
 
   return (
     <Card
@@ -375,10 +535,13 @@ export function MotivationWidget() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={`${index}-${showArabic ? "ar" : "en"}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.28 }}
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.98 }}
+              transition={{
+                duration: prefersReducedMotion ? 0 : 0.35,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="space-y-4"
             >
               {showArabic ? (
@@ -386,8 +549,9 @@ export function MotivationWidget() {
                   lang="ar"
                   dir="rtl"
                   className="text-center text-2xl font-medium leading-[2.15] text-foreground sm:text-3xl"
+                  style={{ unicodeBidi: "isolate" }}
                 >
-                  {item.ar}
+                  <bdi>{item.ar}</bdi>
                 </p>
               ) : (
                 <p
@@ -413,7 +577,7 @@ export function MotivationWidget() {
           </AnimatePresence>
         </div>
 
-        {/* ── Controls ─────────────────────────────────── */}
+        {/* ── Controls Row ─────────────────────────────── */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Language toggle */}
           <div
@@ -451,19 +615,54 @@ export function MotivationWidget() {
             </button>
           </div>
 
-          {/* Refresh / next */}
-          <button
-            type="button"
-            onClick={next}
-            className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-primary/25 px-3.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <HugeiconsIcon
-              icon={Refresh01Icon}
-              className="h-4 w-4"
-              aria-hidden="true"
-            />
-            {copy.next}
-          </button>
+          {/* Action buttons */}
+          <div className="flex items-center gap-2">
+            {/* Notification bell toggle */}
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              aria-label={
+                notificationsEnabled
+                  ? copy.notificationsOn
+                  : copy.notificationsOff
+              }
+              aria-pressed={notificationsEnabled}
+              className={cn(
+                "inline-flex min-h-10 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                notificationsEnabled
+                  ? "border-amber-500/40 bg-amber-500/15 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                  : "border-border bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <HugeiconsIcon
+                icon={notificationsEnabled ? BellIcon : BellOffIcon}
+                className={cn(
+                  "h-4 w-4 transition-transform duration-300",
+                  notificationsEnabled && "animate-[bellRing_0.5s_ease-in-out]"
+                )}
+                aria-hidden="true"
+              />
+              <span className="hidden sm:inline">
+                {notificationsEnabled
+                  ? copy.notificationsOn
+                  : copy.notificationsOff}
+              </span>
+            </button>
+
+            {/* Refresh / next */}
+            <button
+              type="button"
+              onClick={next}
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-primary/25 px-3.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <HugeiconsIcon
+                icon={Refresh01Icon}
+                className="h-4 w-4"
+                aria-hidden="true"
+              />
+              {copy.next}
+            </button>
+          </div>
         </div>
 
         {/* ── Footer note ──────────────────────────────── */}

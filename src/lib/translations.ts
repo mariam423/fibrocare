@@ -466,6 +466,24 @@ export type TranslationKey =
   | "exercises.timer.spoons.many"
   | "exercises.timer.stretchingLabel"
   | "exercises.timer.walkingLabel"
+  | "stretching.intro"
+  | "stretching.tipsTitle"
+  | "stretching.tipsBody"
+  | "stretching.neck.title"
+  | "stretching.neck.steps"
+  | "stretching.neck.duration"
+  | "stretching.shoulder.title"
+  | "stretching.shoulder.steps"
+  | "stretching.shoulder.duration"
+  | "stretching.lowerBack.title"
+  | "stretching.lowerBack.steps"
+  | "stretching.lowerBack.duration"
+  | "stretching.thigh.title"
+  | "stretching.thigh.steps"
+  | "stretching.thigh.duration"
+  | "stretching.calf.title"
+  | "stretching.calf.steps"
+  | "stretching.calf.duration"
   | "logging.mood.selfCare"
   | "faq.title"
   | "faq.subtitle"
@@ -2004,6 +2022,24 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "exercises.timer.spoons.many": "{count} Spoons",
     "exercises.timer.stretchingLabel": "Stretching session",
     "exercises.timer.walkingLabel": "Walking session",
+    "stretching.intro": "A gentle 15-minute routine to ease tension and improve flexibility. Move slowly, breathe deeply, and never push past mild discomfort.",
+    "stretching.tipsTitle": "General Stretching Tips",
+    "stretching.tipsBody": "Always warm up for 2-3 minutes before stretching. Hold each stretch for 15-30 seconds without bouncing. Breathe deeply and relax into each movement. Stop immediately if you feel sharp pain.",
+    "stretching.neck.title": "Neck Rolls",
+    "stretching.neck.steps": "Sit upright in a chair with shoulders relaxed.\nSlowly tilt your head toward your right shoulder.\nHold for 5 seconds, feeling a gentle stretch on the left side.\nReturn to center and repeat on the left side.\nPerform 3 rolls in each direction.",
+    "stretching.neck.duration": "2 min",
+    "stretching.shoulder.title": "Shoulder Shrugs",
+    "stretching.shoulder.steps": "Sit or stand with arms at your sides.\nInhale and raise both shoulders toward your ears.\nHold for 3 seconds, feeling the tension release.\nExhale and slowly lower your shoulders.\nRepeat 8-10 times.",
+    "stretching.shoulder.duration": "2 min",
+    "stretching.lowerBack.title": "Seated Cat-Cow",
+    "stretching.lowerBack.steps": "Sit on a chair with feet flat on the floor, hands on knees.\nArch your back gently, looking up (Cow pose).\nHold for 3 seconds.\nRound your spine, tucking your chin (Cat pose).\nHold for 3 seconds and repeat 5 times.",
+    "stretching.lowerBack.duration": "3 min",
+    "stretching.thigh.title": "Standing Quad Stretch",
+    "stretching.thigh.steps": "Stand near a wall or chair for balance.\nBend your right knee, bringing your heel toward your glutes.\nGently hold your ankle with your right hand.\nKeep your knees close together and stand tall.\nHold for 20 seconds, then switch legs.",
+    "stretching.thigh.duration": "2 min",
+    "stretching.calf.title": "Wall Calf Stretch",
+    "stretching.calf.steps": "Stand facing a wall, about arm's length away.\nStep your right foot back, keeping it flat on the floor.\nLean forward gently, pressing your hands against the wall.\nYou should feel a stretch in your right calf.\nHold for 20 seconds and switch sides.",
+    "stretching.calf.duration": "2 min",
     "logging.mood.selfCare": "Self-Care",
     "faq.title": "Frequently Asked Questions",
     "faq.subtitle": "Answers to common questions about living with fibromyalgia.",
@@ -3548,6 +3584,24 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "exercises.timer.spoons.many": "{count} ملعقة طاقة",
     "exercises.timer.stretchingLabel": "جلسة تمدد",
     "exercises.timer.walkingLabel": "جلسة مشي",
+    "stretching.intro": "روتين لطيف لمدة 15 دقيقة لتحسين المرونة وتخفيف التوتر. تحرّك ببطء، تنفس بعمق، ولا تتجاوز حد الراحة.",
+    "stretching.tipsTitle": "نصائح عامة للتمطيط",
+    "stretching.tipsBody": " دِمًيا لمدة 2-3 دقائق قبل التمطيط. احبس كل تمطيط 15-30 ثانية بدون ارتجاج. تنفس بعمق واسترخِ في كل حركة. توقف فورًا إذا شعرت بألم حاد.",
+    "stretching.neck.title": "دوران الرقبة",
+    "stretching.neck.steps": "اجلس منتصبًا على كرسي مع ارتخاء الكتفين.\nأضِل رأسك ببطء نحو كتفك الأيمن.\nاثبت 5 ثوانٍ مع الشعور بالتمطيط على الجانب الأيسر.\nعُد للمركز وكرر على الجانب الأيسر.\nنفّذ 3 دورانات في كل اتجاه.",
+    "stretching.neck.duration": "دقيقتان",
+    "stretching.shoulder.title": "رفع الكتفين",
+    "stretching.shoulder.steps": "اجلس أو قف مع الذراعين على جانبيك.\nشهيق وارفع كتفيك نحو أذنيك.\nاثبت 3 ثوانٍ مع الشعور ب텀ديد التوتر.\nزفير وخفض كتفيك ببطء.\nكرر 8-10 مرات.",
+    "stretching.shoulder.duration": "دقيقتان",
+    "stretching.lowerBack.title": "القط والبقرة جالسًا",
+    "stretching.lowerBack.steps": "اجلس على كرسي مع القدمين على الأرض واليدان على الركبتين.\nقوس ظهرك برفق محدّقًا للأعلى (وضعية البقرة).\nاثبت 3 ثوانٍ.\nفرد عمودك الفقري محدّقًا بالذقن (وضعية القط).\nاثبت 3 ثوانٍ وكرر 5 مرات.",
+    "stretching.lowerBack.duration": "3 دقائق",
+    "stretching.thigh.title": "تمطيط الفخذ الرباعي واقفًا",
+    "stretching.thigh.steps": "قِف بالقرب من جدار أو كرسي للموازنة.\nثني ركبتك اليمنى جالبًا كعبك نحو مؤخرتك.\nأمسك كاحلك بيدك اليمنى برفق.\nحافظ على ركبتيك متقاربتين وقف منتصبًا.\nاثبت 20 ثانية ثم غيّر الساق.",
+    "stretching.thigh.duration": "دقيقتان",
+    "stretching.calf.title": "تمطيط السمانة على الجدار",
+    "stretching.calf.steps": "قِف مقابل جدار على بعد ذراع تقريبًا.\nخطِّ قدمك اليمنى للخلف مع إبقائها مسطحة على الأرض.\nانحنِ للأمام برفق ضاغطًا يديك على الجدار.\nيجب أن تشعر بالتمطيط في سمانة قدمك اليمنى.\nاثبت 20 ثانية ثم غيّر الجانب.",
+    "stretching.calf.duration": "دقيقتان",
     "logging.mood.selfCare": "رعاية ذاتية",
     "faq.title": "الأسئلة الشائعة",
     "faq.subtitle": "إجابات على الأسئلة الشائعة حول العيش مع التهاب العضلات الليفية.",

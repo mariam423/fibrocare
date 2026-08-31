@@ -78,7 +78,7 @@ export function ContentPageLayout({
   const [foggy, setFoggy] = useState(false);
 
   return (
-    <main className="w-full max-w-4xl mx-auto px-4 pb-12">
+    <div className="w-full max-w-4xl mx-auto px-4 pb-12">
       <div className="space-y-8">
         {/* Hero Header */}
         <ScrollReveal as="section" className="space-y-4">
@@ -219,6 +219,6 @@ export function ContentPageLayout({
           </div>
         </ScrollReveal>
       </div>
-    </main>
+    </div>
   );
 }

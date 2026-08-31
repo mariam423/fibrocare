@@ -103,7 +103,7 @@ function AxisNode({
           </div>
         </div>
         <p className="text-sm font-semibold text-foreground">{label}</p>
-        <p className="max-w-[14ch] text-[11px] leading-snug text-muted-foreground">
+        <p className="max-w-[18ch] text-[11px] leading-snug text-muted-foreground">
           {hint}
         </p>
       </div>

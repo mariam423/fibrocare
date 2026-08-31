@@ -72,7 +72,7 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
           "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-500/15 bg-white/70 shadow-md shadow-emerald-950/5 backdrop-blur-lg transition-all duration-300 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-950/10 hover:scale-[1.01] dark:bg-slate-900/50 dark:hover:border-emerald-500/25"
         )}
       >
-        {/* Gradient header with icon placeholder */}
+        {/* Gradient header with per-exercise icon placeholder */}
         <div
           className={cn(
             "relative flex items-center justify-center py-8 bg-gradient-to-b",
@@ -81,13 +81,13 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
         >
           <div
             className={cn(
-              "flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3",
+              "flex h-16 w-16 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3",
               exercise.iconBg
             )}
           >
             <HugeiconsIcon
               icon={WorkoutStretchingIcon}
-              className="h-7 w-7"
+              className="h-8 w-8"
               aria-hidden="true"
             />
           </div>

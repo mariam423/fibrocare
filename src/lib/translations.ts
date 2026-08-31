@@ -214,6 +214,40 @@ export type TranslationKey =
   | "about.symptom.fog.value"
   | "about.symptom.sleep.label"
   | "about.symptom.sleep.value"
+  | "about.symptom.headache.label"
+  | "about.symptom.headache.value"
+  | "about.symptom.sensitivity.label"
+  | "about.symptom.sensitivity.value"
+  | "about.cause.amplified.title"
+  | "about.cause.amplified.desc"
+  | "about.cause.genetic.title"
+  | "about.cause.genetic.desc"
+  | "about.cause.trauma.title"
+  | "about.cause.trauma.desc"
+  | "about.cause.sleep.title"
+  | "about.cause.sleep.desc"
+  | "about.cause.infection.title"
+  | "about.cause.infection.desc"
+  | "about.causesIntro"
+  | "about.symptomsIntro"
+  | "about.gutBrain.title"
+  | "about.gutBrain.intro"
+  | "about.gutBrain.detail"
+  | "about.gut.node.brain"
+  | "about.gut.node.brainHint"
+  | "about.gut.node.vagus"
+  | "about.gut.node.vagusHint"
+  | "about.gut.node.gut"
+  | "about.gut.node.gutHint"
+  | "about.gut.node.symptoms"
+  | "about.gut.node.symptomsHint"
+  | "about.gut.tip.bloating"
+  | "about.gut.tip.motility"
+  | "about.gut.tip.stress"
+  | "about.gut.tip.microbiome"
+  | "about.visual.eyebrow"
+  | "about.visual.symptoms.caption"
+  | "about.visual.gutBrain.eyebrow"
   | "diagnosis.title"
   | "diagnosis.subtitle"
   | "diagnosis.howDiagnosed"
@@ -1718,6 +1752,40 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.symptom.fog.value": "Trouble focusing, attention, memory",
     "about.symptom.sleep.label": "Sleep problems",
     "about.symptom.sleep.value": "Insomnia or non-restorative sleep",
+    "about.symptom.headache.label": "Headaches & migraines",
+    "about.symptom.headache.value": "Frequent tension headaches or migraines",
+    "about.symptom.sensitivity.label": "Heightened sensitivity",
+    "about.symptom.sensitivity.value": "Light, noise, temperature, and odors feel intense",
+    "about.cause.amplified.title": "Central sensitization",
+    "about.cause.amplified.desc": "The brain and spinal cord turn up the volume on pain signals, so sensations that shouldn't hurt — light pressure, mild heat — are felt as pain.",
+    "about.cause.genetic.title": "Genetic predisposition",
+    "about.cause.genetic.desc": "Fibromyalgia often runs in families, suggesting inherited differences in how the nervous system handles pain.",
+    "about.cause.trauma.title": "Physical or emotional trauma",
+    "about.cause.trauma.desc": "Surgery, injury, infection, or prolonged stress can act as a trigger that flips the nervous system into a sensitized state.",
+    "about.cause.sleep.title": "Sleep disturbances",
+    "about.cause.sleep.desc": "Conditions like restless legs or sleep apnea disrupt deep sleep and may both trigger and worsen fibromyalgia symptoms.",
+    "about.cause.infection.title": "Infections",
+    "about.cause.infection.desc": "Some viral or bacterial illnesses appear to set off fibromyalgia or amplify an existing pattern of symptoms.",
+    "about.causesIntro": "The exact cause isn't fully understood — most researchers describe a combination of these factors.",
+    "about.symptomsIntro": "Fibromyalgia affects many body systems. These are the symptoms most patients describe.",
+    "about.gutBrain.title": "The Gut–Brain Connection",
+    "about.gutBrain.intro": "Up to 70% of people with fibromyalgia also experience IBS. Here's why the two are linked.",
+    "about.gutBrain.detail": "The gut and brain constantly talk to each other through the vagus nerve, immune signals, and the microbiome. When fibromyalgia turns up the volume on pain and stress, the gut feels it too — leading to bloating, pain, and altered motility. Supporting one often supports the other.",
+    "about.gut.node.brain": "Central nervous system",
+    "about.gut.node.brainHint": "Pain & stress processing",
+    "about.gut.node.vagus": "Vagus nerve",
+    "about.gut.node.vagusHint": "Two-way information highway",
+    "about.gut.node.gut": "Gut & microbiome",
+    "about.gut.node.gutHint": "Immune & serotonin signalling",
+    "about.gut.node.symptoms": "IBS symptoms",
+    "about.gut.node.symptomsHint": "Bloating, pain, irregularity",
+    "about.gut.tip.bloating": "Bloating & distension",
+    "about.gut.tip.motility": "Altered bowel motility",
+    "about.gut.tip.stress": "Stress-driven flares",
+    "about.gut.tip.microbiome": "Microbiome balance",
+    "about.visual.eyebrow": "Understanding the condition",
+    "about.visual.symptoms.caption": "Soft body map — areas most affected by fibromyalgia",
+    "about.visual.gutBrain.eyebrow": "Why IBS is so common",
     "diagnosis.title": "Diagnosis",
     "diagnosis.subtitle": "Learn how fibromyalgia is diagnosed and what to expect during the process.",
     "diagnosis.howDiagnosed": "How is Fibromyalgia Diagnosed?",
@@ -3228,6 +3296,40 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.symptom.fog.value": "صعوبة في التركيز والانتباه والذاكرة",
     "about.symptom.sleep.label": "مشاكل النوم",
     "about.symptom.sleep.value": "الأرق أو النوم غير المجدد",
+    "about.symptom.headache.label": "الصداع والصداع النصفي",
+    "about.symptom.headache.value": "صداع توتر متكرر أو نوبات صداع نصفي",
+    "about.symptom.sensitivity.label": "حساسية مفرطة",
+    "about.symptom.sensitivity.value": "الإضاءة والضوضاء والحرارة والروائح تبدو قوية جدًا",
+    "about.cause.amplified.title": "التحسس المركزي",
+    "about.cause.amplified.desc": "يرفع الدماغ والحبل الشوكي من صوت إشارات الألم، فيتم الشعور بالضغط الخفيف أو الحرارة المعتدلة كألم حقيقي.",
+    "about.cause.genetic.title": "استعداد وراثي",
+    "about.cause.genetic.desc": "تنتشر الحالة في العائلات غالبًا، مما يشير إلى فروق موروثة في كيفية تعامل الجهاز العصبي مع الألم.",
+    "about.cause.trauma.title": "صدمة جسدية أو عاطفية",
+    "about.cause.trauma.desc": "يمكن للجراحة أو الإصابة أو العدوى أو الضغط المطوّل أن يكون محفزًا ينقل الجهاز العصبي إلى حالة التحسس.",
+    "about.cause.sleep.title": "اضطرابات النوم",
+    "about.cause.sleep.desc": "حالات مثل متلازمة تململ الساقين أو انقطاع التنفس أثناء النوم تعكر النوم العميق وقد تطلق الأعراض أو تزيدها.",
+    "about.cause.infection.title": "العدوى",
+    "about.cause.infection.desc": "بعض الأمراض الفيروسية أو البكتيرية يبدو أنها تُشعل الحالة أو تزيد من شدة الأعراض الموجودة.",
+    "about.causesIntro": "السبب الدقيق غير مفهوم تمامًا — يصفه أغلب الباحثين بأنه مزيج من هذه العوامل.",
+    "about.symptomsIntro": "تؤثر الفيبروميالجيا على أجهزة الجسم المختلفة. هذه أبرز الأعراض التي يصفها المرضى.",
+    "about.gutBrain.title": "الصلة بين الأمعاء والدماغ",
+    "about.gutBrain.intro": "ما يصل إلى 70٪ من مرضى الفيبروميالجيا يعانون أيضًا من القولون العصبي. إليك السبب.",
+    "about.gutBrain.detail": "تتواصل الأمعاء والدماغ باستمرار عبر العصب الحائر والإشارات المناعية والميكروبيوم. عندما ترفع الفيبروميالجيا صوت الألم والتوتر، تشعر الأمعاء بذلك أيضًا — مما يؤدي إلى الانتفاخ والألم واضطراب الحركة. دعم أحدهما غالبًا ما يدعم الآخر.",
+    "about.gut.node.brain": "الجهاز العصبي المركزي",
+    "about.gut.node.brainHint": "معالجة الألم والتوتر",
+    "about.gut.node.vagus": "العصب الحائر",
+    "about.gut.node.vagusHint": "طريق معلومات ثنائي الاتجاه",
+    "about.gut.node.gut": "الأمعاء والميكروبيوم",
+    "about.gut.node.gutHint": "إشارات مناعية وسيروتونين",
+    "about.gut.node.symptoms": "أعراض القولون العصبي",
+    "about.gut.node.symptomsHint": "انتفاخ، ألم، اضطراب الإخراج",
+    "about.gut.tip.bloating": "انتفاخ وتطبل",
+    "about.gut.tip.motility": "اضطراب حركة الأمعاء",
+    "about.gut.tip.stress": "نوبات مرتبطة بالتوتر",
+    "about.gut.tip.microbiome": "توازن الميكروبيوم",
+    "about.visual.eyebrow": "فهم الحالة",
+    "about.visual.symptoms.caption": "خريطة الجسم — المناطق الأكثر تأثرًا بالفيبروميالجيا",
+    "about.visual.gutBrain.eyebrow": "لماذا القولون العصبي شائع",
     "diagnosis.title": "التشخيص",
     "diagnosis.subtitle": "تعرف على كيفية تشخيص التهاب العضلات الليفية وما يمكن توقعه أثناء العملية.",
     "diagnosis.howDiagnosed": "كيف يتم تشخيص التهاب العضلات الليفية؟",

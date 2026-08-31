@@ -49,3 +49,8 @@ public/workbox/
 # logs
 *.log
 *.log.*
+
+# QA screenshots and test scripts
+scripts/*.png
+scripts/qa_*.py
+scripts/screenshot_*.py

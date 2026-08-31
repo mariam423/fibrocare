@@ -45,7 +45,7 @@ export default function AppHeader({ backHref, backLabel }: AppHeaderProps) {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-emerald-500/10">
+    <header className="fixed top-0 inset-x-0 z-50 w-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200/60 dark:border-emerald-500/10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <div className="container mx-auto flex h-16 items-center justify-between px-6 sm:px-8 lg:px-12 max-w-6xl">
         {/* Logo */}
         <div className="flex items-center gap-2.5">

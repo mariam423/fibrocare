@@ -98,6 +98,7 @@ function PostTypeBadge({ type }: { type: CommunityPost["type"] }) {
 export function CommunitySection() {
   const { t, locale } = useLanguage();
   const [newPost, setNewPost] = useState("");
+  const [newPostType, setNewPostType] = useState<CommunityPost["type"]>("story");
   // User-generated posts only. Sample posts are derived at render time so
   // they re-localize instantly on locale toggle; their likes live here.
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
@@ -145,12 +146,13 @@ export function CommunitySection() {
       id: String(Date.now()),
       author: t("community.you"),
       content: newPost,
-      type: "story",
+      type: newPostType,
       timestamp: t("community.justNow"),
       likes: 0,
     };
     setUserPosts([post, ...userPosts]);
     setNewPost("");
+    setNewPostType("story");
   };
 
   const handleLike = (id: string) => {
@@ -205,6 +207,30 @@ export function CommunitySection() {
                 />
               </div>
               <div className="flex-1 space-y-3">
+                {/* Category tags */}
+                <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label={t("community.filter.aria")}>
+                  {([
+                    { id: "story" as const, labelKey: "community.stories" as TranslationKey },
+                    { id: "tip" as const, labelKey: "community.tips" as TranslationKey },
+                    { id: "support" as const, labelKey: "community.support" as TranslationKey },
+                  ]).map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={newPostType === cat.id}
+                      onClick={() => setNewPostType(cat.id)}
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer",
+                        newPostType === cat.id
+                          ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-700 shadow-sm shadow-emerald-500/10 dark:text-emerald-300"
+                          : "border-border bg-card/60 text-muted-foreground hover:border-emerald-400/30 hover:text-foreground"
+                      )}
+                    >
+                      {t(cat.labelKey)}
+                    </button>
+                  ))}
+                </div>
                 <textarea
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}

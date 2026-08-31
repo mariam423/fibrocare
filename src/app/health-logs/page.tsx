@@ -258,8 +258,8 @@ export default function HealthLogsPage() {
                       <HugeiconsIcon icon={stat.icon} className={cn("h-5 w-5", stat.accent)} aria-hidden="true" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-2xl font-bold leading-tight tracking-tight text-zinc-900 dark:text-white tabular-nums">
-                        <bdi dir="ltr" className="tabular-nums">{stat.value}</bdi>
+                      <p className="text-2xl font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">
+                        {stat.value}
                       </p>
                       <p className="truncate text-sm text-muted-foreground">
                         {stat.label}
@@ -329,7 +329,6 @@ export default function HealthLogsPage() {
                     />
                     <input
                       type="search"
-                      dir="auto"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t("logs.searchPlaceholder")}
@@ -427,10 +426,7 @@ export default function HealthLogsPage() {
                                 )}
                                 aria-hidden="true"
                               />
-                              <span
-                                dir="auto"
-                                className="whitespace-nowrap text-sm text-muted-foreground [unicode-bidi:plaintext]"
-                              >
+                              <span className="whitespace-nowrap text-sm text-muted-foreground">
                                 {formatDateTime(log.loggedAt, locale)}
                               </span>
                             </div>
@@ -440,7 +436,7 @@ export default function HealthLogsPage() {
                               "inline-flex min-w-14 items-center justify-center rounded-full px-3 py-1 text-sm font-bold tabular-nums",
                               SEVERITY_PILL[severity]
                             )}>
-                              <bdi dir="ltr" className="tabular-nums">{log.painLevel}{t("chart.painLevel")}</bdi>
+                              {log.painLevel}{t("chart.painLevel")}
                             </span>
                           </TableCell>
                           <TableCell className="px-3 py-4">

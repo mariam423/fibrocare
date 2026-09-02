@@ -2,6 +2,8 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useReducedMotion, AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -19,6 +21,7 @@ import {
 } from "@/context/AiStatusContext";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import { getChatLoginUrl } from "@/components/ai/chatRecovery";
 import {
   EMPTY_USER_FACTS,
   loadUserFacts,
@@ -53,6 +56,12 @@ function hasToolResult(parts: UiPart[] | undefined): boolean {
 
 export function AiCompanion() {
   const reduceMotion = useReducedMotion();
+  const router = useRouter();
+  const pathname = usePathname() ?? "/dashboard";
+  const searchParams = useSearchParams();
+  const callbackPath = searchParams.toString()
+    ? `${pathname}?${searchParams.toString()}`
+    : pathname;
   const { t, locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -98,7 +107,45 @@ export function AiCompanion() {
     };
   }, []);
 
-  const { messages, sendMessage, stop, status, error, clearError } = useChat();
+  const chatTransport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        fetch: async (input, init) => {
+          const response = await fetch(input, init);
+          if (response.status === 401) {
+            throw new Error("CHAT_AUTH_REQUIRED");
+          }
+          return response;
+        },
+      }),
+    []
+  );
+  const [chatError, setChatError] = useState<Error | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const redirectToLogin = useCallback(() => {
+    router.replace(getChatLoginUrl(callbackPath));
+  }, [callbackPath, router]);
+  const handleChatError = useCallback(
+    (nextError: Error) => {
+      if (nextError.message === "CHAT_AUTH_REQUIRED") {
+        setSessionExpired(true);
+        return;
+      }
+      setChatError(nextError);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!sessionExpired) return;
+    const timer = window.setTimeout(redirectToLogin, 2500);
+    return () => window.clearTimeout(timer);
+  }, [redirectToLogin, sessionExpired]);
+  const { messages, sendMessage, regenerate, stop, status, error, clearError } =
+    useChat({
+      transport: chatTransport,
+      onError: handleChatError,
+    });
 
   const isLoading = status === "submitted" || status === "streaming";
   const isOffline = aiConfigured === false;
@@ -106,17 +153,48 @@ export function AiCompanion() {
   // After each completed answer, learn any new durable facts from what the
   // user just said (deterministic extraction + encrypted save).
   const lastStatusRef = useRef(status);
+  // One silent recovery per turn: if the stream dies before producing any
+  // content (provider blip, transport hiccup) the turn would otherwise end
+  // as a frozen empty bubble — regenerate resubmits the last user message.
+  const retryAttemptRef = useRef(0);
+  // A user-pressed "Stop generating" also ends a turn without content — that
+  // must never be second-guessed with an automatic regenerate.
+  const userStoppedRef = useRef(false);
   useEffect(() => {
     const previous = lastStatusRef.current;
     lastStatusRef.current = status;
-    if (previous !== "streaming" || status !== "ready") return;
-    const lastUser = [...messages].reverse().find((m) => m.role === "user");
-    const text = getMessageText(lastUser?.parts as UiPart[] | undefined);
-    if (!text) return;
-    recordConversationTurn(text)
-      .then(setUserFacts)
-      .catch(() => {});
-  }, [status, messages]);
+    // A turn is complete only when the status settles back to "ready". An
+    // instantly-empty stream can flip submitted → ready without ever being
+    // observed as "streaming", so both in-flight states count as "was active".
+    if ((previous !== "streaming" && previous !== "submitted") || status !== "ready")
+      return;
+    if (userStoppedRef.current) {
+      userStoppedRef.current = false;
+      return;
+    }
+    const lastMessage = messages[messages.length - 1];
+    // A completed turn ends with an assistant message that carries text or a
+    // tool result. When a stream dies empty the SDK drops the empty assistant
+    // message, so the last message is the user's — that is a failed turn.
+    const hasContent =
+      lastMessage?.role === "assistant" &&
+      (getMessageText(lastMessage.parts as UiPart[] | undefined).length > 0 ||
+        hasToolResult(lastMessage.parts as UiPart[] | undefined));
+    if (hasContent) {
+      retryAttemptRef.current = 0;
+      const lastUser = [...messages].reverse().find((m) => m.role === "user");
+      const text = getMessageText(lastUser?.parts as UiPart[] | undefined);
+      if (!text) return;
+      recordConversationTurn(text)
+        .then(setUserFacts)
+        .catch(() => {});
+      return;
+    }
+    if (retryAttemptRef.current === 0) {
+      retryAttemptRef.current = 1;
+      regenerate();
+    }
+  }, [status, messages, regenerate]);
 
   // Keep the newest message in view while streaming.
   useEffect(() => {
@@ -149,6 +227,7 @@ export function AiCompanion() {
   const submitSuggestion = useCallback(
     (prompt: string) => {
       if (aiConfigured !== true || isLoading) return;
+      retryAttemptRef.current = 0;
       // locale rides the body so the server prompt isolates output language.
       void sendMessage({ text: prompt }, { body: { userFacts, locale } });
     },
@@ -162,10 +241,23 @@ export function AiCompanion() {
       if (!value || aiConfigured !== true || isLoading) return;
       setInput("");
       clearError();
+      setChatError(null);
+      setSessionExpired(false);
+      retryAttemptRef.current = 0;
       void sendMessage({ text: value }, { body: { userFacts, locale } });
     },
     [input, aiConfigured, isLoading, sendMessage, clearError, userFacts, locale]
   );
+
+  // Manual recovery: resubmit the last user message after a visible failure.
+  const handleRetry = useCallback(() => {
+    setChatError(null);
+    setSessionExpired(false);
+    clearError();
+    // Manual retries are never followed by another automatic one.
+    retryAttemptRef.current = 1;
+    regenerate();
+  }, [clearError, regenerate]);
 
   const lastAssistantIndex = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -378,10 +470,36 @@ export function AiCompanion() {
                 );
               })}
 
-              {error && (
-                <p className="text-xs text-rose-500" role="alert">
-                  {error.message ?? t("companion.errorDefault")}
-                </p>
+              {sessionExpired && (
+                <div
+                  role="alert"
+                  data-testid="chat-session-expired"
+                  className="space-y-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2.5 text-xs text-amber-950 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-100"
+                >
+                  <p>{t("companion.authExpiredBanner")}</p>
+                  <button
+                    type="button"
+                    onClick={redirectToLogin}
+                    className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                  >
+                    {t("companion.authSignIn")}
+                  </button>
+                </div>
+              )}
+
+              {(error || chatError) && !sessionExpired && (
+                <div className="space-y-1.5" role="alert">
+                  <p className="text-xs text-rose-500">
+                    {t("companion.errorDefault")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    className="rounded-full border border-rose-400/40 px-3 py-1 text-xs font-medium text-rose-500 transition-colors hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                  >
+                    {t("companion.errorRetry")}
+                  </button>
+                </div>
               )}
             </div>
 
@@ -423,7 +541,10 @@ export function AiCompanion() {
                   {isLoading ? (
                     <button
                       type="button"
-                      onClick={stop}
+                      onClick={() => {
+                        userStoppedRef.current = true;
+                        stop();
+                      }}
                       aria-label={t("companion.stopAria")}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 transition-colors hover:bg-rose-500/20"
                     >

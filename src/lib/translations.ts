@@ -1030,7 +1030,11 @@ export type TranslationKey =
   | "companion.inputLabel"
   | "companion.inputPlaceholder"
   | "companion.checkedData"
+  | "companion.errorRetry"
   | "companion.errorDefault"
+  | "companion.authRequired"
+  | "companion.authExpiredBanner"
+  | "companion.authSignIn"
   | "companion.responding"
   | "companion.sendAria"
   | "companion.stopAria"
@@ -2589,7 +2593,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.inputLabel": "Message the AI care companion",
     "companion.inputPlaceholder": "How are you feeling right now?",
     "companion.checkedData": "Checked your latest data",
+    "companion.errorRetry": "Try again",
     "companion.errorDefault": "Something went wrong. Please try again.",
+    "companion.authRequired": "Your session expired. Please sign in again.",
+    "companion.authExpiredBanner": "Your chat session expired. Sign in again to continue your conversation.",
+    "companion.authSignIn": "Sign in again",
     "companion.responding": "The companion is responding.",
     "companion.sendAria": "Send message",
     "companion.stopAria": "Stop generating",
@@ -4170,7 +4178,11 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.inputLabel": "أرسل رسالة لرفيق الرعاية الذكي",
     "companion.inputPlaceholder": "كيف تشعر الآن؟",
     "companion.checkedData": "تم فحص أحدث بياناتك",
+    "companion.errorRetry": "حاول مجددًا",
     "companion.errorDefault": "حدث خطأ ما. حاول مرة أخرى.",
+    "companion.authRequired": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+    "companion.authExpiredBanner": "انتهت جلسة الدردشة. سجّل الدخول مرة أخرى لمتابعة محادثتك.",
+    "companion.authSignIn": "تسجيل الدخول مرة أخرى",
     "companion.responding": "الرفيق يرد.",
     "companion.sendAria": "إرسال الرسالة",
     "companion.stopAria": "إيقاف التوليد",

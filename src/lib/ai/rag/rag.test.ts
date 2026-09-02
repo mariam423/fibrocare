@@ -51,6 +51,12 @@ describe("routeQuery", () => {
     expect(routeQuery("what are the ACR diagnostic criteria?").needsRetrieval).toBe(true);
   });
 
+  it("routes Arabic health-record questions to retrieval", () => {
+    const route = routeQuery("هل توجد أنماط في سجلاتي هذا الأسبوع؟");
+    expect(route.needsRetrieval).toBe(true);
+    expect(route.reason).toContain("Arabic informational phrasing");
+  });
+
   it("routes casual conversation without retrieval", () => {
     expect(routeQuery("hi").needsRetrieval).toBe(false);
     expect(routeQuery("thanks so much").needsRetrieval).toBe(false);

@@ -22,6 +22,16 @@ const QUESTION_WORDS = new Set([
   "study", "studies", "evidence", "guideline", "guidelines", "difference",
 ]);
 
+/** Arabic question terms used for health-record and educational queries. */
+const ARABIC_QUESTION_WORDS = [
+  "هل", "لماذا", "كيف", "متى", "ما", "ماذا", "أي", "أين", "هل توجد", "هل يوجد",
+];
+
+const ARABIC_RECORD_TERMS = [
+  "سجل", "سجلات", "تسجيل", "تسجيلات", "بياناتي", "الأسبوع", "هذا الأسبوع",
+  "أنماط", "اتجاه", "اتجاهات", "أعراض", "ألم", "نوبة", "نوبات",
+];
+
 /** Short conversational turns that never need retrieval. */
 const CHAT_ONLY_PATTERNS = [
   /^(hi|hey|hello|good\s?(morning|afternoon|evening)|salam|مرحبا|اهلا|أهلا)\b/i,
@@ -94,11 +104,22 @@ export function routeQuery(query: string): RagRoute {
   }
 
   const hasQuestionWord = tokens.some((t) => QUESTION_WORDS.has(t));
-  if (hasQuestionWord && tokens.length >= 3) {
+  const hasArabicQuestion = ARABIC_QUESTION_WORDS.some((term) =>
+    trimmed.toLowerCase().includes(term)
+  );
+  const hasArabicRecordTerm = ARABIC_RECORD_TERMS.some((term) =>
+    trimmed.toLowerCase().includes(term)
+  );
+  if (
+    (hasQuestionWord && tokens.length >= 3) ||
+    (hasArabicQuestion && hasArabicRecordTerm)
+  ) {
     return ragRouteSchema.parse({
       needsRetrieval: true,
       domains: [],
-      reason: "informational question phrasing",
+      reason: hasArabicQuestion && hasArabicRecordTerm
+        ? "Arabic informational phrasing"
+        : "informational question phrasing",
     });
   }
 

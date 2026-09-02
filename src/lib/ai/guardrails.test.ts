@@ -218,6 +218,54 @@ describe("createGuardrailStreamTransform", () => {
     expect(text).toContain("a warm compress or a warm bath");
   });
 
+  it("decodes a tool call followed by a later assistant text part", async () => {
+    const input = [
+      'data: {"type":"start","messageId":"m1"}',
+      'data: {"type":"start-step"}',
+      'data: {"type":"tool-input-start","toolCallId":"call-1","toolName":"getHealthSnapshot"}',
+      'data: {"type":"tool-input-available","toolCallId":"call-1","toolName":"getHealthSnapshot","input":{}}',
+      'data: {"type":"tool-output-available","toolCallId":"call-1","output":"{\\"trend\\":\\"stable\\"}"}',
+      'data: {"type":"finish-step"}',
+      'data: {"type":"start-step"}',
+      'data: {"type":"text-start","id":"text-1"}',
+      'data: {"type":"text-delta","id":"text-1","delta":"بالنظر إلى سجلاتك، الاتجاه مستقر."}',
+      'data: {"type":"text-end","id":"text-1"}',
+      'data: {"type":"finish-step"}',
+      'data: {"type":"finish"}',
+    ].join("\n\n") + "\n\n";
+    const output = await transformSse(input);
+    const parsed = parseJsonEventStream({
+      stream: new Response(output).body!,
+      schema: uiMessageChunkSchema,
+    });
+    const chunks = new ReadableStream<UIMessageChunk>({
+      async start(controller) {
+        const reader = parsed.getReader();
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!value.success) throw value.error;
+            controller.enqueue(value.value);
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    let last: UIMessage | undefined;
+    const errors: unknown[] = [];
+    for await (const message of readUIMessageStream({
+      stream: chunks,
+      onError: (error) => errors.push(error),
+    })) {
+      last = message;
+    }
+    expect(errors).toEqual([]);
+    expect((last?.parts ?? []).some((part) => part.type === "text" && part.text.includes("الاتجاه مستقر"))).toBe(true);
+  });
+
   it("keeps tool-step frames after the completed text part", async () => {
     const input = [
       'data: {"type":"text-start","id":"text-1"}',

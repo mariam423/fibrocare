@@ -36,7 +36,7 @@ export default defineConfig({
   projects: [
     // Creates (or reuses) the throwaway account and stores the session so
     // the smoke tests below run authenticated without per-test logins.
-    { name: "auth-setup", testMatch: /auth\.setup\.ts/ },
+    { name: "auth-setup", testMatch: /(^|\/)auth\.setup\.ts$/ },
     // Unauthenticated tests — landing page, auth flows, Arabic RTL for public pages.
     {
       name: "public",

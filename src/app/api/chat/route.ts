@@ -16,6 +16,7 @@ import { buildLongTermMemory, buildShortTermMemory } from "@/lib/ai/memory";
 import { checkChatRateLimit } from "@/lib/ai/ratelimit";
 import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
 import { assembleCompanionContext } from "@/lib/ai/companion";
+import { recordChatAuthFailure } from "@/lib/ai/chatAuthMonitor";
 
 export const maxDuration = 45;
 
@@ -40,10 +41,45 @@ export const maxDuration = 45;
  * `useChat()` with zero transport config.
  */
 
+function unauthorizedResponse() {
+  const authFailure = recordChatAuthFailure();
+  if (authFailure.shouldAlert) {
+    console.warn(
+      `[auth] repeated chat authentication failures detected · count=${authFailure.count} · window=${5}m`
+    );
+  }
+
+  const response = Response.json(
+    { error: "Please sign in first." },
+    { status: 401 }
+  );
+
+  // Remove stale tokens so the companion's login redirect can establish a
+  // fresh session instead of sending the same undecryptable JWT repeatedly.
+  for (const name of [
+    "next-auth.session-token",
+    "__Secure-next-auth.session-token",
+  ]) {
+    response.headers.append(
+      "Set-Cookie",
+      `${name}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax`
+    );
+  }
+
+  return response;
+}
+
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+  let session;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error("[auth] chat session could not be decoded", error);
+    return unauthorizedResponse();
+  }
+
   if (!session?.user?.id) {
-    return Response.json({ error: "Please sign in first." }, { status: 401 });
+    return unauthorizedResponse();
   }
 
   const { ok, resetAt } = checkChatRateLimit(session.user.id);
@@ -112,32 +148,50 @@ export async function POST(req: Request) {
     console.log(`[ai] rag · ${context.ragRoute.reason} · ${context.ragChunkCount} chunk(s)`);
   }
 
-  const result = streamText({
-    model,
-    system: context.systemPrompt,
-    messages: context.messages,
-    // Truncation guard: Arabic tokenizes at ~2–3 tokens/word (vs ~1.3 for
-    // English), and some provider tiers reason verbosely before answering.
-    // 1536 leaves full headroom above the ~180-word persona budget while
-    // still bounding cost; the prompt (not this cap) controls length.
-    maxOutputTokens: 2048,
-    timeout: 30_000,
-    tools: {
-      getHealthSnapshot: tool({
-        description:
-          "Fetch the user's latest health snapshot (the newest log entry with its pain level, severity, symptoms and note, plus current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
-        // AI SDK v7 renamed `parameters` to `inputSchema`.
-        inputSchema: z.object({}),
-        execute: async () =>
-          JSON.stringify(await buildLongTermMemory(session.user.id)),
-      }),
-    },
-    onFinish: async ({ usage }) => {
-      console.log(
-        `[ai] chat · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
-      );
-    },
-  });
+  let result: { toUIMessageStreamResponse: () => Response };
+  try {
+    result = streamText({
+      model,
+      system: context.systemPrompt,
+      messages: context.messages,
+      // Truncation guard: Arabic tokenizes at ~2–3 tokens/word (vs ~1.3 for
+      // English), and some provider tiers reason verbosely before answering.
+      // 1536 leaves full headroom above the ~180-word persona budget while
+      // still bounding cost; the prompt (not this cap) controls length.
+      maxOutputTokens: 2048,
+      // AI SDK v7 timeout semantics: a bare number means totalMs — one
+      // hard abort for the WHOLE stream at 30s, which silently killed long
+      // replies mid-sentence. Streaming calls must use the watchdog object:
+      // abort only when the first token is late or the stream stalls, so a
+      // healthy slow reply keeps streaming to its finish frame.
+      timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
+      maxRetries: 2,
+      tools: {
+        getHealthSnapshot: tool({
+          description:
+            "Fetch the user's latest health snapshot (the newest log entry with its pain level, severity, symptoms and note, plus current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
+          // AI SDK v7 renamed `parameters` to `inputSchema`.
+          inputSchema: z.object({}),
+          execute: async () =>
+            JSON.stringify(await buildLongTermMemory(session.user.id)),
+        }),
+      },
+      onError: ({ error }) => {
+        console.error("[ai] chat · provider stream error", error);
+      },
+      onFinish: async ({ usage }) => {
+        console.log(
+          `[ai] chat · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
+        );
+      },
+    });
+  } catch (error) {
+    console.error("[ai] chat · provider setup error", error);
+    return Response.json(
+      { error: "The AI provider is unavailable right now." },
+      { status: 502 }
+    );
+  }
 
   // Layer 4 — medical guardrails: stream through the warm-therapy
   // sanitizer so cold-pack/ice slips are rewritten to "كمادات دافئة /

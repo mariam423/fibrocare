@@ -65,7 +65,10 @@ export async function POST(req: Request) {
     system: buildReflectionPrompt(note, snapshot, userName),
     prompt: "Reflect on this journal note with warmth and specificity.",
     maxOutputTokens: 768, // Arabic-safe: ~2-3 tokens/word vs English
-    timeout: 30_000,
+    // Watchdog timeouts, not a total cap (see /api/chat route): abort only
+    // when the first token is late or the stream stalls mid-flight.
+    timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
+    maxRetries: 2,
     onFinish: async ({ usage }) => {
       console.log(
         `[ai] reflect · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`

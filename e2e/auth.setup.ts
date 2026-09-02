@@ -1,5 +1,5 @@
 import { test as setup, expect } from "@playwright/test";
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 
 const E2E_EMAIL = process.env.E2E_EMAIL ?? "e2e.smoke@fibrocare.local";
 const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "FibroCareE2E2026!";
@@ -76,6 +76,23 @@ async function waitForOutcome(
  */
 setup("authenticate as throwaway account", async ({ page }) => {
   mkdirSync("e2e/.auth", { recursive: true });
+
+  // Reuse a still-valid state first. This avoids repeating signup/login on
+  // every run and makes the setup resilient to slow dev-server compiles.
+  if (existsSync(STORAGE_STATE)) {
+    try {
+      const storedState = JSON.parse(readFileSync(STORAGE_STATE, "utf8"));
+      await page.context().addCookies(storedState.cookies ?? []);
+      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      if (isAuthed(page.url())) {
+        await page.context().storageState({ path: STORAGE_STATE });
+        return;
+      }
+      await page.context().clearCookies();
+    } catch {
+      await page.context().clearCookies();
+    }
+  }
 
   // --- Attempt 1: sign-up (creates the account on first run) ------------
   await page.goto("/signup", { waitUntil: "domcontentloaded" });

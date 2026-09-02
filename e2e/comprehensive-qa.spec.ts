@@ -218,6 +218,28 @@ test.describe("Resources QA", () => {
     await expect(allBtn).toBeVisible();
     await expect(allBtn).toHaveAttribute("aria-pressed", "true");
   });
+
+  test("filters mental-support resources and refreshes the personalized feed", async ({
+    page,
+  }) => {
+    await page.goto("/resources", { waitUntil: "domcontentloaded" });
+    await expect(
+      page.getByRole("heading", { name: "Personalized care feed" })
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Mental Support", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "Mental Support", exact: true })
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("heading", { name: "Breathwork for Flares" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pacing Techniques" })).toHaveCount(0);
+
+    const refresh = page.getByRole("button", { name: "Refresh feed" });
+    await expect(refresh).toBeVisible();
+    await refresh.click();
+    await expect(refresh).toBeEnabled();
+    await expect(page.getByRole("heading", { name: "Breathwork for Flares" })).toBeVisible();
+  });
 });
 
 /* ─── Profile ─────────────────────────────────────────────────────── */

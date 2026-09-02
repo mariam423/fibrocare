@@ -189,6 +189,12 @@ export type TranslationKey =
   | "resources.painAware.banner"
   | "resources.painAware.highPain"
   | "resources.empty"
+  | "resources.feed.title"
+  | "resources.feed.subtitle"
+  | "resources.feed.refresh"
+  | "resources.feed.refreshing"
+  | "resources.feed.live"
+  | "resources.feed.offline"
   | "about.title"
   | "about.subtitle"
   | "about.overview"
@@ -1756,6 +1762,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.painAware.banner": "High pain today — showing the gentlest options first",
     "resources.painAware.highPain": "High pain",
     "resources.empty": "No resources match your search. Try a different term or clear the filters.",
+    "resources.feed.title": "Personalized care feed",
+    "resources.feed.subtitle": "A fresh, gentle shortlist shaped by your pain, energy, and weather.",
+    "resources.feed.refresh": "Refresh feed",
+    "resources.feed.refreshing": "Refreshing...",
+    "resources.feed.live": "AI-ranked from curated care resources",
+    "resources.feed.offline": "Personalized locally from curated care resources",
     "about.title": "About Fibromyalgia",
     "about.subtitle": "Understanding your condition is the first step toward better management.",
     "about.overview": "What is Fibromyalgia?",
@@ -3329,6 +3341,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.painAware.banner": "ألم مرتفع اليوم — نعرض الخيارات الألطف أولًا",
     "resources.painAware.highPain": "ألم مرتفع",
     "resources.empty": "لا توجد موارد مطابقة لبحثك. جرّب مصطلحًا آخر أو امسح عوامل التصفية.",
+    "resources.feed.title": "خلاصة رعاية مخصصة",
+    "resources.feed.subtitle": "مجموعة لطيفة ومتجددة تتشكل حسب الألم والطاقة والطقس.",
+    "resources.feed.refresh": "تحديث الخلاصة",
+    "resources.feed.refreshing": "جارٍ التحديث...",
+    "resources.feed.live": "مرتبة بالذكاء الاصطناعي من موارد رعاية منتقاة",
+    "resources.feed.offline": "مخصصة محليًا من موارد رعاية منتقاة",
     "about.title": "عن التهاب العضلات الليفية",
     "about.subtitle": "فهم حالتك هو الخطوة الأولى نحو إدارة أفضل.",
     "about.overview": "ما هو التهاب العضلات الليفية؟",

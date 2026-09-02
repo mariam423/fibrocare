@@ -349,20 +349,29 @@ export class IncrementalGuardrail {
     if (cut <= 0) return "";
     const chunk = this.pending.slice(0, cut);
     const released = this.repair(chunk);
-    this.releasedRaw = (this.releasedRaw + chunk).slice(-240);
+    this.releasedRaw += chunk;
     this.pending = this.pending.slice(cut);
     return released;
   }
 
+  /** Release the current text block without applying the final append rule. */
+  flushPending(): string {
+    if (!this.pending) return "";
+    const pending = this.pending;
+    const out = this.repair(pending);
+    this.releasedRaw += pending;
+    this.pending = "";
+    return out;
+  }
+
   /** Stream ended: release everything and apply the append rule once. */
   flush(): string {
-    const pendingSanitized = this.repair(this.pending);
-    const fullSanitized =
-      sanitizeWarmTherapy(
-        this.arabicLeaks
-          ? rewriteWithTable(this.releasedRaw, SORTED_LITERALS)
-          : this.releasedRaw
-      ) + pendingSanitized;
+    const pendingSanitized = this.flushPending();
+    const fullSanitized = sanitizeWarmTherapy(
+      this.arabicLeaks
+        ? rewriteWithTable(this.releasedRaw, SORTED_LITERALS)
+        : this.releasedRaw
+    );
     let out = pendingSanitized;
     if (TENSION_HINT.test(fullSanitized) && !WARM_MENTION.test(fullSanitized)) {
       const isArabic = /[\u0600-\u06FF]/.test(fullSanitized);
@@ -389,40 +398,88 @@ export function createGuardrailStreamTransform(
   const encoder = new TextEncoder();
   let lineBuffer = "";
   let openTextId: string | null = null;
-  let flushed = false;
+  let pendingTextEnd: { id: string; line: string } | null = null;
+  let pendingFrames: string[] = [];
+  let finalized = false;
   const guardrail = new IncrementalGuardrail(options);
 
+  const deltaFrame = (id: string, delta: string): string =>
+    `data: ${JSON.stringify({ type: "text-delta", id, delta })}\n`;
+
+  /** Finish the response and inject any final safety text into its last part. */
+  const finalize = (): string[] => {
+    if (finalized) return [];
+    finalized = true;
+    const tail = guardrail.flush();
+    const frames: string[] = [];
+
+    if (pendingTextEnd) {
+      if (tail) frames.push(deltaFrame(pendingTextEnd.id, tail));
+      // The embedded newline closes this held SSE event; the outer transform
+      // adds the second newline required by SSE.
+      frames.push(pendingTextEnd.line, ...pendingFrames);
+      pendingTextEnd = null;
+    } else if (tail && openTextId) {
+      // Degenerate stream: the active text part never sent text-end.
+      frames.push(deltaFrame(openTextId, tail));
+    }
+
+    return frames;
+  };
+
   const processLine = (line: string): string[] => {
-    if (!line.startsWith("data:")) return [line];
+    if (!line.startsWith("data:")) {
+      if (pendingTextEnd) pendingFrames.push(line);
+      return pendingTextEnd ? [] : [line];
+    }
     const payload = line.slice(5).trim();
-    if (!payload) return [line];
+    if (!payload) {
+      if (pendingTextEnd) pendingFrames.push(line);
+      return pendingTextEnd ? [] : [line];
+    }
     let event: { type?: string; id?: string; delta?: string };
     try {
       event = JSON.parse(payload);
     } catch {
-      return [line]; // never break the stream on a malformed frame
+      if (pendingTextEnd) pendingFrames.push(line);
+      return pendingTextEnd ? [] : [line]; // never break the stream on a malformed frame
     }
     if (event.type === "text-start" && typeof event.id === "string") {
+      const frames: string[] = [];
+      if (pendingTextEnd) {
+        frames.push(pendingTextEnd.line, ...pendingFrames);
+        pendingTextEnd = null;
+        pendingFrames = [];
+      }
       openTextId = event.id;
-      return [line];
+      return [...frames, line];
     }
     if (event.type === "text-delta" && typeof event.delta === "string") {
       const released = guardrail.push(event.delta);
-      return [`data: ${JSON.stringify({ ...event, delta: released })}`];
+      return released
+        ? [`data: ${JSON.stringify({ ...event, delta: released })}`]
+        : [];
     }
-    if (event.type === "text-end" && !flushed) {
-      flushed = true;
-      const tail = guardrail.flush();
+    if (event.type === "text-end" && typeof event.id === "string") {
+      const released = guardrail.flushPending();
       const frames: string[] = [];
-      if (tail && openTextId) {
-        // The injected delta is its OWN SSE event — terminate it with a
-        // blank line so clients don't join it with the following frame.
-        frames.push(
-          `data: ${JSON.stringify({ type: "text-delta", id: openTextId, delta: tail })}\n`
-        );
-      }
-      frames.push(line);
+      if (released) frames.push(deltaFrame(event.id, released));
+      // Hold the end marker until we know whether another text part follows.
+      // This keeps the final safety append inside the last text part.
+      pendingTextEnd = { id: event.id, line };
+      pendingFrames = [];
+      openTextId = null;
       return frames;
+    }
+    if (
+      (event.type === "finish" || event.type === "abort" || event.type === "error") &&
+      !finalized
+    ) {
+      return [...finalize(), line];
+    }
+    if (pendingTextEnd) {
+      pendingFrames.push(line);
+      return [];
     }
     return [line];
   };
@@ -439,21 +496,9 @@ export function createGuardrailStreamTransform(
       }
     },
     flush(controller) {
-      // Degenerate streams that never closed their text part.
-      if (!flushed) {
-        flushed = true;
-        const tail = guardrail.flush();
-        if (tail && openTextId) {
-          controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({
-                type: "text-delta",
-                id: openTextId,
-                delta: tail,
-              })}\n\n`
-            )
-          );
-        }
+      // Degenerate streams that never sent a terminal UI-message frame.
+      for (const out of finalize()) {
+        controller.enqueue(encoder.encode(out + "\n"));
       }
       if (lineBuffer) controller.enqueue(encoder.encode(lineBuffer));
     },

@@ -42,6 +42,7 @@ import {
 import { ResourceCard, type LocalizedResource } from "@/components/resources/ResourceCard";
 import { BodySymptomMap } from "@/components/resources/BodySymptomMap";
 import { FlareActionPlan } from "@/components/resources/FlareActionPlan";
+import { PersonalizedResourceFeed } from "@/components/resources/PersonalizedResourceFeed";
 
 type CategoryId =
   | "managingFlares"
@@ -383,6 +384,15 @@ export default function ResourcesPage() {
     const bodyCardIds = selectedBodyPart
       ? new Set(BODY_PARTS[selectedBodyPart].cardIds)
       : null;
+    const categoryMatches = localizedResources.filter((res) =>
+      activeCategory === "all" ||
+      RESOURCES_DATA.find((r) => r.id === res.id)?.category === activeCategory
+    );
+    const categoryBodyIntersection = bodyCardIds
+      ? categoryMatches.filter((res) => bodyCardIds.has(res.id))
+      : categoryMatches;
+    const effectiveBodyCardIds =
+      bodyCardIds && categoryBodyIntersection.length > 0 ? bodyCardIds : null;
 
     const list = localizedResources.filter((res) => {
       const matchesSearch =
@@ -396,7 +406,8 @@ export default function ResourcesPage() {
       const matchesCategory =
         activeCategory === "all" ||
         RESOURCES_DATA.find((r) => r.id === res.id)?.category === activeCategory;
-      const matchesBodyPart = bodyCardIds === null || bodyCardIds.has(res.id);
+      const matchesBodyPart =
+        effectiveBodyCardIds === null || effectiveBodyCardIds.has(res.id);
       return matchesSearch && matchesCategory && matchesBodyPart;
     });
 
@@ -466,6 +477,14 @@ export default function ResourcesPage() {
               ))}
             </div>
           </section>
+        </ScrollReveal>
+
+        {/* Personalized AI feed */}
+        <ScrollReveal delay={0.08}>
+          <PersonalizedResourceFeed
+            category={activeCategory}
+            resources={localizedResources}
+          />
         </ScrollReveal>
 
         {/* Search & Filters */}

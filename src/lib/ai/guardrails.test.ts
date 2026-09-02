@@ -5,7 +5,16 @@ import {
   sanitizeArabicLeaks,
   sanitizeWarmTherapy,
   stripForeignScripts,
+  createGuardrailStreamTransform,
 } from "./guardrails";
+import { parseUiMessageSseText } from "./sse";
+import {
+  parseJsonEventStream,
+  readUIMessageStream,
+  uiMessageChunkSchema,
+  type UIMessage,
+  type UIMessageChunk,
+} from "ai";
 
 describe("sanitizeWarmTherapy", () => {
   it("rewrites English cold-therapy phrases to warm equivalents", () => {
@@ -132,6 +141,112 @@ describe("IncrementalGuardrail streaming invariant", () => {
   it("passes through plain text unchanged when no rules apply", () => {
     const streamed = streamThrough("Just a calm evening message.", [4]);
     expect(streamed).toBe("Just a calm evening message.");
+  });
+});
+
+describe("createGuardrailStreamTransform", () => {
+  async function transformSse(input: string): Promise<string> {
+    const body = new Response(input).body;
+    if (!body) throw new Error("test stream has no body");
+    const transformed = body.pipeThrough(createGuardrailStreamTransform());
+    const reader = transformed.getReader();
+    const decoder = new TextDecoder();
+    let output = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      output += decoder.decode(value, { stream: true });
+    }
+    return output;
+  }
+
+  it("flushes every independently keyed text block in a multi-step stream", async () => {
+    const input = [
+      'data: {"type":"start","messageId":"m1"}',
+      'data: {"type":"text-start","id":"text-1"}',
+      'data: {"type":"text-delta","id":"text-1","delta":"First part."}',
+      'data: {"type":"text-end","id":"text-1"}',
+      'data: {"type":"text-start","id":"text-2"}',
+      'data: {"type":"text-delta","id":"text-2","delta":"Second part must not disappear."}',
+      'data: {"type":"text-end","id":"text-2"}',
+      'data: {"type":"finish","finishReason":"stop"}',
+    ].join("\n\n") + "\n\n";
+
+    const output = await transformSse(input);
+    expect(parseUiMessageSseText(output)).toBe(
+      "First part.Second part must not disappear."
+    );
+  });
+
+  it("produces a UI-message stream the AI SDK client can decode", async () => {
+    const input = [
+      'data: {"type":"start","messageId":"m1"}',
+      'data: {"type":"text-start","id":"text-1"}',
+      'data: {"type":"text-delta","id":"text-1","delta":"A tense muscle needs support."}',
+      'data: {"type":"text-end","id":"text-1"}',
+      'data: {"type":"finish"}',
+    ].join("\n\n") + "\n\n";
+    const output = await transformSse(input);
+    const parsed = parseJsonEventStream({
+      stream: new Response(output).body!,
+      schema: uiMessageChunkSchema,
+    });
+    const chunks = new ReadableStream<UIMessageChunk>({
+      async start(controller) {
+        const reader = parsed.getReader();
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!value.success) throw value.error;
+            controller.enqueue(value.value);
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    let last: UIMessage | undefined;
+    for await (const message of readUIMessageStream({ stream: chunks })) {
+      last = message;
+    }
+    const text = (last?.parts ?? [])
+      .filter((part): part is { type: "text"; text: string } => part.type === "text")
+      .map((part) => part.text)
+      .join("");
+    expect(text).toContain("a warm compress or a warm bath");
+  });
+
+  it("keeps tool-step frames after the completed text part", async () => {
+    const input = [
+      'data: {"type":"text-start","id":"text-1"}',
+      'data: {"type":"text-delta","id":"text-1","delta":"Before tool."}',
+      'data: {"type":"text-end","id":"text-1"}',
+      'data: {"type":"start-step"}',
+      'data: {"type":"text-start","id":"text-2"}',
+      'data: {"type":"text-delta","id":"text-2","delta":"After tool."}',
+      'data: {"type":"text-end","id":"text-2"}',
+      'data: {"type":"finish-step"}',
+      'data: {"type":"finish"}',
+    ].join("\n\n") + "\n\n";
+    const output = await transformSse(input);
+    const events = output
+      .split("\n\n")
+      .filter(Boolean)
+      .map((event) => JSON.parse(event.slice(6)) as { type: string });
+
+    expect(events.map((event) => event.type)).toEqual([
+      "text-start",
+      "text-delta",
+      "text-end",
+      "start-step",
+      "text-start",
+      "text-delta",
+      "text-end",
+      "finish-step",
+      "finish",
+    ]);
   });
 });
 

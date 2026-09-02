@@ -11,7 +11,7 @@ export default function CommunityPage() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh]">
+    <div>
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
       {/* pb-20 keeps the last post's actions clear of the fixed PWA
           install banner on mobile viewports. */}

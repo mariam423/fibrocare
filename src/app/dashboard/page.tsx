@@ -596,8 +596,12 @@ export default function Home() {
             <Link href="/pro/doctor" className="group block">
               <Card className="h-full transition-colors group-hover:bg-muted/50">
                 <CardContent className="flex items-center gap-4 py-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                    <HugeiconsIcon icon={Stethoscope02Icon} className="h-6 w-6 text-primary" aria-hidden="true" />
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-emerald-500/20 shadow-lg shadow-emerald-950/10">
+                    <img
+                      src="/images/الطبيب.jpg"
+                      alt="Doctor Hub"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.browseDoctors")}</p>
@@ -610,8 +614,12 @@ export default function Home() {
             <Link href="/pro/consultations" className="group block">
               <Card className="h-full transition-colors group-hover:bg-muted/50">
                 <CardContent className="flex items-center gap-4 py-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                    <HugeiconsIcon icon={Chatting01Icon} className="h-6 w-6 text-primary" aria-hidden="true" />
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-emerald-500/20 shadow-lg shadow-emerald-950/10">
+                    <img
+                      src="/images/الاستشارات .jpg"
+                      alt="Consultations"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.startConsultation")}</p>

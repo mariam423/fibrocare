@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AiBrain01Icon,
   ArrowDown01Icon,
+  ArrowRight01Icon,
   ArrowUp01Icon,
   Restaurant02Icon,
   FastWindIcon,
@@ -151,32 +152,50 @@ function ConnectionArrow({
 }
 
 /* ------------------------------------------------------------------ */
-/* GutBrainAxisSection                                                 */
+/* FlowArrow — horizontal connector used between nodes in lg+ layout   */
 /* ------------------------------------------------------------------ */
+
+function FlowArrow() {
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden h-8 w-8 shrink-0 items-center justify-center text-teal-500/60 lg:flex dark:text-teal-300/50"
+    >
+      <HugeiconsIcon
+        icon={ArrowRight01Icon}
+        className="h-5 w-5 rtl:-scale-x-100"
+      />
+    </div>
+  );
+}
 
 interface GutBrainAxisSectionProps {
   titleKey: TranslationKey;
   introKey: TranslationKey;
   detailKey: TranslationKey;
+  /** Optional local photo rendered as a stable banner above the pathway. */
+  image?: string;
 }
 
 /**
  * A dedicated visual section explaining the gut–brain axis and why IBS
- * co-occurs with fibromyalgia. Uses a vertical pathway diagram (brain →
- * vagus nerve → gut → symptoms) and a side panel of "what this means for
- * you" supportive notes.
+ * co-occurs with fibromyalgia. Intro text and a local photo sit side by
+ * side with a panel of "what this means for you" supportive notes, and a
+ * full-width horizontal pathway (brain → vagus nerve → gut → symptoms)
+ * anchors the bottom of the card.
  */
 export function GutBrainAxisSection({
   titleKey,
   introKey,
   detailKey,
+  image,
 }: GutBrainAxisSectionProps) {
   const { t } = useLanguage();
 
   return (
     <ScrollReveal>
       <DepthCard tilt={2} delay={0}>
-        <SpotlightCard className="group relative overflow-hidden rounded-3xl border border-teal-500/25 bg-gradient-to-br from-teal-50/70 via-emerald-50/60 to-violet-50/60 shadow-xl shadow-teal-950/15 backdrop-blur-xl dark:from-teal-950/30 dark:via-slate-900/60 dark:to-violet-950/30">
+        <SpotlightCard className="group relative !overflow-hidden !pb-0 -mb-2 rounded-3xl border border-teal-500/25 bg-gradient-to-br from-teal-50/70 via-emerald-50/60 to-violet-50/60 shadow-xl shadow-teal-950/15 backdrop-blur-xl dark:from-teal-950/30 dark:via-slate-900/60 dark:to-violet-950/30">
           {/* Decorative blobs */}
           <div
             aria-hidden="true"
@@ -187,9 +206,9 @@ export function GutBrainAxisSection({
             className="pointer-events-none absolute -bottom-20 -start-16 h-64 w-64 rounded-full bg-violet-300/20 blur-3xl dark:bg-violet-500/10"
           />
 
-          <CardContent className="relative grid gap-6 p-6 sm:p-8 md:grid-cols-[1fr_1.2fr] md:items-center">
-            {/* Left: pathway diagram */}
-            <div className="space-y-1">
+          <CardContent className="relative grid gap-6 p-5 pb-3 sm:p-7 sm:pb-4 lg:grid-cols-[1fr_1.1fr]">
+            {/* Left: intro + local photo */}
+            <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-700 dark:text-teal-300">
                 <HugeiconsIcon
                   icon={SparklesIcon}
@@ -204,52 +223,27 @@ export function GutBrainAxisSection({
               <p className="text-sm leading-relaxed text-foreground/80">
                 <BdiText text={t(introKey)} />
               </p>
-
-              {/* Vertical pathway */}
-              <div className="mt-4 flex flex-col items-stretch">
-                <AxisNode
-                  icon={AiBrain01Icon}
-                  label={t("about.gut.node.brain")}
-                  hint={t("about.gut.node.brainHint")}
-                  tone="violet"
-                  delay={0}
-                />
-                <ConnectionArrow direction="bidirectional" />
-                <AxisNode
-                  icon={FastWindIcon}
-                  label={t("about.gut.node.vagus")}
-                  hint={t("about.gut.node.vagusHint")}
-                  tone="emerald"
-                  delay={0.05}
-                />
-                <ConnectionArrow direction="bidirectional" />
-                <AxisNode
-                  icon={Restaurant02Icon}
-                  label={t("about.gut.node.gut")}
-                  hint={t("about.gut.node.gutHint")}
-                  tone="teal"
-                  delay={0.1}
-                />
-                <ConnectionArrow direction="down" />
-                <AxisNode
-                  icon={Activity01Icon}
-                  label={t("about.gut.node.symptoms")}
-                  hint={t("about.gut.node.symptomsHint")}
-                  tone="rose"
-                  delay={0.15}
-                />
-              </div>
+              {image && (
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-teal-500/20 shadow-sm">
+                  <img
+                    src={image}
+                    alt={t(titleKey)}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Right: detail panel + supportive tips */}
-            <div className="space-y-3">
+            {/* Right: detail panel + supportive tips, stretching to fill
+                the full column height on lg+ so no empty band remains */}
+            <div className="flex flex-col gap-3 lg:h-full">
               <div className="rounded-2xl border border-teal-500/20 bg-white/70 p-5 shadow-sm backdrop-blur-md dark:bg-slate-900/55">
                 <p className="text-sm leading-relaxed text-foreground/85">
                   <BdiText text={t(detailKey)} />
                 </p>
               </div>
 
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grow gap-2 sm:grid-cols-2 lg:content-center">
                 {(
                   [
                     {
@@ -328,6 +322,53 @@ export function GutBrainAxisSection({
               </div>
             </div>
           </CardContent>
+
+          {/* Horizontal brain↔gut pathway, full-width below the grid so the
+              section has no tall empty side column */}
+          <div className="relative border-t border-teal-500/15 bg-white/30 px-5 pb-5 pt-4 sm:px-7 dark:bg-slate-950/25">
+            <div className="flex flex-col items-center gap-2 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
+              <AxisNode
+                icon={AiBrain01Icon}
+                label={t("about.gut.node.brain")}
+                hint={t("about.gut.node.brainHint")}
+                tone="violet"
+                delay={0}
+              />
+              <div className="w-full lg:hidden">
+                <ConnectionArrow direction="bidirectional" />
+              </div>
+              <FlowArrow />
+              <AxisNode
+                icon={FastWindIcon}
+                label={t("about.gut.node.vagus")}
+                hint={t("about.gut.node.vagusHint")}
+                tone="emerald"
+                delay={0.05}
+              />
+              <div className="w-full lg:hidden">
+                <ConnectionArrow direction="bidirectional" />
+              </div>
+              <FlowArrow />
+              <AxisNode
+                icon={Restaurant02Icon}
+                label={t("about.gut.node.gut")}
+                hint={t("about.gut.node.gutHint")}
+                tone="teal"
+                delay={0.1}
+              />
+              <div className="w-full lg:hidden">
+                <ConnectionArrow direction="down" />
+              </div>
+              <FlowArrow />
+              <AxisNode
+                icon={Activity01Icon}
+                label={t("about.gut.node.symptoms")}
+                hint={t("about.gut.node.symptomsHint")}
+                tone="rose"
+                delay={0.15}
+              />
+            </div>
+          </div>
         </SpotlightCard>
       </DepthCard>
     </ScrollReveal>

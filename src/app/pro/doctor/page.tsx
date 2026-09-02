@@ -53,6 +53,13 @@ export default function DoctorHubPage() {
         <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
           <ScrollReveal>
             <div className="text-center space-y-3">
+              <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+                <img
+                  src="/images/الطبيب.jpg"
+                  alt="Doctor Hub"
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                 <HugeiconsIcon icon={Stethoscope02Icon} className="h-3 w-3" aria-hidden="true" />
                 {t("pro.page.doctorHubBadge")}
@@ -105,13 +112,22 @@ export default function DoctorHubPage() {
     <RouteTransition>
       <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
         <ScrollReveal>
-          <div className="space-y-1">
-            <WordReveal
-              as="h1"
-              text={t("doctor.dashboardTitle")}
-              className="text-2xl font-bold tracking-tight"
-            />
-            <p className="text-muted-foreground">{t("doctor.dashboardSubtitle")}</p>
+          <div className="flex items-center gap-5">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+              <img
+                src="/images/الطبيب.jpg"
+                alt="Doctor Hub"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="space-y-1">
+              <WordReveal
+                as="h1"
+                text={t("doctor.dashboardTitle")}
+                className="text-2xl font-bold tracking-tight"
+              />
+              <p className="text-muted-foreground">{t("doctor.dashboardSubtitle")}</p>
+            </div>
           </div>
         </ScrollReveal>
 

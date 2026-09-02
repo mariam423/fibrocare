@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -260,23 +259,36 @@ export function LandingHero() {
           {/* Column 2 — Visual Asset */}
           <motion.div
             variants={heroItem}
-            className="flex items-center justify-center"
+            className="relative flex items-center justify-center"
           >
-            <div className="relative animate-float-soft">
-              {/* Background glow */}
-              <div
-                aria-hidden="true"
-                className="absolute -inset-4 rounded-full bg-emerald-500/5 dark:bg-emerald-500/8 blur-3xl pointer-events-none -z-10"
-              />
-              {/* Glassmorphic card */}
-              <div className="relative p-4 rounded-3xl bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-emerald-500/20 shadow-sm shadow-emerald-900/5 dark:shadow-[0_0_50px_-12px_rgba(16,185,129,0.25)] backdrop-blur-md">
-                <Image
+            {/* Ambient glow behind the card */}
+            <div
+              aria-hidden="true"
+              className="absolute -inset-8 rounded-full bg-emerald-500/8 dark:bg-emerald-500/10 blur-3xl pointer-events-none"
+            />
+            {/* Glassmorphic card container */}
+            <div className="relative w-full max-w-md animate-float-soft rounded-3xl bg-white/90 dark:bg-slate-900/80 border border-slate-200 dark:border-emerald-500/20 shadow-sm shadow-emerald-900/5 dark:shadow-[0_0_50px_-12px_rgba(16,185,129,0.25)] backdrop-blur-md overflow-hidden p-4 sm:p-5">
+              {/* The full-body pain-points illustration — landscape, no vertical crop */}
+              <div className="relative aspect-[16/9] w-full rounded-2xl hero-image-breathe">
+                <img
                   src="/images/resources/fibromyalgia-pain-points.png"
                   alt="Fibromyalgia pain points illustration showing areas of the body commonly affected"
-                  width={512}
-                  height={512}
-                  priority
-                  className="object-contain drop-shadow-xl max-h-[380px] w-auto mx-auto"
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+                {/* Subtle radial glow that breathes over the pain points */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 35%, rgba(16,185,129,0.12) 0%, transparent 55%), radial-gradient(circle at 50% 65%, rgba(59,130,246,0.08) 0%, transparent 50%)",
+                    animation: "breathe-glow 6s ease-in-out infinite",
+                  }}
+                />
+                {/* Inner ring highlight */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 dark:ring-white/5 pointer-events-none"
                 />
               </div>
             </div>

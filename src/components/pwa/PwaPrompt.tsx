@@ -72,7 +72,8 @@ export function PwaPrompt() {
 
   // Zen is a full-screen focus mode. Keep global install/offline banners out
   // of its visual field and prevent them from competing with its controls.
-  if (pathname === "/zen" || installed || isStandalone()) return null;
+  // Landing page (/) — the install prompt distracts from the hero; hide it.
+  if (pathname === "/zen" || pathname === "/" || installed || isStandalone()) return null;
 
   if (offline) {
     return (

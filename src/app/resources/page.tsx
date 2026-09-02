@@ -185,7 +185,7 @@ const RESOURCES_DATA: Resource[] = [
     category: "mentalSupport",
     effort: "low",
     icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-sky-600 dark:text-sky-300" aria-hidden="true" />,
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-sky-200 to-indigo-100 dark:from-sky-900/50 dark:to-indigo-950/50",
     color: {
       light: "bg-sky-50 text-sky-700 ring-sky-100",
@@ -205,7 +205,7 @@ const RESOURCES_DATA: Resource[] = [
     category: "mentalSupport",
     effort: "low",
     icon: <HugeiconsIcon icon={WaveIcon} className="h-6 w-6 text-violet-600 dark:text-violet-300" aria-hidden="true" />,
-    image: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-violet-200 to-fuchsia-100 dark:from-violet-900/50 dark:to-fuchsia-950/50",
     color: {
       light: "bg-violet-50 text-violet-700 ring-violet-100",
@@ -267,7 +267,7 @@ const RESOURCES_DATA: Resource[] = [
     category: "gentleMovement",
     effort: "medium",
     icon: <HugeiconsIcon icon={Activity01Icon} className="h-6 w-6 text-green-600 dark:text-green-300" aria-hidden="true" />,
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1758599879693-9e06f55a4ded?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-green-200 to-emerald-100 dark:from-green-900/50 dark:to-emerald-950/50",
     color: {
       light: "bg-green-50 text-green-700 ring-green-100",
@@ -309,7 +309,7 @@ const RESOURCES_DATA: Resource[] = [
     category: "mentalSupport",
     effort: "low",
     icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
-    image: "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-indigo-200 to-purple-100 dark:from-indigo-900/50 dark:to-purple-950/50",
     color: {
       light: "bg-indigo-50 text-indigo-700 ring-indigo-100",
@@ -330,7 +330,7 @@ const RESOURCES_DATA: Resource[] = [
     category: "mentalSupport",
     effort: "medium",
     icon: <HugeiconsIcon icon={Brain01Icon} className="h-6 w-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />,
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=800&q=80",
     bannerGradient: "from-slate-200 to-indigo-100 dark:from-slate-900/50 dark:to-indigo-950/50",
     color: {
       light: "bg-indigo-50 text-indigo-700 ring-indigo-100",
@@ -417,10 +417,10 @@ export default function ResourcesPage() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh] text-foreground transition-colors duration-500">
+    <div className="text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-24 space-y-8 max-w-6xl pb-48 mb-20">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-24 space-y-5 max-w-6xl pb-24 mb-10">
         <ScrollReveal as="section" className="space-y-2 text-center max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold tracking-tight">
             {t("resources.title")}
@@ -440,7 +440,7 @@ export default function ResourcesPage() {
               {CONTENT_NAV_ITEMS.map((item) => (
                 <Link key={item.href} href={item.href} className="group">
                   <DepthCard tilt={3} delay={0} hover={false} className="h-full">
-                    <SpotlightCard className="h-full rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-300 group-hover:-translate-y-0.5 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
+                    <SpotlightCard className="h-full !pb-0 -mb-2 rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-300 group-hover:-translate-y-0.5 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
                       <CardContent className="p-6 flex items-center gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.bg} transition-transform duration-300 group-hover:scale-110`}>
                           <HugeiconsIcon
@@ -469,7 +469,7 @@ export default function ResourcesPage() {
         </ScrollReveal>
 
         {/* Search & Filters */}
-        <ScrollReveal delay={0.1} className="flex flex-col items-center gap-6">
+        <ScrollReveal delay={0.1} className="flex flex-col items-center gap-4">
           <div className="relative w-full max-w-md rounded-full border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl dark:bg-slate-900/60">
             <HugeiconsIcon icon={Search01Icon} className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -545,7 +545,7 @@ export default function ResourcesPage() {
         )}
 
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence mode="popLayout" initial={false}>
             {filteredResources.map((res) => (
               <motion.div

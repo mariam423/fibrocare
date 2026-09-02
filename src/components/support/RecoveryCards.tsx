@@ -26,6 +26,8 @@ interface RecoveryCardProps {
   color: "purple" | "teal" | "orange";
   /** Renders the action button in its "on" state (filled + aria-pressed). */
   active?: boolean;
+  /** Optional full-bleed illustration shown as a header band on the card. */
+  image?: string;
 }
 
 const colorMap = {
@@ -62,6 +64,7 @@ export function RecoveryCard({
   onAction,
   color,
   active = false,
+  image,
 }: RecoveryCardProps) {
   const colors = colorMap[color];
   return (
@@ -75,6 +78,22 @@ export function RecoveryCard({
         )}
       >
         <CardContent className="flex h-full flex-col justify-between p-0">
+          {image && (
+            <div className="relative -mx-4 -mt-4 mb-3 h-24 w-auto shrink-0 overflow-hidden rounded-t-2xl sm:h-28">
+              <img
+                src={image}
+                alt=""
+                aria-hidden="true"
+                className="h-full w-full object-cover"
+              />
+              {/* Blends the band into the card surface so titles/buttons
+                  below always sit on a legible backdrop */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-card via-card/25 to-transparent"
+              />
+            </div>
+          )}
           <div className="flex items-start gap-3">
             <div
               className={cn(
@@ -282,6 +301,7 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
           active={isSensitiveMode}
           onAction={toggleSensitive}
           color="purple"
+          image="/images/resources/recovery-rest.svg"
         />
       </div>
       <div className="w-full h-full">
@@ -292,6 +312,7 @@ export function RecoveryPanel({ onZen }: { onZen: () => void }) {
           actionLabel={t("recovery.breath.openZen")}
           onAction={onZen}
           color="teal"
+          image="/images/resources/recovery-breath.svg"
         />
       </div>
       <div className="w-full h-full">

@@ -1,6 +1,16 @@
 {
   "cookies": [
     {
+      "name": "next-auth.csrf-token",
+      "value": "8724f24f7966f775880d5a3d38d88379a1ad044fd4aade42bac811830d2cd0f7%7C37560e093e00f6c89aceb6e814e7bdbe0efb511b532f65a4568e2b70e974c9de",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
       "name": "next-auth.callback-url",
       "value": "http%3A%2F%2Flocalhost%3A3000%2Fdashboard",
       "domain": "localhost",
@@ -11,21 +21,11 @@
       "sameSite": "Lax"
     },
     {
-      "name": "next-auth.csrf-token",
-      "value": "880e73829c61e876c35cf059d39902a8a945bb38f12af03b41992dba95df3aff%7C07f342d857b379ae7b1dead246663990c572eff0da581dac43181e06246cec47",
-      "domain": "localhost",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
       "name": "next-auth.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..GZ-6_myeMALCABtn.dIKUAOQLzTVFT1hVcKlUaj2uOCtHhZBkr1cPBc6ivG1fgwTWdyPmeyvIx6NjUrTHoTClBke_e9dr9iMXhpu4jZ7tyEqEMU-IXE_46ZVGTuBvPPrhdwn_1MdGTwosYU-FAXayFPkHZTJdr1BcccWRls8115w5cZtcIPZB91Xc1EQn7MCjIG3UBnPMEsnCq_Q2snp06F8z1NTLXOVpnBKIxgPEx5PANIor_wI6XXRz24JCxH8dMwHc_5pxFQ0J9DCH.e6-WXqH-vowtIrVQRzoivA",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ygzbGPJtF7N_EFa7.YerlEyDhb6ZRBA6Kc9mIDo2-QJezjzvy41di282UYF5BzbQNW6cXowcvplX1vZTXoAs_EdJGR2LkkyHshSUJ68SdXMDZzAdfgl-ocdzKG7MtwtcpEfd3wB9gYKVfZahaZEJHUQytBpPSqY-nsESWrLnHX7FaeIZW_qnk_uWcc53FaJIowlor29SUu70Blxck6G2c8WIY5dUtqcB1MD705gzT-qFYUgMPUXdDq2ZHMF58LRhcILXeIAwWzN13NlSZ.1Tr0vTROe22WbZh6dhLUsw",
       "domain": "localhost",
       "path": "/",
-      "expires": 1790354390.424406,
+      "expires": 1790948246.602324,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
@@ -37,15 +37,11 @@
       "localStorage": [
         {
           "name": "nextauth.message",
-          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1787762348}"
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1788356246}"
         },
         {
           "name": "fibrocare:last-pressure-reading",
-          "value": "1011"
-        },
-        {
-          "name": "fibrocare:notifications",
-          "value": "[{\"id\":\"daily-log-2026-08-26\",\"type\":\"daily_checkin\",\"title\":\"notification.dailyLog.reminder.title\",\"message\":\"notification.dailyLog.reminder.message\",\"actionUrl\":\"/dashboard\",\"timestamp\":1787762348890,\"read\":false}]"
+          "value": "1018"
         }
       ]
     }

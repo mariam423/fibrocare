@@ -1072,8 +1072,11 @@ body.emergency-mode::after {
   opacity: 1;
 }
 
-/* Keep card content above the highlight layer. */
-.spotlight-card > * {
+/* Keep card content above the highlight layer. Decorative absolutely
+   positioned children (.pointer-events-none) must keep their own
+   positioning — forcing them to `position: relative` would pull them into
+   the flow and stretch the card with empty bands. */
+.spotlight-card > *:not(.pointer-events-none) {
   position: relative;
   z-index: 1;
 }
@@ -1457,5 +1460,31 @@ html.motion-reduce .hero-scenery-haze {
 }
 
 html.motion-reduce .hero-scenery-mist {
+  animation: none;
+}
+
+/* --- Hero pain-points illustration: gentle breathing glow + scale --- */
+@keyframes hero-image-breathe {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    transform: scale(1.015);
+    filter: brightness(1.04) drop-shadow(0 0 18px rgba(16, 185, 129, 0.18));
+  }
+}
+
+.hero-image-breathe {
+  animation: hero-image-breathe 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-image-breathe {
+    animation: none;
+  }
+}
+
+html.motion-reduce .hero-image-breathe {
   animation: none;
 }

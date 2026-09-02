@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 import { DepthCard } from "@/components/ui/DepthCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
@@ -27,6 +29,13 @@ export interface ContentSection {
   title: string;
   icon: IconSvgElement;
   content: string;
+  /** Optional image to accompany the section. */
+  image?: string;
+  /** Object-fit for the image. "contain" shows the full image without any
+   *  cropping (use for photos/diagrams where details must stay visible). */
+  imageFit?: "cover" | "contain";
+  /** Render the image full-width below the text instead of beside it. */
+  standaloneImage?: boolean;
   /** Plain-language variant shown when the foggy toggle is on. */
   plainContent?: string;
   highlights?: HighlightItem[];
@@ -78,10 +87,19 @@ export function ContentPageLayout({
   const [foggy, setFoggy] = useState(false);
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 pb-12">
-      <div className="space-y-8">
+    <div className="w-full max-w-4xl mx-auto px-4 pb-8 relative">
+      {/* Ambient background accents to reduce void feeling */}
+      <div
+        aria-hidden="true"
+        className="absolute -top-12 -left-12 h-64 w-64 rounded-full bg-emerald-100/20 blur-3xl dark:bg-emerald-900/10 -z-10"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute top-1/3 -right-12 h-64 w-64 rounded-full bg-teal-100/20 blur-3xl dark:bg-teal-900/10 -z-10"
+      />
+      <div className="space-y-4">
         {/* Hero Header */}
-        <ScrollReveal as="section" className="space-y-4">
+        <ScrollReveal as="section" className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${colors.bg} ${colors.text}`}>
@@ -122,7 +140,7 @@ export function ContentPageLayout({
         )}
 
         {/* Content Sections */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {sections.map((section, index) => (
             <ScrollReveal key={index} delay={index * 0.05}>
               <DepthCard tilt={3} delay={index * 0.05}>
@@ -144,57 +162,112 @@ export function ContentPageLayout({
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    <div className="prose prose-sm max-w-none text-foreground/90 whitespace-pre-line leading-relaxed">
-                      <BdiText
-                        text={foggy ? section.plainContent ?? section.content : section.content}
-                      />
-                    </div>
-                    {section.highlights && section.highlights.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        {section.highlights.map((item, i) => (
-                          <div
-                            key={i}
-                            className="flex items-start gap-2 rounded-xl bg-muted/50 border border-border/50 p-3 transition-all duration-200 hover:border-emerald-400/30 hover:bg-emerald-500/5"
-                          >
-                            {typeof item === "string" ? (
-                              <>
-                                <span className="shrink-0 mt-1 h-2 w-2 rounded-full bg-primary/60" />
-                                <span className="text-sm text-foreground/80">
-                                  <BdiText text={item} />
-                                </span>
-                              </>
-                            ) : (
-                              <div className="flex w-full flex-col gap-1">
-                                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                  <BdiText text={item.label} />
-                                </span>
-                                <span className="text-sm text-foreground/85">
-                                  <BdiText text={item.value} />
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                  <CardContent className={cn(
+                    "p-5 space-y-3",
+                    section.image && !section.standaloneImage && "grid grid-cols-1 md:grid-cols-[1fr_0.8fr] gap-5"
+                  )}>
+                    <div className="space-y-3">
+                      <div className="prose prose-sm max-w-none text-foreground/90 whitespace-pre-line leading-relaxed">
+                        <BdiText
+                          text={foggy ? section.plainContent ?? section.content : section.content}
+                        />
                       </div>
-                    )}
-                    {section.tags && section.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {section.tags.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 transition-all duration-200 hover:border-emerald-500/40 hover:bg-emerald-500/15 dark:text-emerald-300"
-                          >
+                      {section.highlights && section.highlights.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          {section.highlights.map((item, i) => (
+                            <div
+                              key={i}
+                              className="flex items-start gap-2 rounded-xl bg-muted/50 border border-border/50 p-2.5 transition-all duration-200 hover:border-emerald-400/30 hover:bg-emerald-500/5"
+                            >
+                              {typeof item === "string" ? (
+                                <>
+                                  <span className="shrink-0 mt-1 h-1.5 w-1.5 rounded-full bg-primary/60" />
+                                  <span className="text-sm text-foreground/80">
+                                    <BdiText text={item} />
+                                  </span>
+                                </>
+                              ) : (
+                                <div className="flex w-full flex-col gap-0.5">
+                                  <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                    <BdiText text={item.label} />
+                                  </span>
+                                  <span className="text-sm text-foreground/85">
+                                    <BdiText text={item.value} />
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {section.tags && section.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          {section.tags.map((tag, i) => (
                             <span
-                              className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500/70"
-                              aria-hidden="true"
-                            />
-                            {t(tag)}
-                          </span>
-                        ))}
+                              key={i}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 transition-all duration-200 hover:border-emerald-500/40 hover:bg-emerald-500/15 dark:text-emerald-300"
+                            >
+                              <span
+                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500/70"
+                                aria-hidden="true"
+                              />
+                              {t(tag)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {section.action && <div className="pt-1">{section.action}</div>}
+                    </div>
+                    {section.image && section.standaloneImage ? (
+                      /* Standalone image: full-width below text with breathing glow */
+                      <div className="relative pt-2">
+                        <div className="relative mx-auto max-w-sm rounded-2xl hero-image-breathe">
+                          <img
+                            src={section.image}
+                            alt={section.title}
+                            className="h-auto w-full rounded-2xl object-contain"
+                          />
+                          <div
+                            aria-hidden="true"
+                            className="absolute inset-0 pointer-events-none rounded-2xl"
+                            style={{
+                              background:
+                                "radial-gradient(circle at 50% 35%, rgba(16,185,129,0.12) 0%, transparent 55%), radial-gradient(circle at 50% 65%, rgba(59,130,246,0.08) 0%, transparent 50%)",
+                              animation: "breathe-glow 6s ease-in-out infinite",
+                            }}
+                          />
+                          <div
+                            aria-hidden="true"
+                            className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-emerald-500/10 pointer-events-none"
+                          />
+                        </div>
                       </div>
-                    )}
-                    {section.action && <div className="pt-1">{section.action}</div>}
+                    ) : section.image ? (
+                      <div className="group/img h-full">
+                        <div
+                          className={cn(
+                            "relative aspect-video w-full overflow-hidden rounded-2xl border border-emerald-500/20 shadow-sm md:aspect-auto md:h-full",
+                            section.imageFit === "contain" &&
+                              "bg-white/50 backdrop-blur-xl dark:bg-slate-950/40"
+                          )}
+                        >
+                          <img
+                            src={section.image}
+                            alt={section.title}
+                            className={cn(
+                              "h-full w-full",
+                              section.imageFit === "contain"
+                                ? "object-contain"
+                                : "object-cover transition-transform duration-500 group-hover/img:scale-105"
+                            )}
+                          />
+                          <div
+                            aria-hidden="true"
+                            className="absolute inset-0 bg-gradient-to-t from-emerald-950/10 via-transparent to-transparent"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
                   </CardContent>
                 </SpotlightCard>
               </DepthCard>

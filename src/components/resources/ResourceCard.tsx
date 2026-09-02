@@ -73,12 +73,10 @@ export function ResourceCard({ res }: { res: LocalizedResource }) {
     <SpotlightCard className="group h-full overflow-hidden rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl transition-all duration-300 hover:shadow-emerald-950/30 dark:bg-slate-900/60">
       {/* Imagery — uniform ratio, hover zoom, emerald wash */}
       <div className="relative aspect-video w-full overflow-hidden rounded-t-2xl">
-        <Image
+        <img
           src={res.image}
           alt={res.title}
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/50 via-emerald-950/10 to-transparent" />
         <span className="absolute start-3 top-3 rounded-full border border-white/30 bg-black/40 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">

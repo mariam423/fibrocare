@@ -218,6 +218,10 @@ export type TranslationKey =
   | "about.symptom.headache.value"
   | "about.symptom.sensitivity.label"
   | "about.symptom.sensitivity.value"
+  | "about.symptom.stiffness.label"
+  | "about.symptom.stiffness.value"
+  | "about.symptom.digestive.label"
+  | "about.symptom.digestive.value"
   | "about.cause.amplified.title"
   | "about.cause.amplified.desc"
   | "about.cause.genetic.title"
@@ -245,6 +249,13 @@ export type TranslationKey =
   | "about.gut.tip.motility"
   | "about.gut.tip.stress"
   | "about.gut.tip.microbiome"
+  | "about.weatherSensitivity.title"
+  | "about.weatherSensitivity.eyebrow"
+  | "about.weatherSensitivity.intro"
+  | "about.weatherSensitivity.tip.heat"
+  | "about.weatherSensitivity.tip.cold"
+  | "about.weatherSensitivity.tip.pressure"
+  | "about.weatherSensitivity.tip.transition"
   | "about.visual.eyebrow"
   | "about.visual.symptoms.caption"
   | "about.visual.gutBrain.eyebrow"
@@ -1774,6 +1785,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.symptom.headache.value": "Frequent tension headaches or migraines",
     "about.symptom.sensitivity.label": "Heightened sensitivity",
     "about.symptom.sensitivity.value": "Light, noise, temperature, and odors feel intense",
+    "about.symptom.stiffness.label": "Stiffness",
+    "about.symptom.stiffness.value": "Stiffness and soreness, especially in the morning",
+    "about.symptom.digestive.label": "Digestive issues",
+    "about.symptom.digestive.value": "Irritable bowel syndrome (IBS) is common and frequent",
     "about.cause.amplified.title": "Central sensitization",
     "about.cause.amplified.desc": "The brain and spinal cord turn up the volume on pain signals, so sensations that shouldn't hurt — light pressure, mild heat — are felt as pain.",
     "about.cause.genetic.title": "Genetic predisposition",
@@ -1801,6 +1816,13 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.gut.tip.motility": "Altered bowel motility",
     "about.gut.tip.stress": "Stress-driven flares",
     "about.gut.tip.microbiome": "Microbiome balance",
+    "about.weatherSensitivity.title": "Weather Sensitivity & Temperature Changes",
+    "about.weatherSensitivity.eyebrow": "Environmental triggers",
+    "about.weatherSensitivity.intro": "Weather is one of the most reported environmental triggers for fibromyalgia flares. In summer, extreme heat can dial up pain signals and fatigue; in winter, cold and dampness increase muscle stiffness and slow, aching muscles. Rapid swings in temperature and barometric pressure — the kind that arrive with storms or changing seasons — make the sensitized nervous system feel under threat, amplifying pain, stiffness, and exhaustion within hours.",
+    "about.weatherSensitivity.tip.heat": "Summer heat: keep cool & hydrated",
+    "about.weatherSensitivity.tip.cold": "Winter chill: layer up & warm up",
+    "about.weatherSensitivity.tip.pressure": "Pressure swings: check forecasts, pace the day",
+    "about.weatherSensitivity.tip.transition": "Sudden changes: transition slowly in & out",
     "about.visual.eyebrow": "Understanding the condition",
     "about.visual.symptoms.caption": "Soft body map — areas most affected by fibromyalgia",
     "about.visual.gutBrain.eyebrow": "Why IBS is so common",
@@ -3336,6 +3358,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.symptom.headache.value": "صداع توتر متكرر أو نوبات صداع نصفي",
     "about.symptom.sensitivity.label": "حساسية مفرطة",
     "about.symptom.sensitivity.value": "الإضاءة والضوضاء والحرارة والروائح تبدو قوية جدًا",
+    "about.symptom.stiffness.label": "التيبس",
+    "about.symptom.stiffness.value": "تيبس وألم خاصة عند الاستيقاظ في الصباح",
+    "about.symptom.digestive.label": "مشاكل الجهاز الهضمي",
+    "about.symptom.digestive.value": "متلازمة القولون العصبي تحدث بشكل متكرر",
     "about.cause.amplified.title": "التحسس المركزي",
     "about.cause.amplified.desc": "يرفع الدماغ والحبل الشوكي من صوت إشارات الألم، فيتم الشعور بالضغط الخفيف أو الحرارة المعتدلة كألم حقيقي.",
     "about.cause.genetic.title": "استعداد وراثي",
@@ -3363,6 +3389,13 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "about.gut.tip.motility": "اضطراب حركة الأمعاء",
     "about.gut.tip.stress": "نوبات مرتبطة بالتوتر",
     "about.gut.tip.microbiome": "توازن الميكروبيوم",
+    "about.weatherSensitivity.title": "حساسية الطقس وتغيرات الحرارة",
+    "about.weatherSensitivity.eyebrow": "العوامل البيئية والمحفزات",
+    "about.weatherSensitivity.intro": "يُعدّ الطقس من أكثر المحفِّزات البيئية شيوعًا لنوبات الفيبروميالجيا. ففي الصيف، يزيد الحرّ الشديد من شدة إشارات الألم والإرهاق؛ وفي الشتاء، يزيد البرد والرطوبة من تيبُّس العضلات وثقلها وبطء حركتها. أما التقلبات السريعة والمفاجئة في درجات الحرارة والضغط الجوي — التي ترافق العواصف أو تغيُّر الفصول — فتجعل الجهاز العصبي المتحسِّس يشعر وكأنه مهدَّد، فتتعاظم شدّة الألم والتيبُّس والإرهاق خلال ساعات.",
+    "about.weatherSensitivity.tip.heat": "حرّ الصيف: حافظ على البرودة والترطيب",
+    "about.weatherSensitivity.tip.cold": "برد الشتاء: ارتدِ طبقاتٍ ودفّئ عضلاتك",
+    "about.weatherSensitivity.tip.pressure": "تقلب الضغط: تابع نشرة الطقس ونظّم يومك",
+    "about.weatherSensitivity.tip.transition": "التغيُّر المفاجئ: انتقل ببطء بين الداخل والخارج",
     "about.visual.eyebrow": "فهم الحالة",
     "about.visual.symptoms.caption": "خريطة الجسم — المناطق الأكثر تأثرًا بالفيبروميالجيا",
     "about.visual.gutBrain.eyebrow": "لماذا القولون العصبي شائع",

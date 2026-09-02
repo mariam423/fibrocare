@@ -55,6 +55,7 @@ export default function TreatmentPage() {
       content: t("treatment.medicationsContent"),
       plainContent: t("treatment.medicationsPlain"),
       chunk: medicationChunk,
+      image: "/images/%D8%A7%D8%AF%D9%88%D9%8A%D9%87.jpg",
       tags: ["treatment.tag.meds.1", "treatment.tag.meds.2"],
     },
     {
@@ -63,6 +64,7 @@ export default function TreatmentPage() {
       content: t("treatment.therapyContent"),
       plainContent: t("treatment.therapyPlain"),
       chunk: exerciseChunk,
+      image: "/images/%D8%A7%D9%84%D8%B9%D9%84%D8%A7%D8%AC%20%D8%A7%D9%84%D8%B7%D8%A8%D9%8A%D8%B9%D9%8A.jpg",
       tags: ["treatment.tag.therapy.1", "treatment.tag.therapy.2"],
     },
     {
@@ -71,6 +73,7 @@ export default function TreatmentPage() {
       content: t("treatment.exerciseContent"),
       plainContent: t("treatment.exercisePlain"),
       chunk: exerciseChunk,
+      image: "/images/%D8%A7%D9%84%D8%AA%D9%85%D8%A7%D8%B1%D9%8A%D9%86%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6%D9%8A%D9%87.jpg",
       tags: ["treatment.tag.exercise.1", "treatment.tag.exercise.2"],
     },
     {
@@ -79,6 +82,7 @@ export default function TreatmentPage() {
       content: t("treatment.stressContent"),
       plainContent: t("treatment.stressPlain"),
       chunk: stressChunk,
+      image: "/images/%D8%A7%D8%AF%D8%A7%D8%B1%D9%87%20%D8%A7%D9%84%D8%AA%D9%88%D8%AA%D8%B1%20.jpg",
       tags: ["treatment.tag.stress.1", "treatment.tag.stress.2"],
     },
     {
@@ -87,6 +91,7 @@ export default function TreatmentPage() {
       content: t("treatment.sleepContent"),
       plainContent: t("treatment.sleepPlain"),
       chunk: sleepChunk,
+      image: "/images/%D8%A7%D9%84%D9%86%D9%88%D9%85%20%D8%A7%D9%84%D9%85%D8%B8%D9%8A%D9%81.jpg",
       tags: ["treatment.tag.sleep.1", "treatment.tag.sleep.2"],
     },
     {
@@ -95,6 +100,7 @@ export default function TreatmentPage() {
       content: t("treatment.selfCareContent"),
       plainContent: t("treatment.selfCarePlain"),
       chunk: pacingChunk,
+      image: "/images/%D8%B1%D8%B9%D8%A7%D9%8A%D9%87%20%D8%B0%D8%A7%D8%AA%D9%8A%D9%87.jpg",
       tags: ["treatment.tag.selfCare.1", "treatment.tag.selfCare.2"],
       action: <QuickAddToTracker />,
     },
@@ -102,9 +108,9 @@ export default function TreatmentPage() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh]">
+    <div>
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-48 mb-20">
+      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-24 mb-10">
         <ContentPageLayout
           titleKey="treatment.title"
           subtitleKey="treatment.subtitle"

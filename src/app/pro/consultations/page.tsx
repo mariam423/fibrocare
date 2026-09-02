@@ -76,13 +76,22 @@ export default function ProConsultationsPage() {
       <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
         <ScrollReveal>
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <WordReveal
-                as="h1"
-                text={t("consultation.title")}
-                className="text-2xl font-bold tracking-tight"
-              />
-              <p className="text-muted-foreground">{t("consultation.subtitle")}</p>
+            <div className="flex items-center gap-5">
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+                <img
+                  src="/images/الاستشارات .jpg"
+                  alt="Consultations"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="space-y-1">
+                <WordReveal
+                  as="h1"
+                  text={t("consultation.title")}
+                  className="text-2xl font-bold tracking-tight"
+                />
+                <p className="text-muted-foreground">{t("consultation.subtitle")}</p>
+              </div>
             </div>
             {hasAccess && role !== "doctor" && (
               <Button render={<Link href="/pro/consultations/new" />}>

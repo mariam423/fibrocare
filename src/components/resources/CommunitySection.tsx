@@ -178,17 +178,31 @@ export function CommunitySection() {
 
   return (
     <ScrollReveal as="section" className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <HugeiconsIcon icon={Message02Icon} className="h-5 w-5" aria-hidden="true" />
+      <div className="grid items-center gap-4 sm:grid-cols-[1fr_auto]">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <HugeiconsIcon icon={Message02Icon} className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">
+              {t("community.title")}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {t("community.subtitle")}
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight">
-            {t("community.title")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {t("community.subtitle")}
-          </p>
+        <div className="relative mx-auto aspect-square w-36 overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-50/60 shadow-md shadow-emerald-950/10 sm:mx-0 sm:w-44 lg:w-52">
+          <img
+            src="/images/%D8%AF%D8%B9%D9%85.jpg"
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-tr from-emerald-950/25 via-transparent to-transparent"
+          />
         </div>
       </div>
 

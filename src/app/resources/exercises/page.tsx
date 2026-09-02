@@ -48,6 +48,8 @@ export default function ExercisesPage() {
       content: t("exercises.stretchingContent"),
       plainContent: t("exercises.stretchingPlain"),
       chunk: exerciseChunk,
+      image: "/images/%D8%AA%D9%85%D8%A7%D8%B1%D9%8A%D9%86%20%D8%A7%D9%84%D8%AA%D9%85%D8%B7%D9%8A%D8%B7s.jpg",
+      imageFit: "contain",
       highlights: [
         t("exercises.stretchingHighlight.1"),
         t("exercises.stretchingHighlight.2"),
@@ -68,6 +70,7 @@ export default function ExercisesPage() {
       content: t("exercises.yogaContent"),
       plainContent: t("exercises.yogaPlain"),
       chunk: mindBodyChunk,
+      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
       tags: ["exercises.tag.yoga.1", "exercises.tag.yoga.2"],
     },
     {
@@ -76,6 +79,7 @@ export default function ExercisesPage() {
       content: t("exercises.walkingContent"),
       plainContent: t("exercises.walkingPlain"),
       chunk: exerciseChunk,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
       tags: ["exercises.tag.walking.1", "exercises.tag.walking.2"],
       action: (
         <ExerciseTimer
@@ -91,6 +95,7 @@ export default function ExercisesPage() {
       content: t("exercises.swimmingContent"),
       plainContent: t("exercises.swimmingPlain"),
       chunk: exerciseChunk,
+      image: "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=80",
       tags: ["exercises.tag.swimming.1", "exercises.tag.swimming.2"],
     },
     {
@@ -99,15 +104,16 @@ export default function ExercisesPage() {
       content: t("exercises.tipsContent"),
       plainContent: t("exercises.tipsPlain"),
       chunk: exerciseChunk,
+      image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80",
       tags: ["exercises.tag.tips.1", "exercises.tag.tips.2"],
     },
   ];
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh]">
+    <div>
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-48 mb-20">
+      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-24 mb-10">
         <ContentPageLayout
           titleKey="exercises.title"
           subtitleKey="exercises.subtitle"

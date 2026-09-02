@@ -41,6 +41,7 @@ export default function DiagnosisPage() {
       content: t("diagnosis.criteria"),
       plainContent: t("diagnosis.criteriaPlain"),
       chunk: criteriaChunk,
+      image: "/images/%D9%83%D9%8A%D9%81%20%D9%8A%D8%AA%D9%85%20%D8%AA%D8%B4%D8%AE%D9%8A%D8%B5%20%D8%A7%D9%84%D8%AA%D9%87%D8%A7%D8%A8%20%D8%A7%D9%84%D8%B9%D8%B6%D9%84%D8%A7%D8%AA%20%D8%A7%D9%84%D9%84%D9%8A%D9%81%D9%8A%D8%A9%D8%9F.jpg",
       highlights: [
         {
           label: t("diagnosis.criteria.wpi.label"),
@@ -66,6 +67,7 @@ export default function DiagnosisPage() {
       content: t("diagnosis.exams"),
       plainContent: t("diagnosis.examsPlain"),
       chunk: testsChunk,
+      image: "/images/%D8%A7%D9%84%D8%A7%D8%AE%D8%AA%D8%A8%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D9%8A%D9%8A%D9%85%D8%A7%D8%AA.jpg",
       highlights: [
         {
           label: t("diagnosis.exam.cbc.label"),
@@ -98,6 +100,9 @@ export default function DiagnosisPage() {
       icon: UserMultipleIcon,
       content: t("diagnosis.specialistDetail"),
       plainContent: t("diagnosis.specialistPlain"),
+      image: "/images/متي تري اخصائي؟.webp",
+      imageFit: "contain" as const,
+      standaloneImage: true,
       highlights: [
         t("diagnosis.specialistHighlight.1"),
         t("diagnosis.specialistHighlight.2"),
@@ -108,9 +113,9 @@ export default function DiagnosisPage() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh]">
+    <div>
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-48 mb-20 print:pb-0 print:mb-0">
+      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-24 mb-10 print:pb-0 print:mb-0">
         <ContentPageLayout
           titleKey="diagnosis.title"
           subtitleKey="diagnosis.subtitle"

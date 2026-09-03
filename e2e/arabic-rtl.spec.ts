@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { unlockPrivatePage, unlockLockDialog } from "./helpers/privacy";
 
 /**
  * Arabic i18n & RTL coverage for the four authenticated surfaces:
@@ -38,7 +39,9 @@ test.describe("Arabic i18n & RTL", () => {
         await toggle.click({ timeout: 10_000 });
       } catch {
         // Not hydrated / not visible yet — reload the page fresh and retry.
+        // (A full reload re-locks the privacy gate, so unlock again.)
         await page.reload({ waitUntil: "domcontentloaded" });
+        await unlockLockDialog(page).catch(() => {});
         await page.waitForTimeout(1500);
         continue;
       }
@@ -106,7 +109,7 @@ test.describe("Arabic i18n & RTL", () => {
 
   test("language toggle switches the app to Arabic RTL", async ({ page }) => {
     await test.step("load the hydrated dashboard", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
     });
 
@@ -149,7 +152,7 @@ test.describe("Arabic i18n & RTL", () => {
 
   test("dashboard renders its localized Arabic surfaces", async ({ page }) => {
     await test.step("load the hydrated dashboard", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
     });
 
@@ -177,7 +180,7 @@ test.describe("Arabic i18n & RTL", () => {
     page,
   }) => {
     await test.step("load health logs", async () => {
-      await page.goto("/health-logs", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/health-logs");
       await expect(page.getByRole("heading", { name: "Health Logs" })).toBeVisible();
     });
 
@@ -226,7 +229,7 @@ test.describe("Arabic i18n & RTL", () => {
     page,
   }) => {
     await test.step("load resources", async () => {
-      await page.goto("/resources", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/resources");
       // The resources page uses "Care Resources" for both the page h1 and a
       // section h2 — scope to the top-level heading to stay unambiguous.
       await expect(
@@ -259,7 +262,7 @@ test.describe("Arabic i18n & RTL", () => {
     page,
   }) => {
     await test.step("load profile", async () => {
-      await page.goto("/profile", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/profile");
       await expect(
         page.getByRole("heading", { name: "User Profile", level: 1 })
       ).toBeVisible();
@@ -284,7 +287,7 @@ test.describe("Arabic i18n & RTL", () => {
 
   test("reports renders Arabic RTL with mirrored header", async ({ page }) => {
     await test.step("load reports", async () => {
-      await page.goto("/reports", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/reports");
       await expect(
         page.getByRole("heading", { name: "Medical Reports", level: 1 })
       ).toBeVisible();
@@ -353,13 +356,14 @@ test.describe("Arabic i18n & RTL", () => {
       // The zen page has its own minimal header (no AppHeader, no language
       // toggle), so flip the locale on the dashboard — the preference is
       // stored in localStorage and picked up when /zen loads.
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
       await switchToArabic(page);
     });
 
     await test.step("load the zen portal in Arabic", async () => {
       await page.goto("/zen", { waitUntil: "domcontentloaded" });
+      await unlockLockDialog(page);
       await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
       await expect(page.locator("html")).toHaveAttribute("lang", "ar");
     });

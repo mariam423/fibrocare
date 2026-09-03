@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { unlockPrivatePage, unlockLockDialog } from "./helpers/privacy";
 
 /**
  * Authenticated QA — dashboard, health logs, resources, profile, reports, zen.
@@ -39,7 +40,10 @@ async function switchToArabic(page: Page) {
     try {
       await toggle.click({ timeout: 10_000 });
     } catch {
+      // Not hydrated — reload and retry. (A full reload re-locks the
+      // privacy gate, so unlock again before interacting.)
       await page.reload({ waitUntil: "domcontentloaded" });
+      await unlockLockDialog(page).catch(() => {});
       await page.waitForTimeout(1500);
       continue;
     }
@@ -80,7 +84,7 @@ test.describe("Dashboard QA", () => {
   test("renders greeting, check-in presets, and gentle support", async ({
     page,
   }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
 
     const greeting = page.getByRole("heading", {
@@ -101,12 +105,12 @@ test.describe("Dashboard QA", () => {
     ).toBeVisible();
 
     await expect(
-      page.getByRole("heading", { name: "Gentle Support" })
+      page.getByRole("heading", { name: "Gentle Support", exact: true })
     ).toBeVisible();
   });
 
   test("preset toggle works with glow indicator", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
     await dismissToastIfVisible(page);
 
@@ -123,7 +127,7 @@ test.describe("Dashboard QA", () => {
   });
 
   test("gratitude journal saves entry", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
 
     const textarea = page.locator("#gratitude-input");
@@ -134,7 +138,7 @@ test.describe("Dashboard QA", () => {
   });
 
   test("sensitive mode toggles", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
     await dismissToastIfVisible(page);
 
@@ -161,7 +165,7 @@ test.describe("Dashboard QA", () => {
   });
 
   test("dark mode toggle works", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
 
     await page.getByRole("button", { name: "Switch to dark mode" }).click();
@@ -169,7 +173,7 @@ test.describe("Dashboard QA", () => {
   });
 
   test("zen portal navigation works", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
 
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -194,7 +198,7 @@ test.describe("Dashboard QA", () => {
 
 test.describe("Health Logs QA", () => {
   test("renders heading and table or empty state", async ({ page }) => {
-    await page.goto("/health-logs", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/health-logs");
     await expect(
       page.getByRole("heading", { name: "Health Logs" })
     ).toBeVisible();
@@ -209,7 +213,7 @@ test.describe("Health Logs QA", () => {
 
 test.describe("Resources QA", () => {
   test("renders with category filters", async ({ page }) => {
-    await page.goto("/resources", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/resources");
     await expect(
       page.getByRole("heading", { name: "Care Resources", level: 1 })
     ).toBeVisible();
@@ -222,7 +226,7 @@ test.describe("Resources QA", () => {
   test("filters mental-support resources and refreshes the personalized feed", async ({
     page,
   }) => {
-    await page.goto("/resources", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/resources");
     await expect(
       page.getByRole("heading", { name: "Personalized care feed" })
     ).toBeVisible();
@@ -246,7 +250,7 @@ test.describe("Resources QA", () => {
 
 test.describe("Profile QA", () => {
   test("renders heading and settings sections", async ({ page }) => {
-    await page.goto("/profile", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/profile");
     await expect(page.getByRole("heading", { name: /Profile/i })).toBeVisible({
       timeout: 60_000,
     });
@@ -260,7 +264,7 @@ test.describe("Profile QA", () => {
 
 test.describe("Reports QA", () => {
   test("renders heading and snapshot stats", async ({ page }) => {
-    await page.goto("/reports", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/reports");
     await expect(
       page.getByRole("heading", { name: "Medical Reports", level: 1 })
     ).toBeVisible();
@@ -272,7 +276,7 @@ test.describe("Reports QA", () => {
 
 test.describe("Zen Portal QA", () => {
   test("renders breathing bubble and soundscape", async ({ page }) => {
-    await page.goto("/zen", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/zen");
 
     await expect(
       page.getByRole("button", { name: "Back to Dashboard" })
@@ -286,7 +290,7 @@ test.describe("Zen Portal QA", () => {
   });
 
   test("dark mode toggle works", async ({ page }) => {
-    await page.goto("/zen", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/zen");
     await expect(page.getByRole("button", { name: "Ultra dark" })).toBeVisible();
     await page.getByRole("button", { name: "Ultra dark" }).click();
     await expect(
@@ -295,7 +299,7 @@ test.describe("Zen Portal QA", () => {
   });
 
   test("zen portal covers the viewport and centers calming controls", async ({ page }) => {
-    await page.goto("/zen", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/zen");
 
     const portal = page.getByTestId("zen-portal");
     await expect(portal).toBeVisible();
@@ -356,7 +360,7 @@ test.describe("Zen Portal QA", () => {
 
 test.describe("Arabic RTL authenticated pages QA", () => {
   test("dashboard renders Arabic RTL", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
     await switchToArabic(page);
 
@@ -368,7 +372,7 @@ test.describe("Arabic RTL authenticated pages QA", () => {
   });
 
   test("health logs renders Arabic RTL", async ({ page }) => {
-    await page.goto("/health-logs", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/health-logs");
     await expect(
       page.getByRole("heading", { name: "Health Logs" })
     ).toBeVisible();
@@ -381,7 +385,7 @@ test.describe("Arabic RTL authenticated pages QA", () => {
   });
 
   test("resources renders Arabic RTL", async ({ page }) => {
-    await page.goto("/resources", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/resources");
     await expect(
       page.getByRole("heading", { name: "Care Resources", level: 1 })
     ).toBeVisible();
@@ -394,7 +398,7 @@ test.describe("Arabic RTL authenticated pages QA", () => {
   });
 
   test("profile renders Arabic RTL", async ({ page }) => {
-    await page.goto("/profile", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/profile");
     await expect(page.getByRole("heading", { name: /Profile/i })).toBeVisible({
       timeout: 60_000,
     });
@@ -407,7 +411,7 @@ test.describe("Arabic RTL authenticated pages QA", () => {
   });
 
   test("reports renders Arabic RTL", async ({ page }) => {
-    await page.goto("/reports", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/reports");
     await expect(
       page.getByRole("heading", { name: "Medical Reports", level: 1 })
     ).toBeVisible();
@@ -420,11 +424,11 @@ test.describe("Arabic RTL authenticated pages QA", () => {
   });
 
   test("zen portal renders Arabic RTL", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     await awaitHydratedDashboard(page);
     await switchToArabic(page);
 
-    await page.goto("/zen", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/zen");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
     await expect(
       page.getByRole("button", { name: "العودة للوحة التحكم" })

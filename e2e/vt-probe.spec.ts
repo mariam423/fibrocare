@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { unlockPrivatePage } from "./helpers/privacy";
 
 test.describe("vt-test probe", () => {
   test("same-route ViewTransition fires startViewTransition", async ({ page }) => {
@@ -18,7 +19,7 @@ test.describe("vt-test probe", () => {
     page.on("pageerror", (err) => errors.push(String(err)));
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 
-    await page.goto("/vt-test", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/vt-test");
     const btn = page.locator("#vt-toggle");
     await btn.waitFor({ state: "visible" });
     await page.waitForTimeout(1200);

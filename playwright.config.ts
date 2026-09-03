@@ -48,11 +48,14 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/user.json" },
       dependencies: ["auth-setup"],
-      // PWA behavior runs under its own config (playwright.pwa.config.ts,
-      // `npm run test:e2e:pwa`) which allows the service worker and serves a
-      // production build — the SW is blocked here for determinism, so this
-      // spec must not be picked up by the default match-all project.
-      testIgnore: /pwa\.spec\.ts/,
+      // Specs with dedicated configs must not be picked up by the default
+      // match-all project: pwa.spec.ts runs under playwright.pwa.config.ts
+      // (SW enabled, production build), ai-live.spec.ts under
+      // playwright.live.config.ts (:3101, fake-key live mode), and
+      // live-chat.spec.ts under playwright.live-chat.config.ts (:3103,
+      // real-provider live mode). The default dev server runs mock/offline
+      // mode on :3000, where those specs' assumptions can't hold.
+      testIgnore: /pwa\.spec\.ts|ai-live\.spec\.ts|live-chat\.spec\.ts/,
     },
   ],
   webServer: {

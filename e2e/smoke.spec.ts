@@ -1,11 +1,12 @@
 import { test, expect } from "@playwright/test";
+import { unlockPrivatePage } from "./helpers/privacy";
 
 test.describe("authenticated smoke tests", () => {
   test("dashboard renders the daily check-in and gentle support cards", async ({
     page,
   }) => {
     await test.step("dashboard loads and hydrates", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       const greeting = page.getByRole("heading", { name: /Good (morning|afternoon|evening)/ });
       await expect(greeting).toBeVisible();
       // The dashboard is a client component: the SSR HTML renders the
@@ -17,7 +18,9 @@ test.describe("authenticated smoke tests", () => {
     });
 
     await test.step("gentle support cards are present and equal-height", async () => {
-      const section = page.getByRole("heading", { name: "Gentle Support", level: 2 });
+      // exact: the dashboard also renders an "Insights & gentle support"
+      // subheading, which a substring match would collide with.
+      const section = page.getByRole("heading", { name: "Gentle Support", exact: true, level: 2 });
       await expect(section).toBeVisible();
       await expect(page.getByRole("heading", { name: "Sensory Rest" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Mindful Breath" })).toBeVisible();
@@ -42,7 +45,7 @@ test.describe("authenticated smoke tests", () => {
   });
 
   test("gentle support actions navigate to their destinations", async ({ page }) => {
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
 
     const zenButton = page.getByRole("button", { name: "Open Zen Portal" });
     // The dashboard is a client component, so its SSR HTML renders the
@@ -65,7 +68,7 @@ test.describe("authenticated smoke tests", () => {
     // top header (the portal is a calm, minimal layout by design).
     await expect(page.getByText("Focus on your breath", { exact: true })).toBeVisible();
 
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/dashboard");
     // The dashboard is a client component: on a cold dev-server compile a
     // click can land before React hydrates (dead handler), and the flare
     // toast alertdialog can cover the card — so dismiss any open dialog and
@@ -98,7 +101,7 @@ test.describe("authenticated smoke tests", () => {
 
   test("health logs page lists the log history", async ({ page }) => {
     await test.step("navigate to health logs", async () => {
-      await page.goto("/health-logs", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/health-logs");
       await expect(page.getByRole("heading", { name: "Health Logs" })).toBeVisible();
     });
 
@@ -110,7 +113,7 @@ test.describe("authenticated smoke tests", () => {
   });
 
   test("profile page loads", async ({ page }) => {
-    await page.goto("/profile", { waitUntil: "domcontentloaded" });
+    await unlockPrivatePage(page, "/profile");
     // The profile page awaits three server actions before rendering its
     // heading; on a cold dev-server compile (10-40s on this machine, see the
     // zen route note above) that can exceed the default 20s expect timeout.

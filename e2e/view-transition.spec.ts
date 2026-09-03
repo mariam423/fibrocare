@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { unlockPrivatePage } from "./helpers/privacy";
 
 /**
  * Temporary verification for the React ViewTransition route crossfade.
@@ -27,15 +28,7 @@ test.describe("route view transitions", () => {
       w.__vtCount = read();
     });
 
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
-    const support = await page.evaluate(() => {
-      const hasElements = document.querySelectorAll("[style*='view-transition-name'], *[style*='view-transition-name']").length;
-      return {
-        api: typeof document.startViewTransition,
-        namedElements: hasElements,
-      };
-    });
-    console.log("VT support:", JSON.stringify(support));
+    await unlockPrivatePage(page, "/dashboard");
     // The dashboard is a client component: its SSR HTML renders the
     // placeholder name "User" until React hydrates and the data action
     // resolves. Clicking the nav link in that window lands on a dead

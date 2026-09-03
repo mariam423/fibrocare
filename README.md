@@ -190,6 +190,9 @@ npm run test:e2e
 # Run tests against live AI providers
 npm run test:e2e:live
 
+# Run the REAL-provider AI chat e2e (no mocks; needs GEMINI_API_KEY in .env.local)
+npm run test:e2e:live-chat
+
 # Type-check the project
 npx tsc --noEmit
 
@@ -199,6 +202,30 @@ npm run build
 # Accessibility audit
 npm run check:a11y
 ```
+
+### Scheduled CI: real-provider chat verification (`live-chat-e2e`)
+
+`.github/workflows/live-chat-e2e.yml` runs the real-provider chat suite
+(`playwright.live-chat.config.ts`) **weekly, Sundays 03:00 UTC**, plus on
+demand via **Run workflow** on the Actions tab. It exercises the full live
+stack — auth → companion → `/api/chat` → real Gemini call → guardrail
+stream → UI render — and the session-recovery flow (401 → banner → login
+redirect).
+
+The job **skips gracefully when the `GEMINI_API_KEY` repository secret is
+absent** (e.g. forks). To enable it:
+
+1. Get a free key at [Google AI Studio](https://aistudio.google.com/apikey)
+   (no credit card needed).
+2. In your repository: **Settings → Secrets and variables → Actions →
+   New repository secret**.
+3. Name: `GEMINI_API_KEY` — Value: your key.
+4. Verify via the Actions tab → **live-chat-e2e** → **Run workflow**; the
+   "Check provider secret" guard should report the key and the e2e job
+   should run instead of being skipped.
+
+The key is used only by the e2e job (`AI_MOCK_MODE=false` forces the real
+provider path); it is never written to `.env` or build artifacts.
 
 ---
 

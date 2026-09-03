@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:live": "node scripts/run-live-e2e.mjs",
+    "test:e2e:live-chat": "node scripts/run-live-chat-e2e.mjs",
     "test:e2e:pwa": "node scripts/run-pwa-e2e.mjs",
     "prebuild": "node scripts/check-a11y-css.mjs",
     "check:a11y": "python scripts/a11y-audit.py",

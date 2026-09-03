@@ -16,7 +16,7 @@
  *                    interactive companion.
  */
 
-import { google } from "@ai-sdk/google";
+import { createGoogle } from "@ai-sdk/google";
 import { createOpenAI, openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
@@ -33,7 +33,10 @@ export type AiRuntimeMode = "live" | "mock" | "offline";
 
 /** Default small/fast model per provider — ideal for a wellness companion. */
 const PROVIDER_MODELS: Record<AiProvider, string> = {
-  google: "gemini-2.5-flash",
+  // gemini-2.5-flash was retired for new API users upstream (404
+  // "no longer available to new users"); gemini-3.6-flash is the
+  // successor the API recommends.
+  google: "gemini-3.6-flash",
   openai: "gpt-4o-mini",
   anthropic: "claude-haiku-4-5",
   // OpenRouter slugs are vendor-prefixed. The task's preferred engines
@@ -126,7 +129,12 @@ export function getModel(): LanguageModel | null {
   const modelId = process.env.AI_MODEL || PROVIDER_MODELS[provider];
   switch (provider) {
     case "google":
-      return google(modelId);
+      // Pass the key explicitly. The app's documented contract (env docs,
+      // offline/mock hints) is GEMINI_API_KEY, but the SDK's implicit env
+      // fallback is GOOGLE_GENERATIVE_AI_API_KEY — relying on that fallback
+      // made the app report "configured" while every live call failed with
+      // a missing-key error.
+      return createGoogle({ apiKey: process.env.GEMINI_API_KEY })(modelId);
     case "openai":
       return openai(modelId);
     case "anthropic":

@@ -38,7 +38,9 @@
     ".next-live/types/**/*.ts",
     ".next-live/dev/types/**/*.ts",
     ".next-pwa/types/**/*.ts",
-    ".next-pwa/dev/types/**/*.ts"
+    ".next-pwa/dev/types/**/*.ts",
+    ".next-live-chat/types/**/*.ts",
+    ".next-live-chat/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

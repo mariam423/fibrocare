@@ -58,7 +58,7 @@ export default function AboutPage() {
     <RouteTransition>
       <div>
         <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-        <main className="container mx-auto max-w-4xl space-y-5 p-4 pb-24 sm:p-6 lg:p-8 mb-10">
+        <main className="container mx-auto max-w-4xl space-y-5 p-4 pt-[calc(env(safe-area-inset-top)+5rem)] pb-24 sm:p-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:p-8 mb-10">
           {/* 1. Immersive definition hero with medical illustration */}
           <DefinitionHeroCard
             titleKey="about.title"

@@ -180,8 +180,8 @@ export function SomaticToolkitCard() {
                     isActive || videoOpen ? "border-primary/40 bg-primary/10" : "border-border/60 bg-muted/30"
                   )}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                    <div className="min-w-0">
                       <p className="font-medium">{t(ex.titleKey)}</p>
                       <p className="text-xs text-muted-foreground">{t(ex.descriptionKey)}</p>
                     </div>

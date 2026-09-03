@@ -115,7 +115,7 @@ export default function DiagnosisPage() {
     <RouteTransition>
     <div>
       <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
-      <main className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 pb-24 mb-10 print:pb-0 print:mb-0">
+      <main className="container mx-auto max-w-4xl p-4 pt-[calc(env(safe-area-inset-top)+5rem)] sm:p-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:p-8 pb-24 mb-10 print:pb-0 print:mb-0">
         <ContentPageLayout
           titleKey="diagnosis.title"
           subtitleKey="diagnosis.subtitle"

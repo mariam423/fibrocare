@@ -75,16 +75,16 @@ export default function ProConsultationsPage() {
     <RouteTransition>
       <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
         <ScrollReveal>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-5">
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+            <div className="flex items-center gap-4 min-w-0 sm:gap-5">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-24 sm:w-24">
                 <img
                   src="/images/الاستشارات .jpg"
                   alt="Consultations"
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="space-y-1">
+              <div className="min-w-0 space-y-1">
                 <WordReveal
                   as="h1"
                   text={t("consultation.title")}
@@ -94,7 +94,7 @@ export default function ProConsultationsPage() {
               </div>
             </div>
             {hasAccess && role !== "doctor" && (
-              <Button render={<Link href="/pro/consultations/new" />}>
+              <Button render={<Link href="/pro/consultations/new" />} className="shrink-0 self-stretch sm:self-auto">
                 <HugeiconsIcon icon={Add01Icon} className="me-2 h-4 w-4" />
                 {t("consultation.newConsultation")}
               </Button>

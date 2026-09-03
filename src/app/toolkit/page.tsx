@@ -24,7 +24,7 @@ export default function ToolkitPage() {
       <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
         <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-        <main className="max-w-4xl mx-auto px-4 lg:px-8 pt-24 pb-10 space-y-6">
+        <main className="max-w-4xl mx-auto px-4 lg:px-8 pt-[calc(env(safe-area-inset-top)+5rem)] pb-10 space-y-6">
           <ScrollReveal as="section" className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{t("toolkit.title")}</h1>
             <p className="text-lg text-muted-foreground">{t("toolkit.subtitle")}</p>

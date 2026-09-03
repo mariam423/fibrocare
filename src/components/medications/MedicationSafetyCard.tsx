@@ -106,7 +106,7 @@ export function MedicationSafetyCard() {
               onChange={(e) => setDose(e.target.value)}
               placeholder={t("medications.dosePlaceholder")}
               aria-label={t("medications.dosePlaceholder")}
-              className="w-24 min-w-0 rounded-xl border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="w-20 min-w-0 shrink-0 sm:w-24 rounded-xl border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             />
             <select
               value={timing}

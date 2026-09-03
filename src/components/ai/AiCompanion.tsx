@@ -271,7 +271,7 @@ export function AiCompanion() {
   return (
     <>
       {/* Launcher */}
-      <div className="fixed bottom-5 end-5 z-[70] sm:bottom-6 sm:end-6">
+      <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] end-5 z-[70] sm:bottom-6 sm:end-6">
         <AnimatePresence>
           {!open && (
             <motion.button
@@ -315,7 +315,7 @@ export function AiCompanion() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
             transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 28 }}
-            className="fixed bottom-24 end-4 z-[70] flex h-[min(34rem,calc(100dvh-8.5rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card/95 shadow-2xl backdrop-blur-xl"
+            className="fixed bottom-[max(6rem,calc(env(safe-area-inset-bottom)+5rem))] end-4 z-[70] flex h-[min(34rem,calc(100dvh-8.5rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-border bg-card/95 shadow-2xl backdrop-blur-xl"
           >
             {/* Aurora wash */}
             <div

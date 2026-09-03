@@ -1474,6 +1474,15 @@ export type TranslationKey =
   | "doctor.totalPosts"
   | "doctor.publishedCount"
   | "doctor.pendingCount"
+  | "doctor.aiLibrary.title"
+  | "doctor.aiLibrary.subtitle"
+  | "doctor.aiLibrary.reviewed"
+  | "doctor.aiLibrary.loading"
+  | "doctor.aiLibrary.empty"
+  | "doctor.aiLibrary.newBadge"
+  | "doctor.aiLibrary.read"
+  | "doctor.aiLibrary.disclaimer"
+  | "doctor.aiLibrary.signature"
   | "consultation.title"
   | "consultation.subtitle"
   | "consultation.newConsultation"
@@ -3058,6 +3067,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.totalPosts": "Total Articles",
     "doctor.publishedCount": "Published",
     "doctor.pendingCount": "Pending Review",
+    "doctor.aiLibrary.title": "AI-Generated Article Library",
+    "doctor.aiLibrary.subtitle": "Articles grounded in Mayo Clinic and ACR guidance, signed by a curated set of consultant physicians.",
+    "doctor.aiLibrary.reviewed": "Medically reviewed",
+    "doctor.aiLibrary.loading": "Loading topics…",
+    "doctor.aiLibrary.empty": "Preparing the library…",
+    "doctor.aiLibrary.newBadge": "New",
+    "doctor.aiLibrary.read": "Read article",
+    "doctor.aiLibrary.disclaimer": "Note: Articles are for education only and do not replace medical care. Discuss any change with your care team.",
+    "doctor.aiLibrary.signature": "Each article is signed by a consultant from a curated signature set",
     "consultation.title": "Consultations",
     "consultation.subtitle": "Secure messaging with your care team",
     "consultation.newConsultation": "New Consultation",
@@ -4643,6 +4661,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.totalPosts": "إجمالي المقالات",
     "doctor.publishedCount": "منشور",
     "doctor.pendingCount": "قيد المراجعة",
+    "doctor.aiLibrary.title": "مكتبة المقالات المولّدة بالذكاء الاصطناعي",
+    "doctor.aiLibrary.subtitle": "مقالات مبنية على إرشادات Mayo Clinic و ACR، يوقّعها أطباء استشاريون مختارون بعناية.",
+    "doctor.aiLibrary.reviewed": "موثّق طبياً",
+    "doctor.aiLibrary.loading": "جاري تحميل المواضيع…",
+    "doctor.aiLibrary.empty": "جاري تجهيز المكتبة…",
+    "doctor.aiLibrary.newBadge": "جديد",
+    "doctor.aiLibrary.read": "اقرأ المقال",
+    "doctor.aiLibrary.disclaimer": "تنبيه: المقالات للتثقيف فقط ولا تحلّ محل الرعاية الطبية. ناقش أي تغيير مع طبيبك.",
+    "doctor.aiLibrary.signature": "يوقّع كل مقال طبيب استشاري من مجموعة مختارة بعناية",
     "consultation.title": "الاستشارات",
     "consultation.subtitle": "رسائل آمنة مع فريق رعايتك",
     "consultation.newConsultation": "استشارة جديدة",

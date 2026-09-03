@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DocumentAttachmentIcon, Loading01Icon, Stethoscope02Icon } from "@hugeicons/core-free-icons";
+import {
+  DocumentAttachmentIcon,
+  Loading01Icon,
+  Stethoscope02Icon,
+} from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { WordReveal } from "@/components/ui/WordReveal";
@@ -12,9 +15,11 @@ import { Button } from "@/components/ui/button";
 import { AiPublishingAssistant } from "@/components/pro/AiPublishingAssistant";
 import { PostEditor } from "@/components/pro/PostEditor";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
+import { AiArticleLibrary, type AiArticle } from "@/components/pro/AiArticleLibrary";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProFeature } from "@/hooks/useProFeature";
 import { getDoctorPosts } from "@/app/pro/actions";
+import { listPublishedArticles } from "@/app/pro/doctor-article-actions";
 
 interface Post {
   id: string;
@@ -38,22 +43,49 @@ export default function DoctorHubPage() {
     summary: string;
   } | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [aiArticles, setAiArticles] = useState<AiArticle[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [loadingAi, setLoadingAi] = useState(true);
 
   useEffect(() => {
-    getDoctorPosts({ status: "verified", limit: 12 }).then((r) => {
-      setPosts(r.success ? (r.data ?? []) : []);
+    let cancelled = false;
+    Promise.all([
+      getDoctorPosts({ status: "verified", limit: 12 }),
+      listPublishedArticles(12),
+    ]).then(([p, a]) => {
+      if (cancelled) return;
+      if (p.success) setPosts(p.data ?? []);
+      if (a.success) {
+        setAiArticles(
+          a.data.map((item) => ({
+            id: item.id,
+            title: item.title,
+            summary: item.summary,
+            content: item.content,
+            tags: item.tags,
+            createdAt: item.createdAt,
+            authorName: item.authorName,
+            authorTitle: item.authorTitle,
+            authorityLabel: item.authorityLabel,
+            readingMinutes: item.readingMinutes,
+          }))
+        );
+      }
       setLoadingPosts(false);
+      setLoadingAi(false);
     });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (!isDoctor) {
     return (
       <RouteTransition>
-        <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
+        <main className="container mx-auto max-w-5xl px-4 py-8 space-y-6 sm:space-y-8 sm:py-12">
           <ScrollReveal>
             <div className="text-center space-y-3">
-              <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+              <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-36 sm:w-36">
                 <img
                   src="/images/الطبيب.jpg"
                   alt="Doctor Hub"
@@ -67,32 +99,33 @@ export default function DoctorHubPage() {
               <WordReveal
                 as="h1"
                 text={t("pro.page.doctorHubTitle")}
-                className="text-2xl font-bold tracking-tight"
+                className="text-balance text-2xl font-bold tracking-tight"
               />
-              <p className="mx-auto max-w-xl text-muted-foreground">
+              <p className="mx-auto max-w-xl text-pretty text-muted-foreground">
                 {t("pro.page.doctorHubDesc")}
               </p>
             </div>
           </ScrollReveal>
 
-          {loadingPosts ? (
-            <div className="flex items-center justify-center py-16">
-              <HugeiconsIcon icon={Loading01Icon} className="h-6 w-6 animate-spin text-muted-foreground" />
+          {/* Public feed: AI-generated articles library, plus the manual feed. */}
+          <ScrollReveal delay={0.05}>
+            <AiArticleLibrary initialArticles={aiArticles} />
+          </ScrollReveal>
+
+          {loadingPosts || loadingAi ? (
+            <div className="flex items-center justify-center py-12">
+              <HugeiconsIcon
+                icon={Loading01Icon}
+                className="h-6 w-6 animate-spin text-muted-foreground"
+              />
             </div>
-          ) : posts.length > 0 ? (
-            <ScrollReveal delay={0.1}>
+          ) : null}
+
+          {posts.length > 0 ? (
+            <ScrollReveal delay={0.15}>
               <DoctorContentFeed posts={posts} />
             </ScrollReveal>
-          ) : (
-            <ScrollReveal delay={0.1}>
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <HugeiconsIcon icon={Stethoscope02Icon} className="mx-auto mb-3 h-8 w-8 text-muted-foreground/50" />
-                  <p className="text-sm text-muted-foreground">{t("doctor.noPosts")}</p>
-                </CardContent>
-              </Card>
-            </ScrollReveal>
-          )}
+          ) : null}
 
           <ScrollReveal delay={0.2}>
             <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
@@ -110,25 +143,31 @@ export default function DoctorHubPage() {
 
   return (
     <RouteTransition>
-      <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
+      <main className="container mx-auto max-w-5xl px-4 py-8 space-y-6 sm:space-y-8 sm:py-12">
         <ScrollReveal>
-          <div className="flex items-center gap-5">
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+          <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-5 sm:text-start">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-24 sm:w-24">
               <img
                 src="/images/الطبيب.jpg"
                 alt="Doctor Hub"
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="space-y-1">
+            <div className="min-w-0 space-y-1">
               <WordReveal
                 as="h1"
                 text={t("doctor.dashboardTitle")}
-                className="text-2xl font-bold tracking-tight"
+                className="text-balance text-2xl font-bold tracking-tight"
               />
-              <p className="text-muted-foreground">{t("doctor.dashboardSubtitle")}</p>
+              <p className="text-pretty text-muted-foreground">
+                {t("doctor.dashboardSubtitle")}
+              </p>
             </div>
           </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={0.05}>
+          <AiArticleLibrary initialArticles={aiArticles} />
         </ScrollReveal>
 
         <ScrollReveal delay={0.1}>

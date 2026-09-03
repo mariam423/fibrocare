@@ -2,7 +2,31 @@
   "permissions": {
     "allow": [
       "PowerShell(Move-Item *)",
-      "PowerShell(npx prisma db push)"
+      "PowerShell(npx prisma db push)",
+      "Bash(npx tsc *)",
+      "Bash(npx --no-install tsc --noEmit)",
+      "Bash(npm install *)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(npm run *)",
+      "Bash(timeout 60 npx vitest run --reporter=default)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npx prisma migrate deploy)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npm run dev)",
+      "Bash(curl -s http://localhost:3000/api/ai/articles/list)",
+      "Bash(curl -s \"http://localhost:3000/api/ai/articles/list\")",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" node *)",
+      "Bash(curl -s --max-time 120 \"http://localhost:3000/api/ai/articles/seed\")",
+      "Bash(curl *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(git config *)",
+      "Bash(timeout 60 npx vitest run)",
+      "Bash(python3 -c \"import json, sys; d=json.load\\(sys.stdin\\); print\\('articles:', len\\(d.get\\('data', []\\)\\)\\)\")",
+      "Bash(node scripts/responsive-audit.mjs)",
+      "Bash(pkill -9 -f \"next dev\")",
+      "Bash(pkill -9 -f \"next-server\")",
+      "Bash(kill -9 11101 11148 12688)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" nohup npm run dev)",
+      "Bash(echo \"started pid=$!\")",
+      "Bash(node scripts/screenshot-audit.mjs)"
     ]
   }
 }

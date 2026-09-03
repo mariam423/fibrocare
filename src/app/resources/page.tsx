@@ -431,7 +431,7 @@ export default function ResourcesPage() {
     <div className="text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-24 space-y-5 max-w-6xl pb-24 mb-10">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-[calc(env(safe-area-inset-top)+5rem)] space-y-5 max-w-6xl pb-24 mb-10">
         <ScrollReveal as="section" className="space-y-2 text-center max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold tracking-tight">
             {t("resources.title")}

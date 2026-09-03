@@ -227,7 +227,7 @@ export default function HealthLogsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" />
 
-      <main className="pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      <main className="pb-16 pt-[calc(env(safe-area-inset-top)+5rem)] px-4 sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:px-8 max-w-5xl mx-auto space-y-8">
         {/* Page header */}
         <ScrollReveal as="section" className="space-y-2">
           <div className="flex items-center gap-3">

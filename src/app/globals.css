@@ -1488,3 +1488,34 @@ html.motion-reduce .hero-scenery-mist {
 html.motion-reduce .hero-image-breathe {
   animation: none;
 }
+/* --- Scrollbar hide (mobile-friendly horizontal scrollers) ---
+ * Hides the scrollbar on horizontal scrolling containers (e.g. the
+ * topic chip row) while still allowing native touch/wheel scrolling.
+ * The chip rows are designed to be swipeable, not paginated. */
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  /* Edge-faded scrollers — fade the leading/trailing edges to hint
+   * that the row is scrollable on touch devices. */
+  .scroll-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 24px,
+      black calc(100% - 24px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 24px,
+      black calc(100% - 24px),
+      transparent 100%
+    );
+  }
+}

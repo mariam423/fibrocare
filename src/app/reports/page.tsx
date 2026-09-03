@@ -165,7 +165,7 @@ export default function ReportsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
 
-      <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-24 pb-8 lg:pb-10 space-y-8 max-w-4xl">
+      <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-[calc(env(safe-area-inset-top)+5rem)] pb-8 lg:pb-10 space-y-8 max-w-4xl">
         <ScrollReveal as="section" className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t("reports.pageTitle")}</h1>
           <p className="text-lg text-muted-foreground">

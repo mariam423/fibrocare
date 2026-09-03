@@ -52,10 +52,21 @@ function DialogContent({
   return (
     <DialogPortal>
       <DialogOverlay />
+      {/*
+        Mobile: full-screen sheet pinned to the top, with safe-area
+        padding so the close button clears the iOS home bar. ≥ sm
+        collapses to the original centered modal. Callers that need a
+        different shape can still pass `className` to override.
+      */}
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "glass-surface card-depth fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm text-popover-foreground duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "glass-surface card-depth fixed z-50 grid w-full gap-4 overflow-y-auto text-sm text-popover-foreground duration-100 outline-none",
+          // Mobile: full-screen sheet
+          "inset-0 top-0 left-0 max-h-[100dvh] rounded-none p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]",
+          // ≥ sm: centered modal
+          "sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[88vh] sm:max-w-sm sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:p-6",
+          "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -67,7 +78,7 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 end-2"
+                className="absolute top-2 end-2 z-10"
                 size="icon-sm"
               />
             }

@@ -1,0 +1,99 @@
+name: live-chat-e2e
+
+# Scheduled verification of the REAL-provider AI chat path (no mocks):
+# auth → companion → /api/chat → real Gemini call → guardrail stream → UI
+# render, plus the session-recovery flow (401 → banner → login redirect).
+#
+# Requires the GEMINI_API_KEY repository secret. When the secret is absent
+# (forks, PRs from forks), the guard job reports has-key=false and the suite
+# is skipped instead of failing.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Sundays 03:00 UTC.
+    - cron: "0 3 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-chat-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Check provider secret
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      has-key: ${{ steps.check.outputs.has-key }}
+    steps:
+      - id: check
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            echo "has-key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-key=false" >> "$GITHUB_OUTPUT"
+            echo "GEMINI_API_KEY secret is not set — live-chat suite will be skipped."
+          fi
+
+  live-chat:
+    name: Live provider chat e2e (real Gemini)
+    needs: guard
+    if: needs.guard.outputs.has-key == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Node dependencies
+        # No package-lock.json is committed, so use `npm install` rather
+        # than `npm ci` (matches build-verify.yml).
+        run: npm install
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Install Playwright (Node) + Chromium
+        run: npx playwright install --with-deps chromium
+
+      # .env is gitignored, so CI builds its own. NEXTAUTH_SECRET is required
+      # for JWT signing; DATABASE_URL matches the schema's SQLite provider.
+      # GEMINI_API_KEY is deliberately NOT written here — it is exported in
+      # the test step below so only the e2e run sees the real credential.
+      - name: Create .env for CI
+        run: |
+          echo 'DATABASE_URL="file:./dev.db"' > .env
+          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
+          echo 'NEXTAUTH_URL=http://localhost:3103' >> .env
+
+      - name: Create SQLite database from migrations
+        # The auth setup signs up the throwaway account through the real UI,
+        # so the database must already have the full migrated schema.
+        run: npx prisma migrate deploy
+
+      - name: Run live-provider chat e2e
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Forces the real provider path (mock replies forbidden); the
+          # script passes this through to playwright.live-chat.config.ts,
+          # whose webServer boots `next dev` on :3103 with its own distDir.
+          AI_MOCK_MODE: "false"
+        run: npm run test:e2e:live-chat
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-chat-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

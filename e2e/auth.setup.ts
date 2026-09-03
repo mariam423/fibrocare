@@ -143,6 +143,22 @@ setup("authenticate as throwaway account", async ({ page }) => {
       }
 
       outcome = await waitForOutcome(page, "#login-error", 30_000);
+      if (outcome !== "root") {
+        // Polling the URL can lose the race against the client-side
+        // router.push bounce (a known cold-compile artifact, see
+        // live-auth.setup.ts): the credentials callback succeeds and the
+        // session cookie exists, but the SPA lands back on /login. A direct
+        // full-page load of /dashboard through the proxy reliably resolves
+        // the freshly set cookie, so if it renders, treat the attempt as
+        // successful regardless of the URL the SPA settled on.
+        const cookies = await page.context().cookies();
+        if (cookies.some((c) => c.name === "next-auth.session-token" && c.value)) {
+          await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+          if (isAuthed(page.url())) {
+            outcome = "root";
+          }
+        }
+      }
       if (outcome === "error") {
         // Tell a real server rejection apart from the empty-fields client
         // validation: if the fields are empty, hydration wiped them and the

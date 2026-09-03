@@ -18,7 +18,10 @@ import { test, expect } from "@playwright/test";
 /** Assistant bubbles render in divs with this class in AiCompanion. */
 const ASSISTANT_BUBBLE = "css=div.rounded-bl-md";
 
-async function openCompanion(page: import("@playwright/test").Page) {
+async function openCompanion(
+  page: import("@playwright/test").Page,
+  target = "/dashboard"
+) {
   // PrivacyLock stores only a SHA-256 digest in localStorage. Seed the same
   // known test PIN ("1234") in each isolated context, then unlock through
   // the real keypad because every new context intentionally starts locked.
@@ -28,7 +31,7 @@ async function openCompanion(page: import("@playwright/test").Page) {
       "208afe2b4d6e78c8377d28a9ef6d8f3905268c53e19ff9f8c99a6b00d73fd1b2"
     );
   });
-  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  await page.goto(target, { waitUntil: "domcontentloaded" });
 
   const lockDialog = page.getByRole("dialog", {
     name: "Enter your PIN to unlock FibroCare",
@@ -132,5 +135,64 @@ test.describe("LIVE AI Care Companion (real Gemini)", () => {
     await expect(response.json()).resolves.toEqual({
       error: "Please sign in first.",
     });
+  });
+
+  test("live 401 mid-chat shows the session-expired banner and redirects", async ({
+    page,
+  }) => {
+    // Recovery under the REAL provider path: intercept only this context's
+    // /api/chat and answer with the route's actual 401 contract (JSON error
+    // body + the stale-cookie Set-Cookie clearing the route emits). The
+    // companion's onError must surface the banner, and the auto-redirect
+    // must land on /login preserving the callbackUrl.
+    await page.route("**/api/chat", async (route) => {
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        headers: {
+          "set-cookie":
+            "next-auth.session-token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax",
+        },
+        body: JSON.stringify({ error: "Please sign in first." }),
+      });
+    });
+
+    await openCompanion(page, "/dashboard?tab=care");
+    const dialog = page.getByRole("dialog");
+    await send(dialog, "هلا شوف لي سجلاتي");
+
+    const banner = page.getByTestId("chat-session-expired");
+    await expect(banner).toBeVisible({ timeout: 10_000 });
+    await expect(
+      banner.getByRole("button", { name: "Sign in again" })
+    ).toBeVisible();
+
+    // Auto-redirect after the 2.5s grace period — callback must preserve
+    // the current page.
+    await page.waitForURL(/\/login\?callbackUrl=/, { timeout: 15_000 });
+    expect(page.url()).toContain(
+      encodeURIComponent("/dashboard?tab=care")
+    );
+  });
+
+  test("Sign in again button redirects to login immediately", async ({
+    page,
+  }) => {
+    await page.route("**/api/chat", async (route) => {
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Please sign in first." }),
+      });
+    });
+
+    await openCompanion(page);
+    const dialog = page.getByRole("dialog");
+    await send(dialog, "hi");
+
+    const banner = page.getByTestId("chat-session-expired");
+    await expect(banner).toBeVisible({ timeout: 10_000 });
+    await banner.getByRole("button", { name: "Sign in again" }).click();
+    await page.waitForURL(/\/login\?callbackUrl=/, { timeout: 10_000 });
   });
 });

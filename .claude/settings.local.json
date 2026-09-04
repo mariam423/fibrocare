@@ -46,7 +46,9 @@
       "Bash(tee /tmp/dev-server.log)",
       "Bash(lsof -ti:3000)",
       "Bash(xargs -r kill -9)",
-      "Bash(lsof -i:3000)"
+      "Bash(lsof -i:3000)",
+      "Bash(npx vitest *)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }

@@ -200,4 +200,98 @@ test.describe("Doctor Hub: strict language isolation", () => {
     await expect(topicsAr).toBeVisible({ timeout: 60_000 });
     await expect(topicsAr).toHaveAttribute("aria-label", "مواضيع المقالات");
   });
+
+  /**
+   * The bilingual feed invariant. Before the language column landed
+   * the AI articles were English-only; this test proves the
+   * library now renders the active locale's body for each card.
+   *
+   * The card's title is the cheapest signal — it's part of the
+   * card chrome, not a body render — so we can assert it
+   * without opening every dialog. The body itself is checked
+   * for the first card (open the dialog and read it).
+   */
+  test("AR cards render Arabic titles, EN cards render English titles", async ({
+    page,
+  }) => {
+    // EN
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fibrocare-locale", "en");
+      document.cookie = "fibrocare-locale=en; path=/";
+    });
+    await unlockPrivatePage(page, "/pro/doctor");
+    await expect(page.getByTestId("ai-article-card").first()).toBeVisible({
+      timeout: 60_000,
+    });
+    const enTitles = await page
+      .getByTestId("ai-article-card")
+      .locator("[data-testid='ai-article-title']")
+      .allTextContents();
+    expect(enTitles.length).toBeGreaterThan(0);
+    for (const t of enTitles) {
+      // An English title contains Latin letters. (The bilingual
+      // generator keeps authority names in Latin in both locales,
+      // so a single non-Latin character is enough to fail the
+      // test — the whole title must be Latin-script.)
+      expect(
+        hasLatinScript(t),
+        `EN title should be Latin: ${JSON.stringify(t)}`
+      ).toBe(true);
+    }
+
+    // AR
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fibrocare-locale", "ar");
+      document.cookie = "fibrocare-locale=ar; path=/";
+    });
+    await unlockPrivatePage(page, "/pro/doctor");
+    await expect(page.getByTestId("ai-article-card").first()).toBeVisible({
+      timeout: 60_000,
+    });
+    const arTitles = await page
+      .getByTestId("ai-article-card")
+      .locator("[data-testid='ai-article-title']")
+      .allTextContents();
+    expect(arTitles.length).toBeGreaterThan(0);
+    for (const t of arTitles) {
+      // An Arabic title contains Arabic script. (Some titles may
+      // be predominantly Arabic with a small Latin allowlist for
+      // proper names, but every curated title in `topic.arTitle`
+      // is fully Arabic — the bilingual generator never mixes.)
+      expect(
+        hasArabicScript(t),
+        `AR title should contain Arabic script: ${JSON.stringify(t)}`
+      ).toBe(true);
+    }
+  });
+
+  /**
+   * The dialog body must also be in the active locale. The card
+   * title is a thin signal (it's a 1-3 word slug); the body
+   * proves the actual article content follows the locale.
+   */
+  test("opening a card in AR shows an Arabic-script body", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("fibrocare-locale", "ar");
+      document.cookie = "fibrocare-locale=ar; path=/";
+    });
+    await unlockPrivatePage(page, "/pro/doctor");
+    const firstCard = page.getByTestId("ai-article-card").first();
+    await expect(firstCard).toBeVisible({ timeout: 60_000 });
+
+    // Open the dialog. The Read button is the only testid on the
+    // card that triggers the dialog, and it's at the end of the
+    // card so it's safe to click without scrolling into view on
+    // desktop viewports.
+    await firstCard.getByTestId("ai-article-read").click();
+    const body = page.getByTestId("ai-article-body");
+    await expect(body).toBeVisible({ timeout: 30_000 });
+    const bodyText = (await body.textContent()) ?? "";
+    expect(
+      hasArabicScript(bodyText),
+      `AR dialog body should contain Arabic script: ${JSON.stringify(bodyText.slice(0, 200))}`
+    ).toBe(true);
+  });
 });

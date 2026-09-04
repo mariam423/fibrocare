@@ -40,6 +40,10 @@ export const generatedArticleResultSchema = z.object({
   postId: z.string(),
   topicId: z.string(),
   slug: z.string(),
+  /// Language the article was generated in. The library passes this
+  /// through to the card so the lang attribute on the rendered
+  /// article is always consistent with the body.
+  language: z.enum(["en", "ar"]),
   title: z.string(),
   content: z.string(),
   summary: z.string(),

@@ -49,7 +49,7 @@ import { getDoctorPosts, getMyDoctorPosts } from "@/app/pro/actions";
 import { listPublishedArticles } from "@/app/pro/doctor-article-actions";
 
 export default function DoctorHubPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { role } = useProFeature();
   const isDoctor = role === "doctor";
 
@@ -82,7 +82,11 @@ export default function DoctorHubPage() {
     let cancelled = false;
     const tasks: Array<Promise<unknown>> = [
       getDoctorPosts({ status: "verified", limit: 12 }),
-      listPublishedArticles(12),
+      // The AI library mirrors the document locale — an Arabic-
+      // locale reader sees the Arabic rendering of every curated
+      // topic, an English-locale reader sees the English one. The
+      // same topic is never rendered twice in the same locale.
+      listPublishedArticles(12, locale === "ar" ? "ar" : "en"),
     ];
     if (isDoctor) {
       // Also fetch the doctor's own posts (any status) so the
@@ -113,6 +117,9 @@ export default function DoctorHubPage() {
               authorTitle: item.authorTitle,
               authorityLabel: item.authorityLabel,
               readingMinutes: item.readingMinutes,
+              // Pass the language through so the card's `lang`
+              // attribute and the dedup key both stay accurate.
+              language: item.language,
             }))
           );
         }
@@ -129,7 +136,7 @@ export default function DoctorHubPage() {
     return () => {
       cancelled = true;
     };
-  }, [isDoctor, refreshTick]);
+  }, [isDoctor, refreshTick, locale]);
 
   // Re-run the fetch after a save so the new entry shows up in the
   // doctor's editorial workspace.

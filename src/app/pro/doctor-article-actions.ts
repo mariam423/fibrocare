@@ -315,27 +315,43 @@ function joinTags(tags: string[]): string {
     .join(",");
 }
 
-async function generateOne(topic: ArticleTopic): Promise<{
+async function generateOne(
+  topic: ArticleTopic,
+  language: "en" | "ar" = "en"
+): Promise<{
   topic: ArticleTopic;
   article: GeneratedArticle;
   signature: DoctorSignature;
+  language: "en" | "ar";
 }> {
   const signature = pickSignatureForTopic(topic);
   const seed = SEED_ARTICLES.find((a) => a.topicId === topic.id);
   if (!seed) {
     throw new Error(`Missing seed for topic ${topic.id}`);
   }
-  const seedArticle: GeneratedArticle = {
-    title: seed.title,
-    content: seed.content,
-    tags: seed.tags,
-    summary: seed.summary,
-  };
+  // The seed table holds English content. For Arabic requests we
+  // swap to a deterministic Arabic seed (or fall through to the AI
+  // when one isn't curated yet). The same data shape is preserved
+  // so the rest of the pipeline doesn't have to know.
+  const seedArticle: GeneratedArticle =
+    language === "ar"
+      ? arabicSeedFor(topic, signature) ?? {
+          title: topic.arTitle,
+          content: arabicFallbackContent(topic),
+          tags: seed.tags,
+          summary: arabicFallbackSummary(topic),
+        }
+      : {
+          title: seed.title,
+          content: seed.content,
+          tags: seed.tags,
+          summary: seed.summary,
+        };
 
   // Mock mode or no AI configured → use curated seeds (deterministic,
   // always available, evidence-anchored).
   if (isMockMode() || !isAiConfigured()) {
-    return { topic, signature, article: seedArticle };
+    return { topic, signature, article: seedArticle, language };
   }
 
   // Live AI: try, but fall back to the seed if the provider errors out
@@ -343,10 +359,10 @@ async function generateOne(topic: ArticleTopic): Promise<{
   // never show an empty state because the upstream LLM is unhappy.
   const model = getModel();
   if (!model) {
-    return { topic, signature, article: seedArticle };
+    return { topic, signature, article: seedArticle, language };
   }
   try {
-    const prompt = buildArticlePrompt(topic, signature);
+    const prompt = buildArticlePrompt(topic, signature, language);
     const { generateObject } = await import("ai");
     const result = await generateObject({
       model,
@@ -354,14 +370,63 @@ async function generateOne(topic: ArticleTopic): Promise<{
       prompt,
       temperature: 0.4,
     });
-    return { topic, signature, article: result.object };
+    return { topic, signature, article: result.object, language };
   } catch (err) {
     console.warn(
-      `[ai-articles] generateOne(${topic.id}) fell back to seed after LLM error:`,
+      `[ai-articles] generateOne(${topic.id}, ${language}) fell back to seed after LLM error:`,
       err instanceof Error ? err.message : err
     );
-    return { topic, signature, article: seedArticle };
+    return { topic, signature, article: seedArticle, language };
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Arabic seed helpers                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Curated Arabic seeds for the topics that have a known-good
+ * translation. Anything missing here falls back to a generic
+ * Arabic skeleton (the same body the LLM would produce under
+ * mock mode), so the bilingual feed is never empty for a known
+ * topic.
+ */
+const ARABIC_TOPIC_INTRO: Record<string, string> = {
+  "sleep-hygiene": "النوم العميق من أكثر ما يتأثر عند مرضى الفيبروميالغيا. العناية بنظافة النوم تساعد على استعادة نوم أكثر راحة وعمقاً.",
+  "gentle-movement": "الحركة اللطيفة والمنتظمة أحد أكثر الأساليب الموصى بها للتعامل مع التيبّس والألم المزمن.",
+  "flare-management": "نوبات الاشتعال جزء معروف من مسار الفيبروميالغيا. التعرّف على المحفّزات ووضع خطة بسيطة يساعد على تجاوزها.",
+  "fibro-fog": "ضباب الفيبرو (Fibro Fog) مصطلح يصف صعوبة التركيز وتذكّر الأشياء. استراتيجيات بسيطة يمكن أن تخفف من أثره اليومي.",
+  "central-sensitisation": "فرط التحسس المركزي يعني أن الجهاز العصبي يرفع حساسيته لإشارات الألم. فهم هذا يساعد على تفسير الأعراض والاختيار بين العلاجات.",
+  "warm-therapy": "الكمادات الدافئة والحمامات الدافئة من أكثر تدابير الراحة شيوعاً لمرضى الفيبروميالغيا.",
+  "talking-to-your-doctor": "الاستعداد للزيارة الطبية بملخص بسيط يساعد على استغلال الوقت المحدود والحصول على إجابات أوضح.",
+  "medication-overview": "تتوفر عدة فئات دوائية قد تساعد في تخفيف أعراض الفيبروميالغيا. القرار النهائي دائماً للطبيب المعالج.",
+};
+
+function arabicSeedFor(
+  topic: ArticleTopic,
+  _signature: DoctorSignature
+): GeneratedArticle | null {
+  const intro = ARABIC_TOPIC_INTRO[topic.id];
+  if (!intro) return null;
+  const disclaimer =
+    "هذه المقالة لأغراض تثقيفية فقط، ولا تُغني عن التقييم السريري أو خطة العلاج التي يضعها طبيبك المعالج. ناقش أي استراتيجيات أو أدوية أو تغييرات جديدة مع الطبيب الذي يعرف تاريخك المرضي بالكامل.";
+  const title = topic.arTitle;
+  const content = `# ${title}\n\n${intro}\n\n## ما الذي يمكن أن يساعد\n\n- استعن بإرشادات ${authorityLabel(topic.authority)} العامة كمبدأ توجيهي.\n- ابدأ بخطوات صغيرة قابلة للاستمرار، بدلاً من تغييرات كبيرة دفعة واحدة.\n- سجّل ما يناسبك وما لا يناسبك لمراجعته مع فريقك الطبي.\n\n## متى تتحدث إلى فريقك الطبي\n\n- إذا تفاقمت الأعراض بشكل غير معتاد.\n- إذا ظهر دواء أو عرض جديد لم تناقشه مع طبيبك من قبل.\n- إذا أثّر الألم أو الإرهاق على قدرتك على ممارسة حياتك اليومية.\n\n${disclaimer}`;
+  return {
+    title,
+    content,
+    tags: topic.tags,
+    summary: intro,
+  };
+}
+
+function arabicFallbackContent(topic: ArticleTopic): string {
+  const intro = ARABIC_TOPIC_INTRO[topic.id] ?? "مقالة تثقيفية موجزة.";
+  return `# ${topic.arTitle}\n\n${intro}\n\n## ما الذي يمكن أن يساعد\n\n- استعن بإرشادات ${authorityLabel(topic.authority)} العامة كمبدأ توجيهي.\n- ابدأ بخطوات صغيرة قابلة للاستمرار، بدلاً من تغييرات كبيرة دفعة واحدة.\n- سجّل ما يناسبك لمراجعته مع فريقك الطبي.\n\n${"هذه المقالة لأغراض تثقيفية فقط، ولا تُغني عن التقييم السريري أو خطة العلاج التي يضعها طبيبك المعالج."}`;
+}
+
+function arabicFallbackSummary(topic: ArticleTopic): string {
+  return ARABIC_TOPIC_INTRO[topic.id] ?? `مقالة تثقيفية عن ${topic.arTitle}.`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -386,17 +451,26 @@ export async function listArticleTopics() {
 }
 
 /**
- * Ensure the Doctor Hub has a fresh article on a curated topic.
+ * Ensure the Doctor Hub has a fresh article on a curated topic, in the
+ * caller's preferred language.
  *
- * - If a published post for the topic already exists, returns it.
+ * - If a verified post for (topic, language) already exists, returns it.
  * - Otherwise, asks the AI (or the deterministic seed) for a new article
- *   and persists it as a verified DoctorPost.
+ *   in that language and persists it as a verified DoctorPost.
  *
  * The caller does NOT need to be a doctor — Doctor Hub is a patient-facing
  * feed by design. The "verified" status reflects the editorial signature
  * applied at generation time, not a per-user role check.
+ *
+ * Each topic is generated twice (once per language); the two rows share
+ * the same `slug` (the curated topic id) but carry distinct `language`
+ * values. The library dedupes by `(slug, language)`, so an EN row and
+ * an AR row on the same topic coexist as two cards on the right locale.
  */
-export async function ensureArticleForTopic(topicId: string): Promise<
+export async function ensureArticleForTopic(
+  topicId: string,
+  language: "en" | "ar" = "en"
+): Promise<
   { success: true; data: GeneratedArticleResult } | { success: false; error: string }
 > {
   try {
@@ -405,16 +479,17 @@ export async function ensureArticleForTopic(topicId: string): Promise<
       return { success: false, error: "Unknown topic." };
     }
 
-    // De-dupe: if we already have a verified post for this topic, return
-    // the most recent one and skip generation. The check must be exact
-    // (whole-slug, not substring) so a topic with slug "sleep" never
-    // matches a manual post whose tags happen to contain "sleep-
-    // hygiene". The topic slug is always stored as a standalone tag
-    // entry by `generateOne` below.
+    // De-dupe: if we already have a verified post for THIS (topic,
+    // language) pair, return the most recent one and skip generation.
+    // The check must be exact (whole-slug, not substring) so a topic
+    // with slug "sleep" never matches a manual post whose tags happen
+    // to contain "sleep-hygiene". The topic slug is always stored as a
+    // standalone tag entry by `generateOne` below.
     const slug = topic.slug;
     const existing = await prisma.doctorPost.findFirst({
       where: {
         verifiedStatus: "verified",
+        language,
         // Comma-separated tag match: a stored tags value contains the
         // slug when it is one of the comma-separated entries. We
         // approximate "whole token" with two boundaries: ",<slug>,"
@@ -429,7 +504,9 @@ export async function ensureArticleForTopic(topicId: string): Promise<
           { tags: { startsWith: `${slug},` } },
           { tags: { contains: `,${slug},` } },
           { tags: { endsWith: `,${slug}` } },
-          { title: topic.enTitle },
+          // Title match is language-aware: in EN we look up by the
+          // English title, in AR by the Arabic title.
+          { title: language === "ar" ? topic.arTitle : topic.enTitle },
         ],
       },
       orderBy: { createdAt: "desc" },
@@ -447,6 +524,7 @@ export async function ensureArticleForTopic(topicId: string): Promise<
         postId: post.id,
         topicId: topic.id,
         slug: topic.slug,
+        language,
         title: post.title,
         content: post.content,
         summary: post.content.slice(0, 220).trim(),
@@ -461,11 +539,13 @@ export async function ensureArticleForTopic(topicId: string): Promise<
       return { success: true, data: generatedArticleResultSchema.parse(result) };
     }
 
-    // Generate + persist.
-    const { article, signature } = await generateOne(topic);
+    // Generate + persist in the requested language.
+    const { article, signature } = await generateOne(topic, language);
     const author = await ensureAuthorForSignature(signature);
 
-    // Ensure the slug lives inside the tags so we can find this post again.
+    // Ensure the slug lives inside the tags so we can find this post
+    // again. Tags themselves are language-neutral (the topic slug is a
+    // machine identifier, not user-facing copy).
     const tagsWithSlug = Array.from(new Set([...article.tags, topic.slug]));
 
     const post = await prisma.doctorPost.create({
@@ -483,6 +563,11 @@ export async function ensureArticleForTopic(topicId: string): Promise<
         // intact for the read side, but the write side now stamps the
         // marker for new rows.
         source: "ai",
+        // Language discriminator: every (topic, language) pair is a
+        // unique article. The public list filters by language so an
+        // Arabic-locale reader sees the Arabic rendering of the same
+        // topic, not the English one with the same slug.
+        language,
       },
     });
 
@@ -490,6 +575,7 @@ export async function ensureArticleForTopic(topicId: string): Promise<
       postId: post.id,
       topicId: topic.id,
       slug: topic.slug,
+      language,
       title: article.title,
       content: article.content,
       summary: article.summary,
@@ -521,44 +607,67 @@ export async function ensureArticleForTopic(topicId: string): Promise<
 }
 
 /**
- * Ensure the Doctor Hub has at least one article on every curated topic.
+ * Ensure the Doctor Hub has at least one article on every curated topic,
+ * in every supported language.
  *
  * Used by the public Doctor Hub page on first visit: the page calls this
  * once, so the feed always renders an attractive library of articles
- * instead of an empty state. Subsequent calls are cheap (de-duped by slug).
+ * instead of an empty state — and a user flipping the locale mid-session
+ * never lands on a half-empty feed. Subsequent calls are cheap
+ * (de-duped by (slug, language)).
  */
 export async function seedDoctorArticleLibrary(): Promise<{
   generated: number;
   total: number;
 }> {
   let generated = 0;
-  for (const topic of ARTICLE_TOPICS) {
-    const result = await ensureArticleForTopic(topic.id);
-    if (result.success) {
-      // We only count a "new" generation if the post was created during
-      // this call (postId is not from a prior session). The de-dupe check
-      // in ensureArticleForTopic would still return success.
-      // We can detect that by checking createdAt: if the post was created
-      // within the last few seconds, we generated it now.
-      const post = await prisma.doctorPost.findUnique({
-        where: { id: result.data.postId },
-        select: { createdAt: true },
-      });
-      if (post) {
-        const ageMs = Date.now() - post.createdAt.getTime();
-        if (ageMs < 5_000) generated += 1;
+  // The total is the cartesian product of topics × languages so the
+  // caller's progress meter matches the actual work. The current
+  // default is two languages; if a third is added, the loop below
+  // extends naturally.
+  const languages: Array<"en" | "ar"> = ["en", "ar"];
+  for (const language of languages) {
+    for (const topic of ARTICLE_TOPICS) {
+      const result = await ensureArticleForTopic(topic.id, language);
+      if (result.success) {
+        // We only count a "new" generation if the post was created
+        // during this call (postId is not from a prior session). The
+        // de-dupe check in ensureArticleForTopic would still return
+        // success. We can detect that by checking createdAt: if the
+        // post was created within the last few seconds, we generated
+        // it now.
+        const post = await prisma.doctorPost.findUnique({
+          where: { id: result.data.postId },
+          select: { createdAt: true },
+        });
+        if (post) {
+          const ageMs = Date.now() - post.createdAt.getTime();
+          if (ageMs < 5_000) generated += 1;
+        }
       }
     }
   }
-  return { generated, total: ARTICLE_TOPICS.length };
+  return {
+    generated,
+    total: ARTICLE_TOPICS.length * languages.length,
+  };
 }
 
 /**
- * Public read-only listing of verified doctor articles. The public
- * Doctor Hub uses this so it never has to round-trip through session
- * detection.
+ * Public read-only listing of verified doctor articles, filtered to a
+ * single language. The public Doctor Hub uses this so it never has to
+ * round-trip through session detection — the locale flows from the
+ * `fibrocare-locale` cookie through the `/api/ai/articles/list`
+ * route and into this server action.
+ *
+ * `language` is required: bilingual generation writes two rows per
+ * topic (one per language) and the library must never collapse an
+ * English row with the Arabic row of the same topic.
  */
-export async function listPublishedArticles(limit = 12): Promise<{
+export async function listPublishedArticles(
+  limit = 12,
+  language: "en" | "ar" = "en"
+): Promise<{
   success: true;
   data: Array<{
     id: string;
@@ -574,24 +683,26 @@ export async function listPublishedArticles(limit = 12): Promise<{
     readingMinutes: number;
     topicId: string;
     slug: string;
+    language: "en" | "ar";
   }>;
 }> {
-  return cachedListPublishedArticles(limit);
+  return cachedListPublishedArticles(limit, language);
 }
 
 /**
- * Cached implementation of `listPublishedArticles`. Keyed by `limit` and
- * tagged with `AI_ARTICLES_TAG` so any code that writes a verified post
- * can call `revalidateTag(AI_ARTICLES_TAG)` to immediately invalidate
- * the cache. The TTL is intentionally short (60s) so even without an
- * explicit invalidation the library converges to fresh content within
- * a minute. The full computation result is memoized in Next's request
- * cache, so the DB is hit at most once per minute per `(limit)`,
- * regardless of how many concurrent users load the Doctor Hub.
+ * Cached implementation of `listPublishedArticles`. Keyed by
+ * `(limit, language)` and tagged with `AI_ARTICLES_TAG` so any code
+ * that writes a verified post can call `revalidateTag(AI_ARTICLES_TAG)`
+ * to immediately invalidate the cache. The TTL is intentionally short
+ * (60s) so even without an explicit invalidation the library converges
+ * to fresh content within a minute. The full computation result is
+ * memoized in Next's request cache, so the DB is hit at most once per
+ * minute per `(limit, language)`, regardless of how many concurrent
+ * users load the Doctor Hub.
  */
 const cachedListPublishedArticles = unstable_cache(
-  async (limit: number) => {
-    return listPublishedArticlesUncached(limit);
+  async (limit: number, language: "en" | "ar") => {
+    return listPublishedArticlesUncached(limit, language);
   },
   ["ai-articles-list"],
   {
@@ -600,7 +711,10 @@ const cachedListPublishedArticles = unstable_cache(
   }
 );
 
-async function listPublishedArticlesUncached(limit: number): Promise<{
+async function listPublishedArticlesUncached(
+  limit: number,
+  language: "en" | "ar"
+): Promise<{
   success: true;
   data: Array<{
     id: string;
@@ -616,10 +730,11 @@ async function listPublishedArticlesUncached(limit: number): Promise<{
     readingMinutes: number;
     topicId: string;
     slug: string;
+    language: "en" | "ar";
   }>;
 }> {
   const posts = await prisma.doctorPost.findMany({
-    where: { verifiedStatus: "verified" },
+    where: { verifiedStatus: "verified", language },
     orderBy: { createdAt: "desc" },
     take: limit,
     include: { author: { select: { id: true, name: true, email: true } } },
@@ -631,10 +746,12 @@ async function listPublishedArticlesUncached(limit: number): Promise<{
     authorByEmail.set(`${sig.id}@fibrocare.local`, sig);
   }
 
-  // Build a per-topic keep-list so the public feed never shows the same
-  // curated topic twice. The first encounter of a topic slug wins
-  // (we ordered by createdAt desc), so the most recent post per topic
-  // is what surfaces.
+  // Build a per-(topic, language) keep-list so the public feed never
+  // shows the same curated topic twice in the same language. The first
+  // encounter of a topic slug wins (we ordered by createdAt desc), so
+  // the most recent post per (topic, language) is what surfaces. The
+  // language is part of the key so an EN post and an AR post on the
+  // same topic coexist as two cards when the locale flips.
   const seenSlugs = new Set<string>();
   const seenTitles = new Set<string>();
   const data: Array<{
@@ -651,18 +768,20 @@ async function listPublishedArticlesUncached(limit: number): Promise<{
     readingMinutes: number;
     topicId: string;
     slug: string;
+    language: "en" | "ar";
   }> = [];
 
   for (const post of posts) {
     const topic = ARTICLE_TOPICS.find((t) =>
       post.tags.split(",").map((s) => s.trim()).includes(t.slug)
     );
-    // Topic-slug key collapses any duplicate curated posts.
-    const slugKey = topic?.slug ?? `__unscoped:${post.id}`;
+    // (slug, language) is the dedup key — same topic in two languages
+    // produces two cards when the locale flips.
+    const slugKey = `${language}:${topic?.slug ?? `__unscoped:${post.id}`}`;
     if (seenSlugs.has(slugKey)) continue;
     // Title-based key collapses manual posts that share a title with
     // a curated post (or two manual posts that happen to match).
-    const titleKey = post.title.trim().toLowerCase();
+    const titleKey = `${language}:${post.title.trim().toLowerCase()}`;
     if (seenTitles.has(titleKey)) continue;
     seenSlugs.add(slugKey);
     seenTitles.add(titleKey);
@@ -691,6 +810,7 @@ async function listPublishedArticlesUncached(limit: number): Promise<{
       readingMinutes: topic?.readingMinutes ?? 5,
       topicId: topic?.id ?? "",
       slug: topic?.slug ?? "",
+      language,
     });
     if (data.length >= limit) break;
   }

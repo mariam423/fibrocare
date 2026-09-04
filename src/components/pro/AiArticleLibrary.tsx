@@ -78,9 +78,17 @@ function isFresh(iso: string, days = 14): boolean {
 
 /**
  * De-duplicate a list of articles. The grid must never show the same
- * curated topic twice — even if the server returns duplicates, the
- * `id` differs but the `slug` (or `topicId`) is the canonical key.
- * We prefer the most recent of any group, by `createdAt` desc.
+ * curated topic twice in the same language — even if the server
+ * returns duplicates, the `id` differs but the `(slug, language)`
+ * pair is the canonical key. We prefer the most recent of any
+ * group, by `createdAt` desc.
+ *
+ * The language is part of the key because each topic is generated
+ * twice (once per language). An EN row and an AR row on the same
+ * topic must coexist as two cards when the locale flips — the
+ * grid in the EN locale shows only the EN row, the grid in the
+ * AR locale shows only the AR row, and the dedup never collapses
+ * across the boundary.
  */
 export function dedupeArticles(items: AiArticle[]): AiArticle[] {
   if (items.length <= 1) return items;
@@ -90,7 +98,11 @@ export function dedupeArticles(items: AiArticle[]): AiArticle[] {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
   for (const article of sorted) {
-    const key = article.slug || article.topicId || `id:${article.id}`;
+    const topicKey = article.slug || article.topicId || `id:${article.id}`;
+    // (language, topicKey) is the dedup key. Legacy rows that pre-date
+    // the bilingual split carry `language: "en"` (the schema default)
+    // so they still match the EN-side dedup path.
+    const key = `${article.language}:${topicKey}`;
     if (!byKey.has(key)) {
       byKey.set(key, article);
     }
@@ -117,6 +129,7 @@ function toAiArticle(
     readingMinutes: number;
     slug?: string;
     topicId?: string;
+    language: "en" | "ar";
   }
 ): AiArticle {
   return {
@@ -132,6 +145,7 @@ function toAiArticle(
     readingMinutes: a.readingMinutes,
     slug: a.slug,
     topicId: a.topicId,
+    language: a.language,
   };
 }
 
@@ -146,6 +160,7 @@ function mapResultToArticle(data: {
   postId: string;
   topicId?: string;
   slug?: string;
+  language: "en" | "ar";
   title: string;
   summary: string;
   content: string;
@@ -169,6 +184,7 @@ function mapResultToArticle(data: {
     readingMinutes: data.readingMinutes,
     topicId: data.topicId,
     slug: data.slug,
+    language: data.language,
   };
 }
 
@@ -247,16 +263,27 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
     if (initialArticles.length > 0) return;
     (async () => {
       try {
-        // 1. List existing (in case the server-side seed is racing with us)
-        const list = await listPublishedArticles(12);
+        // 1. List existing (in case the server-side seed is racing with us).
+        //    The list is filtered to the active locale so an Arabic
+        //    reader lands on the Arabic rendering of the curated
+        //    topics, not a half-empty feed.
+        const list = await listPublishedArticles(
+          12,
+          locale === "ar" ? "ar" : "en"
+        );
         if (!cancelled && list.success && list.data.length > 0) {
           setArticles(dedupeArticles(list.data.map(toAiArticle)));
           return;
         }
-        // 2. Seed via the public endpoint.
+        // 2. Seed via the public endpoint. The seed endpoint is
+        //    language-agnostic — it writes both languages at once
+        //    — so a single call covers all locales.
         await fetch("/api/ai/articles/seed", { method: "GET" });
-        // 3. Reload.
-        const after = await listPublishedArticles(12);
+        // 3. Reload in the active locale.
+        const after = await listPublishedArticles(
+          12,
+          locale === "ar" ? "ar" : "en"
+        );
         if (!cancelled && after.success) {
           setArticles(dedupeArticles(after.data.map(toAiArticle)));
         }
@@ -305,7 +332,15 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
       setError(null);
       setActiveTopic(topicId);
       startGenerating(async () => {
-        const result = await ensureArticleForTopic(topicId);
+        // The article is generated in the active locale so the
+        // user sees their language immediately. The same topic in
+        // the other language is generated on the next locale flip
+        // (the public list filters by language, so the user is
+        // never shown a mismatch).
+        const result = await ensureArticleForTopic(
+          topicId,
+          locale === "ar" ? "ar" : "en"
+        );
         if (!result.success) {
           setError(result.error);
           setActiveTopic(null);
@@ -338,7 +373,10 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
           // No topics to refresh — fall back to the seed endpoint so the
           // empty-state still resolves.
           await fetch("/api/ai/articles/seed", { method: "GET" });
-          const after = await listPublishedArticles(12);
+          const after = await listPublishedArticles(
+            12,
+            locale === "ar" ? "ar" : "en"
+          );
           if (after.success) {
             setArticles(dedupeArticles(after.data.map(toAiArticle)));
           }
@@ -351,8 +389,12 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         const fresh: AiArticle[] = [];
         for (const topic of topicList) {
           try {
+            // Pin the sweep to the active locale. A user flipping the
+            // language switcher while a sweep is in flight will simply
+            // re-issue the sweep on the next render; the per-locale
+            // dedup keeps the two states from interleaving.
             const res = await fetch(
-              `/api/ai/articles/generate?topic=${encodeURIComponent(topic.id)}`,
+              `/api/ai/articles/generate?topic=${encodeURIComponent(topic.id)}&language=${locale === "ar" ? "ar" : "en"}`,
               { method: "GET" }
             );
             if (!res.ok) continue;

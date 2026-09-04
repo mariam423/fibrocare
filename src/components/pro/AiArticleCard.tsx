@@ -62,11 +62,18 @@ export interface AiArticle {
   authorityLabel: string;
   readingMinutes: number;
   /**
+   * Language the article was generated in. The library uses this
+   * (a) to drive the `lang` attribute on the rendered card and
+   * (b) to keep the dedup key language-scoped — an EN article and
+   * an AR article on the same topic must coexist, not collapse.
+   */
+  language: "en" | "ar";
+  /**
    * Curated topic slug (e.g. "sleep-hygiene"). The public list
-   * collapses posts with the same slug, so a stale `id` from an older
-   * post never causes a duplicate card once the slug is exposed.
-   * Optional for back-compat with any code that still constructs
-   * `AiArticle` manually.
+   * collapses posts with the same slug within a language, so a
+   * stale `id` from an older post never causes a duplicate card
+   * once the slug is exposed. Optional for back-compat with any
+   * code that still constructs `AiArticle` manually.
    */
   slug?: string;
   /**
@@ -138,13 +145,14 @@ export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps)
       <Card
         size="sm"
         data-testid="ai-article-card"
-        // `lang` mirrors the active document locale so screen readers
-        // pronounce every text node in the card in the right language
-        // — without this, a sub-tree inside an RTL document that
-        // contains LTR-pinned numbers (like "5 min") would be read
-        // with the wrong voice profile. The card already inherits the
+        // `lang` mirrors the article's own language, not the
+        // document locale — the two are always equal in practice
+        // (the library filters by locale before rendering), but
+        // pinning the lang to the article makes the voice profile
+        // correct even if a future caller passes a mixed list
+        // through the dedup. The card already inherits the
         // document `dir`; we don't re-pin it here.
-        lang={locale === "ar" ? "ar" : "en"}
+        lang={article.language}
         className="flex h-full flex-col"
       >
         <CardHeader>

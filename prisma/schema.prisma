@@ -105,6 +105,12 @@ model DoctorPost {
   /// only in `DoctorContentFeed`. The default is `"manual"` so any
   /// pre-migration row is treated as doctor-written.
   source         String   @default("manual")
+  /// Language of the post body and title. `"en"` and `"ar"` are
+  /// the only values written by the AI generator; manual posts
+  /// default to `"en"`. The library dedupes by `(slug, language)`,
+  /// not by slug alone, so an EN post and an AR post on the same
+  /// topic coexist as two cards.
+  language       String   @default("en")
   authorId       String
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
@@ -114,6 +120,7 @@ model DoctorPost {
   @@index([authorId])
   @@index([verifiedStatus])
   @@index([source])
+  @@index([language])
 }
 
 /// Per-user reaction on a verified Doctor Hub article.

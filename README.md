@@ -316,7 +316,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](./LICEN
 
 <div align="center">
 
-**Built with mariam423 💚 for the chronic pain community**
+**Built with care by [@mariam423](https://github.com/mariam423).** If this project helped you, a ⭐ is the best way to say thanks.
 
 [⬆ Back to top](#-fibrocare---معك-في-كل-خطوة)
 

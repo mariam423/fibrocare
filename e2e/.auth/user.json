@@ -2,7 +2,7 @@
   "cookies": [
     {
       "name": "next-auth.csrf-token",
-      "value": "985c984ff58ea98ff074118fb2620ed0a99c881be6464885075e0cadf91e88b0%7Cee2034e35adf4ab4fe4abd93ddd51ecbc813621a09ed1d8028d85ff8f4bd62ea",
+      "value": "f18bfbd727b40107a883b9b6abf1b00746d5fad72d2831bef5687c157c7d576d%7Cfb22d045859418769e0fcf646a4006cc7bdb27a6e38f3a8b1ee721513efbf2ae",
       "domain": "localhost",
       "path": "/",
       "expires": -1,
@@ -22,14 +22,28 @@
     },
     {
       "name": "next-auth.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..veVexbRFedjrjIN9.sYU4NmBiwmY54uSgOxrQvsiOMouH_tQD4yvqBWSZoTnbB5hYyKTEXaK0OpgfyGLupkCswQeS4qmLJoxy5oH2BrQB02J9_3LGENlkEeeIO2IcljZC1-GpS0nJHQILEJ5rtUHxqDTALHAF639ITwX8KEpOt_arszLACV-QGAbguJ2skg1zUeVioPjzdXI3X8BJup_aDh5yC0He1ExDdarzFY5WBEJC5lwgWfUJni38TUrhERVo15k6dQQ3CgLuW__c.NXthAmaW1f1omNamuX61lA",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..PUPrIv4GD_PRKzlL.UQGP8XgR2ZqltqFAcDOMLuPkHQGS6zMXMml1GKWEAf6bmIDgVo-8kgK9GTkAztHOnt7O47JLOam658ffpgB03uaXk3oaogU-NpmUJG_v1Ao4B6RlqKhFYr96bfNkFNbYVTUGgvhpbUAIVBhXorvl5GjAXJeIfU70EzN_L_71O2CdCICtwU-51u4kIOpTEd8HcfMyruycnl-cVrrnrv2Ma2dXkQbIUKjs0VlQewpjcC-We2IAm5yOGZ-vDqMTDRjv.i98BEnNnrRRNlsMX4Y7vrA",
       "domain": "localhost",
       "path": "/",
-      "expires": 1790996581.630156,
+      "expires": 1791133839.153169,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
     }
   ],
-  "origins": []
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "nextauth.message",
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1788541834}"
+        },
+        {
+          "name": "fibrocare:notifications",
+          "value": "[{\"id\":\"daily-log-2026-09-04\",\"type\":\"daily_checkin\",\"title\":\"notification.dailyLog.reminder.title\",\"message\":\"notification.dailyLog.reminder.message\",\"actionUrl\":\"/dashboard\",\"timestamp\":1788541829421,\"read\":false}]"
+        }
+      ]
+    }
+  ]
 }

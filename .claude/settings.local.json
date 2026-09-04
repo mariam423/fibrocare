@@ -26,7 +26,27 @@
       "Bash(kill -9 11101 11148 12688)",
       "Bash(DATABASE_URL=\"file:./prisma/dev.db\" nohup npm run dev)",
       "Bash(echo \"started pid=$!\")",
-      "Bash(node scripts/screenshot-audit.mjs)"
+      "Bash(node scripts/screenshot-audit.mjs)",
+      "Bash(npm test *)",
+      "Bash(PLAYWRIGHT_BROWSERS_PATH=/home/mariam/.cache/ms-playwright npx playwright install chromium-headless-shell)",
+      "Bash(git push *)",
+      "Bash(npx eslint *)",
+      "Bash(git stash *)",
+      "Bash(grep -n \"min$\" src/lib/translations.ts)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(kill 13044 13045 13056)",
+      "Bash(E2E_PROMOTE_TOKEN=\"e2e-promote\" NEXTAUTH_SECRET=\"e2e-test-secret\" npm run dev -- -p 3000)",
+      "Bash(tee /tmp/dev.log)",
+      "Bash(npx playwright *)",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(git *)",
+      "Bash(npx prisma *)",
+      "Bash(grep *)",
+      "Bash(tee /tmp/dev-server.log)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs -r kill -9)",
+      "Bash(lsof -i:3000)"
     ]
   }
 }

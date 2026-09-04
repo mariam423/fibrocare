@@ -50,7 +50,7 @@ export function AiPublishingAssistant({ onArticleGenerated }: AiPublishingAssist
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="e.g., New research on sleep hygiene for fibromyalgia patients…"
+          placeholder={t("doctor.aiAssistPlaceholder")}
           className="min-h-[120px] w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           disabled={isPending}
         />

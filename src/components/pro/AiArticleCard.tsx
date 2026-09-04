@@ -137,7 +137,14 @@ export function AiArticleCard({ article, badge }: AiArticleCardProps) {
                 className="h-3 w-3"
                 aria-hidden="true"
               />
-              {article.readingMinutes} min
+              {/*
+                Pin the number+unit to LTR so Arabic digits and the
+                unit abbreviation keep the correct visual order inside
+                the AR locale (the parent flows RTL).
+              */}
+              <span dir="ltr" className="tabular-nums">
+                {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
+              </span>
             </span>
           </div>
           <CardTitle
@@ -237,7 +244,13 @@ export function AiArticleCard({ article, badge }: AiArticleCardProps) {
                 className="h-3 w-3"
                 aria-hidden="true"
               />
-              {article.readingMinutes} min
+              {/*
+                LTR pin keeps the number+unit visually ordered inside
+                the AR locale; the parent dialog flows RTL.
+              */}
+              <span dir="ltr" className="tabular-nums">
+                {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
+              </span>
             </span>
           </div>
           <DialogTitle className="text-lg leading-snug sm:text-xl">

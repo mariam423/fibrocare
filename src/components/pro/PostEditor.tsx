@@ -56,7 +56,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-            placeholder="e.g., Sleep Hygiene Tips for Fibromyalgia"
+            placeholder={t("doctor.postTitlePlaceholder")}
             disabled={isPending}
           />
         </div>
@@ -66,7 +66,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[200px] w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-            placeholder="Write your article content here…"
+            placeholder={t("doctor.postContentPlaceholder")}
             disabled={isPending}
           />
         </div>
@@ -77,13 +77,13 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-            placeholder="sleep, pain management, exercise"
+            placeholder={t("doctor.postTagsPlaceholder")}
             disabled={isPending}
           />
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         {success && (
-          <p className="text-sm text-emerald-600">Article submitted for review!</p>
+          <p className="text-sm text-emerald-600">{t("doctor.postSubmitted")}</p>
         )}
         <div className="flex gap-3">
           <Button onClick={handlePublish} disabled={isPending || !title.trim() || !content.trim()}>

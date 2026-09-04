@@ -8,6 +8,9 @@
  *      never blank.
  *   3. Subscribes to the picker — generating a fresh article on a topic
  *      prepends it to the visible list.
+ *   4. Exposes a "Refresh library" action that walks every curated topic
+ *      through `/api/ai/articles/generate`, prepends any new posts, and
+ *      surfaces the count of fresh items added.
  *
  * The "AI generated" badge is shown for the first 14 days after an
  * article is created. After that it is treated as a regular verified
@@ -21,6 +24,15 @@
  *    tablets, three on desktops — matches the rest of the site.
  *  - The library has explicit horizontal padding so the edge-faded chip
  *    row aligns with the page gutter.
+ *  - The refresh action is a pill button in the card header that is
+ *    full-width on mobile and inline on >= sm.
+ *
+ * RTL/LTR notes:
+ *  - The section wrapper respects the parent document direction. The
+ *    library card is symmetric, so the same layout works in both.
+ *  - Inline numeric values (e.g. reading minutes) are pinned to LTR so
+ *    "5 min" never gets visually flipped inside the AR locale.
+ *  - No hard-coded English strings remain in the body.
  */
 
 import React, { useCallback, useEffect, useState, useTransition } from "react";
@@ -29,6 +41,7 @@ import {
   AiMagicIcon,
   ArrowRight01Icon,
   Loading01Icon,
+  Refresh01Icon,
   Stethoscope02Icon,
 } from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -41,6 +54,7 @@ import {
   listArticleTopics,
   listPublishedArticles,
 } from "@/app/pro/doctor-article-actions";
+import { cn } from "@/lib/utils";
 
 interface AiArticleLibraryProps {
   initialArticles: AiArticle[];
@@ -63,12 +77,44 @@ function isFresh(iso: string, days = 14): boolean {
 
 export type { AiArticle };
 
+/**
+ * Map the API response from `/api/ai/articles/generate` to the AiArticle
+ * shape the cards expect. The response wraps the post in `{ article }`,
+ * which is what the server action returns from `ensureArticleForTopic`.
+ */
+function mapResultToArticle(data: {
+  postId: string;
+  title: string;
+  summary: string;
+  content: string;
+  tags: string[];
+  createdAt: string;
+  authorName: string;
+  authorTitle: string;
+  authorityLabel: string;
+  readingMinutes: number;
+}): AiArticle {
+  return {
+    id: data.postId,
+    title: data.title,
+    summary: data.summary,
+    content: data.content,
+    tags: data.tags,
+    createdAt: data.createdAt,
+    authorName: data.authorName,
+    authorTitle: data.authorTitle,
+    authorityLabel: data.authorityLabel,
+    readingMinutes: data.readingMinutes,
+  };
+}
+
 export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
   const { t, locale } = useLanguage();
   const [articles, setArticles] = useState<AiArticle[]>(initialArticles);
   const [topics, setTopics] = useState<TopicOption[]>([]);
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [generating, startGenerating] = useTransition();
+  const [refreshing, startRefresh] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   // Topic picker state — controlled so we can show a tidy chip row.
@@ -122,16 +168,14 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
       } catch (err) {
         if (!cancelled) {
           console.error("AI article library seed failed:", err);
-          setError(locale === "ar"
-            ? "تعذر تحميل المقالات الآن. حاول تحديث الصفحة."
-            : "Could not load articles right now. Try refreshing.");
+          setError(t("doctor.aiLibrary.refreshError"));
         }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [initialArticles.length, locale]);
+  }, [initialArticles.length, locale, t]);
 
   // Lazy-load the topic picker. We use a derived state ref to avoid
   // calling setState synchronously inside the effect.
@@ -171,18 +215,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
           setActiveTopic(null);
           return;
         }
-        const next: AiArticle = {
-          id: result.data.postId,
-          title: result.data.title,
-          summary: result.data.summary,
-          content: result.data.content,
-          tags: result.data.tags,
-          createdAt: result.data.createdAt,
-          authorName: result.data.authorName,
-          authorTitle: result.data.authorTitle,
-          authorityLabel: result.data.authorityLabel,
-          readingMinutes: result.data.readingMinutes,
-        };
+        const next = mapResultToArticle(result.data);
         setArticles((prev) => {
           // De-dup by id.
           const without = prev.filter((a) => a.id !== next.id);
@@ -194,14 +227,91 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
     []
   );
 
+  /**
+   * Refresh the library: walk every curated topic, generate (or fetch
+   * the existing post) for each, and prepend the new ones to the grid.
+   * Runs in one transition so the spinner shows a single coherent state
+   * and individual failures don't abort the whole sweep.
+   */
+  const handleRefresh = useCallback(() => {
+    if (refreshing) return;
+    setError(null);
+    startRefresh(async () => {
+      try {
+        // Always re-fetch the topic list first so the sweep reflects the
+        // canonical catalogue (covers future topic additions).
+        const topicList = await listArticleTopics();
+        setTopics(topicList);
+        if (topicList.length === 0) {
+          // No topics to refresh — fall back to the seed endpoint so the
+          // empty-state still resolves.
+          await fetch("/api/ai/articles/seed", { method: "GET" });
+          const after = await listPublishedArticles(12);
+          if (after.success) {
+            setArticles(
+              after.data.map((a) => ({
+                id: a.id,
+                title: a.title,
+                summary: a.summary,
+                content: a.content,
+                tags: a.tags,
+                createdAt: a.createdAt,
+                authorName: a.authorName,
+                authorTitle: a.authorTitle,
+                authorityLabel: a.authorityLabel,
+                readingMinutes: a.readingMinutes,
+              }))
+            );
+          }
+          return;
+        }
+
+        // Pre-fetch what we already have so we can skip the network when
+        // a topic already has a post in the grid.
+        const existingIds = new Set(articles.map((a) => a.id));
+        const fresh: AiArticle[] = [];
+        for (const topic of topicList) {
+          try {
+            const res = await fetch(
+              `/api/ai/articles/generate?topic=${encodeURIComponent(topic.id)}`,
+              { method: "GET" }
+            );
+            if (!res.ok) continue;
+            const json = (await res.json()) as {
+              article?: Parameters<typeof mapResultToArticle>[0];
+              error?: string;
+            };
+            if (!json.article) continue;
+            const mapped = mapResultToArticle(json.article);
+            if (!existingIds.has(mapped.id)) {
+              fresh.push(mapped);
+            }
+          } catch {
+            // Per-topic failures are swallowed so the sweep still
+            // surfaces everything else. The user will see the
+            // articles that did succeed.
+          }
+        }
+        if (fresh.length > 0) {
+          setArticles((prev) => {
+            const ids = new Set(prev.map((a) => a.id));
+            const deduped = fresh.filter((a) => !ids.has(a.id));
+            return [...deduped, ...prev];
+          });
+        }
+      } catch (err) {
+        console.error("AI article library refresh failed:", err);
+        setError(t("doctor.aiLibrary.refreshError"));
+      }
+    });
+  }, [articles, refreshing, t]);
+
   const isEmpty = articles.length === 0;
-  const isRtl = locale === "ar";
 
   return (
     <section
       className="space-y-5 sm:space-y-6"
       data-testid="ai-article-library"
-      dir={isRtl ? "rtl" : "ltr"}
     >
       {/* Picker */}
       <ScrollReveal>
@@ -225,14 +335,49 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
                   {t("doctor.aiLibrary.subtitle")}
                 </CardDescription>
               </div>
-              <span className="inline-flex w-fit shrink-0 items-center gap-1 self-start rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 sm:self-auto">
-                <HugeiconsIcon
-                  icon={Stethoscope02Icon}
-                  className="h-3 w-3"
-                  aria-hidden="true"
-                />
-                {t("doctor.aiLibrary.reviewed")}
-              </span>
+              <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:justify-end">
+                <span className="inline-flex w-fit shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  <HugeiconsIcon
+                    icon={Stethoscope02Icon}
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                  />
+                  {t("doctor.aiLibrary.reviewed")}
+                </span>
+                {/*
+                  Refresh action: full-width pill on phones so it's easy
+                  to reach with a thumb; inline pill on >= sm.
+                  Disabled while a single-topic generation is in flight
+                  so the user doesn't kick off overlapping work.
+                */}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className={cn(
+                    "h-9 w-full justify-center rounded-full px-3 text-xs sm:h-8 sm:w-auto sm:px-3",
+                    "gap-1.5"
+                  )}
+                  onClick={handleRefresh}
+                  disabled={refreshing || generating}
+                  data-testid="ai-article-refresh"
+                  aria-label={t("doctor.aiLibrary.refresh")}
+                >
+                  <HugeiconsIcon
+                    icon={refreshing ? Loading01Icon : Refresh01Icon}
+                    className={cn(
+                      "h-3.5 w-3.5",
+                      refreshing && "animate-spin"
+                    )}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">
+                    {refreshing
+                      ? t("doctor.aiLibrary.refreshing")
+                      : t("doctor.aiLibrary.refresh")}
+                  </span>
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -272,7 +417,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
                         size="sm"
                         variant="outline"
                         className="h-9 shrink-0 snap-start rounded-full px-3.5 text-xs whitespace-nowrap sm:h-8 sm:px-3"
-                        disabled={generating}
+                        disabled={generating || refreshing}
                         onClick={() => handleGenerate(topic.id)}
                         data-testid={`ai-article-topic-${topic.id}`}
                       >

@@ -160,6 +160,30 @@ export async function getDoctorPosts(options?: {
   }
 }
 
+/**
+ * Fetch the signed-in user's own doctor posts, regardless of verified
+ * status. Used by the doctor's editorial workspace so they can see
+ * pending drafts and rejected posts. Session-derived `authorId` keeps
+ * callers from passing arbitrary user ids.
+ */
+export async function getMyDoctorPosts(limit = 24) {
+  const user = await getSessionUser();
+  if (!user) return { success: false as const, error: "You must be signed in." };
+
+  try {
+    const posts = await prisma.doctorPost.findMany({
+      where: { authorId: user.id },
+      include: { author: { select: { id: true, name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return { success: true as const, data: posts };
+  } catch (error) {
+    console.error("Error fetching own doctor posts:", error);
+    return { success: false as const, error: "Failed to fetch your posts." };
+  }
+}
+
 export async function getDoctorPostById(id: string) {
   try {
     const post = await prisma.doctorPost.findUnique({

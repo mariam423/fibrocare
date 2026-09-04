@@ -1483,6 +1483,22 @@ export type TranslationKey =
   | "doctor.aiLibrary.read"
   | "doctor.aiLibrary.disclaimer"
   | "doctor.aiLibrary.signature"
+  | "doctor.aiLibrary.refresh"
+  | "doctor.aiLibrary.refreshing"
+  | "doctor.aiLibrary.refreshed"
+  | "doctor.aiLibrary.refreshError"
+  | "doctor.aiLibrary.minutesShort"
+  | "doctor.manualPublishing.title"
+  | "doctor.manualPublishing.subtitle"
+  | "doctor.manualPublishing.openEditor"
+  | "doctor.manualPublishing.closeEditor"
+  | "doctor.ownPosts.title"
+  | "doctor.ownPosts.subtitle"
+  | "doctor.postTitlePlaceholder"
+  | "doctor.postContentPlaceholder"
+  | "doctor.postTagsPlaceholder"
+  | "doctor.aiAssistPlaceholder"
+  | "doctor.postSubmitted"
   | "consultation.title"
   | "consultation.subtitle"
   | "consultation.newConsultation"
@@ -3076,6 +3092,22 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.read": "Read article",
     "doctor.aiLibrary.disclaimer": "Note: Articles are for education only and do not replace medical care. Discuss any change with your care team.",
     "doctor.aiLibrary.signature": "Each article is signed by a consultant from a curated signature set",
+    "doctor.aiLibrary.refresh": "Refresh library",
+    "doctor.aiLibrary.refreshing": "Refreshing…",
+    "doctor.aiLibrary.refreshed": "Library refreshed.",
+    "doctor.aiLibrary.refreshError": "Could not refresh the library. Please try again.",
+    "doctor.aiLibrary.minutesShort": "min",
+    "doctor.manualPublishing.title": "Manual publishing",
+    "doctor.manualPublishing.subtitle": "Write your own article, set tags, and submit it for review. Your published pieces appear alongside AI-generated guidance.",
+    "doctor.manualPublishing.openEditor": "Write a new article",
+    "doctor.manualPublishing.closeEditor": "Close editor",
+    "doctor.ownPosts.title": "Your articles",
+    "doctor.ownPosts.subtitle": "Every post you have authored, including drafts awaiting review.",
+    "doctor.postTitlePlaceholder": "e.g., Sleep Hygiene Tips for Fibromyalgia",
+    "doctor.postContentPlaceholder": "Write your article content here…",
+    "doctor.postTagsPlaceholder": "sleep, pain management, exercise",
+    "doctor.aiAssistPlaceholder": "e.g., New research on sleep hygiene for fibromyalgia patients…",
+    "doctor.postSubmitted": "Article submitted for review!",
     "consultation.title": "Consultations",
     "consultation.subtitle": "Secure messaging with your care team",
     "consultation.newConsultation": "New Consultation",
@@ -4670,6 +4702,22 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.read": "اقرأ المقال",
     "doctor.aiLibrary.disclaimer": "تنبيه: المقالات للتثقيف فقط ولا تحلّ محل الرعاية الطبية. ناقش أي تغيير مع طبيبك.",
     "doctor.aiLibrary.signature": "يوقّع كل مقال طبيب استشاري من مجموعة مختارة بعناية",
+    "doctor.aiLibrary.refresh": "تحديث المكتبة",
+    "doctor.aiLibrary.refreshing": "جاري التحديث…",
+    "doctor.aiLibrary.refreshed": "تم تحديث المكتبة.",
+    "doctor.aiLibrary.refreshError": "تعذّر تحديث المكتبة. حاول مرة أخرى.",
+    "doctor.aiLibrary.minutesShort": "د",
+    "doctor.manualPublishing.title": "النشر اليدوي",
+    "doctor.manualPublishing.subtitle": "اكتب مقالك بنفسك، حدّد التصنيفات، وقدّمه للمراجعة. تظهر مقالاتك المنشورة إلى جانب الإرشادات المولّدة بالذكاء الاصطناعي.",
+    "doctor.manualPublishing.openEditor": "اكتب مقالاً جديداً",
+    "doctor.manualPublishing.closeEditor": "إغلاق المحرر",
+    "doctor.ownPosts.title": "مقالاتك",
+    "doctor.ownPosts.subtitle": "كل مقال كتبته، بما في ذلك المسودات بانتظار المراجعة.",
+    "doctor.postTitlePlaceholder": "مثال: نصائح لنظافة النوم لمرضى الفيبروميالغيا",
+    "doctor.postContentPlaceholder": "اكتب محتوى مقالك هنا…",
+    "doctor.postTagsPlaceholder": "نوم, إدارة الألم, تمارين",
+    "doctor.aiAssistPlaceholder": "مثال: أبحاث جديدة عن نظافة النوم لمرضى الفيبروميالغيا…",
+    "doctor.postSubmitted": "تم تقديم المقال للمراجعة!",
     "consultation.title": "الاستشارات",
     "consultation.subtitle": "رسائل آمنة مع فريق رعايتك",
     "consultation.newConsultation": "استشارة جديدة",

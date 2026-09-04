@@ -22,6 +22,18 @@ export const TEST_PIN_HASH =
 
 const LOCK_DIALOG_NAME = "Enter your PIN to unlock FibroCare";
 
+/**
+ * How long to wait for the privacy lock dialog to appear after a navigation.
+ *
+ * Generous on purpose: in CI, the first navigation to a route forces a cold
+ * compile of every server component in that subtree, and the lock screen
+ * is rendered by the same React tree the test is exercising. 20s was
+ * empirically too tight when running multiple specs in a single `npm run
+ * e2e` invocation on a fresh `next dev` — 60s keeps the spec stable
+ * without slowing down the common (warm) case.
+ */
+const LOCK_DIALOG_TIMEOUT_MS = 60_000;
+
 /** Seeds the known test PIN before any app script runs. */
 export async function seedPrivacyPin(page: Page): Promise<void> {
   await page.addInitScript((hash) => {
@@ -32,12 +44,12 @@ export async function seedPrivacyPin(page: Page): Promise<void> {
 /** Waits for the lock screen and unlocks through the real keypad. */
 export async function unlockLockDialog(page: Page): Promise<void> {
   const lockDialog = page.getByRole("dialog", { name: LOCK_DIALOG_NAME });
-  await expect(lockDialog).toBeVisible({ timeout: 20_000 });
+  await expect(lockDialog).toBeVisible({ timeout: LOCK_DIALOG_TIMEOUT_MS });
 
   for (const digit of ["1", "2", "3", "4"]) {
     await lockDialog.getByRole("button", { name: `Digit ${digit}` }).click();
   }
-  await expect(lockDialog).toHaveCount(0, { timeout: 10_000 });
+  await expect(lockDialog).toHaveCount(0, { timeout: LOCK_DIALOG_TIMEOUT_MS });
 }
 
 /**

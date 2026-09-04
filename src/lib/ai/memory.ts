@@ -19,6 +19,7 @@ import type { ModelMessage } from "ai";
 import { prisma } from "@/lib/prisma";
 import { healthSnapshotSchema, type HealthSnapshot } from "@/lib/ai/schemas";
 import { buildHealthSnapshot } from "@/lib/ai/context";
+import { getCachedHealthSnapshot } from "@/lib/ai/snapshotCache";
 import { deterministicWeather } from "@/lib/weather";
 
 /* ------------------------------------------------------------------ */
@@ -226,7 +227,7 @@ async function buildWeatherContext(): Promise<LongTermMemory["weather"]> {
  */
 export async function buildLongTermMemory(userId: string): Promise<LongTermMemory> {
   const [snapshot, medications, weather] = await Promise.all([
-    buildHealthSnapshot(userId),
+    getCachedHealthSnapshot(userId),
     buildMedicationMentions(userId),
     buildWeatherContext(),
   ]);

@@ -31,6 +31,8 @@ vi.mock("@/lib/ai/provider", () => ({
   getProviderDisplayName: vi.fn(() => "Test Provider"),
   isAiConfigured: vi.fn(),
   isMockMode: vi.fn(),
+  recordAiFailure: vi.fn(),
+  recordAiSuccess: vi.fn(),
 }));
 
 vi.mock("@/lib/ai/memory", () => ({
@@ -57,7 +59,7 @@ vi.mock("@/lib/ai/memory", () => ({
 }));
 
 vi.mock("@/lib/ai/ratelimit", () => ({
-  checkChatRateLimit: vi.fn(() => ({ ok: true, resetAt: Date.now() + 60_000 })),
+  checkChatRateLimit: vi.fn(async () => ({ ok: true, resetAt: Date.now() + 60_000 })),
 }));
 
 vi.mock("@/lib/ai/companion", () => ({

@@ -18,6 +18,7 @@ import { NextRequest } from "next/server";
 import { ensureArticleForTopic, listArticleTopics } from "@/app/pro/doctor-article-actions";
 import { listArticleTopicSchema } from "@/app/api/ai/articles/_schema";
 import { LOCALE_COOKIE, parseLocale } from "@/lib/locale";
+import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
 
 export const maxDuration = 60;
 
@@ -47,6 +48,24 @@ export async function GET(request: NextRequest) {
     langParam === "en" || langParam === "ar"
       ? langParam
       : parseLocale(request.cookies.get(LOCALE_COOKIE)?.value);
+
+  // Coarse cross-instance rate limit: prevent two clients from racing
+  // on the same (topic, language) LLM generation. `ensureArticleForTopic`
+  // is DB-idempotent so a second concurrent caller just reads the row
+  // the first one wrote — the limit exists to keep the provider budget
+  // honest, not for correctness. 1 request per 10s per (topic, language).
+  const { ok, resetAt } = await checkRateLimitDistributed(
+    `generate:${parsed.data.topicId}:${language}`,
+    1,
+    10_000
+  );
+  if (!ok) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+    return Response.json(
+      { error: "An article for this topic was just generated — try again shortly." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
 
   const result = await ensureArticleForTopic(parsed.data.topicId, language);
   if (!result.success) {

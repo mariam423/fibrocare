@@ -7,6 +7,8 @@ import {
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
+  recordAiFailure,
+  recordAiSuccess,
 } from "@/lib/ai/provider";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { heuristicParseLog } from "@/lib/ai/voice-log/parser";
@@ -40,9 +42,13 @@ export async function POST(req: Request) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
 
-  const { ok } = checkFeatureRateLimit(session.user.id);
+  const { ok, resetAt } = await checkFeatureRateLimit(session.user.id);
   if (!ok) {
-    return Response.json({ error: "Give the AI a moment — try again shortly." }, { status: 429 });
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+    return Response.json(
+      { error: "Give the AI a moment — try again shortly." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
   }
 
   let text = "";
@@ -79,8 +85,10 @@ export async function POST(req: Request) {
       console.log(
         `[ai] parse-log · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
       );
+      recordAiSuccess();
       return Response.json({ parsed: object, source: "llm" });
     } catch (err) {
+      recordAiFailure();
       console.warn("[ai] parse-log LLM extraction failed — falling back to heuristic:", err);
     }
   }

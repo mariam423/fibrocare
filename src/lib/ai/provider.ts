@@ -152,3 +152,41 @@ export function getModel(): LanguageModel | null {
       })(modelId);
   }
 }
+
+/**
+ * Returns the configured model, but consults the circuit breaker first.
+ * When the breaker for this provider is open, returns `null` so the
+ * caller falls through to the existing offline/mock branch instead of
+ * cascading 502s.
+ *
+ * Use this in route handlers that previously called `getModel()`. The
+ * underlying model is the same; only the short-circuit behavior changes.
+ */
+export function getModelSafe(): LanguageModel | null {
+  const provider = getActiveProvider();
+  if (!provider) return null;
+  // Dynamic require keeps the optional dependency out of the build for
+  // callers that don't need the breaker.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getBreakerState } = require("@/lib/observability/circuitBreaker") as typeof import("@/lib/observability/circuitBreaker");
+  if (getBreakerState(`ai:${provider}`) === "open") return null;
+  return getModel();
+}
+
+/** Record a successful AI call — closes the breaker for the active provider. */
+export function recordAiSuccess(): void {
+  const provider = getActiveProvider();
+  if (!provider) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { recordBreakerSuccess } = require("@/lib/observability/circuitBreaker") as typeof import("@/lib/observability/circuitBreaker");
+  recordBreakerSuccess(`ai:${provider}`);
+}
+
+/** Record a failed AI call — opens the breaker after the threshold. */
+export function recordAiFailure(): void {
+  const provider = getActiveProvider();
+  if (!provider) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { recordBreakerFailure } = require("@/lib/observability/circuitBreaker") as typeof import("@/lib/observability/circuitBreaker");
+  recordBreakerFailure(`ai:${provider}`);
+}

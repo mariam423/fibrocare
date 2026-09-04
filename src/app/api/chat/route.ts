@@ -7,6 +7,8 @@ import {
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
+  recordAiFailure,
+  recordAiSuccess,
 } from "@/lib/ai/provider";
 import {
   mockChatReply,
@@ -82,15 +84,16 @@ export async function POST(req: Request) {
     return unauthorizedResponse();
   }
 
-  const { ok, resetAt } = checkChatRateLimit(session.user.id);
+  const { ok, resetAt } = await checkChatRateLimit(session.user.id);
   if (!ok) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
     return Response.json(
       {
         error:
           "You're chatting a lot right now — take a short break and try again in a minute.",
         resetAt,
       },
-      { status: 429 }
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
     );
   }
 
@@ -178,8 +181,10 @@ export async function POST(req: Request) {
       },
       onError: ({ error }) => {
         console.error("[ai] chat · provider stream error", error);
+        recordAiFailure();
       },
       onFinish: async ({ usage }) => {
+        recordAiSuccess();
         console.log(
           `[ai] chat · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
         );
@@ -187,6 +192,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[ai] chat · provider setup error", error);
+    recordAiFailure();
     return Response.json(
       { error: "The AI provider is unavailable right now." },
       { status: 502 }

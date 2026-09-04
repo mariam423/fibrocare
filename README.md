@@ -17,6 +17,21 @@
 
 ---
 
+## 🚦 Recent Major Upgrade (September 2026)
+
+FibroCare shipped a **non-destructive major upgrade** to its backend scalability story:
+
+- **Distributed rate limiting** via [Upstash Redis](https://upstash.com) — sliding-window budgets shared across every server instance (chat: 20/min/user, AI features: 10/min/user, article generation: 1/10s per topic+language).
+- **Distributed LLM cache** via Upstash — repeated calls with the same prompt fingerprint hit Redis, not the provider.
+- **Prisma Accelerate** support — opt-in connection pooling + edge query cache, no code change required to enable.
+- **5 new database indexes** — `User(role)`, `User(signupRole)`, `User(createdAt)`, `ArticleReaction(userId)`, and the composite `ConsultationMessage(consultationId, createdAt)`.
+- **AI provider circuit breaker** — 5 consecutive failures opens for 60 s, preventing cascading 502s when Gemini/OpenAI/Anthropic is flaky.
+- **Admin-gated `/api/health`** — single endpoint reports which adapters are active, breaker state, and in-process metrics.
+
+**All distributed adapters are opt-in via env vars.** With nothing configured, every route returns byte-identical responses to pre-upgrade. See [`DEPLOY.md`](./DEPLOY.md) for the env-var matrix and [`docs/upgrade-2026-09.md`](./docs/upgrade-2026-09.md) for the architectural rationale.
+
+---
+
 ## 📖 Overview
 
 FibroCare is a **modern, AI-powered Progressive Web Application** designed for individuals living with chronic pain conditions — particularly fibromyalgia. It provides a calm, responsive, and deeply personalized environment for:

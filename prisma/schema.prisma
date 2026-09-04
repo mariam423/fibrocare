@@ -8,6 +8,10 @@ datasource db {
   // DATABASE_URL (e.g. Vercel Postgres). Local dev keeps the SQLite file via
   // DATABASE_URL="file:./dev.db" in .env — see .env.example.
   url      = env("DATABASE_URL")
+  // `directUrl` is only required when `url` points at a pooler (e.g. Prisma
+  // Accelerate). Prisma uses it for migrations and introspection, so leaving
+  // it unset in dev falls back to `url` and behavior is unchanged.
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -29,6 +33,14 @@ model User {
   patientConsultations Consultation[]        @relation("PatientConsultations")
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
+
+  // Indexes added in the perf migration:
+  //  - `role` is filtered for "all doctors" / "all pro users" admin queries.
+  //  - `signupRole` is filtered for cohort analytics (patient vs doctor).
+  //  - `createdAt` backs the cohort-by-signup-date growth chart.
+  @@index([role])
+  @@index([signupRole])
+  @@index([createdAt])
 }
 
 /// Provider-agnostic billing state written by the webhook route
@@ -143,6 +155,10 @@ model ArticleReaction {
 
   @@unique([userId, postId, kind])
   @@index([postId, kind])
+  // "Show me everything this user reacted to" — backs the user history
+  // view. Without this index, the query is a full scan as the table
+  // grows past a few thousand rows.
+  @@index([userId])
 }
 
 model Consultation {
@@ -171,6 +187,10 @@ model ConsultationMessage {
   consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([consultationId])
+  // Composite index: chat-pagination reads
+  // (`WHERE consultationId = ? ORDER BY createdAt`) hit a single B-tree
+  // seek. The single-column `consultationId` index is dropped because
+  // the composite covers the same lookup AND the ORDER BY.
+  @@index([consultationId, createdAt])
   @@index([senderId])
 }

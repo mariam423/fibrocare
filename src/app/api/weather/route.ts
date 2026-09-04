@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { TtlCache } from "@/lib/ai/cache";
+import { getCache } from "@/lib/cache/selectAdapter";
 import {
   computePressureTrend,
   detectWeatherTriggers,
@@ -143,9 +144,21 @@ export async function GET(request: Request) {
   }
 
   try {
-    const payload = await weatherCache.getOrSet(
-      locationKey(parseCoordinates(request)),
-      () => fetchLive(request, apiKey)
+    // Two-layer cache: distributed first (Upstash when configured, so every
+    // instance shares one entry; in-process fallback otherwise), then the
+    // existing per-instance `weatherCache` as a hot-path short-circuit. The
+    // 10-min TTL keeps us at 1/6 of the OpenWeather free-tier quota per
+    // (location, key) pair regardless of how many server instances are
+    // running.
+    const key = `weather:v1:${locationKey(parseCoordinates(request))}`;
+    const payload = await getCache().getOrSet(
+      key,
+      () =>
+        weatherCache.getOrSet(
+          locationKey(parseCoordinates(request)),
+          () => fetchLive(request, apiKey)
+        ),
+      CACHE_TTL_MS
     );
     return NextResponse.json(payload);
   } catch (error) {

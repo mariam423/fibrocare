@@ -7,9 +7,11 @@ import {
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
+  recordAiFailure,
+  recordAiSuccess,
 } from "@/lib/ai/provider";
 import { mockNarration, mockStreamResponse } from "@/lib/ai/mock";
-import { buildHealthSnapshot, getInsightSummaries } from "@/lib/ai/context";
+import { getCachedHealthSnapshot, getCachedInsightSummaries } from "@/lib/ai/snapshotCache";
 import { buildNarrationPrompt } from "@/lib/ai/prompts";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { parseLocale, LOCALE_COOKIE } from "@/lib/locale";
@@ -27,11 +29,12 @@ export async function POST() {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
 
-  const { ok } = checkFeatureRateLimit(session.user.id);
+  const { ok, resetAt } = await checkFeatureRateLimit(session.user.id);
   if (!ok) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
     return Response.json(
       { error: "Give the AI a moment — try again shortly." },
-      { status: 429 }
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
     );
   }
 
@@ -41,8 +44,8 @@ export async function POST() {
 
   const userName = session.user.name ?? "there";
   const [snapshot, insights] = await Promise.all([
-    buildHealthSnapshot(session.user.id),
-    getInsightSummaries(session.user.id, 30),
+    getCachedHealthSnapshot(session.user.id),
+    getCachedInsightSummaries(session.user.id, 30),
   ]);
 
   if (isMockMode()) {
@@ -67,9 +70,14 @@ export async function POST() {
     timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
     maxRetries: 2,
     onFinish: async ({ usage }) => {
+      recordAiSuccess();
       console.log(
         `[ai] insight · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
       );
+    },
+    onError: ({ error }) => {
+      recordAiFailure();
+      console.error("[ai] insight · provider stream error", error);
     },
   });
 

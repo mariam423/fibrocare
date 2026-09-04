@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       // new one is being computed in the background — Doctor Hub
       // tolerates a slightly stale list, but it cannot tolerate an
       // empty list during a refresh sweep.
-      "Cache-Control": "s-maxage=60, stale-while-revalidate=300",
+      "Cache-Control": "s-maxage=300, stale-while-revalidate=600",
       // The response varies by the locale cookie so a shared cache
       // never hands back an English list to an Arabic-locale user
       // (or vice versa). The limit is also part of the cache key

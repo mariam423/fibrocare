@@ -42,6 +42,9 @@ export default defineConfig({
       name: "public",
       use: devices["Desktop Chrome"],
       testMatch: /comprehensive-qa-public\.spec\.ts/,
+      // responsive.spec.ts uses viewport overrides + the auth helper, so
+      // it only runs under the authenticated chromium project.
+      testIgnore: /responsive\.spec\.ts/,
     },
     // Authenticated tests — depend on auth-setup for session state.
     {
@@ -63,5 +66,14 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 150_000,
+    // E2E_PROMOTE_TOKEN gates the /api/e2e/promote-doctor endpoint
+    // (see src/app/api/e2e/promote-doctor/route.ts) so authenticated
+    // smoke tests can exercise the doctor-only Doctor Hub surfaces
+    // (manual publishing, own-posts workspace). The endpoint refuses
+    // every request when the env var is unset, so this is safe to
+    // default-on for the test run.
+    env: {
+      E2E_PROMOTE_TOKEN: process.env.E2E_PROMOTE_TOKEN ?? "e2e-promote",
+    },
   },
 });

@@ -180,5 +180,22 @@ setup("authenticate as throwaway account", async ({ page }) => {
   }
 
   await expect(page).toHaveURL(/^http:\/\/localhost:\d+\/(dashboard)?\/?$/);
+
+  // Promote the throwaway E2E account to the `doctor` role so the
+  // doctor-only Doctor Hub surfaces (manual publishing composer,
+  // own-posts editorial workspace) can be exercised end-to-end.
+  // The endpoint is gated by `E2E_PROMOTE_TOKEN` (set on the dev
+  // webServer in playwright.config.ts) and is disabled in any
+  // environment that hasn't opted in.
+  const promoteToken = process.env.E2E_PROMOTE_TOKEN ?? "e2e-promote";
+  const promoteRes = await page.context().request.post("/api/e2e/promote-doctor", {
+    headers: { "x-e2e-token": promoteToken },
+  });
+  if (!promoteRes.ok()) {
+    throw new Error(
+      `Failed to promote E2E user to doctor role: ${promoteRes.status()} ${await promoteRes.text()}`
+    );
+  }
+
   await page.context().storageState({ path: STORAGE_STATE });
 });

@@ -25,6 +25,7 @@ model User {
   sessions             Session[]
   symptomLogs          SymptomLog[]
   doctorPosts          DoctorPost[]
+  articleReactions     ArticleReaction[]
   patientConsultations Consultation[]        @relation("PatientConsultations")
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
@@ -101,9 +102,32 @@ model DoctorPost {
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  reactions      ArticleReaction[]
 
   @@index([authorId])
   @@index([verifiedStatus])
+}
+
+/// Per-user reaction on a verified Doctor Hub article.
+///
+/// `kind` is `"like"` or `"helpful"`. A user can hold both kinds on
+/// the same post (stored as two rows) and the like/helpful count is
+/// the row count. We keep a row-per-reaction model (instead of a
+/// counter column on DoctorPost) so the same user cannot inflate the
+/// count by repeatedly toggling — the (userId, postId, kind)
+/// uniqueness is the only thing that matters.
+model ArticleReaction {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  /// "like" or "helpful"
+  kind      String
+  createdAt DateTime @default(now())
+  post      DoctorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId, kind])
+  @@index([postId, kind])
 }
 
 model Consultation {

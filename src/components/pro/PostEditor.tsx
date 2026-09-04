@@ -38,7 +38,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
         setTags("");
         onSaved?.();
       } else {
-        setError(result.error ?? "Failed to publish.");
+        setError(result.error ?? t("doctor.postError"));
       }
     });
   };
@@ -58,6 +58,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             placeholder={t("doctor.postTitlePlaceholder")}
             disabled={isPending}
+            data-testid="doctor-post-title"
           />
         </div>
         <div className="space-y-1.5">
@@ -68,6 +69,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             className="min-h-[200px] w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             placeholder={t("doctor.postContentPlaceholder")}
             disabled={isPending}
+            data-testid="doctor-post-content"
           />
         </div>
         <div className="space-y-1.5">
@@ -79,14 +81,19 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             placeholder={t("doctor.postTagsPlaceholder")}
             disabled={isPending}
+            data-testid="doctor-post-tags"
           />
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-sm text-destructive" data-testid="doctor-post-error">{error}</p>}
         {success && (
-          <p className="text-sm text-emerald-600">{t("doctor.postSubmitted")}</p>
+          <p className="text-sm text-emerald-600" data-testid="doctor-post-success">{t("doctor.postSubmitted")}</p>
         )}
         <div className="flex gap-3">
-          <Button onClick={handlePublish} disabled={isPending || !title.trim() || !content.trim()}>
+          <Button
+            onClick={handlePublish}
+            disabled={isPending || !title.trim() || !content.trim()}
+            data-testid="doctor-post-publish"
+          >
             {isPending ? (
               <HugeiconsIcon icon={Loading01Icon} className="me-2 h-4 w-4 animate-spin" />
             ) : null}

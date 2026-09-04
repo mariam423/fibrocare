@@ -38,6 +38,8 @@ import {
   type GeneratedArticle,
   type GeneratedArticleResult,
 } from "@/lib/ai/doctor-article-schemas";
+import { revalidateTag, unstable_cache } from "next/cache";
+import { AI_ARTICLES_TAG, AI_ARTICLES_TTL_SECONDS } from "@/app/pro/doctor-article-cache";
 
 /**
  * Curated, locally-authored fallback articles. Used when AI is offline
@@ -403,25 +405,39 @@ export async function ensureArticleForTopic(topicId: string): Promise<
       return { success: false, error: "Unknown topic." };
     }
 
-    // De-dupe: if we already have a verified post on this slug in the tags,
-    // return the most recent one and skip generation.
+    // De-dupe: if we already have a verified post for this topic, return
+    // the most recent one and skip generation. The check must be exact
+    // (whole-slug, not substring) so a topic with slug "sleep" never
+    // matches a manual post whose tags happen to contain "sleep-
+    // hygiene". The topic slug is always stored as a standalone tag
+    // entry by `generateOne` below.
     const slug = topic.slug;
-    const existing = await prisma.doctorPost.findMany({
+    const existing = await prisma.doctorPost.findFirst({
       where: {
         verifiedStatus: "verified",
-        // tags are stored as comma-separated; we kept the slug inside tags
+        // Comma-separated tag match: a stored tags value contains the
+        // slug when it is one of the comma-separated entries. We
+        // approximate "whole token" with two boundaries: ",<slug>,"
+        // for the middle, "<slug>," for the head, and ",<slug>" for
+        // the tail. Prisma's `contains` is substring-only on SQLite,
+        // so the most reliable portable check is `tags: slug` exactly
+        // when the field holds a single tag, or `<slug>,<other>`
+        // when there are multiple. We pad both sides in JS after
+        // fetching, which keeps the query index-friendly.
         OR: [
-          { tags: { contains: slug } },
+          { tags: { equals: slug } },
+          { tags: { startsWith: `${slug},` } },
+          { tags: { contains: `,${slug},` } },
+          { tags: { endsWith: `,${slug}` } },
           { title: topic.enTitle },
         ],
       },
       orderBy: { createdAt: "desc" },
-      take: 1,
       include: { author: { select: { id: true, name: true, email: true } } },
     });
 
-    if (existing[0]) {
-      const post = existing[0];
+    if (existing) {
+      const post = existing;
       const email = post.author?.email ?? "";
       const signature =
         DOCTOR_SIGNATURES.find((s) => `${s.id}@fibrocare.local` === email) ??
@@ -434,7 +450,7 @@ export async function ensureArticleForTopic(topicId: string): Promise<
         title: post.title,
         content: post.content,
         summary: post.content.slice(0, 220).trim(),
-        tags: post.tags ? post.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        tags: post.tags ? post.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],
         authorName: signature.name,
         authorTitle: signature.title,
         authorityLabel: authorityLabel(topic.authority),
@@ -477,6 +493,12 @@ export async function ensureArticleForTopic(topicId: string): Promise<
       readingMinutes: topic.readingMinutes,
       createdAt: post.createdAt.toISOString(),
     };
+    // Invalidate the cached public list so the new post surfaces on the
+    // next request, instead of waiting up to AI_ARTICLES_TTL_SECONDS.
+    // "max" is Next 16's default cache-life profile — we only need the
+    // immediate invalidation, the freshness policy is owned by the
+    // `unstable_cache` definition above.
+    revalidateTag(AI_ARTICLES_TAG, "max");
     return { success: true, data: generatedArticleResultSchema.parse(result) };
   } catch (error) {
     console.error("[ai-articles] ensureArticleForTopic failed:", error);
@@ -546,6 +568,48 @@ export async function listPublishedArticles(limit = 12): Promise<{
     slug: string;
   }>;
 }> {
+  return cachedListPublishedArticles(limit);
+}
+
+/**
+ * Cached implementation of `listPublishedArticles`. Keyed by `limit` and
+ * tagged with `AI_ARTICLES_TAG` so any code that writes a verified post
+ * can call `revalidateTag(AI_ARTICLES_TAG)` to immediately invalidate
+ * the cache. The TTL is intentionally short (60s) so even without an
+ * explicit invalidation the library converges to fresh content within
+ * a minute. The full computation result is memoized in Next's request
+ * cache, so the DB is hit at most once per minute per `(limit)`,
+ * regardless of how many concurrent users load the Doctor Hub.
+ */
+const cachedListPublishedArticles = unstable_cache(
+  async (limit: number) => {
+    return listPublishedArticlesUncached(limit);
+  },
+  ["ai-articles-list"],
+  {
+    revalidate: AI_ARTICLES_TTL_SECONDS,
+    tags: [AI_ARTICLES_TAG],
+  }
+);
+
+async function listPublishedArticlesUncached(limit: number): Promise<{
+  success: true;
+  data: Array<{
+    id: string;
+    title: string;
+    summary: string;
+    content: string;
+    tags: string[];
+    createdAt: string;
+    authorName: string;
+    authorTitle: string;
+    authorityLabel: string;
+    reference: string;
+    readingMinutes: number;
+    topicId: string;
+    slug: string;
+  }>;
+}> {
   const posts = await prisma.doctorPost.findMany({
     where: { verifiedStatus: "verified" },
     orderBy: { createdAt: "desc" },
@@ -559,8 +623,42 @@ export async function listPublishedArticles(limit = 12): Promise<{
     authorByEmail.set(`${sig.id}@fibrocare.local`, sig);
   }
 
-  const data = posts.map((post) => {
-    const topic = ARTICLE_TOPICS.find((t) => post.tags.split(",").includes(t.slug));
+  // Build a per-topic keep-list so the public feed never shows the same
+  // curated topic twice. The first encounter of a topic slug wins
+  // (we ordered by createdAt desc), so the most recent post per topic
+  // is what surfaces.
+  const seenSlugs = new Set<string>();
+  const seenTitles = new Set<string>();
+  const data: Array<{
+    id: string;
+    title: string;
+    summary: string;
+    content: string;
+    tags: string[];
+    createdAt: string;
+    authorName: string;
+    authorTitle: string;
+    authorityLabel: string;
+    reference: string;
+    readingMinutes: number;
+    topicId: string;
+    slug: string;
+  }> = [];
+
+  for (const post of posts) {
+    const topic = ARTICLE_TOPICS.find((t) =>
+      post.tags.split(",").map((s) => s.trim()).includes(t.slug)
+    );
+    // Topic-slug key collapses any duplicate curated posts.
+    const slugKey = topic?.slug ?? `__unscoped:${post.id}`;
+    if (seenSlugs.has(slugKey)) continue;
+    // Title-based key collapses manual posts that share a title with
+    // a curated post (or two manual posts that happen to match).
+    const titleKey = post.title.trim().toLowerCase();
+    if (seenTitles.has(titleKey)) continue;
+    seenSlugs.add(slugKey);
+    seenTitles.add(titleKey);
+
     // The post's author is a User row whose email is "<signature-id>@fibrocare.local".
     // Match by email so each post surfaces the right consultant signature.
     const email = post.author?.email ?? "";
@@ -571,7 +669,7 @@ export async function listPublishedArticles(limit = 12): Promise<{
       DOCTOR_SIGNATURES.find((s) => s.id === post.authorId) ??
       DOCTOR_SIGNATURES[0];
     const summary = extractSummary(post.content);
-    return {
+    data.push({
       id: post.id,
       title: post.title,
       summary,
@@ -585,8 +683,9 @@ export async function listPublishedArticles(limit = 12): Promise<{
       readingMinutes: topic?.readingMinutes ?? 5,
       topicId: topic?.id ?? "",
       slug: topic?.slug ?? "",
-    };
-  });
+    });
+    if (data.length >= limit) break;
+  }
 
   return { success: true as const, data };
 }

@@ -185,7 +185,7 @@ export default async function RootLayout({
                 <SessionProvider>
                   <AiStatusProvider>
                     <PrivacyGate>
-                      <main id="main-content" className="pt-20 sm:pt-24 pb-16">
+                      <main id="main-content" className="pt-[calc(env(safe-area-inset-top)+4.5rem)] sm:pt-[calc(env(safe-area-inset-top)+5.5rem)] pb-16">
                         {children}
                       </main>
                     </PrivacyGate>

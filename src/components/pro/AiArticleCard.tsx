@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dialog";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { ArticleReactions } from "./ArticleReactions";
 
 export interface AiArticle {
   id: string;
@@ -60,12 +61,38 @@ export interface AiArticle {
   authorTitle: string;
   authorityLabel: string;
   readingMinutes: number;
+  /**
+   * Curated topic slug (e.g. "sleep-hygiene"). The public list
+   * collapses posts with the same slug, so a stale `id` from an older
+   * post never causes a duplicate card once the slug is exposed.
+   * Optional for back-compat with any code that still constructs
+   * `AiArticle` manually.
+   */
+  slug?: string;
+  /**
+   * The curated topic id (`sleep-hygiene`, `gentle-movement`, etc.).
+   * Same rationale as `slug`.
+   */
+  topicId?: string;
+}
+
+export interface ArticleReactionsState {
+  /** True when the current user is signed in. */
+  signedIn: boolean;
+  likes: number;
+  helpful: number;
+  liked: boolean;
+  helpfulChecked: boolean;
 }
 
 interface AiArticleCardProps {
   article: AiArticle;
   /** A short locale-specific label shown above the title (e.g. "New"). */
   badge?: string;
+  /** Pre-fetched reaction counts and the current user's reaction
+   *  state. Server Component callers should populate this from
+   *  `getArticleReactions`. */
+  reactions?: ArticleReactionsState;
 }
 
 function formatDate(iso: string, locale: "en" | "ar"): string {
@@ -80,7 +107,7 @@ function formatDate(iso: string, locale: "en" | "ar"): string {
   }
 }
 
-export function AiArticleCard({ article, badge }: AiArticleCardProps) {
+export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps) {
   const { t, locale } = useLanguage();
   const [open, setOpen] = useState(false);
 
@@ -95,11 +122,29 @@ export function AiArticleCard({ article, badge }: AiArticleCardProps) {
     [article.tags]
   );
 
+  // When no reaction data is provided, fall back to a "guest" view so
+  // the card still renders cleanly. The sign-in hint is shown so the
+  // user knows they can react after signing in.
+  const reactionState: ArticleReactionsState = reactions ?? {
+    signedIn: false,
+    likes: 0,
+    helpful: 0,
+    liked: false,
+    helpfulChecked: false,
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Card
         size="sm"
         data-testid="ai-article-card"
+        // `lang` mirrors the active document locale so screen readers
+        // pronounce every text node in the card in the right language
+        // — without this, a sub-tree inside an RTL document that
+        // contains LTR-pinned numbers (like "5 min") would be read
+        // with the wrong voice profile. The card already inherits the
+        // document `dir`; we don't re-pin it here.
+        lang={locale === "ar" ? "ar" : "en"}
         className="flex h-full flex-col"
       >
         <CardHeader>
@@ -176,6 +221,22 @@ export function AiArticleCard({ article, badge }: AiArticleCardProps) {
               ))}
             </div>
           )}
+          {/*
+            Compact reaction row: the card footer is too cramped for the
+            full reaction bar (and a "Helpful" label would push the
+            "Read article" button off the edge on phones), so the
+            card-level reactions use the compact variant. The dialog
+            below renders the full bar in the body where there's room.
+          */}
+          <ArticleReactions
+            postId={article.id}
+            signedIn={reactionState.signedIn}
+            initialLikes={reactionState.likes}
+            initialHelpful={reactionState.helpful}
+            initialLiked={reactionState.liked}
+            initialHelpfulChecked={reactionState.helpfulChecked}
+            variant="compact"
+          />
           {/*
             Footer: author + date on the left, "Read article" on the right.
             On narrow screens the row wraps so the button drops below the
@@ -272,12 +333,28 @@ export function AiArticleCard({ article, badge }: AiArticleCardProps) {
           </DialogDescription>
         </DialogHeader>
         <div
-          className="prose prose-base dark:prose-invert max-w-none px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[15px] leading-7 sm:prose-sm sm:px-0 sm:pb-0 sm:text-sm sm:leading-relaxed"
+          className="prose prose-base dark:prose-invert max-w-none px-4 text-[15px] leading-7 sm:prose-sm sm:px-0 sm:text-sm sm:leading-relaxed"
           data-testid="ai-article-body"
         >
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {article.content}
           </ReactMarkdown>
+        </div>
+        {/*
+          Reaction footer: full bar (with "Like" + "Helpful" labels) sits
+          below the markdown body, separated by a thin border. The
+          bottom safe-area inset is folded into the padding so the bar
+          doesn't sit under the iOS home bar.
+        */}
+        <div className="mt-4 border-t border-border px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:px-0 sm:pb-0">
+          <ArticleReactions
+            postId={article.id}
+            signedIn={reactionState.signedIn}
+            initialLikes={reactionState.likes}
+            initialHelpful={reactionState.helpful}
+            initialLiked={reactionState.liked}
+            initialHelpfulChecked={reactionState.helpfulChecked}
+          />
         </div>
       </DialogContent>
     </Dialog>

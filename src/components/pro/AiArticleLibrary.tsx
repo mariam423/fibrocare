@@ -54,6 +54,7 @@ import {
   listArticleTopics,
   listPublishedArticles,
 } from "@/app/pro/doctor-article-actions";
+import { getArticleReactions } from "@/app/pro/article-reaction-actions";
 import { cn } from "@/lib/utils";
 
 interface AiArticleLibraryProps {
@@ -75,6 +76,65 @@ function isFresh(iso: string, days = 14): boolean {
   return ageMs < days * 24 * 60 * 60 * 1000;
 }
 
+/**
+ * De-duplicate a list of articles. The grid must never show the same
+ * curated topic twice — even if the server returns duplicates, the
+ * `id` differs but the `slug` (or `topicId`) is the canonical key.
+ * We prefer the most recent of any group, by `createdAt` desc.
+ */
+export function dedupeArticles(items: AiArticle[]): AiArticle[] {
+  if (items.length <= 1) return items;
+  const byKey = new Map<string, AiArticle>();
+  // Sort newest-first so the first writer wins; later copies are dropped.
+  const sorted = [...items].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  for (const article of sorted) {
+    const key = article.slug || article.topicId || `id:${article.id}`;
+    if (!byKey.has(key)) {
+      byKey.set(key, article);
+    }
+  }
+  return Array.from(byKey.values());
+}
+
+/**
+ * Project a `listPublishedArticles` row into the AiArticle shape and
+ * apply the dedupe. Centralised so the server shape and the dedupe
+ * key live in one place.
+ */
+function toAiArticle(
+  a: {
+    id: string;
+    title: string;
+    summary: string;
+    content: string;
+    tags: string[];
+    createdAt: string;
+    authorName: string;
+    authorTitle: string;
+    authorityLabel: string;
+    readingMinutes: number;
+    slug?: string;
+    topicId?: string;
+  }
+): AiArticle {
+  return {
+    id: a.id,
+    title: a.title,
+    summary: a.summary,
+    content: a.content,
+    tags: a.tags,
+    createdAt: a.createdAt,
+    authorName: a.authorName,
+    authorTitle: a.authorTitle,
+    authorityLabel: a.authorityLabel,
+    readingMinutes: a.readingMinutes,
+    slug: a.slug,
+    topicId: a.topicId,
+  };
+}
+
 export type { AiArticle };
 
 /**
@@ -84,6 +144,8 @@ export type { AiArticle };
  */
 function mapResultToArticle(data: {
   postId: string;
+  topicId?: string;
+  slug?: string;
   title: string;
   summary: string;
   content: string;
@@ -105,6 +167,8 @@ function mapResultToArticle(data: {
     authorTitle: data.authorTitle,
     authorityLabel: data.authorityLabel,
     readingMinutes: data.readingMinutes,
+    topicId: data.topicId,
+    slug: data.slug,
   };
 }
 
@@ -120,29 +184,73 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
   // Topic picker state — controlled so we can show a tidy chip row.
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
 
+  // Pre-fetched reaction counts and the current user's reaction state,
+  // keyed by post id. We fetch this in a separate effect so the article
+  // grid is rendered as soon as the list resolves, without waiting for
+  // the (potentially many) reaction queries.
+  const [reactions, setReactions] = useState<
+    Record<
+      string,
+      {
+        signedIn: boolean;
+        likes: number;
+        helpful: number;
+        liked: boolean;
+        helpfulChecked: boolean;
+      }
+    >
+  >({});
+
+  // Fetch reactions for the visible article ids. Runs whenever the
+  // visible article set changes (mount, refresh, or generate). Errors
+  // are swallowed — the reaction bar falls back to a guest view.
+  useEffect(() => {
+    let cancelled = false;
+    if (articles.length === 0) return;
+    Promise.all(articles.map((a) => getArticleReactions(a.id)))
+      .then((rows) => {
+        if (cancelled) return;
+        setReactions((prev) => {
+          const next = { ...prev };
+          for (const r of rows) {
+            next[r.postId] = {
+              signedIn: r.signedIn,
+              likes: r.likes,
+              helpful: r.helpful,
+              liked: r.liked,
+              helpfulChecked: r.helpfulChecked,
+            };
+          }
+          return next;
+        });
+      })
+      .catch(() => {
+        // Reaction fetch failures are non-fatal — the cards still
+        // render with a guest view.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [articles]);
+
   // On mount, if we got nothing server-side, kick off the seed.
   useEffect(() => {
-    if (initialArticles.length > 0) return;
     let cancelled = false;
+    // Always de-dup on mount: even when the server gave us an initial
+    // set, it might contain duplicates from a parallel seed. Defer to a
+    // microtask so the effect body never sets state synchronously
+    // (react-hooks/set-state-in-effect).
+    const initialDedup = Promise.resolve().then(() => {
+      if (cancelled) return;
+      setArticles((prev) => dedupeArticles([...initialArticles, ...prev]));
+    });
+    if (initialArticles.length > 0) return;
     (async () => {
       try {
         // 1. List existing (in case the server-side seed is racing with us)
         const list = await listPublishedArticles(12);
         if (!cancelled && list.success && list.data.length > 0) {
-          setArticles(
-            list.data.map((a) => ({
-              id: a.id,
-              title: a.title,
-              summary: a.summary,
-              content: a.content,
-              tags: a.tags,
-              createdAt: a.createdAt,
-              authorName: a.authorName,
-              authorTitle: a.authorTitle,
-              authorityLabel: a.authorityLabel,
-              readingMinutes: a.readingMinutes,
-            }))
-          );
+          setArticles(dedupeArticles(list.data.map(toAiArticle)));
           return;
         }
         // 2. Seed via the public endpoint.
@@ -150,20 +258,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         // 3. Reload.
         const after = await listPublishedArticles(12);
         if (!cancelled && after.success) {
-          setArticles(
-            after.data.map((a) => ({
-              id: a.id,
-              title: a.title,
-              summary: a.summary,
-              content: a.content,
-              tags: a.tags,
-              createdAt: a.createdAt,
-              authorName: a.authorName,
-              authorTitle: a.authorTitle,
-              authorityLabel: a.authorityLabel,
-              readingMinutes: a.readingMinutes,
-            }))
-          );
+          setArticles(dedupeArticles(after.data.map(toAiArticle)));
         }
       } catch (err) {
         if (!cancelled) {
@@ -174,6 +269,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
     })();
     return () => {
       cancelled = true;
+      initialDedup.catch(() => undefined);
     };
   }, [initialArticles.length, locale, t]);
 
@@ -216,11 +312,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
           return;
         }
         const next = mapResultToArticle(result.data);
-        setArticles((prev) => {
-          // De-dup by id.
-          const without = prev.filter((a) => a.id !== next.id);
-          return [next, ...without];
-        });
+        setArticles((prev) => dedupeArticles([next, ...prev]));
         setActiveTopic(null);
       });
     },
@@ -248,20 +340,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
           await fetch("/api/ai/articles/seed", { method: "GET" });
           const after = await listPublishedArticles(12);
           if (after.success) {
-            setArticles(
-              after.data.map((a) => ({
-                id: a.id,
-                title: a.title,
-                summary: a.summary,
-                content: a.content,
-                tags: a.tags,
-                createdAt: a.createdAt,
-                authorName: a.authorName,
-                authorTitle: a.authorTitle,
-                authorityLabel: a.authorityLabel,
-                readingMinutes: a.readingMinutes,
-              }))
-            );
+            setArticles(dedupeArticles(after.data.map(toAiArticle)));
           }
           return;
         }
@@ -293,11 +372,12 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
           }
         }
         if (fresh.length > 0) {
-          setArticles((prev) => {
-            const ids = new Set(prev.map((a) => a.id));
-            const deduped = fresh.filter((a) => !ids.has(a.id));
-            return [...deduped, ...prev];
-          });
+          setArticles((prev) => dedupeArticles([...fresh, ...prev]));
+        } else {
+          // Even if no new articles came back, run a final dedupe so a
+          // stale duplicate that arrived via initialArticles gets
+          // collapsed once the sweep returns.
+          setArticles((prev) => dedupeArticles(prev));
         }
       } catch (err) {
         console.error("AI article library refresh failed:", err);
@@ -392,11 +472,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
               <div
                 className="scrollbar-none scroll-fade-x flex gap-2 overflow-x-auto px-(--card-spacing) py-1 snap-x snap-mandatory touch-pan-x sm:flex-wrap sm:overflow-visible sm:px-0 sm:py-0 sm:[mask-image:none] sm:[-webkit-mask-image:none]"
                 role="list"
-                aria-label={
-                  locale === "ar"
-                    ? "مواضيع المقالات"
-                    : "Article topics"
-                }
+                aria-label={t("doctor.aiLibrary.topicsAria")}
               >
                 {loadingTopics ? (
                   <span className="inline-flex shrink-0 items-center gap-2 px-2 text-xs text-muted-foreground">
@@ -477,6 +553,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
                 badge={
                   isFresh(article.createdAt) ? t("doctor.aiLibrary.newBadge") : undefined
                 }
+                reactions={reactions[article.id]}
               />
             </ScrollReveal>
           ))}

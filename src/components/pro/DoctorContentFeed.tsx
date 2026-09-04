@@ -46,7 +46,7 @@ export function DoctorContentFeed({ posts }: DoctorContentFeedProps) {
               <CardHeader>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-primary font-medium">
-                    {post.author.name ?? "Doctor"}
+                    {post.author.name ?? t("doctor.authorFallback")}
                   </span>
                   {post.verifiedStatus === "verified" && (
                     <span className="inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-600 font-medium dark:bg-emerald-950 dark:text-emerald-400">

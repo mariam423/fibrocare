@@ -15,6 +15,7 @@
     "test:e2e:live-chat": "node scripts/run-live-chat-e2e.mjs",
     "test:e2e:pwa": "node scripts/run-pwa-e2e.mjs",
     "prebuild": "node scripts/check-a11y-css.mjs",
+    "clean": "node scripts/clean.mjs",
     "check:a11y": "python scripts/a11y-audit.py",
     "check:a11y:full": "python scripts/a11y-audit.py --full",
     "check:a11y:css": "node scripts/check-a11y-css.mjs",

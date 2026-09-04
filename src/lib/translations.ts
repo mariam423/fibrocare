@@ -1488,6 +1488,12 @@ export type TranslationKey =
   | "doctor.aiLibrary.refreshed"
   | "doctor.aiLibrary.refreshError"
   | "doctor.aiLibrary.minutesShort"
+  | "doctor.aiLibrary.topicsAria"
+  | "doctor.reactions.like"
+  | "doctor.reactions.helpful"
+  | "doctor.reactions.signInHint"
+  | "doctor.authorFallback"
+  | "doctor.postError"
   | "doctor.manualPublishing.title"
   | "doctor.manualPublishing.subtitle"
   | "doctor.manualPublishing.openEditor"
@@ -3097,6 +3103,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.refreshed": "Library refreshed.",
     "doctor.aiLibrary.refreshError": "Could not refresh the library. Please try again.",
     "doctor.aiLibrary.minutesShort": "min",
+    "doctor.aiLibrary.topicsAria": "Article topics",
+    "doctor.reactions.like": "Like",
+    "doctor.reactions.helpful": "Helpful",
+    "doctor.reactions.signInHint": "Sign in to react.",
+    "doctor.authorFallback": "Doctor",
+    "doctor.postError": "Failed to publish.",
     "doctor.manualPublishing.title": "Manual publishing",
     "doctor.manualPublishing.subtitle": "Write your own article, set tags, and submit it for review. Your published pieces appear alongside AI-generated guidance.",
     "doctor.manualPublishing.openEditor": "Write a new article",
@@ -4707,6 +4719,12 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.refreshed": "تم تحديث المكتبة.",
     "doctor.aiLibrary.refreshError": "تعذّر تحديث المكتبة. حاول مرة أخرى.",
     "doctor.aiLibrary.minutesShort": "د",
+    "doctor.aiLibrary.topicsAria": "مواضيع المقالات",
+    "doctor.reactions.like": "إعجاب",
+    "doctor.reactions.helpful": "مفيد",
+    "doctor.reactions.signInHint": "سجّل الدخول للتفاعل.",
+    "doctor.authorFallback": "طبيب",
+    "doctor.postError": "تعذّر النشر.",
     "doctor.manualPublishing.title": "النشر اليدوي",
     "doctor.manualPublishing.subtitle": "اكتب مقالك بنفسك، حدّد التصنيفات، وقدّمه للمراجعة. تظهر مقالاتك المنشورة إلى جانب الإرشادات المولّدة بالذكاء الاصطناعي.",
     "doctor.manualPublishing.openEditor": "اكتب مقالاً جديداً",

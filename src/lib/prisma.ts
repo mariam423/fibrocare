@@ -28,11 +28,18 @@ function createPrismaClient(): PrismaClient {
     // Dynamic require keeps the optional dependency out of the bundle
     // when Accelerate is not configured. The extension is a thin wrapper
     // that sends queries to the Accelerate URL instead of the direct one.
+    // The module name is built at runtime so Next 16's static analysis
+    // cannot trace the require — this is the standard escape hatch for
+    // opt-in runtime dependencies in Turbopack. The dependency is also
+    // listed in `next.config.ts` `serverExternalPackages` as a
+    // belt-and-braces guarantee.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { withAccelerate } = require('@prisma/extension-accelerate') as {
+    const moduleName = '@prisma/extension-accelerate';
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const accelerator = require(moduleName) as {
       withAccelerate: (client: PrismaClient) => PrismaClient;
     };
-    return withAccelerate(base);
+    return accelerator.withAccelerate(base);
   }
   return base;
 }

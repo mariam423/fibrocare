@@ -52,6 +52,12 @@ const nextConfig: NextConfig = {
   // Standalone output for Docker/Azure deployment — copies only the files
   // needed to run the app, reducing image size significantly.
   output: "standalone",
+  // `@prisma/extension-accelerate` is an opt-in runtime dependency loaded
+  // dynamically from `src/lib/prisma.ts` (only when PRISMA_ACCELERATE_URL is
+  // set). It must not be bundled — Next 16's static analysis otherwise
+  // fails the build on environments where the package is declared but not
+  // resolvable through the bundler (e.g. monorepo / hoisted install).
+  serverExternalPackages: ["@prisma/extension-accelerate"],
   experimental: {
     viewTransition: true,
   },

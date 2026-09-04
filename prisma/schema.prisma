@@ -98,6 +98,13 @@ model DoctorPost {
   content        String
   tags           String   @default("")
   verifiedStatus String   @default("pending")
+  /// Origin of the post. `"ai"` rows are produced by the curated AI
+  /// article generator (see `doctor-article-actions.ts`) and surface
+  /// only in the `AiArticleLibrary`. `"manual"` rows are written by
+  /// a verified doctor through the publishing composer and surface
+  /// only in `DoctorContentFeed`. The default is `"manual"` so any
+  /// pre-migration row is treated as doctor-written.
+  source         String   @default("manual")
   authorId       String
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
@@ -106,6 +113,7 @@ model DoctorPost {
 
   @@index([authorId])
   @@index([verifiedStatus])
+  @@index([source])
 }
 
 /// Per-user reaction on a verified Doctor Hub article.

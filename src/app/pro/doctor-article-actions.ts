@@ -475,6 +475,14 @@ export async function ensureArticleForTopic(topicId: string): Promise<
         tags: joinTags(tagsWithSlug),
         authorId: author.id,
         verifiedStatus: "verified",
+        // Discriminator: the curated AI generator writes posts with
+        // `source: "ai"`, the doctor composer writes `"manual"`. The
+        // public `DoctorContentFeed` filters on `"manual"` so an AI
+        // article never appears in both the library and the manual
+        // feed. The legacy dedup-by-slug code path above is left
+        // intact for the read side, but the write side now stamps the
+        // marker for new rows.
+        source: "ai",
       },
     });
 

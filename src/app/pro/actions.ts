@@ -140,11 +140,26 @@ export async function getDoctorPosts(options?: {
   status?: string;
   authorId?: string;
   limit?: number;
+  /**
+   * When true (default), only doctor-written posts are returned.
+   * Set false only for callers that explicitly want the union of
+   * AI + manual (e.g. the article library which does its own
+   * de-duplication). The Doctor Hub page calls this with the
+   * default; the AI library calls `listPublishedArticles` directly.
+   */
+  manualOnly?: boolean;
 }) {
   try {
     const where: Record<string, unknown> = {};
     if (options?.status) where.verifiedStatus = options.status;
     if (options?.authorId) where.authorId = options.authorId;
+    // `manualOnly` defaults to true: DoctorContentFeed must never show
+    // an AI-generated article that the AiArticleLibrary already shows.
+    // The split is enforced at the data layer so the public page
+    // cannot accidentally render the same post in two sections.
+    if (options?.manualOnly !== false) {
+      where.source = "manual";
+    }
 
     const posts = await prisma.doctorPost.findMany({
       where,

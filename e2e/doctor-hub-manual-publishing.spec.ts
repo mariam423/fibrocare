@@ -141,4 +141,71 @@ test.describe("Doctor Hub: manual publishing + library", () => {
     await expect(ownPosts).toBeVisible({ timeout: 60_000 });
     await expect(ownPosts).toContainText(title);
   });
+
+  /**
+   * Page-level dedup regression test. Both the AI library and the
+   * manual "Doctor Insights" feed pull from the same `DoctorPost`
+   * table; before the `source` discriminator landed, AI articles
+   * rendered in BOTH sections. The two surfaces must now show
+   * disjoint sets: an AI library card must not also appear as a
+   * manual feed card, and vice versa.
+   *
+   * For a doctor session (the throwaway account is promoted to
+   * the `doctor` role by auth.setup.ts) the page renders BOTH
+   * surfaces, so the assertion is meaningful here. For a plain
+   * user session, only the library is rendered, so this test is
+   * only meaningful in the doctor path — it lives in this spec
+   * because it's a Doctor Hub invariant.
+   */
+  test("AI library and Doctor Insights show disjoint post sets", async ({
+    page,
+  }) => {
+    await unlockPrivatePage(page, "/pro/doctor");
+
+    // Wait for the AI library to populate before snapshotting titles.
+    const libraryGrid = page.getByTestId("ai-article-grid");
+    await expect(libraryGrid).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByTestId("ai-article-card").first()).toBeVisible({
+      timeout: 60_000,
+    });
+    const libraryTitles = new Set(
+      (
+        await page
+          .getByTestId("ai-article-card")
+          .locator("[data-testid='ai-article-title']")
+          .allTextContents()
+      ).map((t) => t.trim())
+    );
+
+    // The manual feed surface is the "Doctor Insights" section
+    // (translation key: doctor.feedTitle). It may legitimately be
+    // empty if no manual posts exist yet — that's OK, the assertion
+    // is "no overlap" which is vacuously true.
+    const feedTitle = "رؤى الأطباء";
+    const insightsHeading = page.getByRole("heading", { name: feedTitle });
+    if ((await insightsHeading.count()) === 0) {
+      // No manual feed rendered → nothing to compare against.
+      return;
+    }
+    await expect(insightsHeading).toBeVisible({ timeout: 60_000 });
+
+    // The feed renders post titles inside the same CardTitle
+    // elements. We pull the whole page's H3s inside the section
+    // that follows the heading, so the AI library cards above
+    // the heading don't pollute the set.
+    const insightsSection = page
+      .locator("section, div")
+      .filter({ has: insightsHeading })
+      .first();
+    const insightsTitles = (
+      await insightsSection.locator("h3").allTextContents()
+    ).map((t) => t.trim());
+
+    for (const title of insightsTitles) {
+      expect(
+        libraryTitles.has(title),
+        `Post "${title}" appears in both AI library and Doctor Insights`
+      ).toBe(false);
+    }
+  });
 });

@@ -1,6 +1,11 @@
 /**
- * Tests for the Upstash cache adapter. We mock `@upstash/redis` to a
- * fake in-memory store so the test runs without a real Redis.
+ * Tests for the Upstash cache adapter.
+ *
+ * The Upstash SDK is loaded via `module.createRequire` in
+ * `src/lib/upstash/client.ts` to hide it from Turbopack's static
+ * analysis. We inject a fake `Redis` class through the public
+ * `__setUpstashModuleForTests` hook — see the limiter test for the
+ * rationale.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,31 +30,31 @@ const setMock = vi.fn(async (key: string, value: unknown, opts?: { ex?: number }
   return "OK";
 });
 
-vi.mock("@upstash/redis", () => {
-  class FakeRedis {
-    get = getMock;
-    set = setMock;
-  }
-  return { Redis: FakeRedis };
-});
-
 const originalUrl = process.env.UPSTASH_REDIS_REST_URL;
 const originalToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-beforeEach(() => {
+beforeEach(async () => {
   process.env.UPSTASH_REDIS_REST_URL = "https://fake.upstash.io";
   process.env.UPSTASH_REDIS_REST_TOKEN = "fake-token";
   fakeStore.clear();
   getMock.mockClear();
   setMock.mockClear();
+
+  class FakeRedis {
+    get = getMock;
+    set = setMock;
+  }
+  const clientModule = await import("../client");
+  clientModule.__setUpstashModuleForTests("@upstash/redis", FakeRedis);
 });
 
-afterEach(() => {
+afterEach(async () => {
   if (originalUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
   else process.env.UPSTASH_REDIS_REST_URL = originalUrl;
   if (originalToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
   else process.env.UPSTASH_REDIS_REST_TOKEN = originalToken;
-  vi.resetModules();
+  const clientModule = await import("../client");
+  clientModule.__resetUpstashModulesForTests();
 });
 
 describe("UpstashDistributedCache", () => {

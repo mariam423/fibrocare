@@ -57,7 +57,19 @@ const nextConfig: NextConfig = {
   // set). It must not be bundled — Next 16's static analysis otherwise
   // fails the build on environments where the package is declared but not
   // resolvable through the bundler (e.g. monorepo / hoisted install).
-  serverExternalPackages: ["@prisma/extension-accelerate"],
+  //
+  // `@upstash/redis` and `@upstash/ratelimit` are loaded the same way
+  // from `src/lib/upstash/client.ts`. `@upstash/redis` has a complex
+  // `exports` field and `@upstash/ratelimit@2.0.8` is CJS-only with no
+  // `module` field, so Turbopack fails the static `import` even when the
+  // packages are installed. The runtime `createRequire` in the client
+  // file is the primary fix; `serverExternalPackages` is the
+  // belt-and-braces guarantee.
+  serverExternalPackages: [
+    "@prisma/extension-accelerate",
+    "@upstash/redis",
+    "@upstash/ratelimit",
+  ],
   experimental: {
     viewTransition: true,
   },

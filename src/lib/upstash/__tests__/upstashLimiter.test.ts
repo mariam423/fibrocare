@@ -1,50 +1,48 @@
 /**
- * Tests for the Upstash adapter. We mock `@upstash/ratelimit` so the
- * adapter logic can be exercised without a real Redis.
+ * Tests for the Upstash adapter.
+ *
+ * The Upstash SDK is loaded via `module.createRequire` in
+ * `src/lib/upstash/client.ts` to hide it from Turbopack's static
+ * analysis. We can't `vi.mock("@upstash/ratelimit", ...)` anymore —
+ * vitest's `vi.mock` patches the ESM module registry, not Node's CJS
+ * `require`. Instead, we inject the fake class through the public
+ * `__setUpstashModuleForTests` hook.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── Mocks ──────────────────────────────────────────────────────────────
-// The Upstash SDK is mocked at the module boundary; we control the
-// return value of `Ratelimit.slidingWindow` and the constructed
-// `Ratelimit` instance.
-
 const limitMock = vi.fn();
 const slidingWindowMock = vi.fn(() => ({ __algo: "slidingWindow" }));
-const RatelimitMock = vi.fn().mockImplementation(function () {
-  return { limit: limitMock };
-});
 
-vi.mock("@upstash/ratelimit", () => {
-  // The real export is `class Ratelimit { static slidingWindow(...) {} }`.
-  // The class itself needs to be constructable AND have a static method.
+beforeEach(async () => {
+  process.env.UPSTASH_REDIS_REST_URL = "https://fake.upstash.io";
+  process.env.UPSTASH_REDIS_REST_TOKEN = "fake-token";
+  limitMock.mockReset();
+  slidingWindowMock.mockClear();
+
+  // Build the fake Ratelimit class and inject it through the test hook.
+  // The loader returns the same instance for every call within the test.
   class FakeRatelimit {
     limit = limitMock;
   }
   (FakeRatelimit as unknown as { slidingWindow: typeof slidingWindowMock }).slidingWindow =
     slidingWindowMock;
-  return { Ratelimit: FakeRatelimit };
+
+  const clientModule = await import("../client");
+  clientModule.__setUpstashModuleForTests("@upstash/redis", class FakeRedis {});
+  clientModule.__setUpstashModuleForTests("@upstash/ratelimit", FakeRatelimit);
 });
 
-// We exercise the adapter through `selectAdapter`, which inspects
-// `process.env.UPSTASH_REDIS_REST_URL`.
 const originalUrl = process.env.UPSTASH_REDIS_REST_URL;
 const originalToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-beforeEach(() => {
-  process.env.UPSTASH_REDIS_REST_URL = "https://fake.upstash.io";
-  process.env.UPSTASH_REDIS_REST_TOKEN = "fake-token";
-  limitMock.mockReset();
-  slidingWindowMock.mockClear();
-  RatelimitMock.mockClear();
-});
-
-afterEach(() => {
+afterEach(async () => {
   if (originalUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
   else process.env.UPSTASH_REDIS_REST_URL = originalUrl;
   if (originalToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
   else process.env.UPSTASH_REDIS_REST_TOKEN = originalToken;
-  vi.resetModules();
+  const clientModule = await import("../client");
+  clientModule.__resetUpstashModulesForTests();
 });
 
 describe("UpstashRateLimiter", () => {

@@ -32,11 +32,20 @@ export class UpstashRateLimiter implements IDistributedRateLimiter {
     }
 
     try {
-      const { success, remaining, reset } = await limiter.limit(key);
+      // The limiter is typed as `unknown` because the Upstash SDK is
+      // loaded lazily via `createRequire` in the client module — see
+      // `src/lib/upstash/client.ts` for the rationale. The SDK's
+      // `limit(key)` method returns `{ success, limit, remaining, reset,
+      // pending }`; we extract the three fields we care about.
+      const result = (await (limiter as { limit: (k: string) => Promise<unknown> }).limit(key)) as {
+        success: boolean;
+        remaining: number;
+        reset: number;
+      };
       return {
-        ok: success,
-        remaining,
-        resetAt: reset,
+        ok: result.success,
+        remaining: result.remaining,
+        resetAt: result.reset,
       };
     } catch (error) {
       // Don't take the route down when Redis is degraded.

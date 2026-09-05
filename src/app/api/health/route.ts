@@ -20,6 +20,7 @@ import { getPrismaAdapterName } from "@/lib/prisma";
 import { snapshot } from "@/lib/observability/metrics";
 import { getBreakerState } from "@/lib/observability/circuitBreaker";
 import { getActiveProvider } from "@/lib/ai/provider";
+import { getFlagsSnapshot } from "@/lib/featureFlags";
 
 export const maxDuration = 5;
 
@@ -54,6 +55,7 @@ export async function GET(request: Request) {
       cache: getCacheName(),
       database: getPrismaAdapterName(),
     },
+    flags: getFlagsSnapshot(),
     breakers: {
       ...(provider ? { [`ai:${provider}`]: getBreakerState(`ai:${provider}`) } : {}),
     },

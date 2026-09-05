@@ -1,21 +1,20 @@
 import type { IDistributedRateLimiter } from "./IDistributedRateLimiter";
 import { InMemoryRateLimiter } from "./InMemoryRateLimiter";
 import { UpstashRateLimiter } from "./upstashLimiter";
+import { shouldUseUpstashRateLimit } from "@/lib/featureFlags";
 
 /**
- * Returns the configured rate-limiter, picking the distributed (Upstash)
- * adapter when `UPSTASH_REDIS_REST_URL` is set, otherwise the in-process
- * adapter. The decision is cached for the lifetime of the process so we
- * don't re-import the Upstash client on every call.
+ * Returns the configured rate-limiter. The selection rule mirrors the
+ * cache selector: opt in via `USE_UPSTASH_RATELIMIT=1`. Default is the
+ * in-process adapter so production behaviour is unchanged.
  */
 let cached: IDistributedRateLimiter | null = null;
 
 export function getRateLimiter(): IDistributedRateLimiter {
   if (cached) return cached;
-  cached =
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-      ? new UpstashRateLimiter()
-      : new InMemoryRateLimiter();
+  cached = shouldUseUpstashRateLimit()
+    ? new UpstashRateLimiter()
+    : new InMemoryRateLimiter();
   return cached;
 }
 
@@ -26,7 +25,5 @@ export function __resetRateLimiterForTests(): void {
 
 /** Adapter name for the metrics route. */
 export function getRateLimiterName(): "upstash" | "memory" {
-  return process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? "upstash"
-    : "memory";
+  return shouldUseUpstashRateLimit() ? "upstash" : "memory";
 }

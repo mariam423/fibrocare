@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { shouldUseAccelerate } from '@/lib/featureFlags'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -36,8 +37,13 @@ function createPrismaClient(): PrismaClient {
     log: process.env.NODE_ENV === 'development' ? ['query'] : [],
   });
 
-  // Opt-in: only attempt the wrap when the URL is configured.
-  if (process.env.PRISMA_ACCELERATE_URL) {
+  // Opt-in: only attempt the wrap when the URL is configured AND the
+  // user has explicitly enabled the feature flag. The flag is the
+  // single source of truth for "is the rollout active" — checking the
+  // env var alone would cause a cutover the moment someone adds
+  // PRISMA_ACCELERATE_URL to a Vercel preview deploy, which is exactly
+  // what we want to prevent during the shadow-mode validation period.
+  if (shouldUseAccelerate() && process.env.PRISMA_ACCELERATE_URL) {
     const accelerated = tryWithAccelerate(base);
     if (accelerated) return accelerated;
   }
@@ -107,5 +113,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 /** Adapter name for the metrics route. */
 export function getPrismaAdapterName(): 'accelerate' | 'direct' {
-  return process.env.PRISMA_ACCELERATE_URL ? 'accelerate' : 'direct';
+  return shouldUseAccelerate() && process.env.PRISMA_ACCELERATE_URL
+    ? 'accelerate'
+    : 'direct';
 }

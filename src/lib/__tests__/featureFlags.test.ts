@@ -130,4 +130,32 @@ describe("featureFlags", () => {
       shadowRateLimit: false,
     });
   });
+
+  it("isShadowCacheActive requires the flag, the credentials, and no cutover", async () => {
+    // No flag → inactive.
+    expect((await freshFlags()).isShadowCacheActive()).toBe(false);
+
+    // Flag but no credentials → still inactive (nothing to shadow with).
+    process.env.SHADOW_CACHE = "1";
+    expect((await freshFlags()).isShadowCacheActive()).toBe(false);
+
+    // Flag + credentials → active.
+    process.env.UPSTASH_REDIS_REST_URL = "https://x.upstash.io";
+    process.env.UPSTASH_REDIS_REST_TOKEN = "t";
+    expect((await freshFlags()).isShadowCacheActive()).toBe(true);
+
+    // Cutover flipped → inactive again (Upstash is now the primary).
+    process.env.USE_UPSTASH_CACHE = "1";
+    expect((await freshFlags()).isShadowCacheActive()).toBe(false);
+  });
+
+  it("isShadowRateLimitActive follows the same rule", async () => {
+    process.env.SHADOW_RATELIMIT = "1";
+    expect((await freshFlags()).isShadowRateLimitActive()).toBe(false); // no creds
+    process.env.UPSTASH_REDIS_REST_URL = "https://x.upstash.io";
+    process.env.UPSTASH_REDIS_REST_TOKEN = "t";
+    expect((await freshFlags()).isShadowRateLimitActive()).toBe(true);
+    process.env.USE_UPSTASH_RATELIMIT = "1";
+    expect((await freshFlags()).isShadowRateLimitActive()).toBe(false);
+  });
 });

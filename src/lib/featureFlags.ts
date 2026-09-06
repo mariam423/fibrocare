@@ -66,6 +66,13 @@ export function __resetFeatureFlagsForTests(): void {
   cached = null;
 }
 
+/** Are the Upstash credentials present in env? Shared by all selectors. */
+export function hasUpstashCredentials(): boolean {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
+
 /**
  * Should the cache selector return the Upstash adapter?
  *
@@ -79,18 +86,14 @@ export function __resetFeatureFlagsForTests(): void {
 export function shouldUseUpstashCache(): boolean {
   const f = flags();
   if (!f.useUpstashCache) return false;
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return hasUpstashCredentials();
 }
 
 /** Same rule for the rate-limiter selector. */
 export function shouldUseUpstashRateLimit(): boolean {
   const f = flags();
   if (!f.useUpstashRateLimit) return false;
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return hasUpstashCredentials();
 }
 
 /** Should `getPrisma()` apply the Accelerate extension? */
@@ -108,6 +111,30 @@ export function isShadowCacheEnabled(): boolean {
 /** Is shadow-ratelimit mode active? */
 export function isShadowRateLimitEnabled(): boolean {
   return flags().shadowRateLimit;
+}
+
+/**
+ * Is the cache selector actually running the shadow wrapper?
+ *
+ * Shadow mode is only *active* when the operator asked for it
+ * (`SHADOW_CACHE=1`), the Upstash credentials are present (so there is a
+ * secondary adapter to compare against), AND the cutover has not already
+ * happened (`USE_UPSTASH_CACHE` still off — otherwise the Upstash adapter
+ * IS the primary and there is nothing to shadow).
+ */
+export function isShadowCacheActive(): boolean {
+  return (
+    isShadowCacheEnabled() && hasUpstashCredentials() && !shouldUseUpstashCache()
+  );
+}
+
+/** Same rule for the rate-limiter selector. */
+export function isShadowRateLimitActive(): boolean {
+  return (
+    isShadowRateLimitEnabled() &&
+    hasUpstashCredentials() &&
+    !shouldUseUpstashRateLimit()
+  );
 }
 
 /**

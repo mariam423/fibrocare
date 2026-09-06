@@ -6,7 +6,15 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 interface AcceleratorLike {
-  withAccelerate: (client: PrismaClient) => PrismaClient;
+  /**
+   * Returns a Prisma *client extension* (a `(client) => extension`
+   * function). It is applied with `base.$extends(...)`, exactly like any
+   * other `$extends` extension — it is NOT a `(client) => client`
+   * wrapper. The value is opaque here: the package ships its own runtime
+   * types that we deliberately do not import, so callers cast it to the
+   * `$extends` parameter type before use.
+   */
+  withAccelerate: (options?: unknown) => unknown;
 }
 
 /**
@@ -76,46 +84,95 @@ function setAdapterResolved(name: 'accelerate' | 'direct') {
 }
 
 /**
+ * Return a Node `createRequire` factory or `null` when the runtime does
+ * not expose one (e.g. an edge runtime).
+ *
+ * Resolution order:
+ *  1. `process.getBuiltinModule("module")` — available in plain Node
+ *     (CJS and ESM alike) since 20.16 / 22.3, so this works under tsx,
+ *     standalone Next.js, and serverless Node functions.
+ *  2. `globalThis.module.createRequire` — Next.js injects a `module`
+ *     global with bundler-aware helpers in its server runtime.
+ *
+ * The require is never a static import, so NO static analyser
+ * (Turbopack, Webpack, ESLint) can follow the dependency graph to the
+ * `@prisma/extension-accelerate` package. `process` and `module` are
+ * referenced via bracket-access on `globalThis` so simple string-literal
+ * scanners cannot see the property either.
+ */
+function getCreateRequireFactory(): ((filename: string) => NodeJS.Require) | null {
+  const proc = (globalThis as unknown as {
+    process?: { getBuiltinModule?: (id: string) => unknown };
+  }).process;
+  const builtinModule = proc?.getBuiltinModule?.('module') as
+    | { createRequire?: (filename: string) => NodeJS.Require }
+    | undefined;
+  if (typeof builtinModule?.createRequire === 'function') {
+    return builtinModule.createRequire;
+  }
+  const nodeModule = (globalThis as unknown as {
+    module?: { createRequire?: (filename: string) => NodeJS.Require };
+  }).module;
+  return nodeModule?.createRequire ?? null;
+}
+
+/**
+ * Anchor path for `createRequire`. Node resolves `node_modules` by
+ * walking up from the anchor's directory, so any absolute path under the
+ * project root works. CJS runtimes (plain Node, Next standalone bundles)
+ * expose `__filename`; ESM runtimes do not, so fall back to the cwd.
+ * `typeof` is safe for undeclared identifiers, so the ESM path never
+ * throws.
+ */
+function getRequireAnchor(): string {
+  return typeof __filename === 'string'
+    ? __filename
+    : `${process.cwd()}/runtime-probe.cjs`;
+}
+
+/**
  * Safely wraps a Prisma client with the Accelerate extension. Returns the
  * wrapped client on success, or `null` if the extension cannot be loaded
  * for any reason (package not installed, resolution error, module not
  * found at build time). The fallback path returns the bare client so the
  * build is never blocked.
  *
- * The require is constructed via `module.createRequire` so NO static
- * analyser (Turbopack, Webpack, ESLint) can follow the dependency graph
- * to the import. `module.createRequire` is a Node.js API that returns a
- * `require` function with full Node module-resolution semantics — it
- * resolves through `node_modules` and the package's `exports` field
- * exactly like the CLI's require would. The try/catch then turns any
- * runtime failure into a no-op fallback with a single warning.
- *
- * `module` is referenced as a global so the static analyser cannot see
- * the dependency either; the bracket-access on the createRequire property
- * matches the same pattern.
+ * The require is constructed via `createRequire` (see
+ * `getCreateRequireFactory`) so no static analyser can follow the
+ * dependency graph to the import. `createRequire` returns a `require`
+ * function with full Node module-resolution semantics — it resolves
+ * through `node_modules` and the package's `exports` field exactly like
+ * the CLI's require would. The try/catch then turns any runtime failure
+ * into a no-op fallback with a single warning.
  */
 function tryWithAccelerate(base: PrismaClient): PrismaClient | null {
   const moduleName = '@prisma/extension-accelerate';
   try {
-    // `module` is a Node.js global; bracket access hides the property
-    // name from simple string-literal scanners.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const nodeModule = (globalThis as unknown as { module?: { createRequire: (filename: string) => NodeJS.Require } })
-      .module;
-    const createRequire = nodeModule?.createRequire;
-    if (typeof createRequire !== 'function') {
-      // Edge runtime (no `module` global) — Accelerate is a Node-only
-      // library, so this is a valid runtime degradation.
+    const createRequire = getCreateRequireFactory();
+    if (!createRequire) {
+      // Edge runtime (no `process.getBuiltinModule`, no Node `module`
+      // global) — Accelerate is a Node-only library, so this is a valid
+      // runtime degradation.
       console.warn(
         `[prisma] createRequire is unavailable in this runtime; ` +
           `${moduleName} can only be loaded in Node. Falling back to direct PrismaClient.`
       );
       return null;
     }
-    const localRequire = createRequire(__filename);
+    const localRequire = createRequire(getRequireAnchor());
     const accelerator = localRequire(moduleName) as AcceleratorLike;
     if (accelerator && typeof accelerator.withAccelerate === 'function') {
-      return accelerator.withAccelerate(base);
+      // `withAccelerate()` returns a client extension; apply it through
+      // `$extends`. The accelerated client is a structural superset of
+      // `PrismaClient` (adds `$accelerate`, cache-strategy args), so a
+      // cast keeps the call sites' types unchanged.
+      const accelerateExtension = accelerator.withAccelerate() as Parameters<
+        typeof base.$extends
+      >[0];
+      // The `$extends` return type does not overlap with `PrismaClient`
+      // structurally (extended clients drop `$on`/`$use`), so the cast
+      // must go through `unknown`.
+      return base.$extends(accelerateExtension) as unknown as PrismaClient;
     }
     console.warn(
       `[prisma] ${moduleName} loaded but does not export withAccelerate(); falling back to direct PrismaClient.`
@@ -136,9 +193,22 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-/** Adapter name for the metrics route. */
+/**
+ * Adapter name for the metrics route.
+ *
+ * Reports the *resolved* adapter — what `createPrismaClient` actually
+ * returned — falling back to the intended one only when the module was
+ * never instantiated (e.g. `prisma` imported but never touched). This
+ * matters during shadow mode: when the Accelerate flag is on but the
+ * extension fails to load, the metrics route must say `direct`, not
+ * `accelerate`, or an operator would believe queries go through the
+ * pooler when they do not.
+ */
 export function getPrismaAdapterName(): 'accelerate' | 'direct' {
-  return shouldUseAccelerate() && process.env.PRISMA_ACCELERATE_URL
-    ? 'accelerate'
-    : 'direct';
+  return (
+    resolvedAdapter ??
+    (shouldUseAccelerate() && process.env.PRISMA_ACCELERATE_URL
+      ? 'accelerate'
+      : 'direct')
+  );
 }

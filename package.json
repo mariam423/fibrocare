@@ -28,6 +28,10 @@
     "prod-audit": "node scripts/prod-audit.mjs",
     "db:migrate:pg": "node scripts/db-migrate-pg.mjs",
     "db:status:pg": "node scripts/db-migrate-pg.mjs --status",
+    "shadow:enable": "node scripts/cutover.mjs --enable-shadow",
+    "cutover:status": "node scripts/cutover.mjs --status",
+    "cutover:apply": "node scripts/cutover.mjs --cutover",
+    "cutover:rollback": "node scripts/cutover.mjs --rollback",
     "db:diff:pg": "prisma migrate diff --from-empty --to-schema-datamodel prisma-pg/schema.prisma --script",
     "postinstall": "prisma generate --schema prisma/schema.prisma"
   },

@@ -20,7 +20,11 @@ import { getPrismaAdapterName } from "@/lib/prisma";
 import { snapshot } from "@/lib/observability/metrics";
 import { getBreakerState } from "@/lib/observability/circuitBreaker";
 import { getActiveProvider } from "@/lib/ai/provider";
-import { getFlagsSnapshot } from "@/lib/featureFlags";
+import {
+  getFlagsSnapshot,
+  isShadowCacheActive,
+  isShadowRateLimitActive,
+} from "@/lib/featureFlags";
 
 export const maxDuration = 5;
 
@@ -54,6 +58,14 @@ export async function GET(request: Request) {
       rateLimiter: getRateLimiterName(),
       cache: getCacheName(),
       database: getPrismaAdapterName(),
+      // Shadow mode is *active* only when the flag, the credentials, AND
+      // the not-yet-cutover condition all hold. `flags.shadowCache` below
+      // is the operator's intent; `adapters.shadow` is what the process
+      // actually did.
+      shadow: {
+        cache: isShadowCacheActive(),
+        rateLimiter: isShadowRateLimitActive(),
+      },
     },
     flags: getFlagsSnapshot(),
     breakers: {

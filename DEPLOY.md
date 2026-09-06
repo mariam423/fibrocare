@@ -11,7 +11,7 @@ For the **public-facing project documentation**, see [`README.md`](./README.md).
 | # | Check | Command | Pass criteria |
 |---|-------|---------|---------------|
 | 1 | TypeScript clean | `npx tsc --noEmit` | 0 errors |
-| 2 | Unit tests pass | `npm test` | All 606 vitest suites green |
+| 2 | Unit tests pass | `npm test` | All vitest suites green |
 | 3 | Lint clean (no new errors) | `npm run lint` | 0 new errors vs `main` |
 | 4 | Production build succeeds | `npm run build` | Bundle builds, Prisma generates, SW builds |
 | 5 | DB migration applies | `npx prisma migrate deploy` | All migrations applied, new `20260905000000_add_perf_indexes_and_accelerate` present |
@@ -110,13 +110,21 @@ Response shape:
 ```json
 {
   "adapters": {
-    "rateLimiter": "upstash",
-    "cache": "upstash",
-    "database": "accelerate"
+    "rateLimiter": "memory",
+    "cache": "memory",
+    "database": "accelerate",
+    "shadow": { "cache": true, "rateLimiter": true }
+  },
+  "flags": {
+    "useUpstashCache": false,
+    "useUpstashRateLimit": false,
+    "useAccelerate": true,
+    "shadowCache": true,
+    "shadowRateLimit": true
   },
   "breakers": { "ai:google": "closed" },
   "metrics": {
-    "counters": { "chat_429": 0, "ai_success": 142 },
+    "counters": { "chat_429": 0, "ai_success": 142, "shadow_cache_check": 812, "shadow_cache_mismatch": 0 },
     "lastSeen": { "chat_429": 1700000000000 },
     "dbLatencyP95Ms": 12
   },
@@ -124,7 +132,64 @@ Response shape:
 }
 ```
 
+> `adapters.shadow` reports what the process *actually* resolved (shadow is
+> active only when the flag, the credentials, AND the not-yet-cutover
+> condition all hold). `flags` is the operator's intent — read them
+> together.
+
 > Without `ADMIN_METRICS_TOKEN`, the route returns 503 (not 401) so a misconfigured deploy is loud, not silent.
+
+### 3.4 Shadow mode (24h validation) + cutover script
+
+The `USE_*` / `SHADOW_*` split is two-stage on purpose: adding Upstash
+credentials to a preview deploy must never silently switch production.
+The supported rollout path is **shadow first, cutover after 24h**, driven
+by `scripts/cutover.mjs` (it edits only `.env.production`, which is
+gitignored — redeploy or restart after any change so Next.js re-reads the
+env):
+
+1. **Enable shadow** — `node scripts/cutover.mjs --enable-shadow`
+
+   Sets `SHADOW_CACHE=1` / `SHADOW_RATELIMIT=1` and records
+   `SHADOW_STARTED_AT`. From that moment every cache / rate-limit call
+   runs the Upstash adapter in *parallel* with the in-process primary,
+   but the response is **always served by the in-process primary** —
+   shadow never changes user-visible behaviour, it only warms Upstash and
+   measures parity.
+
+2. **Watch the window** — `node scripts/cutover.mjs --status` plus
+   `/api/health`. Shadow parity is exported as metrics counters:
+
+   - `shadow_cache_check` / `shadow_cache_mismatch`
+   - `shadow_ratelimit_check` / `shadow_ratelimit_mismatch`
+
+   A mismatch means “after cutover this call would behave differently”:
+   for the cache, the in-process store served a value Upstash missed; for
+   the rate limiter, in-process allowed a request Upstash denied (i.e. a
+   user-visible 429). Consistently zero mismatches over the window → safe
+   to cut over. (The inverse directions — Upstash warmer / more
+   permissive — are expected and not counted.)
+
+3. **Cut over** — `node scripts/cutover.mjs --cutover`
+
+   Refuses until 24 h have elapsed since `SHADOW_STARTED_AT` (`--cutover
+   --now` overrides deliberately). Flips `USE_UPSTASH_CACHE=1` /
+   `USE_UPSTASH_RATELIMIT=1`, sets `USE_ACCELERATE=1` when
+   `PRISMA_ACCELERATE_URL` is present, and clears the shadow flags.
+
+4. **Roll back** — `node scripts/cutover.mjs --rollback`
+
+   Clears the `USE_*` flags and re-enables shadow monitoring so parity
+   stays visible while you investigate. For an instant in-process
+   fallback without editing files, unset the env vars instead (see §6).
+
+Prisma Accelerate has no request-path “shadow” (there is a single client);
+its pre-cutover check is the runtime + connection probes:
+
+```bash
+npx tsx scripts/verify-accelerate-runtime.mjs   # adapter resolves to "accelerate"
+node scripts/verify-accelerate-connection.mjs   # cold/warm query latencies
+```
 
 ---
 
@@ -173,6 +238,9 @@ Each upgrade layer is gated by env-var presence. To roll back **any single layer
 | Perf indexes | `npx prisma migrate resolve --rolled-back 20260905000000_add_perf_indexes_and_accelerate` |
 | Whole upgrade | `git revert <commit-hash>` → restore the schema, drop the new files, redeploy |
 
+Shadow-mode cutover is scripted: `node scripts/cutover.mjs --rollback`
+clears the `USE_*` flags and re-enables shadow parity monitoring.
+
 **The pre-upgrade code path is fully preserved in-process.** With no `UPSTASH_*` and no `PRISMA_ACCELERATE_URL`, the existing in-memory `Map` rate limiter and `TtlCache` are used, and the Prisma client talks to `DATABASE_URL` directly.
 
 ---
@@ -204,6 +272,11 @@ Postgres is the bottleneck. Either:
 
 ## 8. What's in the upgrade
 
+- **Phase L-6 (shadow mode + cutover)**: `ShadowCache` / `ShadowRateLimiter`
+  wrappers activated by `SHADOW_CACHE` / `SHADOW_RATELIMIT`, parity
+  counters in `/api/health`, and `scripts/cutover.mjs` (enable → 24h gate
+  → cutover → rollback) with npm scripts `shadow:enable`,
+  `cutover:status`, `cutover:apply`, `cutover:rollback`.
 - **17 new unit tests** covering the distributed adapters, circuit breaker, and metrics.
 - **1 new migration** (`20260905000000_add_perf_indexes_and_accelerate`) — 5 `CREATE INDEX` statements, all additive.
 - **9 new env vars** (4 optional Upstash, 1 optional Accelerate, 1 optional admin token, 3 existing now better documented).

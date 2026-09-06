@@ -1,6 +1,6 @@
 # Major System Upgrade — September 2026
 
-> **Status**: shipped on `main`. 606 unit tests pass, 0 new TypeScript errors, 0 new lint errors, production build succeeds.
+> **Status**: shipped on `main`. 637 unit tests pass, 0 new TypeScript errors, 0 new lint errors, production build succeeds. Phase L-6 (shadow mode + cutover script) landed on top — see the addendum in §12.
 
 This document is the architectural rationale for the upgrade. For **how to deploy**, see [`../DEPLOY.md`](../DEPLOY.md).
 
@@ -323,3 +323,32 @@ prisma/migrations/20260905000000_add_perf_indexes_and_accelerate/
 - **Roll out a new feature** behind a 1 req / 10s `(topic, language)` throttle without writing any rate-limit code — `checkRateLimitDistributed` is the API.
 - **Detect a flaky AI provider** in seconds via the `/api/health` breaker state, instead of seeing a 50% 502 spike in your logs.
 - **Tune the chat rate limit** from 20/min to 30/min by changing one constant in `src/lib/ai/ratelimit.ts` — the same change applies to every instance, no per-instance config drift.
+
+---
+
+## 12. Addendum — L-6 shadow mode + cutover
+
+Landing on `main` after §1–11: the two-stage rollout that makes the
+upgrade above safe to ship.
+
+**Why**: §3–5 introduced the `USE_*` flags, but nothing stopped an
+operator from flipping them the day the credentials were added. L-6 adds
+(1) a *shadow* stage that runs Upstash next to the in-process adapter
+without ever serving from it, and (2) a scripted 24h gate before the
+`USE_*` flags may be flipped.
+
+**New files**:
+
+```
+src/lib/observability/shadow.ts                      # parity reporter
+src/lib/cache/shadowCache.ts                         # primary+shadow wrapper
+src/lib/ratelimit/shadowLimiter.ts                   # primary+shadow wrapper
+src/lib/cache/__tests__/shadowCache.test.ts
+src/lib/ratelimit/__tests__/shadowLimiter.test.ts
+scripts/cutover.mjs                                  # enable/status/cutover/rollback
+```
+
+`/api/health` now reports `adapters.shadow.{cache,rateLimiter}` (what the
+process actually resolved) alongside the `flags` intent, and the shadow
+parity counters (`shadow_cache_*`, `shadow_ratelimit_*`) appear in the
+metrics snapshot. See [`DEPLOY.md §3.4`](../DEPLOY.md) for the runbook.

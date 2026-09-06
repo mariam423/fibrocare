@@ -84,21 +84,15 @@ export function loadUpstashModule<T>(
 
   // 3. Live load
   try {
-    // `module` is a Node.js global; the cast hides the property access
-    // from simple string-literal scanners.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const nodeModule = (globalThis as unknown as {
-      module?: { createRequire: (filename: string) => NodeJS.Require };
-    }).module;
-    const createRequire = nodeModule?.createRequire;
-    if (typeof createRequire !== "function") {
+    const createRequire = getCreateRequireFactory();
+    if (!createRequire) {
       console.warn(
         `[upstash] createRequire is unavailable in this runtime; ` +
           `${name} can only be loaded in Node. Falling back to in-process adapter.`
       );
       return null;
     }
-    const localRequire = createRequire(__filename);
+    const localRequire = createRequire(getRequireAnchor());
     const mod = localRequire(name) as T;
     cache[name] = mod;
     return mod;
@@ -111,6 +105,44 @@ export function loadUpstashModule<T>(
     );
     return null;
   }
+}
+
+/**
+ * Return a Node `createRequire` factory or `null` when the runtime does
+ * not expose one (e.g. an edge runtime). See `src/lib/prisma.ts` for the
+ * full rationale — the two loaders share the same rules:
+ *
+ *  1. `process.getBuiltinModule("module")` — plain Node (CJS and ESM),
+ *     available since 20.16 / 22.3, so it works under tsx, standalone
+ *     Next.js, and serverless Node functions.
+ *  2. `globalThis.module.createRequire` — Next.js injects a `module`
+ *     global with bundler-aware helpers in its server runtime.
+ */
+function getCreateRequireFactory(): ((filename: string) => NodeJS.Require) | null {
+  const proc = (globalThis as unknown as {
+    process?: { getBuiltinModule?: (id: string) => unknown };
+  }).process;
+  const builtinModule = proc?.getBuiltinModule?.("module") as
+    | { createRequire?: (filename: string) => NodeJS.Require }
+    | undefined;
+  if (typeof builtinModule?.createRequire === "function") {
+    return builtinModule.createRequire;
+  }
+  const nodeModule = (globalThis as unknown as {
+    module?: { createRequire?: (filename: string) => NodeJS.Require };
+  }).module;
+  return nodeModule?.createRequire ?? null;
+}
+
+/**
+ * Anchor path for `createRequire`. CJS runtimes expose `__filename`;
+ * ESM runtimes do not, so fall back to the cwd. `typeof` is safe for
+ * undeclared identifiers, so the ESM path never throws.
+ */
+function getRequireAnchor(): string {
+  return typeof __filename === "string"
+    ? __filename
+    : `${process.cwd()}/runtime-probe.cjs`;
 }
 
 /**

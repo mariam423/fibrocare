@@ -42,14 +42,33 @@ jobs:
           node-version: 22 # Next.js 16 requires Node 18.18+ — 22 is LTS
           cache: npm
 
+      # The schema is Postgres (Phase L-1) and declares directUrl, so the
+      # SQLite file:./dev.db placeholder no longer works here — migrations
+      # must run against the managed database via the repository secrets.
+      - name: Check required secrets are configured
+        run: |
+          missing=""
+          for s in DATABASE_URL DIRECT_URL NEXTAUTH_SECRET; do
+            if [ -z "$(printenv "$s")" ]; then missing="$missing $s"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions (see DEPLOY.md §2-3)."
+            exit 1
+          fi
+        env:
+          DATABASE_URL: "${{ secrets.DATABASE_URL }}"
+          DIRECT_URL: "${{ secrets.DIRECT_URL }}"
+          NEXTAUTH_SECRET: "${{ secrets.NEXTAUTH_SECRET }}"
+
       # .env is gitignored and the Prisma schema reads DATABASE_URL via
       # env(), so CI materializes its own .env BEFORE `npm install` — the
       # @prisma/client postinstall generates the client from the schema and
       # would fail without the variable.
       - name: Create .env for CI
         run: |
-          echo 'DATABASE_URL="file:./dev.db"' > .env
-          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
+          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "DIRECT_URL=\"${{ secrets.DIRECT_URL }}\"" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
           echo 'NEXTAUTH_URL=http://localhost:3000' >> .env
 
       # No package-lock.json is committed, so `npm install` (not `npm ci`).
@@ -60,6 +79,9 @@ jobs:
         run: |
           npx prisma generate
           npx prisma migrate deploy
+        env:
+          DATABASE_URL: "${{ secrets.DATABASE_URL }}"
+          DIRECT_URL: "${{ secrets.DIRECT_URL }}"
 
       - name: Run unit tests
         run: npm test
@@ -92,10 +114,12 @@ jobs:
 
       # Same reasoning as the gate: the SWA CLI's `npm install` triggers the
       # Prisma postinstall, which needs DATABASE_URL present in the workspace.
+      # Postgres (L-1) requires DIRECT_URL too, so both come from secrets.
       - name: Create .env for Azure build
         run: |
-          echo 'DATABASE_URL="file:./dev.db"' > .env
-          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
+          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "DIRECT_URL=\"${{ secrets.DIRECT_URL }}\"" >> .env
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
           echo "NEXTAUTH_URL=${NEXT_PUBLIC_SITE_URL}" >> .env
 
       - name: Build And Deploy
@@ -122,9 +146,25 @@ jobs:
             NEXTAUTH_SECRET: "${{ secrets.NEXTAUTH_SECRET }}"
             NEXTAUTH_URL: "${{ secrets.NEXTAUTH_URL }}"
             DATABASE_URL: "${{ secrets.DATABASE_URL }}"
+            DIRECT_URL: "${{ secrets.DIRECT_URL }}"
             HEALTH_DATA_ENCRYPTION_KEY: "${{ secrets.HEALTH_DATA_ENCRYPTION_KEY }}"
             AI_PROVIDER: "${{ secrets.AI_PROVIDER }}"
             GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY }}"
+            # ── Phase L: distributed adapters (DEPLOY.md §3) ──
+            PRISMA_ACCELERATE_URL: "${{ secrets.PRISMA_ACCELERATE_URL }}"
+            UPSTASH_REDIS_REST_URL: "${{ secrets.UPSTASH_REDIS_REST_URL }}"
+            UPSTASH_REDIS_REST_TOKEN: "${{ secrets.UPSTASH_REDIS_REST_TOKEN }}"
+            ADMIN_METRICS_TOKEN: "${{ secrets.ADMIN_METRICS_TOKEN }}"
+            # Shadow mode: the 24h validation window before cutover. The
+            # in-process adapters keep serving; Upstash runs in parallel
+            # and parity counters surface in /api/health. These three are
+            # non-secret rollout state managed by scripts/cutover.mjs —
+            # SHADOW_STARTED_AT gates `cutover:apply` for 24h. At cutover
+            # add USE_UPSTASH_CACHE=1 / USE_UPSTASH_RATELIMIT=1 /
+            # USE_ACCELERATE=1 and drop the SHADOW_* lines.
+            SHADOW_CACHE: "1"
+            SHADOW_RATELIMIT: "1"
+            SHADOW_STARTED_AT: "1788710390189"
 
   # ─────────────────────────────────────────────────────────────────────
   # Remove the Azure preview environment when its pull request closes.

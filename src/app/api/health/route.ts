@@ -18,6 +18,7 @@ import { getRateLimiterName } from "@/lib/ratelimit/selectAdapter";
 import { getCacheName } from "@/lib/cache/selectAdapter";
 import { getPrismaAdapterName } from "@/lib/prisma";
 import { snapshot } from "@/lib/observability/metrics";
+import { readShadowRemoteCounters } from "@/lib/observability/shadowRemote";
 import { getBreakerState } from "@/lib/observability/circuitBreaker";
 import { getActiveProvider } from "@/lib/ai/provider";
 import {
@@ -53,6 +54,20 @@ export async function GET(request: Request) {
   }
 
   const provider = getActiveProvider();
+  const metrics = snapshot();
+  // The in-process counters are per-process — invisible across Vercel route
+  // functions. Merge the Upstash-backed parity counters over them so the
+  // operator sees the aggregate across every route and instance. When the
+  // remote store is unreachable, `shadowRemote: "local-only"` says the
+  // numbers below are this process' own counts, not the fleet's.
+  const remoteShadow = await readShadowRemoteCounters();
+  if (remoteShadow) {
+    metrics.counters = {
+      ...(metrics.counters as Record<string, number>),
+      ...remoteShadow,
+    };
+  }
+
   return Response.json({
     adapters: {
       rateLimiter: getRateLimiterName(),
@@ -71,7 +86,10 @@ export async function GET(request: Request) {
     breakers: {
       ...(provider ? { [`ai:${provider}`]: getBreakerState(`ai:${provider}`) } : {}),
     },
-    metrics: snapshot(),
+    metrics: {
+      ...metrics,
+      shadowRemote: remoteShadow ? "upstash" : "local-only",
+    },
     uptimeSec: Math.round(process.uptime()),
   });
 }

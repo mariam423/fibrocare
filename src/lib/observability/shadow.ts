@@ -14,6 +14,7 @@
  * persistently > 0 (or worse, climbing) is a reason to delay cutover.
  */
 import { inc } from "./metrics";
+import { recordRemoteShadowEvent } from "./shadowRemote";
 
 const MAX_WARNED_KEYS = 200;
 const warned = new Set<string>();
@@ -27,6 +28,9 @@ function counterName(surface: ShadowSurface, kind: "check" | "mismatch"): string
 /** Record that one shadowed call ran on the secondary adapter. */
 export function recordShadowCheck(surface: ShadowSurface): void {
   inc(counterName(surface, "check"));
+  // Distributed mirror (fire-and-forget INCR) so serverless deploys where
+  // every route is its own process can still aggregate parity data.
+  recordRemoteShadowEvent(surface, "check");
 }
 
 /**
@@ -41,6 +45,7 @@ export function recordShadowMismatch(
   detail: string
 ): void {
   inc(counterName(surface, "mismatch"));
+  recordRemoteShadowEvent(surface, "mismatch");
   if (warned.size >= MAX_WARNED_KEYS) return;
   const id = `${surface}:${key}`;
   if (warned.has(id)) return;

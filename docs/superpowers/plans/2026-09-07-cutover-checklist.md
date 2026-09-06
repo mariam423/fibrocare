@@ -67,14 +67,10 @@ Use `node scripts/cutover.mjs --status` for the gate clock only.
 ## Pre-flight (before touching anything)
 
 - [ ] `node scripts/cutover.mjs --status` → window complete ✓ (gate ≥ 15:59 UTC)
-- [ ] 24h shadow parity green: no `shadow cache parity mismatch` /
-      `ratelimit parity mismatch` lines in `vercel logs <latest-deploy>`
-      (note: `/api/health` counters are per-process on Vercel and may read 0 —
-      logs + the Upstash mirror are the real signal)
-- [ ] Upstash warm: mirrored keys exist under `fibrocare:cache:*`
-      (weather keys confirmed 2026-09-06)
-- [ ] Env present on Vercel production: `UPSTASH_REDIS_REST_URL`/`_TOKEN`,
-      `PRISMA_ACCELERATE_URL`, `ADMIN_METRICS_TOKEN` (set 2026-09-06)
+- [ ] 24h shadow parity green: no `shadow.*mismatch` / `INCR failed` / `remote counters unavailable` / `upstash could not be loaded` lines in `vercel logs <latest-deploy>`
+- [ ] `/api/health` shows `metrics.shadowRemote: "upstash"` (counts are fleet-wide, not local-only); `metrics.counters.shadow_*_mismatch` is 0; `shadow_*_check` values are climbing as traffic arrives
+- [ ] Upstash warm: mirrored keys exist under `fibrocare:cache:*` (weather keys confirmed 2026-09-06)
+- [ ] Env present on Vercel production: `UPSTASH_REDIS_REST_URL`/`_TOKEN`, `PRISMA_ACCELERATE_URL`, `ADMIN_METRICS_TOKEN` (set 2026-09-06)
 
 ## Cutover
 
@@ -83,7 +79,7 @@ Use `node scripts/cutover.mjs --status` for the gate clock only.
 - [ ] `curl -s https://fibrocare-mariam-6620.vercel.app/api/health -H "x-admin-token: $ADMIN_METRICS_TOKEN"` →
       `adapters: { rateLimiter: "upstash", cache: "upstash", database: "accelerate" }`,
       `shadow: { cache: false, rateLimiter: false }`
-- [ ] Drive `/api/weather` → `source: "live"`, no new warnings in logs
+- [ ] Drive `/api/weather` → `source: "live"`; `/api/health` reports `shadowRemote: "upstash"` and the shadow check counters climbed; no new warnings in logs
 - [ ] Spot-check latency (Upstash US-East from Vercel; expected ≈ tens of ms)
 
 ## Rollback (any time parity breaks or latency regresses)
@@ -103,10 +99,11 @@ file the parity/log evidence before retrying.
 
 ## Known follow-up (not blocking)
 
-- Parity counters are in-process → invisible across Vercel route functions.
-  If per-route parity visibility on serverless is wanted, move the counters
-  to Upstash (`INCR` per check) — small change in
-  `src/lib/observability/shadow.ts`.
+- Parity counters were in-process → invisible across Vercel route functions.
+  They now live in Upstash (`INCR` per shadow check, fail-open), exposed in
+  `/api/health` under `metrics.counters` with a `metrics.shadowRemote:
+  "upstash"` / `"local-only"` source marker. So `/api/health` now reports
+  the aggregate across every instance and route that served shadow traffic.
 - Local `.env.production` still holds shadow-only state; mirror the cutover
   there too (`node scripts/cutover.mjs --cutover`) so local scripts stay
   consistent with prod.

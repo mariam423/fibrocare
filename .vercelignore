@@ -1,0 +1,12 @@
+coverage
+playwright-report
+test-results
+.next
+.next-live
+.next-pwa
+dev.log
+.tmp-*
+*.png
+!public/**/*.png
+scripts/*.png
+docs/figma

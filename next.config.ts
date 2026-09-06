@@ -73,6 +73,19 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  // The Upstash SDKs and the Accelerate extension are required at runtime
+  // through `module.createRequire` with a *variable* module name (see
+  // `src/lib/upstash/client.ts` / `src/lib/prisma.ts`), so Next.js' file
+  // tracer cannot see them and serverless bundles deploy without them —
+  // the shadow secondary silently no-ops and Accelerate falls back to
+  // direct. Explicitly trace the real module directories into every route.
+  outputFileTracingIncludes: {
+    '/*': [
+      './node_modules/@upstash/redis/**/*',
+      './node_modules/@upstash/ratelimit/**/*',
+      './node_modules/@prisma/extension-accelerate/**/*',
+    ],
+  },
   images: {
     remotePatterns: [
       {

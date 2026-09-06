@@ -48,7 +48,12 @@
       "Bash(xargs -r kill -9)",
       "Bash(lsof -i:3000)",
       "Bash(npx vitest *)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(npm --version)",
+      "Read(//home/mariam/.claude/**)",
+      "Bash(apt list *)",
+      "Bash(ffmpeg -version)",
+      "Bash(apt-get install *)"
     ]
   }
 }

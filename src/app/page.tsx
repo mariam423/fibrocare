@@ -3,6 +3,7 @@ import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingHero } from "@/components/landing/LandingHero";
+import { HeroVideoPreview } from "@/components/landing/HeroVideoPreview";
 import { GentleMarquee } from "@/components/landing/GentleMarquee";
 import { TaglineReveal } from "@/components/landing/TaglineReveal";
 import { DayStory } from "@/components/landing/DayStory";
@@ -31,6 +32,7 @@ export default function Home() {
         <LandingNav />
         <div className="flex-1">
           <LandingHero />
+          <HeroVideoPreview />
           <ToolkitQuickAccess />
           <GentleMarquee />
           <TaglineReveal />

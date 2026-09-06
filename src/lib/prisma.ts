@@ -45,9 +45,34 @@ function createPrismaClient(): PrismaClient {
   // what we want to prevent during the shadow-mode validation period.
   if (shouldUseAccelerate() && process.env.PRISMA_ACCELERATE_URL) {
     const accelerated = tryWithAccelerate(base);
-    if (accelerated) return accelerated;
+    if (accelerated) {
+      setAdapterResolved('accelerate');
+      return accelerated;
+    }
+    // The flag was on, the URL was set, but the extension failed
+    // to load. We log this once and fall through to the bare
+    // client — production keeps running, but the operator should
+    // see the warning and fix the wiring.
+    console.warn(
+      '[prisma] Accelerate flag is on but the extension could not be loaded; ' +
+        'falling back to direct PrismaClient. Check that ' +
+        '`@prisma/extension-accelerate` is installed and the runtime supports `module.createRequire`.'
+    );
   }
+  setAdapterResolved('direct');
   return base;
+}
+
+// Module-level state for the adapter name. Updated by
+// `createPrismaClient` once the actual decision is made so
+// `getPrismaAdapterName` reports the *resolved* adapter, not
+// the *intended* one. The two differ when the flag is on but
+// the extension failed to load (e.g. a runtime that lacks
+// `module.createRequire`, or the package isn't installed).
+let resolvedAdapter: 'accelerate' | 'direct' | null = null;
+
+function setAdapterResolved(name: 'accelerate' | 'direct') {
+  resolvedAdapter = name;
 }
 
 /**

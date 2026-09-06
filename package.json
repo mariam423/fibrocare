@@ -79,6 +79,7 @@
     "jsdom": "^30.0.1",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "^4.1.10",
     "workbox-build": "^7.4.1"

@@ -15,6 +15,21 @@
 
 </div>
 
+<p align="center">
+  <img src="./assets/fibrocare-repo-demo.gif" alt="FibroCare product walkthrough — landing page, resources library, and citation dialog" width="860" />
+</p>
+
+<p align="center">
+  <strong>FibroCare</strong> — a calm, bilingual companion for living with fibromyalgia.<br />
+  Track pain and flares, browse a curated care library, chat with a RAG-grounded clinical assistant — all offline-ready and on-device.
+</p>
+
+<div align="center" dir="rtl">
+
+**فيبروكير** — رفيقك الهادئ لإدارة الألم المزمن. يوميات يومية، مكتبة رعاية معتمدة سريرياً، وذكاء اصطناعي موثوق يعمل دون اتصال.
+
+</div>
+
 ---
 
 ## 🚦 Recent Major Upgrade (September 2026)
@@ -106,6 +121,17 @@ Here is a quick look at the **FibroCare** interface:
 
 ### Login
 ![Login](public/images/Log%20in.jpeg)
+
+> The walkthrough GIF at the top of this README is auto-generated. To
+> regenerate it (requires Playwright + Chromium):
+>
+> ```bash
+> npm run demo:all        # capture frames + compose animated GIF
+> npm run demo:all -- --quick   # 3 frames per screen (faster smoke run)
+> ```
+>
+> Output: `assets/fibrocare-repo-demo.gif` (README hero) and
+> `public/videos/fibrocare-app-preview.webm` (in-page hero preview).
 
 ---
 

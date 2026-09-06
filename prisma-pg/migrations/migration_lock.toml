@@ -1,0 +1,6 @@
+# Prisma migration lock for the Postgres tree.
+# Used by `npm run db:migrate:pg` only. The main `prisma/migrations/`
+# tree is locked to sqlite (the dev path). The two trees are kept in
+# sync via `prisma migrate diff` from the `prisma/schema.pg.prisma`
+# shadow schema.
+provider = "postgresql"

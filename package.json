@@ -14,6 +14,9 @@
     "test:e2e:live": "node scripts/run-live-e2e.mjs",
     "test:e2e:live-chat": "node scripts/run-live-chat-e2e.mjs",
     "test:e2e:pwa": "node scripts/run-pwa-e2e.mjs",
+    "demo:capture": "node scripts/capture-demo.mjs",
+    "demo:gif": "node scripts/build-gif.mjs",
+    "demo:all": "npm run demo:capture && npm run demo:gif",
     "prebuild": "node scripts/check-a11y-css.mjs",
     "clean": "node scripts/clean.mjs",
     "check:a11y": "python scripts/a11y-audit.py",
@@ -23,7 +26,10 @@
     "check:pwa:prompt": "node scripts/verify-pwa-prompt.mjs",
     "build:verify": "npm run build && npm run check:a11y",
     "prod-audit": "node scripts/prod-audit.mjs",
-    "postinstall": "prisma generate"
+    "db:migrate:pg": "node scripts/db-migrate-pg.mjs",
+    "db:status:pg": "node scripts/db-migrate-pg.mjs --status",
+    "db:diff:pg": "prisma migrate diff --from-empty --to-schema-datamodel prisma-pg/schema.prisma --script",
+    "postinstall": "prisma generate --schema prisma/schema.prisma"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.37",

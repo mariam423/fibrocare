@@ -54,3 +54,6 @@ public/workbox/
 scripts/*.png
 scripts/qa_*.py
 scripts/screenshot_*.py
+
+.vercel
+.env*

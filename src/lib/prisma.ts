@@ -117,17 +117,17 @@ function getCreateRequireFactory(): ((filename: string) => NodeJS.Require) | nul
 }
 
 /**
- * Anchor path for `createRequire`. Node resolves `node_modules` by
- * walking up from the anchor's directory, so any absolute path under the
- * project root works. CJS runtimes (plain Node, Next standalone bundles)
- * expose `__filename`; ESM runtimes do not, so fall back to the cwd.
- * `typeof` is safe for undeclared identifiers, so the ESM path never
- * throws.
+ * Anchor path for `createRequire`.
+ *
+ * Must be a real path whose parent chain reaches `node_modules`.
+ * `__filename` is NOT reliable here: Next dev (Turbopack) rewrites it to
+ * a virtual in-memory path (e.g. `/ROOT/src/lib/prisma.ts`) from which
+ * Node cannot resolve any package. `process.cwd()` is the real project
+ * root in dev and the standalone/serverless output root in prod (both
+ * contain `node_modules`), so anchor resolution there.
  */
 function getRequireAnchor(): string {
-  return typeof __filename === 'string'
-    ? __filename
-    : `${process.cwd()}/runtime-probe.cjs`;
+  return `${process.cwd()}/runtime-probe.cjs`;
 }
 
 /**

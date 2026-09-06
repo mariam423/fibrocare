@@ -135,14 +135,17 @@ function getCreateRequireFactory(): ((filename: string) => NodeJS.Require) | nul
 }
 
 /**
- * Anchor path for `createRequire`. CJS runtimes expose `__filename`;
- * ESM runtimes do not, so fall back to the cwd. `typeof` is safe for
- * undeclared identifiers, so the ESM path never throws.
+ * Anchor path for `createRequire`.
+ *
+ * Must be a real path whose parent chain reaches `node_modules`.
+ * `__filename` is NOT reliable here: Next dev (Turbopack) rewrites it to
+ * a virtual in-memory path (e.g. `/ROOT/src/lib/upstash/client.ts`) from
+ * which Node cannot resolve any package. `process.cwd()` is the real
+ * project root in dev and the standalone/serverless output root in prod
+ * (both contain `node_modules`), so anchor resolution there.
  */
 function getRequireAnchor(): string {
-  return typeof __filename === "string"
-    ? __filename
-    : `${process.cwd()}/runtime-probe.cjs`;
+  return `${process.cwd()}/runtime-probe.cjs`;
 }
 
 /**
@@ -177,6 +180,28 @@ type UpstashClientBundle = {
   limiters: Map<string, unknown>;
 };
 
+/**
+ * Extract a constructor from a loaded SDK module.
+ *
+ * The real packages are CJS modules shaped as *namespaces* —
+ * `@upstash/redis` exports `{ Redis, SearchIndex, ... }` and
+ * `@upstash/ratelimit` exports `{ Ratelimit, Analytics, ... }` — so the
+ * constructor is `mod[prop]`. Unit tests inject the constructor itself
+ * (via `__setUpstashModuleForTests`), so a bare function is passed
+ * through unchanged. This keeps both the live require path and the test
+ * injection path working.
+ */
+function unwrapModuleCtor(mod: unknown, prop: string): unknown {
+  if (typeof mod === "function") return mod;
+  const namespace = mod as Record<string, unknown> | undefined;
+  if (namespace && typeof namespace[prop] === "function") return namespace[prop];
+  const viaDefault = (namespace?.default as Record<string, unknown> | undefined);
+  if (viaDefault && typeof viaDefault[prop] === "function") {
+    return viaDefault[prop];
+  }
+  return undefined;
+}
+
 const globalForUpstash = globalThis as unknown as {
   upstash: UpstashClientBundle | undefined;
 };
@@ -188,7 +213,10 @@ export function getUpstashClient(): UpstashClientBundle | null {
 
   if (globalForUpstash.upstash) return globalForUpstash.upstash;
 
-  const RedisCtor = loadUpstashModule<RedisLike>("@upstash/redis");
+  const RedisCtor = unwrapModuleCtor(
+    loadUpstashModule("@upstash/redis"),
+    "Redis"
+  ) as RedisLike | undefined;
   if (!RedisCtor) return null;
 
   const redis = new RedisCtor({
@@ -237,7 +265,10 @@ export function getUpstashRatelimit(
   const cached = bundle.limiters.get(key);
   if (cached) return cached;
 
-  const RatelimitCtor = loadUpstashModule<RatelimitLike>("@upstash/ratelimit");
+  const RatelimitCtor = unwrapModuleCtor(
+    loadUpstashModule("@upstash/ratelimit"),
+    "Ratelimit"
+  ) as RatelimitLike | undefined;
   if (!RatelimitCtor) return null;
 
   const limiter = new RatelimitCtor({

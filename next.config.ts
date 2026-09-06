@@ -83,6 +83,10 @@ const nextConfig: NextConfig = {
     '/*': [
       './node_modules/@upstash/redis/**/*',
       './node_modules/@upstash/ratelimit/**/*',
+      // Transitive deps of the two SDKs above (hoisted at the root); the
+      // tracer misses them because the SDKs are required dynamically.
+      './node_modules/uncrypto/**/*',
+      './node_modules/@upstash/core-analytics/**/*',
       './node_modules/@prisma/extension-accelerate/**/*',
     ],
   },

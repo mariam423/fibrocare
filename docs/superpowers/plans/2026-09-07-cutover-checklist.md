@@ -9,6 +9,42 @@
 > Runbook reference: [`DEPLOY.md`](../../../DEPLOY.md) §3.4. Phase L history:
 > [`2026-09-06-phase-l-distributed-rollout.md`](./2026-09-06-phase-l-distributed-rollout.md).
 
+## ⏰ Execution plan — 2026-09-07 (gate opens 15:59 UTC)
+
+**Step 0 — anytime before the gate (2 min):**
+
+```bash
+node scripts/cutover.mjs --status   # confirm window shows "— complete ✓" after 15:59
+```
+
+**Step 1 — AT/AFTER 15:59 UTC: verify parity before flipping anything.**
+
+- [ ] `vercel logs <latest-deployment-url> --scope mariam-6620` → grep for
+      `parity mismatch` → expect **0 lines** since the current deploy
+      (`fibrocare-82y7t13jw`, live since 2026-09-06 with shadow on)
+- [ ] Upstash mirror warm (drive `/api/weather` first if unsure):
+      scan `fibrocare:cache:*` → keys present
+- [ ] `/api/health` → `shadow: {cache: true, rateLimiter: true}` still reported
+
+**Gate to cutover: ALL of Step 1 green. If any mismatch warning exists in
+logs — STOP, investigate, do not cut over.**
+
+**Step 2 — cutover (Vercel first, then mirror locally):**
+
+```bash
+vercel env add USE_UPSTASH_CACHE production --force --scope mariam-6620      # value: 1
+vercel env add USE_UPSTASH_RATELIMIT production --force --scope mariam-6620  # value: 1
+vercel env add USE_ACCELERATE production --force --scope mariam-6620         # value: 1
+vercel env rm SHADOW_CACHE production --scope mariam-6620
+vercel env rm SHADOW_RATELIMIT production --scope mariam-6620
+vercel env rm SHADOW_STARTED_AT production --scope mariam-6620
+vercel deploy --prod -y --scope mariam-6620
+node scripts/cutover.mjs --cutover   # mirror the same state into local .env.production
+```
+
+**Step 3 — post-cutover verification (see checklist below).**
+If anything regresses → rollback section below, then re-enter shadow.
+
 ## ⚠ Where the flags actually live (read first)
 
 `scripts/cutover.mjs` edits the **local `.env.production` only**. It does NOT

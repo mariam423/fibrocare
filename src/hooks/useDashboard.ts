@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   getCurrentUser,
   getStreak,
@@ -48,7 +49,6 @@ interface DashboardData {
 async function fetchDashboardData(): Promise<DashboardData> {
   const user = await getCurrentUser();
   if (!user) {
-    if (typeof window !== "undefined") window.location.assign("/login");
     throw new Error("Not signed in");
   }
   const [currentStreak, trend, todaySymptoms, logs, insights] = await Promise.all([
@@ -107,6 +107,7 @@ export interface DashboardState {
 }
 
 export function useDashboard(): DashboardState {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("User");
   const [hydrationCount, setHydrationCount] = useState(0);
@@ -159,7 +160,11 @@ export function useDashboard(): DashboardState {
         }
       })
       .catch((error) => {
-        console.error("Failed to load dashboard data", error);
+        if (error instanceof Error && error.message === "Not signed in") {
+          router.push("/login");
+        } else {
+          console.error("Failed to load dashboard data", error);
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);

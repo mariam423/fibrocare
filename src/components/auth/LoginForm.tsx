@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -18,9 +18,9 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
@@ -29,7 +29,8 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
       return;
     }
 
-    startTransition(async () => {
+    setIsLoading(true);
+    try {
       const result = await signIn("credentials", {
         email: email.trim().toLowerCase(),
         password,
@@ -37,14 +38,17 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         callbackUrl,
       });
 
-      if (result?.error) {
+      if (result?.error || !result?.ok) {
         setError("Incorrect email or password. Please try again.");
+        setIsLoading(false);
         return;
       }
 
-      router.push(callbackUrl);
-      router.refresh();
-    });
+      router.push(callbackUrl || "/dashboard");
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,10 +105,10 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 
       <Button
         type="submit"
-        disabled={isPending}
+        disabled={isLoading}
         className="h-12 w-full rounded-xl text-base font-semibold"
       >
-        {isPending ? (
+        {isLoading ? (
           <>
             <HugeiconsIcon
               icon={Loading01Icon}

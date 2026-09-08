@@ -5,14 +5,7 @@ import { getJwtSecret } from "@/lib/auth";
 
 /**
  * Route protection for authenticated-only pages.
- *
- * Next 16 renamed middleware -> proxy. This runs on the Node runtime and
- * validates the NextAuth JWT session cookie on every matching request before
- * the route renders. It is an optimistic check: the server actions and route
- * handlers must also verify the session (see src/app/actions.ts).
- *
- * Protected: the dashboard (`/dashboard`), health-log viewer (`/health-logs`),
- * Zen portal (`/zen`), reports (`/reports`), and profile (`/profile`).
+ * Validates the NextAuth JWT session cookie on every matching request.
  */
 const PROTECTED_PREFIXES = [
   "/dashboard",
@@ -32,7 +25,7 @@ function isProtectedPath(pathname: string): boolean {
   );
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isProtectedPath(pathname)) {
@@ -40,12 +33,9 @@ export async function proxy(request: NextRequest) {
   }
 
   const secret = getJwtSecret();
-  // Without a secret (misconfigured production env), getToken() would throw
-  // and turn every protected route into a 500. Skip the optimistic guard
-  // instead — server actions and API routes still enforce the session.
   if (!secret) {
     console.warn(
-      "[proxy] NEXTAUTH_SECRET is missing — skipping optimistic route guard; server actions still enforce auth."
+      "[middleware] NEXTAUTH_SECRET is missing — skipping optimistic route guard."
     );
     return NextResponse.next();
   }
@@ -59,7 +49,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Role-based redirect: If a doctor tries to access the patient dashboard,
-  // redirect them to the Doctor Hub to ensure they land in the correct experience.
+  // redirect them to the Doctor Hub.
   if (pathname === "/dashboard" && token.signupRole === "DOCTOR") {
     return NextResponse.redirect(new URL("/pro/doctor", request.url));
   }
@@ -75,12 +65,6 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     *
-     * Prefetch requests (Link prefetches send `next-router-prefetch` and/or
-     * `purpose: prefetch`) are deliberately excluded. Otherwise a logged-out
-     * prefetch of a protected route would cache a redirect in the router
-     * cache, and a later back/forward navigation could be served that stale
-     * redirect, trapping the user instead of restoring the previous page.
      */
     {
       source: "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",

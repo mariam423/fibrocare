@@ -138,17 +138,39 @@ export function HeroVideoPreview({
   const titleId = React.useId();
 
   // Track whether the <video> element successfully started playback. If
-  // `loadeddata` never fires within 4 s (typical for missing files behind
-  // a dev server with blocked /public), swap to the static fallback.
+  // `loadeddata` never fires within 20 s AND the element reports no progress,
+  // swap to the static fallback. The element's own `onError` handles genuine
+  // failures (404, codec) immediately — this timer is only the safety net for
+  // the rare "request hangs with no error event" case. It must be long enough
+  // to never race a slow-but-successful load (dev-server cold compile, slow
+  // mobile link): the fallback flash-then-video swap looks broken to users.
   const [status, setStatus] = React.useState<"loading" | "ready" | "error">(
     "loading",
   );
+
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+
+  // Flip to "ready" the moment the element can play — whether that happens
+  // via the canplay event OR because the element was already fully buffered
+  // when this check runs. The latter matters: canplay can fire before React
+  // attaches event listeners (fast network + slow hydration), in which case
+  // the event is missed and the video stays hidden behind opacity-0 forever.
+  // Polling readyState closes that race for real users too, not just tests.
+  React.useEffect(() => {
+    if (status !== "loading") return;
+    const id = window.setInterval(() => {
+      const el = videoRef.current;
+      // readyState >= 3 (HAVE_FUTURE_DATA) is what fires canplay.
+      if (el && el.readyState >= 3) setStatus("ready");
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [status]);
 
   React.useEffect(() => {
     if (status === "ready") return;
     const timer = window.setTimeout(() => {
       setStatus((prev) => (prev === "loading" ? "error" : prev));
-    }, 4_000);
+    }, 20_000);
     return () => window.clearTimeout(timer);
   }, [status]);
 
@@ -195,6 +217,7 @@ export function HeroVideoPreview({
 
           {status !== "error" ? (
             <video
+              ref={videoRef}
               className={cn(
                 "absolute inset-0 h-full w-full object-cover bg-black/60",
                 status === "loading" && "opacity-0",

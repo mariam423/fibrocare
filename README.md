@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌿 FibroCare — معك في كل خطوة
+# 🌿 FibroCare — With you in every step
 
 **Your calm companion for chronic pain management, symptom tracking, and psychological support.**
 
@@ -24,15 +24,15 @@
   Track pain and flares, browse a curated care library, chat with a RAG-grounded clinical assistant — all offline-ready and on-device.
 </p>
 
-<div align="center" dir="rtl">
+<div align="center">
 
-**فيبروكير** — رفيقك الهادئ لإدارة الألم المزمن. يوميات يومية، مكتبة رعاية معتمدة سريرياً، وذكاء اصطناعي موثوق يعمل دون اتصال.
+**FibroCare** — your calm companion for managing chronic pain. Daily diary, clinically approved care library, and trustworthy AI that works offline.
 
 </div>
 
 ---
 
-## 🚦 Recent Major Upgrade (September 2026)
+## 🚦 Recent Major Upgrade
 
 FibroCare shipped a **non-destructive major upgrade** to its backend scalability story:
 
@@ -359,6 +359,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](./LICEN
 
 **Built with care by [@mariam423](https://github.com/mariam423).** If this project helped you, a ⭐ is the best way to say thanks.
 
-[⬆ Back to top](#-fibrocare---معك-في-كل-خطوة)
+[⬆ Back to top](#-fibrocare---with-you-in-every-step)
 
 </div>

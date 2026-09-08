@@ -23,7 +23,7 @@
 
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { mkdir, cp, readdir, rm } from "node:fs/promises";
+import { mkdir, cp, readdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -104,9 +104,7 @@ function startDevServer() {
         }, 5_000);
       }),
   };
-}
-
-/**
+}/**
  * Wait for a URL to respond 2xx. Used as a second-chance readiness check
  * after the dev-server "Ready in" log.
  */
@@ -122,6 +120,44 @@ async function waitForHttp(url, attempts = 60) {
   }
   throw new Error(`HTTP probe for ${url} failed after ${attempts}s`);
 }
+
+/**
+ * The PrivacyGate (src/components/auth/PrivacyLock.tsx) blocks every route
+ * except the landing/legal/auth paths behind a PIN keypad. A fresh capture
+ * context has no stored PIN, so the gate shows the *setup* dialog instead
+ * of the page. Dismiss it by setting the gate's localStorage key directly,
+ * then reload — the store re-reads on the `fibrocare-pin-change` event and
+ * renders the real page.
+ */
+async function bypassPrivacyGate(page, url) {
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  const gate = page.locator('[role="dialog"][aria-modal="true"]').first();
+  const gateVisible = await gate.isVisible().catch(() => false);
+  if (!gateVisible) return; // public route or gate not mounted — nothing to do
+
+  // Stage 1: seed a PIN so the gate renders the *keypad* (configured+locked)
+  // instead of the setup dialog. Any value works: the gate only checks
+  // that a PIN hash exists.
+  await page.evaluate(() => {
+    window.localStorage.setItem("fibrocare-privacy-pin", "capture-bypass");
+    window.dispatchEvent(new Event("fibrocare-pin-change"));
+  });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(1_500);
+
+  // Stage 2: "Use Biometrics" calls unlock() directly — no PIN digits needed.
+  const biometrics = page.getByRole("button", { name: /use biometrics|البصمة/i });
+  if (await biometrics.count()) {
+    await biometrics.first().click();
+    await page.waitForTimeout(1_500);
+  }
+}
+
+/**
+ * Capture one screen: navigate, wait for a key element, then sample
+ * `FRAMES` PNG frames at `FRAME_INTERVAL_MS` cadence. Returns the path
+ * of the WebM clip produced by Playwright's recordVideo.
+ */
 
 /**
  * Capture one screen: navigate, wait for a key element, then sample
@@ -145,7 +181,7 @@ async function captureScreen(browser, { name, url, waitFor, beforeCapture }) {
   const page = await context.newPage();
 
   console.log(`[capture:${name}] navigating → ${url}`);
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  await bypassPrivacyGate(page, url);
   if (waitFor) {
     await page.waitForSelector(waitFor, { timeout: 30_000, state: "visible" });
   }
@@ -189,17 +225,61 @@ async function captureScreen(browser, { name, url, waitFor, beforeCapture }) {
  */
 async function publishShowcase() {
   await mkdir(PUBLIC_VIDEOS, { recursive: true });
-  // Prefer the resources (screen 2) WebM as the showcase: it shows cards
-  // and is more visually informative than a static landing scroll.
-  const preferred = join(TMP_DIR, "resources", "clip.webm");
-  const fallback = join(TMP_DIR, "landing", "clip.webm");
-  const source = existsSync(preferred) ? preferred : fallback;
-  if (!existsSync(source)) {
-    throw new Error("no WebM clip found to publish as hero showcase");
-  }
   const dest = join(PUBLIC_VIDEOS, "fibrocare-app-preview.webm");
-  await cp(source, dest);
-  console.log(`[publish] copied ${source} → ${dest}`);
+
+  // Combine all three screen clips (landing → resources → modal) into one
+  // showcase video. Playwright's recordVideo emits VP8; normalize each clip
+  // to VP9 first so the concat demuxer accepts them with -c copy. Falls
+  // back to the single resources clip if ffmpeg is unavailable.
+  const clips = ["landing", "resources", "modal"]
+    .map((s) => join(TMP_DIR, s, "clip.webm"))
+    .filter((p) => existsSync(p));
+
+  let published = false;
+  if (clips.length > 1) {
+    try {
+      const { execFile } = await import("node:child_process");
+      const { promisify } = await import("node:util");
+      const execFileP = promisify(execFile);
+      const norm = [];
+      for (const clip of clips) {
+        const out = join(dirname(clip), "norm.webm");
+        await execFileP("ffmpeg", [
+          "-y", "-loglevel", "error", "-i", clip,
+          "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "32", "-an", out,
+        ]);
+        norm.push(out);
+      }
+      const listFile = join(TMP_DIR, "concat.txt");
+      await writeFile(
+        listFile,
+        norm.map((p) => `file '${p.replace(/\\/g, "/")}'`).join("\n") + "\n"
+      );
+      await execFileP("ffmpeg", [
+        "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
+        "-i", listFile, "-c", "copy", dest,
+      ]);
+      published = true;
+      console.log(`[publish] combined ${norm.length} clips → ${dest}`);
+    } catch (err) {
+      console.warn(
+        `[publish] ffmpeg combine failed (${String(err.message).split("\n")[0]}); falling back to single clip`
+      );
+    }
+  }
+
+  if (!published) {
+    // Prefer the resources (screen 2) WebM as the showcase: it shows cards
+    // and is more visually informative than a static landing scroll.
+    const preferred = join(TMP_DIR, "resources", "clip.webm");
+    const fallback = join(TMP_DIR, "landing", "clip.webm");
+    const source = existsSync(preferred) ? preferred : fallback;
+    if (!existsSync(source)) {
+      throw new Error("no WebM clip found to publish as hero showcase");
+    }
+    await cp(source, dest);
+    console.log(`[publish] copied ${source} → ${dest}`);
+  }
 
   // Use the first frame of the landing capture as the poster.
   const posterSrc = join(TMP_DIR, "landing", "01.png");
@@ -243,7 +323,10 @@ async function main() {
     await captureScreen(browser, {
       name: "resources",
       url: `${BASE_URL}/resources`,
-      waitFor: '[data-slot="dialog-content"], .grid',
+      // The resource-card grid (desktop). The first `.grid` on the page is a
+      // hidden mobile-only wrapper (grid-rows-[0fr]) that never becomes
+      // visible, so target the card grid explicitly.
+      waitFor: '.grid.grid-cols-1.sm\\:grid-cols-2',
       beforeCapture: async (page) => {
         // The search input is the first <input> on the page. We fall
         // through if it's not there (e.g. unauthenticated layout) so the
@@ -258,18 +341,34 @@ async function main() {
 
     // Screen 3 — interactive modal: navigate to a sub-page that has the
     // CitationBadge dialog (resources about page), then click the badge.
+    // The badge is the button labelled "View cited guideline" — targeting by
+    // aria-label text (not the first button[aria-label] on the page, which is
+    // a nav element) is what makes the dialog actually open.
     await captureScreen(browser, {
       name: "modal",
       url: `${BASE_URL}/resources/about`,
       waitFor: "body",
       beforeCapture: async (page) => {
-        const trigger = await page.$('button[aria-label]');
-        if (trigger) {
-          await trigger.click();
-          await page.waitForSelector('[data-slot="dialog-content"]', {
+        // The CitationBadge mounts only AFTER the "AI 1-Minute Takeaway"
+        // banner is expanded ({open && <CitationBadge/>} in AiTakeawayBanner).
+        // Expand it first, then click the badge inside the expanded panel.
+        const banner = page.getByRole("button", {
+          name: /ai 1-minute takeaway|خلاصة ذكية في دقيقة/i,
+        });
+        if (await banner.count()) {
+          await banner.first().click();
+          await page.waitForSelector('[data-slot="dialog-trigger"]', {
             timeout: 10_000,
-          });
+          }).catch(() => {});
         }
+        const trigger = page
+          .getByRole("button", { name: /view cited guideline|عرض الإرشاد المُستشهد به/i })
+          .first();
+        await trigger.waitFor({ state: "visible", timeout: 15_000 });
+        await trigger.click();
+        await page.waitForSelector('[data-slot="dialog-content"]', {
+          timeout: 10_000,
+        });
       },
     });
 

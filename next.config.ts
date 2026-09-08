@@ -88,6 +88,7 @@ const nextConfig: NextConfig = {
       './node_modules/uncrypto/**/*',
       './node_modules/@upstash/core-analytics/**/*',
       './node_modules/@prisma/extension-accelerate/**/*',
+      './node_modules/@prisma/client/scripts/**/*',
     ],
   },
   images: {

@@ -53,7 +53,8 @@
       "Read(//home/mariam/.claude/**)",
       "Bash(apt list *)",
       "Bash(ffmpeg -version)",
-      "Bash(apt-get install *)"
+      "Bash(apt-get install *)",
+      "Bash(npm list *)"
     ]
   }
 }

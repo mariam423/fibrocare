@@ -38,6 +38,9 @@ coverage/
 playwright-report/
 test-results/
 
+# demo capture working directory (scripts/capture-demo.mjs)
+tmp/
+
 # generated at build time by scripts/build-sw.mjs
 public/sw.js
 public/workbox/

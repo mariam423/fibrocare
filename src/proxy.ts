@@ -58,6 +58,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(signInUrl);
   }
 
+  // Role-based redirect: If a doctor tries to access the patient dashboard,
+  // redirect them to the Doctor Hub to ensure they land in the correct experience.
+  if (pathname === "/dashboard" && token.signupRole === "DOCTOR") {
+    return NextResponse.redirect(new URL("/pro/doctor", request.url));
+  }
+
   return NextResponse.next();
 }
 

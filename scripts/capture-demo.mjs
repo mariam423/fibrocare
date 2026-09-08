@@ -47,6 +47,9 @@ function startDevServer() {
     cwd: REPO_ROOT,
     env: { ...process.env, NODE_ENV: "development" },
     stdio: ["ignore", "pipe", "pipe"],
+    // On Windows `npm` is `npm.cmd`; without a shell the spawn fails
+    // silently (an 'error' event with no output), and the watchdog fires.
+    shell: process.platform === "win32",
   });
 
   // Surface dev-server logs so the user can see when the compile finishes.
@@ -61,7 +64,11 @@ function startDevServer() {
   });
 
   let resolved = false;
+  let readyResolve;
+  let readyReject;
   const ready = new Promise((resolve, reject) => {
+    readyResolve = resolve;
+    readyReject = reject;
     const onData = (chunk) => {
       const line = chunk.toString();
       if (resolved) return;
@@ -80,7 +87,7 @@ function startDevServer() {
 
   // Hard timeout in case Next crashes silently.
   const watchdog = setTimeout(
-    () => reject(new Error(`dev server did not become ready within 90s`)),
+    () => readyReject(new Error(`dev server did not become ready within 90s`)),
     90_000,
   );
 

@@ -1,5 +1,8 @@
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { cookies } from "next/headers";
+import { parseLocale, LOCALE_COOKIE } from "@/lib/locale";
+import { translations } from "@/lib/translations";
 
 export const metadata = {
   title: "Sign in",
@@ -16,10 +19,13 @@ export default async function LoginPage({
       ? callbackUrl
       : "/dashboard";
 
+  const locale = parseLocale((await cookies()).get(LOCALE_COOKIE)?.value);
+  const t = translations[locale];
+
   return (
     <AuthShell
-      title="Welcome back"
-      description="Sign in to continue your check-ins, trends, and gentle support."
+      title={t["auth.login.title"]}
+      description={t["auth.login.description"]}
     >
       <LoginForm callbackUrl={safeCallbackUrl} />
     </AuthShell>

@@ -98,3 +98,25 @@ log(
     `(shell pages: ${shellPages.length}, public assets: ${publicAssets.length})`
 );
 log(`generated public/sw.js (${Math.round((statSync(join(root, "public", "sw.js")).size / 1024))} kB)`);
+
+// ── 4. Mirror SW artifacts into the standalone output ─────────────────────
+// `next build` with `output: "standalone"` copies public/ *before* this
+// script runs, so a freshly generated sw.js/workbox never lands in the
+// standalone bundle. Docker / Azure App Service / Vercel serve from
+// `.next/standalone`, and a missing sw.js silently kills the PWA there —
+// mirror the generated artifacts explicitly so every deploy ships them.
+const standalonePublic = join(root, dist, "standalone", "public");
+if (!existsSync(standalonePublic)) {
+  log(`standalone output not found (${dist}/standalone) — skipping mirror`);
+} else {
+  const mirrorDir = join(standalonePublic, "workbox");
+  mkdirSync(mirrorDir, { recursive: true });
+  copyFileSync(join(root, "public", "sw.js"), join(standalonePublic, "sw.js"));
+  for (const mod of WORKBOX_MODULES) {
+    copyFileSync(
+      join(root, "public", "workbox", `workbox-${mod}.prod.js`),
+      join(mirrorDir, `workbox-${mod}.prod.js`)
+    );
+  }
+  log(`mirrored sw.js + workbox runtime into ${relative(root, standalonePublic)}`);
+}

@@ -2,13 +2,13 @@ import { getServerSession } from "next-auth";
 import { generateObject } from "ai";
 import { authOptions } from "@/lib/auth";
 import {
-  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
   recordAiFailure,
   recordAiSuccess,
 } from "@/lib/ai/provider";
+import { generateObjectWithFailover } from "@/lib/ai/failover";
 import { mockDoctorQuestions } from "@/lib/ai/mock";
 import { getCachedHealthSnapshot, getCachedInsightSummaries } from "@/lib/ai/snapshotCache";
 import { buildDoctorQuestionsPrompt } from "@/lib/ai/prompts";
@@ -82,8 +82,7 @@ export async function POST(request: Request) {
   const cacheKey = `doctor-questions:${session.user.id}:${snapshot.logCount30d}:${snapshot.lastLogAt ?? "none"}:${locale}`;
   const questions = await questionsCache.getOrSet(cacheKey, async () => {
     try {
-      const { object, usage } = await generateObject({
-        model,
+      const { object, usage } = await generateObjectWithFailover({
         schema: doctorQuestionsSchema,
         system: buildDoctorQuestionsPrompt(snapshot, insights, userName, locale),
         prompt: "Generate my doctor questions.",

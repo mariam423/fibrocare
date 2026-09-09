@@ -18,6 +18,8 @@ export type TranslationKey =
   | "nav.language"
   | "nav.switchToArabic"
   | "nav.switchToEnglish"
+  | "auth.login.title"
+  | "auth.login.description"
   | "header.themeLight"
   | "header.themeDark"
   | "ai.statusLabel"
@@ -1638,6 +1640,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "common.loading": "Loading...",
     "common.readMore": "Read More",
     "common.back": "Back",
+    "auth.login.title": "Welcome back",
+    "auth.login.description": "Sign in to continue your check-ins, trends, and gentle support.",
     "resources.title": "Care Resources",
     "resources.subtitle": "Explore guides, tips, and educational content to help you manage fibromyalgia with confidence.",
     "resources.search": "Search resources...",
@@ -3252,6 +3256,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "common.loading": "جاري التحميل...",
     "common.readMore": "اقرأ المزيد",
     "common.back": "رجوع",
+    "auth.login.title": "مرحباً بك مجدداً",
+    "auth.login.description": "سجل دخولك لمتابعة سجلاتك، وتوجهاتك، ودعمنا اللطيف.",
     "resources.title": "موارد الرعاية",
     "resources.subtitle": "استكشف الأدلة والنصائح والمحتوى التعليمي لمساعدتك على إدارة التهاب العضلات الليفية بثقة.",
     "resources.search": "البحث في الموارد...",

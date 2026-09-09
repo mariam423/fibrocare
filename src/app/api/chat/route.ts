@@ -3,13 +3,13 @@ import { streamText, tool } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import {
-  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
   recordAiFailure,
   recordAiSuccess,
 } from "@/lib/ai/provider";
+import { streamTextWithFailover } from "@/lib/ai/failover";
 import {
   mockChatReply,
   mockStreamResponse,
@@ -153,8 +153,7 @@ export async function POST(req: Request) {
 
   let result: { toUIMessageStreamResponse: () => Response };
   try {
-    result = streamText({
-      model,
+    result = await streamTextWithFailover({
       system: context.systemPrompt,
       messages: context.messages,
       // Truncation guard: Arabic tokenizes at ~2–3 tokens/word (vs ~1.3 for

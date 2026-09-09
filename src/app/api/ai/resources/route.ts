@@ -3,11 +3,11 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import {
-  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
 } from "@/lib/ai/provider";
+import { generateObjectWithFailover } from "@/lib/ai/failover";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { detectWeatherTriggers, type WeatherData, type WeatherTriggerId } from "@/lib/weather";
 import { buildResourceFeed, RESOURCE_CATALOG, type ResourceFeedCategory } from "@/lib/resources/feed";
@@ -108,17 +108,13 @@ export async function POST(request: Request) {
     return Response.json({ feed: fallback, source: "fallback" });
   }
 
-  const model = getModel();
-  if (!model) return Response.json({ feed: fallback, source: "fallback" });
-
   const candidates = buildResourceFeed({
     ...input,
     weatherTriggers: safeTriggers(input.weather),
   }).map((item) => item.resourceId);
 
   try {
-    const { object, usage } = await generateObject({
-      model,
+    const { object, usage } = await generateObjectWithFailover({
       schema: aiSelectionSchema,
       system: promptFor(input, candidates),
       prompt: "Refresh the Care Resources feed for this check-in.",

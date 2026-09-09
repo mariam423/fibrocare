@@ -55,13 +55,13 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
               {/* Breathing sage glow, echoing the app's calm identity */}
               <div
                 aria-hidden="true"
-                className="breathe-glow absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[color-mix(in_oklab,#86ac8c_30%,transparent)] blur-2xl"
+                className="breathe-glow absolute -end-16 -top-16 h-64 w-64 rounded-full bg-[color-mix(in_oklab,#86ac8c_30%,transparent)] blur-2xl"
               />
 
               {/* Floating glass chip over the photo */}
               <div
                 aria-hidden="true"
-                className="animate-float-soft absolute right-8 top-10 z-10"
+                className="animate-float-soft absolute end-8 top-10 z-10"
               >
                 <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur-md">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">

@@ -21,7 +21,7 @@ import { createOpenAI, openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
 
-export type AiProvider = "google" | "openai" | "anthropic" | "openrouter";
+export type AiProvider = "google" | "openai" | "anthropic" | "openrouter" | "groq";
 
 /**
  * How the AI runtime is behaving right now:
@@ -69,6 +69,7 @@ function getProviderKeys(): Record<AiProvider, string | undefined> {
     openai: process.env.OPENAI_API_KEY,
     anthropic: process.env.ANTHROPIC_API_KEY,
     openrouter: process.env.OPENROUTER_API_KEY,
+    groq: process.env.GROQ_API_KEY,
   };
 }
 
@@ -122,9 +123,13 @@ export function getProviderDisplayName(): string {
         : "OpenRouter";
 }
 
+export function getFailoverOrder(): AiProvider[] {
+  return ["google", "openrouter", "groq"];
+}
+
 /** Returns the configured model or null when no provider key exists. */
-export function getModel(): LanguageModel | null {
-  const provider = getActiveProvider();
+export function getModel(providerOverride?: AiProvider): LanguageModel | null {
+  const provider = providerOverride || getActiveProvider();
   if (!provider) return null;
   const modelId = process.env.AI_MODEL || PROVIDER_MODELS[provider];
   switch (provider) {
@@ -150,6 +155,11 @@ export function getModel(): LanguageModel | null {
           "X-Title": "FibroCare",
         },
       })(modelId);
+    case "groq":
+      return createOpenAI({
+        baseURL: "https://api.groq.com/openai/v1",
+        apiKey: process.env.GROQ_API_KEY,
+      })(modelId);
   }
 }
 
@@ -174,8 +184,8 @@ export function getModelSafe(): LanguageModel | null {
 }
 
 /** Record a successful AI call — closes the breaker for the active provider. */
-export function recordAiSuccess(): void {
-  const provider = getActiveProvider();
+export function recordAiSuccess(providerOverride?: AiProvider): void {
+  const provider = providerOverride || getActiveProvider();
   if (!provider) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { recordBreakerSuccess } = require("@/lib/observability/circuitBreaker") as typeof import("@/lib/observability/circuitBreaker");
@@ -183,8 +193,8 @@ export function recordAiSuccess(): void {
 }
 
 /** Record a failed AI call — opens the breaker after the threshold. */
-export function recordAiFailure(): void {
-  const provider = getActiveProvider();
+export function recordAiFailure(providerOverride?: AiProvider): void {
+  const provider = providerOverride || getActiveProvider();
   if (!provider) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { recordBreakerFailure } = require("@/lib/observability/circuitBreaker") as typeof import("@/lib/observability/circuitBreaker");

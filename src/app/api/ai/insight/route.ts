@@ -3,13 +3,13 @@ import { cookies } from "next/headers";
 import { streamText } from "ai";
 import { authOptions } from "@/lib/auth";
 import {
-  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
   recordAiFailure,
   recordAiSuccess,
 } from "@/lib/ai/provider";
+import { streamTextWithFailover } from "@/lib/ai/failover";
 import { mockNarration, mockStreamResponse } from "@/lib/ai/mock";
 import { getCachedHealthSnapshot, getCachedInsightSummaries } from "@/lib/ai/snapshotCache";
 import { buildNarrationPrompt } from "@/lib/ai/prompts";
@@ -60,26 +60,34 @@ export async function POST() {
     return Response.json({ offline: true });
   }
 
-  const result = streamText({
-    model,
-    system: buildNarrationPrompt(snapshot, insights, userName),
-    prompt: "Explain my health data to me, kindly.",
-    maxOutputTokens: 768, // Arabic-safe: ~2-3 tokens/word vs English
-    // Watchdog timeouts, not a total cap (see /api/chat route): abort only
-    // when the first token is late or the stream stalls mid-flight.
-    timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
-    maxRetries: 2,
-    onFinish: async ({ usage }) => {
-      recordAiSuccess();
-      console.log(
-        `[ai] insight · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
-      );
-    },
-    onError: ({ error }) => {
-      recordAiFailure();
-      console.error("[ai] insight · provider stream error", error);
-    },
-  });
+  try {
+    const result = await streamTextWithFailover({
+      system: buildNarrationPrompt(snapshot, insights, userName),
+      prompt: "Explain my health data to me, kindly.",
+      maxOutputTokens: 768, // Arabic-safe: ~2-3 tokens/word vs English
+      // Watchdog timeouts, not a total cap (see /api/chat route): abort only
+      // when the first token is late or the stream stalls mid-flight.
+      timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
+      maxRetries: 2,
+      onFinish: async ({ usage }) => {
+        recordAiSuccess();
+        console.log(
+          `[ai] insight · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
+        );
+      },
+      onError: ({ error }) => {
+        recordAiFailure();
+        console.error("[ai] insight · provider stream error", error);
+      },
+    });
 
-  return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse();
+  } catch (error) {
+    console.error("[ai] insight · provider setup error", error);
+    recordAiFailure();
+    return Response.json(
+      { error: "The AI provider is unavailable right now." },
+      { status: 502 }
+    );
+  }
 }

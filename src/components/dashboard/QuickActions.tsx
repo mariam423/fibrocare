@@ -61,11 +61,11 @@ export function QuickActions() {
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {ACTIONS.map((action, index) => (
           <li key={action.href} className="h-full">
-            <Link
-              href={action.href}
-              className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              <DepthCard tilt={4} delay={index * 0.06} className="h-full">
+            <DepthCard tilt={4} delay={index * 0.06} className="h-full">
+              <Link
+                href={action.href}
+                className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
                 <SpotlightCard
                   className={cn(
                     "flex h-full flex-col gap-4 rounded-2xl border border-border bg-card backdrop-blur-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-5 transition-all duration-300 ease-out hover:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.4),0_0_24px_rgba(16,185,129,0.16)]",
@@ -96,8 +96,8 @@ export function QuickActions() {
                     />
                   </div>
                 </SpotlightCard>
-              </DepthCard>
-            </Link>
+              </Link>
+            </DepthCard>
           </li>
         ))}
       </ul>

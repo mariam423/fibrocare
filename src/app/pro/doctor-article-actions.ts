@@ -22,6 +22,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getModel, isAiConfigured, isMockMode } from "@/lib/ai/provider";
+import { generateObjectWithFailover } from "@/lib/ai/failover";
 import {
   ARTICLE_TOPICS,
   authorityLabel,
@@ -357,15 +358,9 @@ async function generateOne(
   // Live AI: try, but fall back to the seed if the provider errors out
   // (rate limits, network blip, schema rejection). The Doctor Hub must
   // never show an empty state because the upstream LLM is unhappy.
-  const model = getModel();
-  if (!model) {
-    return { topic, signature, article: seedArticle, language };
-  }
   try {
     const prompt = buildArticlePrompt(topic, signature, language);
-    const { generateObject } = await import("ai");
-    const result = await generateObject({
-      model,
+    const result = await generateObjectWithFailover({
       schema: generatedArticleSchema,
       prompt,
       temperature: 0.4,
@@ -373,7 +368,7 @@ async function generateOne(
     return { topic, signature, article: result.object, language };
   } catch (err) {
     console.warn(
-      `[ai-articles] generateOne(${topic.id}, ${language}) fell back to seed after LLM error:`,
+      `[ai-articles] generateOne(${topic.id}, ${language}) fell back to seed after all providers failed:`,
       err instanceof Error ? err.message : err
     );
     return { topic, signature, article: seedArticle, language };

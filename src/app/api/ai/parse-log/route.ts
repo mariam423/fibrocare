@@ -3,13 +3,13 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import {
-  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
   recordAiFailure,
   recordAiSuccess,
 } from "@/lib/ai/provider";
+import { generateObjectWithFailover } from "@/lib/ai/failover";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { heuristicParseLog } from "@/lib/ai/voice-log/parser";
 import {
@@ -59,12 +59,11 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid request — send { text: 3–2000 chars }." }, { status: 400 });
   }
 
-  const model = !isMockMode() && isAiConfigured() ? getModel() : null;
+  const isLive = !isMockMode() && isAiConfigured();
 
-  if (model) {
+  if (isLive) {
     try {
-      const { object, usage } = await generateObject({
-        model,
+      const { object, usage } = await generateObjectWithFailover({
         schema: parsedHealthLogSchema,
         prompt: [
           "Extract a structured health log from this patient's spoken or free-text note about their fibromyalgia symptoms.",

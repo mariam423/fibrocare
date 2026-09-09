@@ -1,18 +1,19 @@
-import { streamText, generateText, generateObject, type StreamTextResult, type GenerateTextResult, type CoreMessage } from "ai";
+import { streamText, generateText, generateObject, type CoreMessage } from "ai";
 import { getFailoverOrder, getModel, recordAiFailure, recordAiSuccess, type AiProvider } from "./provider";
-import { cn } from "@/lib/utils";
+import type { LanguageModel } from "ai";
 
 /**
  * Error types that should trigger a failover to the next provider.
  * 429 (Too Many Requests) is the primary trigger.
  * 502/503/504 are also typical transient provider issues.
  */
-function isTransientError(error: any): boolean {
-  if (error?.status === 429) return true;
-  if (error?.status >= 502 && error?.status <= 504) return true;
+function isTransientError(error: unknown): boolean {
+  const err = error as any;
+  if (err?.status === 429) return true;
+  if (err?.status >= 502 && err?.status <= 504) return true;
 
   // Check for common AI SDK error messages that indicate rate limits
-  const msg = error?.message?.toLowerCase() ?? "";
+  const msg = err?.message?.toLowerCase() ?? "";
   if (msg.includes("rate limit") || msg.includes("too many requests") || msg.includes("quota exceeded")) {
     return true;
   }
@@ -28,7 +29,7 @@ interface FailoverOptions {
   maxRetries?: number;
   tools?: any;
   // Allow passing through other streamText/generateText options
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -37,7 +38,7 @@ interface FailoverOptions {
  */
 export async function streamTextWithFailover(options: FailoverOptions) {
   const order = getFailoverOrder();
-  let lastError: any = null;
+  let lastError: unknown = null;
 
   for (const provider of order) {
     // 1. Check if this provider is configured
@@ -80,7 +81,7 @@ export async function streamTextWithFailover(options: FailoverOptions) {
  */
 export async function generateTextWithFailover(options: FailoverOptions) {
   const order = getFailoverOrder();
-  let lastError: any = null;
+  let lastError: unknown = null;
 
   for (const provider of order) {
     const model = getModelForProvider(provider);
@@ -111,7 +112,7 @@ export async function generateTextWithFailover(options: FailoverOptions) {
  * Internal helper to get a model for a specific provider,
  * bypassing the default 'active provider' logic.
  */
-function getModelForProvider(provider: AiProvider): any {
+function getModelForProvider(provider: AiProvider): LanguageModel | null {
   return getModel(provider);
 }
 
@@ -120,7 +121,7 @@ function getModelForProvider(provider: AiProvider): any {
  */
 export async function generateObjectWithFailover<T>(options: any & { schema: any }) {
   const order = getFailoverOrder();
-  let lastError: any = null;
+  let lastError: unknown = null;
 
   for (const provider of order) {
     const model = getModelForProvider(provider);

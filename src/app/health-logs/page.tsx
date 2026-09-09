@@ -440,18 +440,21 @@ export default function HealthLogsPage() {
                               "inline-flex min-w-14 items-center justify-center rounded-full px-3 py-1 text-sm font-bold tabular-nums",
                               SEVERITY_PILL[severity]
                             )}>
-                              <bdi dir="ltr" className="tabular-nums">{log.painLevel}{t("chart.painLevel")}</bdi>
+                              <span className="inline-flex items-baseline gap-0.5">
+                                <bdi dir="ltr" className="tabular-nums">{log.painLevel}</bdi>
+                                {t("chart.painLevel")}
+                              </span>
                             </span>
                           </TableCell>
                           <TableCell className="px-3 py-4">
-                            <span className="whitespace-nowrap text-sm font-medium text-foreground">
+                            <span dir="auto" className="whitespace-nowrap text-sm font-medium text-foreground">
                               {STORED_MOOD_KEYS[log.moodTag]
                                 ? t(STORED_MOOD_KEYS[log.moodTag])
                                 : log.moodTag}
                             </span>
                           </TableCell>
                           <TableCell className="max-w-[16rem] px-3 py-4">
-                            <span className="block truncate text-sm text-muted-foreground">
+                            <span dir="auto" className="block truncate text-sm text-muted-foreground">
                               {log.notes || (
                                 <span className="italic text-muted-foreground/60">{t("logs.noNotes")}</span>
                               )}

@@ -59,26 +59,27 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
               />
 
               {/* Floating glass chip over the photo */}
-              <div
-                aria-hidden="true"
-                className="animate-float-soft absolute end-8 top-10 z-10"
-              >
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur-md">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                    <HugeiconsIcon icon={HeartIcon} className="h-4 w-4 text-white" />
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-white">
-                      Gentle by design
+                <div
+                  aria-hidden="true"
+                  className="animate-float-soft absolute end-8 top-10 z-10"
+                  dir="ltr"
+                >
+                  <div className="flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur-md">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                      <HugeiconsIcon icon={HeartIcon} className="h-4 w-4 text-white" />
                     </span>
-                    <span className="block text-[11px] text-white/70">
-                      check in when you can
+                    <span className="flex flex-col">
+                      <span className="block text-sm font-semibold text-white">
+                        Gentle by design
+                      </span>
+                      <span className="block text-[11px] text-white/70">
+                        check in when you can
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </div>
-              </div>
 
-              <figure className="absolute inset-x-0 bottom-0 z-10 p-8">
+              <figure className="absolute inset-x-0 bottom-0 z-10 p-8" dir="ltr">
                 <blockquote className="max-w-sm text-lg italic leading-relaxed text-white drop-shadow-md">
                   &ldquo;You are not broken. You are learning to move at your
                   body&rsquo;s pace.&rdquo;
@@ -129,6 +130,7 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
                   <li
                     key={point.label}
                     className="flex items-center gap-1.5 text-[13px] text-muted-foreground"
+                    dir="ltr"
                   >
                     <HugeiconsIcon
                       icon={point.icon}

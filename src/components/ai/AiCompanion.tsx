@@ -433,6 +433,7 @@ export function AiCompanion() {
                       </div>
                     )}
                     <div
+                      dir="auto"
                       className={cn(
                         "max-w-[86%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
                         isUser

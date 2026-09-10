@@ -49,6 +49,9 @@ import { BodyMapBento } from "@/components/dashboard/BodyMapBento";
 import { MedicationTrackerCard } from "@/components/dashboard/MedicationTrackerCard";
 import { PostMealFatigueSection } from "@/components/dashboard/PostMealFatigueSection";
 import { SymptomTracker } from "@/components/logging/SymptomTracker";
+import { CycleStatusWidget } from "@/components/health/CycleStatusWidget";
+import { SymptomMapWidget } from "@/components/health/SymptomMapWidget";
+import { CareRecommendationCard } from "@/components/health/CareRecommendationCard";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
@@ -288,6 +291,13 @@ export default function Home() {
           </div>
         </ScrollReveal>
         </motion.div>
+
+        {/* ── Health Tracking Hub ────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          <CycleStatusWidget />
+          <CareRecommendationCard />
+          <SymptomMapWidget />
+        </div>
 
         {/* ── Today ──────────────────────────────────── */}
         <ScrollReveal as="section" className="space-y-5">

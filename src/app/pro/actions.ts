@@ -87,6 +87,25 @@ async function requireConsultationAccess(consultationId: string) {
   return { ok: true as const, consultation, userId: user.id, isDoctor };
 }
 
+export async function getConsultationDetails(consultationId: string) {
+  try {
+    const auth = await requireConsultationAccess(consultationId);
+    if (!auth.ok) return { success: false as const, error: auth.error };
+    return {
+      success: true as const,
+      data: {
+        patientId: auth.consultation.patientId,
+        doctorId: auth.consultation.doctorId,
+        subject: auth.consultation.subject,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching consultation details:", error);
+    return { success: false as const, error: "Failed to fetch consultation details." };
+  }
+}
+
+
 /* ------------------------------------------------------------------ */
 /*  Doctor Hub actions                                                  */
 /* ------------------------------------------------------------------ */

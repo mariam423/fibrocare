@@ -17,12 +17,16 @@ import { Button } from "@/components/ui/button";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { ClinicalMemo } from "@/components/pro/ClinicalMemo";
 import { DoctorCopilot } from "@/components/pro/DoctorCopilot";
+import { DoctorHealthSummary } from "@/components/pro/DoctorHealthSummary";
 import { useLanguage } from "@/context/LanguageContext";
+
 import { useProFeature } from "@/hooks/useProFeature";
 import {
   getConsultationMessages,
   sendMessage,
+  getConsultationDetails,
 } from "@/app/pro/actions";
+
 
 interface Message {
   id: string;
@@ -43,6 +47,7 @@ export default function ConsultationDetailPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [patientId, setPatientId] = useState<string | null>(null);
   const [sending, startTransition] = useTransition();
   const [showPatientAssistant, setShowPatientAssistant] = useState(false);
   const [structuredResult, setStructuredResult] = useState<{
@@ -53,9 +58,15 @@ export default function ConsultationDetailPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getConsultationMessages(consultationId).then((result) => {
-      if (result.success && result.data) {
-        setMessages(result.data);
+    Promise.all([
+      getConsultationMessages(consultationId),
+      getConsultationDetails(consultationId),
+    ]).then(([msgResult, detailResult]) => {
+      if (msgResult.success && msgResult.data) {
+        setMessages(msgResult.data);
+      }
+      if (detailResult.success && detailResult.data) {
+        setPatientId(detailResult.data.patientId);
       }
       setLoading(false);
     });
@@ -110,7 +121,10 @@ export default function ConsultationDetailPage() {
 
         {isDoctor && (
           <ScrollReveal delay={0.05}>
-            <ClinicalMemo consultationId={consultationId} />
+            <div className="grid gap-4 md:grid-cols-2">
+              <ClinicalMemo consultationId={consultationId} />
+              {patientId && <DoctorHealthSummary patientId={patientId} />}
+            </div>
           </ScrollReveal>
         )}
 

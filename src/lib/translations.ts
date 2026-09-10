@@ -1019,7 +1019,6 @@ export type TranslationKey =
   | "companion.waking"
   | "companion.offlineBadge"
   | "companion.liveSimulated"
-  | "companion.livePowered"
   | "companion.liveRag"
   | "companion.retrieving"
   | "companion.closeAria"
@@ -2615,7 +2614,6 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.waking": "Waking up…",
     "companion.offlineBadge": "Offline · add an AI key to chat live",
     "companion.liveSimulated": "Live · simulated ({provider})",
-    "companion.livePowered": "Live · powered by {provider}",
     "companion.liveRag": "Live · RAG Active",
     "companion.retrieving": "Searching medical references and gathering your data...",
     "companion.closeAria": "Close chat",
@@ -4233,7 +4231,6 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "companion.waking": "جارٍ الاستيقاظ…",
     "companion.offlineBadge": "غير متصل · أضف مفتاح ذكاء اصطناعي للدردشة المباشرة",
     "companion.liveSimulated": "مباشر · محاكاة ({provider})",
-    "companion.livePowered": "مباشر · مدعوم بـ {provider}",
     "companion.liveRag": "مباشر · RAG Active",
     "companion.retrieving": "جاري البحث في المراجع الطبية وتجميع البيانات...",
     "companion.closeAria": "إغلاق الدردشة",

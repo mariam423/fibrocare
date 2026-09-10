@@ -7,6 +7,39 @@ import { test, expect, type Page } from "@playwright/test";
 
 /* ─── Helpers ──────────────────────────────────────────────────────── */
 
+/**
+ * Click a submit button only after the form is genuinely hydrated.
+ *
+ * Cold dev-server compiles + React hydration race the first click: a click
+ * that lands before hydration triggers a native form submit (full reload),
+ * which silently discards client-side validation. Verify hydration by
+ * asserting the button is enabled, then drive the click; if the page
+ * navigated anyway (native submit), reload and retry.
+ */
+async function submitWhenHydrated(
+  page: Page,
+  buttonName: string,
+  reloadSelector: string
+) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const button = page.getByRole("button", { name: buttonName });
+    await expect(button).toBeEnabled({ timeout: 20_000 });
+    await button.click();
+    // Hydrated forms never navigate on validation failures. If the URL
+    // gains a query string or the form fields disappear, we raced hydration
+    // — reload and try again.
+    const navigated =
+      page.url().includes("?") ||
+      !(await page.locator(reloadSelector).isVisible().catch(() => false));
+    if (!navigated) return;
+    await page.goto(page.url().split("?")[0], {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForSelector(reloadSelector, { timeout: 20_000 });
+    await page.waitForTimeout(1_000);
+  }
+}
+
 /** Switch the app to Arabic via the header toggle. */
 async function switchToArabic(page: Page) {
   // Wait for the nav to hydrate before checking for the toggle button.
@@ -128,11 +161,9 @@ test.describe("Landing page QA", () => {
 test.describe("Auth flows QA", () => {
   test("login validates empty fields", async ({ page }) => {
     await page.goto("/login", { waitUntil: "domcontentloaded" });
-    // Wait for hydration before clicking
     await page.waitForSelector("#email", { timeout: 20_000 });
-    await page.waitForTimeout(1000);
 
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await submitWhenHydrated(page, "Sign in", "#email");
     await expect(
       page.getByText("Please enter your email and password.")
     ).toBeVisible({ timeout: 10_000 });
@@ -141,22 +172,20 @@ test.describe("Auth flows QA", () => {
   test("signup validates name required", async ({ page }) => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
     await page.waitForSelector("#name", { timeout: 20_000 });
-    await page.waitForTimeout(2000);
 
-    await page.getByRole("button", { name: "Create account" }).click();
+    await submitWhenHydrated(page, "Create account", "#name");
     await expect(page.getByText("Please enter your name.")).toBeVisible({ timeout: 10_000 });
   });
 
   test("signup validates password mismatch", async ({ page }) => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
     await page.waitForSelector("#name", { timeout: 20_000 });
-    await page.waitForTimeout(2000);
 
     await page.locator("#name").fill("Test User");
     await page.locator("#email").fill("test@example.com");
     await page.locator("#password").fill("password123");
     await page.locator("#confirm-password").fill("differentpassword");
-    await page.getByRole("button", { name: "Create account" }).click();
+    await submitWhenHydrated(page, "Create account", "#name");
 
     await expect(page.getByText("Passwords do not match.")).toBeVisible({ timeout: 10_000 });
   });

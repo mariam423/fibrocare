@@ -53,7 +53,7 @@ const DEV_FALLBACK_SECRET = "fibrocare-dev-only-fallback-secret-not-for-producti
  * Resolve the JWT secret with a dev-only fallback. Production refuses to
  * run without a real NEXTAUTH_SECRET — silently signing JWTs with a known
  * value would be worse than a loud error. Shared with the route guard in
- * `src/proxy.ts` so both layers agree on the same secret.
+ * `src/middleware.ts` so both layers agree on the same secret.
  */
 export function getJwtSecret(): string | undefined {
   return (

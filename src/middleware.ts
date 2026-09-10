@@ -17,6 +17,15 @@ import { getJwtSecret } from "@/lib/auth";
  * and the user is redirected to /login. Server Components / Server
  * Actions still perform their own session checks — this layer is the
  * first gate, not the only one.
+ *
+ * CRITICAL: the cookie name is pinned to `next-auth.session-token` (the
+ * explicit name configured in src/lib/auth.ts). `getToken` derives its
+ * default cookie name from environment (https / VERCEL), which resolves
+ * to `__Secure-next-auth.session-token` in production — a name this app
+ * never writes. That mismatch made `getToken` return null on Vercel and
+ * bounced every logged-in user back to /login in a redirect loop, even
+ * though the session cookie existed. Passing the name explicitly keeps
+ * the guard environment-independent.
  */
 const PROTECTED_PREFIXES = [
   "/dashboard",
@@ -53,7 +62,13 @@ export async function middleware(request: NextRequest) {
   const secret = getJwtSecret();
   if (secret) {
     try {
-      const token = await getToken({ req: request, secret });
+      const token = await getToken({
+        req: request,
+        secret,
+        // Always read the cookie under the name src/lib/auth.ts writes,
+        // regardless of the deployment's https/VERCEL environment.
+        cookieName: "next-auth.session-token",
+      });
       if (token?.sub) {
         return NextResponse.next();
       }

@@ -50,8 +50,15 @@ const nextConfig: NextConfig = {
   // dev server, which Next refuses to share. Production/unset stays `.next`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // Standalone output for Docker/Azure deployment — copies only the files
-  // needed to run the app, reducing image size significantly.
-  output: "standalone",
+  // needed to run the app, reducing image size significantly. Disabled on
+  // Vercel: Next 16.3's Turbopack builder + Vercel's build adapter miscounts
+  // the `.next/next-server.js.nft.json` trace artifact and fails the build
+  // (next.js issues #96646 / #96657). Vercel deploys fine with the default
+  // output; standalone is preserved for the container path.
+  output:
+    process.env.VERCEL === "1"
+      ? undefined
+      : "standalone",
   // `@prisma/extension-accelerate` is an opt-in runtime dependency loaded
   // dynamically from `src/lib/prisma.ts` (only when PRISMA_ACCELERATE_URL is
   // set). It must not be bundled — Next 16's static analysis otherwise

@@ -27,6 +27,17 @@ export interface PainPatternLog {
 export interface SymptomPatternLog {
   symptom: string;
   date: string;
+  severity: number;
+  category: "PHYSICAL" | "COGNITIVE" | "MOOD";
+  area?: "PELVIC" | "LOWER_BACK" | "WIDESPREAD" | "JOINTS" | "OTHER";
+}
+
+/** Minimal shape of a cycle log the analysis needs (subset of the Prisma MenstrualCycle). */
+export interface CyclePatternLog {
+  id: string;
+  phase: "MENSTRUAL" | "FOLLICULAR" | "OVULATORY" | "LUTEAL";
+  startDate: Date;
+  endDate: Date | null;
 }
 
 const FLARE_THRESHOLD = 7;
@@ -59,6 +70,7 @@ const WEEKDAY_NAMES = [
 export function analyzePainPatterns(
   logs: PainPatternLog[],
   symptomLogs: SymptomPatternLog[],
+  cycles: CyclePatternLog[],
   days = 30
 ): Insight[] {
   const insights: Insight[] = [];
@@ -274,6 +286,45 @@ export function analyzePainPatterns(
     });
   }
 
+  // --- 6. Cycle-Symptom Correlation (Luteal Brain Fog) ---
+  if (cycles.length > 0) {
+    const mostRecentCycle = cycles[0]; // already ordered by startDate desc in wrapper
+    if (mostRecentCycle.phase === "LUTEAL") {
+      const cognitiveLogs = symptomLogs.filter((s) => s.category === "COGNITIVE");
+      if (cognitiveLogs.length > 0) {
+        const avgCogSeverity =
+          cognitiveLogs.reduce((s, l) => s + l.severity, 0) / cognitiveLogs.length;
+        if (avgCogSeverity > 6) {
+          insights.push({
+            id: "luteal-cognitive-flare",
+            title: "Hormonal Cognitive Influence",
+            message:
+              "Your current luteal phase correlates with higher cognitive symptoms (brain fog/focus). This is a common hormonal pattern.",
+            type: "correlation",
+            severity: "warning",
+            params: { avgCogSeverity: Number(avgCogSeverity.toFixed(1)) },
+          });
+        }
+      }
+    }
+  }
+
+  // --- 7. Area-Based Recommendations ---
+  const highPainAreas = symptomLogs.filter(
+    (s) => (s.area === "PELVIC" || s.area === "LOWER_BACK") && s.severity >= 7
+  );
+  if (highPainAreas.length > 0) {
+    insights.push({
+      id: "heat-therapy-rec",
+      title: "Comfort Recommendation",
+      message:
+        "High severity pain detected in pelvic or lower back areas. Warm therapy or a compression wrap may provide relief.",
+      type: "tip",
+      severity: "info",
+      params: { areas: highPainAreas.map((a) => a.area) },
+    });
+  }
+
   const severityRank = { critical: 0, warning: 1, info: 2 } as const;
   insights.sort((a, b) => severityRank[a.severity] - severityRank[b.severity]);
   return insights;
@@ -289,7 +340,7 @@ export async function analyzeHealthPatterns(
 ): Promise<Insight[]> {
   const since = new Date(Date.now() - days * DAY_MS);
 
-  const [logs, symptomLogs] = await Promise.all([
+  const [logs, symptomLogs, cycles] = await Promise.all([
     prisma.painLog.findMany({
       where: { userId, loggedAt: { gte: since } },
       orderBy: { loggedAt: "asc" },
@@ -297,9 +348,13 @@ export async function analyzeHealthPatterns(
     prisma.symptomLog.findMany({
       where: { userId, date: { gte: toDateKey(since) } },
     }),
+    prisma.menstrualCycle.findMany({
+      where: { userId, startDate: { gte: since } },
+      orderBy: { startDate: "desc" },
+    }),
   ]);
 
-  return analyzePainPatterns(logs, symptomLogs, days);
+  return analyzePainPatterns(logs, symptomLogs, cycles, days);
 }
 
 /** Most frequently logged symptoms in the last `days`, descending. */

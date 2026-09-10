@@ -27,7 +27,7 @@ function symptom(symptom: string, daysAgo: number): { symptom: string; date: str
 
 describe("analyzePainPatterns", () => {
   it("returns an empty array when fewer than 5 logs exist", () => {
-    const insights = analyzePainPatterns([pain(5, 1), pain(5, 2), pain(5, 3)], []);
+    const insights = analyzePainPatterns([pain(5, 1), pain(5, 2), pain(5, 3)], [], []);
     expect(insights).toEqual([]);
   });
 
@@ -39,7 +39,7 @@ describe("analyzePainPatterns", () => {
       pain(8, 4, 4),
       pain(9, 5, 5),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     const high = insights.find((i) => i.id === "high-pain-avg");
     expect(high).toBeDefined();
     expect(high?.severity).toBe("warning");
@@ -54,13 +54,13 @@ describe("analyzePainPatterns", () => {
       pain(1, 4, 4),
       pain(3, 5, 5),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     expect(insights.find((i) => i.id === "low-pain-avg")?.severity).toBe("info");
   });
 
   it("flags frequent flare-ups (7+ flare days) as critical", () => {
     const logs = Array.from({ length: 8 }, (_, i) => pain(8, i + 1, i + 1));
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     const flares = insights.find((i) => i.id === "freq-flares");
     expect(flares).toBeDefined();
     expect(flares?.severity).toBe("critical");
@@ -77,7 +77,7 @@ describe("analyzePainPatterns", () => {
       pain(2, 6, 6),
       pain(8, 7, 7),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     const flares = insights.find((i) => i.id === "flares-rising");
     expect(flares).toBeDefined();
     expect(flares?.severity).toBe("warning");
@@ -94,7 +94,7 @@ describe("analyzePainPatterns", () => {
       pain(9, 7, 7),
       pain(8, 8, 8),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     expect(insights.find((i) => i.id === "trend-worsening")).toBeDefined();
   });
 
@@ -109,7 +109,7 @@ describe("analyzePainPatterns", () => {
       pain(2, 7, 7),
       pain(1, 8, 8),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     expect(insights.find((i) => i.id === "trend-improving")).toBeDefined();
   });
 
@@ -132,7 +132,7 @@ describe("analyzePainPatterns", () => {
       pain(3, 3, 7),
       pain(2, 4, 8),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     const weekday = insights.find((i) => i.id === "weekday-pattern");
     expect(weekday).toBeDefined();
     expect(weekday?.message).toContain("Monday");
@@ -153,7 +153,9 @@ describe("analyzePainPatterns", () => {
       symptom("fatigue", 2),
       symptom("fatigue", 3),
     ];
-    const insights = analyzePainPatterns(logs, symptoms);
+    // Need to provide dummy severity/category for symptom fixture
+    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" }));
+    const insights = analyzePainPatterns(logs, enhancedSymptoms, []);
     const corr = insights.find((i) => i.id === "symptom-correlation");
     expect(corr).toBeDefined();
     expect(corr?.title).toBe("Symptom-Pain Link Detected");
@@ -173,7 +175,8 @@ describe("analyzePainPatterns", () => {
       pain(8, 7, 7),
     ];
     const symptoms = [symptom("stretching", 1), symptom("stretching", 2), symptom("stretching", 3)];
-    const insights = analyzePainPatterns(logs, symptoms);
+    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" }));
+    const insights = analyzePainPatterns(logs, enhancedSymptoms, []);
     const corr = insights.find((i) => i.id === "symptom-correlation");
     expect(corr).toBeDefined();
     expect(corr?.title).toBe("Symptom Seen on Easier Days");
@@ -191,8 +194,36 @@ describe("analyzePainPatterns", () => {
       pain(8, 7, 7),
       pain(8, 8, 8),
     ];
-    const insights = analyzePainPatterns(logs, []);
+    const insights = analyzePainPatterns(logs, [], []);
     const order = insights.map((i) => i.severity);
     expect(order).toEqual([...order].sort());
+  });
+
+  it("detects luteal-cognitive-flare when in luteal phase with high cognitive symptoms", () => {
+    const logs = Array.from({ length: 5 }, (_, i) => pain(5, i + 1, i + 1));
+    const cycles = [
+      { id: "c1", phase: "LUTEAL", startDate: new Date(), endDate: null }
+    ];
+    const symptoms = [
+      { symptom: "brain fog", date: "2026-01-01", severity: 8, category: "COGNITIVE", area: "OTHER" },
+      { symptom: "focus fatigue", date: "2026-01-02", severity: 7, category: "COGNITIVE", area: "OTHER" },
+    ];
+    const insights = analyzePainPatterns(logs, symptoms, cycles);
+    const flare = insights.find((i) => i.id === "luteal-cognitive-flare");
+    expect(flare).toBeDefined();
+    expect(flare?.severity).toBe("warning");
+    expect(flare?.message).toContain("luteal phase");
+  });
+
+  it("recommends heat therapy for high severity pelvic or lower back pain", () => {
+    const logs = Array.from({ length: 5 }, (_, i) => pain(5, i + 1, i + 1));
+    const symptoms = [
+      { symptom: "pelvic pain", date: "2026-01-01", severity: 8, category: "PHYSICAL", area: "PELVIC" },
+    ];
+    const insights = analyzePainPatterns(logs, symptoms, []);
+    const rec = insights.find((i) => i.id === "heat-therapy-rec");
+    expect(rec).toBeDefined();
+    expect(rec?.severity).toBe("info");
+    expect(rec?.message).toContain("Warm therapy");
   });
 });

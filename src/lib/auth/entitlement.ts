@@ -12,10 +12,14 @@
  *   2. Billing configured (webhook secrets present) → `pro_user` only when
  *      an ACTIVE subscription row linked to the user exists; otherwise
  *      `free_user`.
- *   3. Billing NOT configured → demo/local mode: every signed-in user is
- *      treated as `pro_user`. There is no payment path at all in this
- *      state, so gating would only break the app; the moment webhook
- *      secrets are configured, enforcement becomes strict automatically.
+ *   3. Billing NOT configured:
+ *      - Production → `free_user` (fail closed). Missing billing envs in
+ *        production are treated as a misconfiguration, never as a reason
+ *        to grant Pro.
+ *      - Demo/local → every signed-in user is `pro_user`. There is no
+ *        payment path at all in this state, so gating would only break
+ *        the app; the moment webhook secrets are configured, enforcement
+ *        becomes strict automatically.
  */
 
 import { prisma } from "@/lib/prisma";
@@ -48,6 +52,11 @@ interface EffectiveRoleInput {
   subscriptions?: SubscriptionLike[];
 }
 
+/** True only when running outside production (demo/local billing fallback). */
+function isDemoEnvironment(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
 /**
  * Pure role resolution from DB state. Exported for unit tests.
  */
@@ -59,6 +68,14 @@ export function resolveEffectiveRole(input: EffectiveRoleInput): UserRole {
       isProActive(s as Subscription)
     );
     return hasActivePro ? "pro_user" : "free_user";
+  }
+
+  // Billing not configured.
+  // Production is fail-closed: missing payment envs never grant Pro, even
+  // if a stale subscription row happens to exist, so entitlement can only
+  // be won through an active subscription or a verified doctor role.
+  if (!isDemoEnvironment()) {
+    return "free_user";
   }
 
   // Demo/local mode (no payment provider configured): every signed-in

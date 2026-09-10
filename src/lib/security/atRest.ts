@@ -61,12 +61,17 @@ export async function decryptSensitiveData(value: string | null | undefined): Pr
   const key = process.env.HEALTH_DATA_ENCRYPTION_KEY;
   if (!key) {
     // Dev fallback mirrors the write path: the value was stored as base64.
+    // Validate strictly before decoding — Node's base64 decoder is lenient
+    // and would happily return mojibake for legacy plaintext rows.
     if (process.env.NODE_ENV !== "production") {
-      try {
+      if (
+        /^[A-Za-z0-9+/]*={0,2}$/.test(value) &&
+        value.length % 4 === 0 &&
+        value.length > 0
+      ) {
         return Buffer.from(value, "base64").toString("utf8");
-      } catch {
-        return value; // not base64 — treat as legacy plaintext
       }
+      return value; // not base64 — treat as legacy plaintext
     }
     // Production without a key: cannot decrypt. Return null rather than
     // leaking ciphertext into the UI/AI context.

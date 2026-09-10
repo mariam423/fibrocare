@@ -30,11 +30,10 @@ import {
 export const maxDuration = 5;
 
 function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  const aBuf = new TextEncoder().encode(a);
-  const bBuf = new TextEncoder().encode(b);
-  // Node's Web Crypto `subtle.timingSafeEqual` requires equal lengths,
-  // which we just enforced above.
+  // Pad to equal length to prevent timing oracle on length check
+  const maxLen = Math.max(a.length, b.length);
+  const aBuf = new TextEncoder().encode(a.padEnd(maxLen, "\0"));
+  const bBuf = new TextEncoder().encode(b.padEnd(maxLen, "\0"));
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { timingSafeEqual: tse } = require("node:crypto") as typeof import("node:crypto");
   return tse(aBuf, bBuf);

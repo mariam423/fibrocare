@@ -278,7 +278,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         // 2. Seed via the public endpoint. The seed endpoint is
         //    language-agnostic — it writes both languages at once
         //    — so a single call covers all locales.
-        await fetch("/api/ai/articles/seed", { method: "GET" });
+        await fetch("/api/ai/articles/seed", { method: "POST" });
         // 3. Reload in the active locale.
         const after = await listPublishedArticles(
           12,
@@ -372,7 +372,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         if (topicList.length === 0) {
           // No topics to refresh — fall back to the seed endpoint so the
           // empty-state still resolves.
-          await fetch("/api/ai/articles/seed", { method: "GET" });
+          await fetch("/api/ai/articles/seed", { method: "POST" });
           const after = await listPublishedArticles(
             12,
             locale === "ar" ? "ar" : "en"
@@ -393,10 +393,11 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
             // language switcher while a sweep is in flight will simply
             // re-issue the sweep on the next render; the per-locale
             // dedup keeps the two states from interleaving.
-            const res = await fetch(
-              `/api/ai/articles/generate?topic=${encodeURIComponent(topic.id)}&language=${locale === "ar" ? "ar" : "en"}`,
-              { method: "GET" }
-            );
+            const res = await fetch(`/api/ai/articles/generate`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ topicId: topic.id, language: locale === "ar" ? "ar" : "en" }),
+            });
             if (!res.ok) continue;
             const json = (await res.json()) as {
               article?: Parameters<typeof mapResultToArticle>[0];

@@ -7,6 +7,8 @@
  * are never mistaken for direct clinical advice.
  */
 
+import { sanitizeForPrompt } from "@/lib/security/sanitizer";
+
 const MEDICAL_DISCLAIMER =
   "\n\nIMPORTANT: AI provides informational summaries only and does not replace direct clinical judgment. Always include this disclaimer when generating content.";
 
@@ -28,7 +30,7 @@ Guidelines:
 ${MEDICAL_DISCLAIMER}
 
 RAW CLINICAL NOTES:
-${rawNotes}
+<doctor-notes>${sanitizeForPrompt(rawNotes, 5000)}</doctor-notes>
 
 Respond with a JSON object matching the article schema (title, content, tags, summary).`;
 }
@@ -95,10 +97,10 @@ export function buildDoctorResponseDraftPrompt(
   return `You are FibroCare's Clinical Copilot — assisting a doctor in responding to a fibromyalgia patient's message.
 
 Patient's message:
-"${patientMessage}"
+<patient-message>${sanitizeForPrompt(patientMessage, 3000)}</patient-message>
 
 Clinical context:
-${clinicalContext}
+<clinical-context>${sanitizeForPrompt(clinicalContext, 5000)}</clinical-context>
 
 Generate a professional, empathetic draft response that:
 1. Acknowledges the patient's specific concerns
@@ -133,7 +135,7 @@ Guidelines:
 ${MEDICAL_DISCLAIMER}
 
 Patient's raw description:
-"${rawInput}"
+<patient-description>${sanitizeForPrompt(rawInput, 3000)}</patient-description>
 
 Respond with a JSON object matching the symptom structure schema.`;
 }

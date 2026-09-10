@@ -22,6 +22,7 @@ import { healthSnapshotSchema, type HealthSnapshot } from "@/lib/ai/schemas";
 import { buildHealthSnapshot } from "@/lib/ai/context";
 import { getCachedHealthSnapshot } from "@/lib/ai/snapshotCache";
 import { deterministicWeather } from "@/lib/weather";
+import { sanitizeForPrompt } from "@/lib/security/sanitizer";
 
 /* ------------------------------------------------------------------ */
 /* Short-term memory (thread history)                                  */
@@ -84,7 +85,7 @@ export function buildShortTermMemory(raw: unknown[]): ShortTermMemory {
   for (const item of raw) {
     const result = rawUiMessageSchema.safeParse(item);
     if (!result.success) continue;
-    const text = textOf(result.data).trim().slice(0, MAX_MESSAGE_CHARS);
+    const text = sanitizeForPrompt(textOf(result.data), MAX_MESSAGE_CHARS);
     if (!text) continue;
     parsed.push(shortTermMessageSchema.parse({ role: result.data.role, text }));
   }

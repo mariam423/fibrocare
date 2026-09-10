@@ -17,7 +17,7 @@ import {
   mockStreamResponse,
 } from "@/lib/ai/mock";
 import { buildLongTermMemory, buildShortTermMemory } from "@/lib/ai/memory";
-import { checkChatRateLimit } from "@/lib/ai/ratelimit";
+import { checkChatRateLimit, checkDailyAndMonthlyBudget } from "@/lib/ai/ratelimit";
 import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
 import { assembleCompanionContext } from "@/lib/ai/companion";
 import { recordChatAuthFailure } from "@/lib/ai/chatAuthMonitor";
@@ -101,6 +101,15 @@ export async function POST(req: Request) {
         resetAt,
       },
       { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
+  // Daily + monthly usage budget (caps total AI spend across the day/month)
+  const budget = await checkDailyAndMonthlyBudget(session.user.id);
+  if (!budget.ok) {
+    return Response.json(
+      { error: budget.error },
+      { status: 429, headers: budget.resetAt ? { "Retry-After": String(Math.max(1, Math.ceil((budget.resetAt - Date.now()) / 1000))) } : {} }
     );
   }
 

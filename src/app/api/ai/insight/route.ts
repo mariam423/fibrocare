@@ -15,6 +15,7 @@ import { mockNarration, mockStreamResponse } from "@/lib/ai/mock";
 import { getCachedHealthSnapshot, getCachedInsightSummaries } from "@/lib/ai/snapshotCache";
 import { buildNarrationPrompt } from "@/lib/ai/prompts";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
+import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
 import { parseLocale, LOCALE_COOKIE } from "@/lib/locale";
 import { translations } from "@/lib/translations";
 
@@ -44,6 +45,7 @@ export async function POST() {
   }
 
   const userName = session.user.name ?? "there";
+  const locale = parseLocale((await cookies()).get(LOCALE_COOKIE)?.value);
   const [snapshot, insights] = await Promise.all([
     getCachedHealthSnapshot(session.user.id),
     getCachedInsightSummaries(session.user.id, 30),
@@ -51,7 +53,6 @@ export async function POST() {
 
   if (isMockMode()) {
     console.log(`[ai] insight · mode=mock`);
-    const locale = parseLocale((await cookies()).get(LOCALE_COOKIE)?.value);
     const missingLogsFallback = translations[locale]["narration.missingLogsFallback"];
     return mockStreamResponse(mockNarration(snapshot, insights, userName, missingLogsFallback));
   }
@@ -82,7 +83,15 @@ export async function POST() {
       },
     });
 
-    return result.toUIMessageStreamResponse();
+    const base = result.toUIMessageStreamResponse();
+    const guarded = base.body?.pipeThrough(
+      createGuardrailStreamTransform({ arabicLeaks: locale === "ar" })
+    );
+    if (!guarded) return base;
+    return new Response(guarded, {
+      status: base.status,
+      headers: base.headers,
+    });
   } catch (error) {
     console.error("[ai] insight · provider setup error", error);
     recordAiFailure();

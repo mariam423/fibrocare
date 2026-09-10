@@ -4,8 +4,10 @@ import crypto from "crypto";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
+import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
 import {
   analyzeHealthPatterns,
   getTopSymptoms,
@@ -40,6 +42,26 @@ export async function registerUser(input: {
   password: string;
   signupRole?: "PATIENT" | "DOCTOR";
 }): Promise<RegisterResult> {
+  // Prevent mass account creation: bound registrations per IP (20/hour).
+  // Server actions run on the request thread, so `headers()` is safe here.
+  const h = await headers();
+  const clientIp =
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    h.get("x-real-ip")?.trim() ||
+    "unknown";
+  const { ok, resetAt } = await checkRateLimitDistributed(
+    `register-ip:${clientIp}`,
+    20,
+    60 * 60 * 1000
+  );
+  if (!ok) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+    return {
+      success: false,
+      error: `Too many accounts created from this address — try again in ${Math.ceil(retryAfter / 60)} minute(s).`,
+    };
+  }
+
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
   const password = input.password;
@@ -103,9 +125,10 @@ export async function requestPasswordReset(
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
-  // The reset link is a bearer credential — never log it outside dev.
+  // Never log the reset link — it contains a bearer token.
+  // In development, only log that a reset was requested (no token).
   if (process.env.NODE_ENV !== "production") {
-    console.log(`[auth] Password reset requested for ${email}: ${resetLink}`);
+    console.log(`[auth] Password reset requested for ${email}`);
   }
 
   // In non-production the link is returned so the flow can be tested
@@ -192,6 +215,7 @@ export async function updateUserName(newName: string) {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { name },
+      select: { id: true, name: true, email: true, role: true, signupRole: true },
     });
 
     revalidatePath("/dashboard");
@@ -202,7 +226,7 @@ export async function updateUserName(newName: string) {
     console.error("Error updating user name:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update user name"
+      error: "Failed to update your name. Please try again."
     };
   }
 }
@@ -224,10 +248,14 @@ export async function savePainLog(
       : 3;
 
     // Bound free-text fields (length caps only — content is rendered
-    // escaped and stored via Prisma's parameterized queries).
+    // escaped and stored via Prisma's parameterized queries). Validate the
+    // symptoms array as strings — never coerce objects/numbers silently.
     const safeMoodTag = String(moodTag ?? "").slice(0, 40);
-    const safeSymptoms = symptoms
-      .map((s) => String(s).slice(0, 60))
+    const safeSymptoms = (Array.isArray(symptoms)
+      ? symptoms.filter((s): s is string => typeof s === "string")
+      : []
+    )
+      .map((s) => s.slice(0, 60))
       .filter((s) => s.trim().length > 0)
       .slice(0, 20);
     const safeNotes = notes ? notes.slice(0, 2000) : undefined;
@@ -262,7 +290,7 @@ export async function savePainLog(
     console.error("Error saving pain log detailed:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to save pain log due to an unknown error"
+      error: "Failed to save your pain log. Please try again."
     };
   }
 }
@@ -286,6 +314,7 @@ export async function updateUserProfile(name: string, email: string) {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { name: safeName, email: safeEmail },
+      select: { id: true, name: true, email: true, role: true, signupRole: true },
     });
 
     revalidatePath("/dashboard");
@@ -296,7 +325,7 @@ export async function updateUserProfile(name: string, email: string) {
     console.error("Error updating user profile:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update user profile"
+      error: "Failed to update your profile. Please try again."
     };
   }
 }
@@ -621,10 +650,7 @@ export async function generateMedicalSummary(): Promise<
     console.error("Error generating medical summary:", error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to generate medical summary",
+      error: "Failed to generate your medical summary. Please try again.",
     };
   }
 }

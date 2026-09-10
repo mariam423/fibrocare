@@ -15,6 +15,7 @@ import type { LongTermMemory } from "@/lib/ai/memory";
 import type { UserFacts } from "@/lib/ai/memory/userMemory";
 import { translations, type Locale } from "@/lib/translations";
 import { SYMPTOM_KEYS, humanizeSymptom } from "@/lib/insightLocalization";
+import { sanitizeForPrompt } from "@/lib/security/sanitizer";
 
 /** Snapshot plus the optional long-term extras (meds, weather). */
 export type CompanionMemory = HealthSnapshot &
@@ -79,9 +80,10 @@ function snapshotBlock(
   userName: string,
   locale: Locale = "en"
 ): string {
+  const safeName = sanitizeForPrompt(userName, 100);
   const label = (id: string) => symptomLabel(id, locale);
   const lines = [
-    `USER HEALTH SNAPSHOT (user: ${userName}) — treat as private and current:`,
+    `USER HEALTH SNAPSHOT (user: ${safeName}) — treat as private and current:`,
     `- Current pain: ${snapshot.currentPain ?? "not logged today"} / 10`,
     `- 7-day average pain: ${snapshot.avgPain7d ?? "no data"}`,
     `- 30-day average pain: ${snapshot.avgPain30d ?? "no data"}`,
@@ -144,14 +146,14 @@ function snapshotBlock(
 export function buildUserMemoryBlock(facts: UserFacts): string {
   const lines: string[] = [];
   if (facts.effectiveTools.length) {
-    lines.push(`- Tools that have helped them before (their own words): ${facts.effectiveTools.join("; ")}`);
+    lines.push(`- Tools that have helped them before (their own words): ${facts.effectiveTools.map((t) => sanitizeForPrompt(t, 200)).join("; ")}`);
   }
   if (facts.weatherTriggers.length) {
-    lines.push(`- Weather they link to worse symptoms: ${facts.weatherTriggers.join("; ")}`);
+    lines.push(`- Weather they link to worse symptoms: ${facts.weatherTriggers.map((t) => sanitizeForPrompt(t, 200)).join("; ")}`);
   }
   if (facts.sensitivities.length) {
     lines.push(
-      `- Things they cannot tolerate / avoid (patient-reported only, never medical advice): ${facts.sensitivities.join("; ")}`
+      `- Things they cannot tolerate / avoid (patient-reported only, never medical advice): ${facts.sensitivities.map((t) => sanitizeForPrompt(t, 200)).join("; ")}`
     );
   }
   if (lines.length === 0) return "";
@@ -218,6 +220,7 @@ export function buildNarrationPrompt(
   insights: Array<{ title: string; message: string; severity: string }>,
   userName: string
 ): string {
+  const safeName = sanitizeForPrompt(userName, 100);
   const insightLines =
     insights.length > 0
       ? insights
@@ -229,7 +232,7 @@ export function buildNarrationPrompt(
       : "No detected patterns yet (user needs at least 5 logged days).";
 
   return [
-    `You are FibroCare's AI Care Companion. The user (${userName}) asked you to explain their health data in warm, human, non-clinical language.`,
+    `You are FibroCare's AI Care Companion. The user (${safeName}) asked you to explain their health data in warm, human, non-clinical language.`,
     ``,
     snapshotBlock(snapshot, userName),
     ``,
@@ -251,13 +254,14 @@ export function buildReflectionPrompt(
   snapshot: HealthSnapshot,
   userName: string
 ): string {
+  const safeName = sanitizeForPrompt(userName, 100);
   return [
-    `You are FibroCare's AI Care Companion. The user (${userName}) wrote a free-form journal note during their daily check-in. Reflect on it with warmth and specificity.`,
+    `You are FibroCare's AI Care Companion. The user (${safeName}) wrote a free-form journal note during their daily check-in. Reflect on it with warmth and specificity.`,
     ``,
     snapshotBlock(snapshot, userName),
     ``,
     `THE USER'S NOTE:`,
-    `"""${note.slice(0, 1200)}"""`,
+    `<user-note>${sanitizeForPrompt(note, 1200)}</user-note>`,
     ``,
     `Write a reflection that:`,
     `1. Acknowledges the specific content of the note (situations, feelings they described, wins or struggles) — never generic sympathy.`,
@@ -276,6 +280,7 @@ export function buildDoctorQuestionsPrompt(
   userName: string,
   locale: Locale = "en"
 ): string {
+  const safeName = sanitizeForPrompt(userName, 100);
   const insightLines =
     insights.length > 0
       ? insights.map((i) => `- [${i.severity}] ${i.title}: ${i.message}`).join("\n")
@@ -290,7 +295,7 @@ export function buildDoctorQuestionsPrompt(
       : "";
 
   return [
-    `You are preparing a patient (${userName}) with fibromyalgia for their next doctor's appointment.`,
+    `You are preparing a patient (${safeName}) with fibromyalgia for their next doctor's appointment.`,
     ``,
     snapshotBlock(snapshot, userName),
     ``,

@@ -105,3 +105,44 @@ export function looksMalicious(raw: string): boolean {
     /\b(?:javascript|vbscript|data)\s*:/i.test(raw)
   );
 }
+
+/**
+ * Sanitize user-supplied text before it is embedded in an LLM prompt.
+ *
+ * Strips common prompt-injection markers (triple quotes, XML-like tags,
+ * instruction-override phrases) and bounds length. This is a best-effort
+ * defense — no regex can catch every novel attack, but it raises the bar
+ * significantly against the most common payloads.
+ */
+export function sanitizeForPrompt(raw: string, maxLength = 2000): string {
+  if (typeof raw !== "string") return "";
+  let text = raw.slice(0, maxLength);
+
+  // 1. Strip triple-quote sequences (used as fake delimiters in prompts)
+  text = text.replace(/"""+/g, "");
+
+  // 2. Strip XML/HTML-like tags that could mimic instruction boundaries
+  text = text.replace(/<\/?(?:system|user|assistant|instruction|prompt|end)[^>]*>/gi, "");
+
+  // 3. Neutralize common instruction-override patterns
+  text = text.replace(
+    /(?:ignore|disregard|override|forget)\s+(?:all\s+)?(?:previous|prior|above|earlier|initial)\s+(?:rules|instructions|prompts|guidelines|context)/gi,
+    "[content filtered]"
+  );
+  text = text.replace(
+    /(?:you\s+are\s+now|new\s+(?:system\s+)?instruction|act\s+as|pretend\s+(?:you\s+are|to\s+be))/gi,
+    "[content filtered]"
+  );
+  text = text.replace(
+    /\[END\s+(?:OF\s+)?(?:NOTE|USER|INPUT|MESSAGE|CONTENT)\]/gi,
+    "[content filtered]"
+  );
+
+  // 4. Strip control characters + bidi-override (preserves Arabic joiners)
+  text = text.replace(CONTROL_CHARS_RE, "");
+
+  // 5. Collapse whitespace
+  text = text.replace(/\s+/g, " ").trim();
+
+  return text;
+}

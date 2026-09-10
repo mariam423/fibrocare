@@ -1,21 +1,23 @@
 /**
- * GET /api/ai/articles/seed
+ * POST /api/ai/articles/seed
  *
  * Triggers a one-shot seed of the curated article library. Idempotent:
  * topics that already have a published post are returned as-is, only the
  * missing ones are generated. Doctor Hub calls this on first visit so the
  * feed never shows the empty state.
  *
- * The endpoint is public by design (the Doctor Hub is patient-facing), but
- * seeding runs LLM generation, so it is rate-limited per client IP: 2
- * seeds per hour. The work itself is bounded (closed topic catalogue,
- * persisted + de-duped), the limiter just stops a script from hammering
- * it.
+ * The endpoint requires authentication (session cookie), but seeding runs
+ * LLM generation, so it is rate-limited per client IP: 2 seeds per hour.
+ * The work itself is bounded (closed topic catalogue, persisted + de-duped),
+ * the limiter just stops a script from hammering it.
  */
 
 import { NextRequest } from "next/server";
 import { seedDoctorArticleLibrary } from "@/app/pro/doctor-article-actions";
 import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { requirePermissionResponse } from "@/lib/auth/entitlement";
 
 export const maxDuration = 120;
 
@@ -27,7 +29,17 @@ function clientIp(request: NextRequest): string {
   );
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return Response.json({ error: "You must be signed in." }, { status: 401 });
+  }
+
+  // Article generation burns LLM budget — only verified doctors may
+  // trigger it, not any signed-in user.
+  const denied = await requirePermissionResponse(session.user.id, "doctor:publish");
+  if (denied) return denied;
+
   // Per-IP budget: 2 seeds / hour. The seed is idempotent, so a legit
   // client never needs more.
   const { ok, resetAt } = await checkRateLimitDistributed(

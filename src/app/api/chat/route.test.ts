@@ -67,6 +67,7 @@ vi.mock("@/lib/ai/memory", () => ({
 
 vi.mock("@/lib/ai/ratelimit", () => ({
   checkChatRateLimit: vi.fn(async () => ({ ok: true, resetAt: Date.now() + 60_000 })),
+  checkDailyAndMonthlyBudget: vi.fn(async () => ({ ok: true, resetAt: Date.now() + 60_000 })),
 }));
 
 vi.mock("@/lib/ai/companion", () => ({

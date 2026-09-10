@@ -65,9 +65,8 @@ describe("GET /api/weather", () => {
       "fetch",
       vi.fn(async () => jsonResponse(200, openWeatherOk))
     );
-    // The NEXT_PUBLIC_ var must also work as a server-side key source.
-    vi.stubEnv("OPENWEATHER_API_KEY", "");
-    vi.stubEnv("NEXT_PUBLIC_WEATHER_API_KEY", "public-fallback-key");
+    vi.stubEnv("OPENWEATHER_API_KEY", "live-secret-key");
+    vi.stubEnv("NEXT_PUBLIC_WEATHER_API_KEY", "");
     vi.stubEnv("OPENWEATHER_CITY", "LiveCity");
 
     const res = await GET(new Request("http://localhost/api/weather"));
@@ -84,20 +83,20 @@ describe("GET /api/weather", () => {
     expect(data.pressureTrend).toEqual({ trend: "steady", deltaHpa: 0 });
   });
 
-  it("prefers OPENWEATHER_API_KEY over NEXT_PUBLIC_WEATHER_API_KEY", async () => {
+  it("only accepts OPENWEATHER_API_KEY and never the NEXT_PUBLIC_ var", async () => {
     const fetchMock = vi.fn(
       async (_url: string | URL | Request) => jsonResponse(200, openWeatherOk)
     );
     vi.stubGlobal("fetch", fetchMock);
     vi.stubEnv("OPENWEATHER_API_KEY", "primary-secret-key");
-    vi.stubEnv("NEXT_PUBLIC_WEATHER_API_KEY", "secondary-public-key");
+    vi.stubEnv("NEXT_PUBLIC_WEATHER_API_KEY", "public-key-must-be-ignored");
     vi.stubEnv("OPENWEATHER_CITY", "PrecedenceCity");
 
     await GET(new Request("http://localhost/api/weather"));
 
     const calledUrl = String(fetchMock.mock.calls[0]?.[0]);
     expect(calledUrl).toContain("appid=primary-secret-key");
-    expect(calledUrl).not.toContain("secondary-public-key");
+    expect(calledUrl).not.toContain("public-key-must-be-ignored");
   });
 });
 

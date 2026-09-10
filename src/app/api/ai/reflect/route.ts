@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { streamText } from "ai";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import {
   getModel,
@@ -14,8 +15,13 @@ import { mockReflection, mockStreamResponse } from "@/lib/ai/mock";
 import { getCachedHealthSnapshot } from "@/lib/ai/snapshotCache";
 import { buildReflectionPrompt } from "@/lib/ai/prompts";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
+import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
 
 export const maxDuration = 45;
+
+const bodySchema = z.object({
+  note: z.string().trim().min(5).max(2000),
+});
 
 /** Empathetic reflection on a user's journal note (streamed). */
 export async function POST(req: Request) {
@@ -35,8 +41,8 @@ export async function POST(req: Request) {
 
   let note = "";
   try {
-    const body = await req.json();
-    note = typeof body?.note === "string" ? body.note.trim() : "";
+    const body = bodySchema.parse(await req.json());
+    note = body.note;
   } catch {
     return Response.json({ error: "Invalid request." }, { status: 400 });
   }
@@ -85,7 +91,15 @@ export async function POST(req: Request) {
       },
     });
 
-    return result.toUIMessageStreamResponse();
+    const base = result.toUIMessageStreamResponse();
+    const guarded = base.body?.pipeThrough(
+      createGuardrailStreamTransform({ arabicLeaks: /[\u0600-\u06FF]/.test(note) })
+    );
+    if (!guarded) return base;
+    return new Response(guarded, {
+      status: base.status,
+      headers: base.headers,
+    });
   } catch (error) {
     console.error("[ai] reflect · provider setup error", error);
     recordAiFailure();

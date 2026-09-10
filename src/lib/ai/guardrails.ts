@@ -19,6 +19,34 @@
 export const MAX_PATTERN_LEN = 24;
 
 /* ------------------------------------------------------------------ */
+/* HTML stripping for AI output                                        */
+/* ------------------------------------------------------------------ */
+
+/** Tags that should never appear in AI output (the UI renders Markdown). */
+const AI_OUTPUT_TAG_RE =
+  /<\s*(script|style|iframe|object|embed|form|input|button|textarea|select|meta|link|base)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi;
+/** Catch any remaining HTML tags the AI might emit. */
+const ANY_TAG_RE = /<[^>]+>/g;
+/** javascript:/data:/vbscript: URLs — never safe to render as links. */
+const DANGEROUS_URL_RE =
+  /((?:href|src)\s*=\s*["']?)\s*(?:javascript|vbscript|data)\s*:/gi;
+
+/**
+ * Strip HTML from AI-generated text. The UI renders Markdown; any
+ * HTML in the LLM output is either accidental or adversarial.
+ */
+export function stripHtmlFromAiOutput(text: string): string {
+  return text.replace(AI_OUTPUT_TAG_RE, "").replace(ANY_TAG_RE, "");
+}
+
+/** Strip dangerous script/style tags + javascript:/data: URLs from Markdown. */
+export function stripDangerousMarkdown(text: string): string {
+  return text
+    .replace(AI_OUTPUT_TAG_RE, "")
+    .replace(DANGEROUS_URL_RE, "");
+}
+
+/* ------------------------------------------------------------------ */
 /* Literal rewrite table (longest-match wins, case-insensitive EN)     */
 /* ------------------------------------------------------------------ */
 
@@ -325,6 +353,8 @@ export class IncrementalGuardrail {
     } else {
       out = sanitizeWarmTherapy(chunk);
     }
+    // Strip any HTML the LLM may have emitted (UI renders Markdown, not HTML)
+    out = stripHtmlFromAiOutput(out);
     this.lastChar = chunk[chunk.length - 1] ?? this.lastChar;
     return out;
   }

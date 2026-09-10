@@ -92,3 +92,51 @@ export async function checkChatRateLimit(userId: string): Promise<RateLimitResul
 export async function checkFeatureRateLimit(userId: string): Promise<RateLimitResult> {
   return checkRateLimitDistributed(`feature:${userId}`, 10, 60_000);
 }
+
+/**
+ * Daily + monthly AI usage budget. These sit on top of the per-minute
+ * rate limits above. Even if a user stays under 20 req/min, they should
+ * not be able to burn hundreds of LLM calls in a day/month.
+ *
+ * Defaults: 200 requests/day, 2 000 requests/month. Override with env.
+ */
+
+const DAILY_AI_LIMIT = Number(process.env.AI_DAILY_LIMIT) || 200;
+const MONTHLY_AI_LIMIT = Number(process.env.AI_MONTHLY_LIMIT) || 2_000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const MONTH_MS = 30 * DAY_MS;
+
+/** Returns true when the user is within both daily and monthly budgets. */
+export async function checkDailyAndMonthlyBudget(
+  userId: string
+): Promise<{ ok: boolean; error?: string; resetAt?: number }> {
+  const limiter = getRateLimiter();
+  const now = Date.now();
+
+  // Daily: sliding window — one request per 24h = one key per day,
+  // sliding. We simulate it with a fixed window keyed by calendar day.
+  const dayKey = `ai-budget:d:${userId}:${Math.floor(now / DAY_MS)}`;
+  const daily = await limiter.check(dayKey, DAILY_AI_LIMIT, DAY_MS + 1000);
+  if (!daily.ok) {
+    return {
+      ok: false,
+      error: `Daily AI limit reached (${DAILY_AI_LIMIT}/day). Resets at midnight.`,
+      resetAt: daily.resetAt,
+    };
+  }
+
+  // Monthly: rolling 30-day window.
+  const monthKey = `ai-budget:m:${userId}:${Math.floor(now / MONTH_MS)}`;
+  const monthly = await limiter.check(monthKey, MONTHLY_AI_LIMIT, MONTH_MS + 1000);
+  if (!monthly.ok) {
+    return {
+      ok: false,
+      error: `Monthly AI limit reached (${MONTHLY_AI_LIMIT}/month). Resets next month.`,
+      resetAt: monthly.resetAt,
+    };
+  }
+
+  return { ok: true };
+}
+
+export { DAILY_AI_LIMIT, MONTHLY_AI_LIMIT };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { TtlCache } from "@/lib/ai/cache";
 import { getCache } from "@/lib/cache/selectAdapter";
+import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
 import {
   computePressureTrend,
   detectWeatherTriggers,
@@ -53,14 +54,12 @@ function fallback(city: string, note?: string): WeatherApiResponse {
 }
 
 /**
- * Server-side key resolution. `NEXT_PUBLIC_WEATHER_API_KEY` also works here
- * (and is the same var some client tooling reads) — note that NEXT_PUBLIC_*
- * values are public by design once bundled, so prefer OPENWEATHER_API_KEY.
+ * Server-side key resolution. Only the private `OPENWEATHER_API_KEY` is
+ * accepted — `NEXT_PUBLIC_*` values are public-by-design once bundled, so
+ * they must never reach the upstream provider.
  */
 function resolveApiKey(): string | undefined {
-  const key =
-    process.env.OPENWEATHER_API_KEY || process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-  return key?.trim() || undefined;
+  return process.env.OPENWEATHER_API_KEY?.trim() || undefined;
 }
 
 /** Validate optional ?lat=&lon= query params (client geolocation). */
@@ -134,6 +133,27 @@ function locationKey(coords: { lat: number; lon: number } | null): string {
  */
 export async function GET(request: Request) {
   const apiKey = resolveApiKey();
+
+  // Per-IP budget so an unauthenticated script cannot hammer this proxy.
+  // The cache already bounds upstream quota, but a flood of distinct
+  // locations can still reach OpenWeather on a cold cache — cap it.
+  const clientIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "unknown";
+  const { ok, resetAt } = await checkRateLimitDistributed(
+    `weather-ip:${clientIp}`,
+    120,
+    60_000
+  );
+  if (!ok) {
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many weather requests — try again shortly." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   if (!apiKey) {
     return NextResponse.json(
       fallback(

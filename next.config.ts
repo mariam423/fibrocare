@@ -70,9 +70,6 @@ const nextConfig: NextConfig = {
     "@upstash/redis",
     "@upstash/ratelimit",
   ],
-  experimental: {
-    viewTransition: true,
-  },
   // The Upstash SDKs and the Accelerate extension are required at runtime
   // through `module.createRequire` with a *variable* module name (see
   // `src/lib/upstash/client.ts` / `src/lib/prisma.ts`), so Next.js' file

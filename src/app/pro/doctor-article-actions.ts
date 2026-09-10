@@ -23,6 +23,9 @@
 import { prisma } from "@/lib/prisma";
 import { getModel, isAiConfigured, isMockMode } from "@/lib/ai/provider";
 import { generateObjectWithFailover } from "@/lib/ai/failover";
+import { stripDangerousMarkdown } from "@/lib/ai/guardrails";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import {
   ARTICLE_TOPICS,
   authorityLabel,
@@ -469,6 +472,11 @@ export async function ensureArticleForTopic(
   { success: true; data: GeneratedArticleResult } | { success: false; error: string }
 > {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return { success: false, error: "You must be signed in." };
+    }
+
     const topic = findTopic(topicId);
     if (!topic) {
       return { success: false, error: "Unknown topic." };
@@ -545,8 +553,8 @@ export async function ensureArticleForTopic(
 
     const post = await prisma.doctorPost.create({
       data: {
-        title: article.title,
-        content: article.content,
+        title: stripDangerousMarkdown(article.title),
+        content: stripDangerousMarkdown(article.content),
         tags: joinTags(tagsWithSlug),
         authorId: author.id,
         verifiedStatus: "verified",
@@ -593,10 +601,7 @@ export async function ensureArticleForTopic(
     console.error("[ai-articles] ensureArticleForTopic failed:", error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to generate the article. Please try again.",
+      error: "Failed to generate the article. Please try again.",
     };
   }
 }
@@ -615,6 +620,11 @@ export async function seedDoctorArticleLibrary(): Promise<{
   generated: number;
   total: number;
 }> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
+  }
+
   let generated = 0;
   // The total is the cartesian product of topics × languages so the
   // caller's progress meter matches the actual work. The current
@@ -681,7 +691,7 @@ export async function listPublishedArticles(
     language: "en" | "ar";
   }>;
 }> {
-  return cachedListPublishedArticles(limit, language);
+  return cachedListPublishedArticles(Math.max(1, Math.min(limit, 200)), language);
 }
 
 /**

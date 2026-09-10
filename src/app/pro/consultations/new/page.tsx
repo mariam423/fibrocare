@@ -17,7 +17,7 @@ export default function NewConsultationPage() {
   const router = useRouter();
   const { t, locale } = useLanguage();
   const isRtl = locale === "ar";
-  const [doctors, setDoctors] = useState<{ id: string; name: string | null; email: string }[]>([]);
+  const [doctors, setDoctors] = useState<{ id: string; name: string | null }[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [subject, setSubject] = useState("");
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ export default function NewConsultationPage() {
                       <option value="">{t("consultation.selectDoctorPlaceholder")}</option>
                       {doctors.map((doc) => (
                         <option key={doc.id} value={doc.id}>
-                          {doc.name ?? doc.email}
+                          {doc.name || "Doctor"}
                         </option>
                       ))}
                     </select>

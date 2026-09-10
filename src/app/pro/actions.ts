@@ -25,6 +25,7 @@ import {
   doctorResponseDraftSchema,
   symptomStructureSchema,
 } from "@/lib/ai/doctor-schemas";
+import { sanitizeUserText } from "@/lib/security/sanitizer";
 
 /* ------------------------------------------------------------------ */
 /*  Internal helpers                                                    */
@@ -99,9 +100,9 @@ export async function createDoctorPost(input: {
     const auth = await requireDoctor();
     if (!auth.ok) return { success: false as const, error: auth.error };
 
-    const title = input.title.trim();
-    const content = input.content.trim();
-    const tags = (input.tags ?? "").trim();
+    const title = sanitizeUserText(input.title.trim(), { maxLength: 120 });
+    const content = sanitizeUserText(input.content.trim(), { maxLength: 10000 });
+    const tags = sanitizeUserText((input.tags ?? "").trim(), { maxLength: 200 });
 
     if (title.length < 5 || title.length > 120) {
       return { success: false as const, error: "Title must be between 5 and 120 characters." };
@@ -166,7 +167,7 @@ export async function getDoctorPosts(options?: {
       where,
       include: { author: { select: { id: true, name: true } } },
       orderBy: { createdAt: "desc" },
-      take: options?.limit ?? 50,
+      take: Math.max(1, Math.min(options?.limit ?? 50, 200)),
     });
 
     return { success: true as const, data: posts };
@@ -203,7 +204,7 @@ export async function getMyDoctorPosts(limit = 24) {
 export async function getDoctorPostById(id: string) {
   try {
     const post = await prisma.doctorPost.findUnique({
-      where: { id },
+      where: { id, verifiedStatus: "verified" },
       include: { author: { select: { id: true, name: true } } },
     });
     if (!post) return { success: false as const, error: "Post not found." };
@@ -291,7 +292,7 @@ export async function createConsultation(input: {
       return { success: false as const, error: "Selected doctor is not verified." };
     }
 
-    const subject = input.subject.trim();
+    const subject = sanitizeUserText(input.subject.trim(), { maxLength: 200 });
     if (subject.length < 3 || subject.length > 200) {
       return { success: false as const, error: "Subject must be between 3 and 200 characters." };
     }
@@ -374,8 +375,8 @@ export async function sendMessage(consultationId: string, content: string) {
     const auth = await requireConsultationAccess(consultationId);
     if (!auth.ok) return { success: false as const, error: auth.error };
 
-    const text = content.trim();
-    if (text.length < 1 || text.length > 5000) {
+    const text = sanitizeUserText(content.trim(), { maxLength: 5000 });
+    if (text.length < 1) {
       return { success: false as const, error: "Message must be between 1 and 5000 characters." };
     }
 
@@ -633,7 +634,7 @@ export async function getVerifiedDoctors() {
   try {
     const doctors = await prisma.user.findMany({
       where: { role: "doctor" },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true },
       orderBy: { name: "asc" },
     });
     return { success: true as const, data: doctors };

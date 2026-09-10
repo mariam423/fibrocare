@@ -45,11 +45,12 @@ const ROOT = resolve(__filename, "..", "..");
 
 function loadEnvFile(path) {
   if (!existsSync(path)) {
-    console.error(`[db-migrate-pg] ${path} not found.`);
-    console.error(
-      "  Create it with the Neon DATABASE_URL and DIRECT_URL (see .env.example)."
-    );
-    process.exit(1);
+    // Running inside a sandboxed build environment (Vercel, CI) there is
+    // no local `.env.production`; the connection strings come from the
+    // platform's own environment variables instead. Only fail later if
+    // DATABASE_URL / DIRECT_URL are genuinely missing from process.env.
+    console.warn(`[db-migrate-pg] ${path} not found; relying on process env.`);
+    return;
   }
   const text = readFileSync(path, "utf8");
   for (const rawLine of text.split("\n")) {
@@ -89,6 +90,17 @@ process.env.DIRECT_URL = process.env.DIRECT_URL;
 
 const args = process.argv.slice(2);
 const isStatus = args.includes("--status") || args.includes("--verify");
+
+// Guard: only run real migrations on production deployments. Preview /
+// development builds must never migrate the shared production database.
+const vercelEnv = process.env.VERCEL_ENV;
+if (vercelEnv && vercelEnv !== "production" && !isStatus) {
+  console.log(
+    `[db-migrate-pg] VERCEL_ENV=${vercelEnv}: skipping migrations (production-only).`
+  );
+  process.exit(0);
+}
+
 const prismaArgs = [
   "migrate",
   isStatus ? "status" : "deploy",
@@ -101,7 +113,8 @@ console.log(
   `[db-migrate-pg] DATABASE_URL host: ${new URL(process.env.DATABASE_URL).host}`
 );
 
-const result = spawnSync("node_modules/.bin/prisma", prismaArgs, {
+const prismaCli = resolve(ROOT, "node_modules/prisma/build/index.js");
+const result = spawnSync(process.execPath, [prismaCli, ...prismaArgs], {
   cwd: ROOT,
   stdio: "inherit",
   env: process.env,

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 
 /**
  * E2E-only endpoint that promotes the currently signed-in user to the
@@ -21,11 +22,16 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(request: Request) {
   const expected = process.env.E2E_PROMOTE_TOKEN;
-  if (!expected) {
+  // Hard-disable unless a token is configured AND we are not in production.
+  if (!expected || process.env.NODE_ENV === "production") {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const header = request.headers.get("x-e2e-token");
-  if (header !== expected) {
+  const header = request.headers.get("x-e2e-token") ?? "";
+  // Constant-time comparison to prevent timing oracle
+  const maxLen = Math.max(header.length, expected.length);
+  const headerBuf = Buffer.from(header.padEnd(maxLen, "\0"));
+  const expectedBuf = Buffer.from(expected.padEnd(maxLen, "\0"));
+  if (!crypto.timingSafeEqual(headerBuf, expectedBuf)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const session = await getServerSession(authOptions);

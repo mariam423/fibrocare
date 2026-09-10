@@ -32,7 +32,11 @@ import { prisma } from "@/lib/prisma";
 
 const mockedLimiter = vi.mocked(checkRateLimitDistributed);
 const mockedFindUnique = vi.mocked(prisma.user.findUnique);
-const mockedCompare = vi.mocked(bcrypt.compare);
+// bcryptjs `compare` is overloaded (promise + callback); vi.mocked resolves
+// to the last (void) overload, so pin the promise signature explicitly.
+const mockedCompare = vi.mocked(
+  bcrypt.compare as (a: string, b: string) => Promise<boolean>
+);
 
 /**
  * Extract the credentials `authorize` callback from the NextAuth config.

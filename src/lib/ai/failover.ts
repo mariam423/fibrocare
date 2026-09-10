@@ -1,6 +1,15 @@
-import { streamText, generateText, generateObject, type CoreMessage } from "ai";
+import {
+  streamText,
+  generateText,
+  generateObject,
+  type GenerateTextOnEndCallback,
+  type LanguageModel,
+  type ModelMessage,
+  type StreamTextOnErrorCallback,
+  type TimeoutConfiguration,
+  type ToolSet,
+} from "ai";
 import { getFailoverOrder, getModel, recordAiFailure, recordAiSuccess, type AiProvider } from "./provider";
-import type { LanguageModel } from "ai";
 
 /**
  * Error types that should trigger a failover to the next provider.
@@ -21,14 +30,27 @@ function isTransientError(error: unknown): boolean {
   return false;
 }
 
+/**
+ * Deliberately permissive option bag. The failover wrapper is a pass-through:
+ * it forwards everything the caller sent to `streamText`/`generateText` plus
+ * the resolved model. Deriving the type structurally from the SDK's
+ * overloaded signatures collapsed to `never` (v7 option unions), so the
+ * boundary is a hand-rolled superset; each call site casts into the SDK's
+ * parameter type at the single choke point below.
+ */
 interface FailoverOptions {
   system?: string;
-  messages: CoreMessage[];
+  messages?: unknown[];
+  prompt?: string;
   maxOutputTokens?: number;
-  timeout?: any;
   maxRetries?: number;
-  tools?: any;
-  // Allow passing through other streamText/generateText options
+  temperature?: number;
+  timeout?: unknown;
+  tools?: Record<string, unknown>;
+  onFinish?: (event: {
+    usage: { inputTokens: number; outputTokens: number };
+  }) => void | Promise<void>;
+  onError?: (event: { error: unknown }) => void;
   [key: string]: unknown;
 }
 
@@ -50,7 +72,7 @@ export async function streamTextWithFailover(options: FailoverOptions) {
       const result = await streamText({
         ...options,
         model,
-      });
+      } as Parameters<typeof streamText>[0]);
 
       // We can't fully "await" the stream here without consuming it,
       // but we can return the result. The actual error might happen during streaming.
@@ -91,7 +113,7 @@ export async function generateTextWithFailover(options: FailoverOptions) {
       const result = await generateText({
         ...options,
         model,
-      });
+      } as Parameters<typeof generateText>[0]);
       recordAiSuccess(provider);
       return result;
     } catch (error) {
@@ -118,8 +140,17 @@ function getModelForProvider(provider: AiProvider): LanguageModel | null {
 
 /**
  * Executes a generateObject call with a 3-tier failover chain.
+ * `T` stays inferred-loose (call sites re-validate with their zod schema at
+ * the boundary — never trust the provider's JSON blindly).
  */
-export async function generateObjectWithFailover<T>(options: any & { schema: any }) {
+interface GenerateObjectResult<T> {
+  object: T;
+  usage: { inputTokens: number; outputTokens: number };
+}
+
+export async function generateObjectWithFailover<T = any>(
+  options: Record<string, unknown> & { schema: unknown }
+): Promise<GenerateObjectResult<T>> {
   const order = getFailoverOrder();
   let lastError: unknown = null;
 
@@ -131,9 +162,15 @@ export async function generateObjectWithFailover<T>(options: any & { schema: any
       const result = await generateObject({
         ...options,
         model,
-      });
+      } as Parameters<typeof generateObject>[0]);
       recordAiSuccess(provider);
-      return result;
+      return {
+        object: result.object as T,
+        usage: {
+          inputTokens: result.usage.inputTokens ?? 0,
+          outputTokens: result.usage.outputTokens ?? 0,
+        },
+      };
     } catch (error) {
       lastError = error;
       if (isTransientError(error)) {

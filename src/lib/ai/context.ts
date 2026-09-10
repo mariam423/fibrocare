@@ -8,6 +8,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { decryptSensitiveData } from "@/lib/security/atRest";
 import { analyzePainPatterns } from "@/lib/insightEngine";
 import { healthSnapshotSchema, type HealthSnapshot } from "@/lib/ai/schemas";
 import { getPainTrend } from "@/lib/careInsightEngine";
@@ -153,6 +154,12 @@ export async function buildHealthSnapshot(
   }
 
   const lastLog = logs30[0]; // newest first
+
+  // Notes are AES-GCM encrypted at rest — decrypt the latest entry's note
+  // before it flows into the snapshot / system prompt.
+  if (lastLog?.notes) {
+    lastLog.notes = (await decryptSensitiveData(lastLog.notes)) ?? null;
+  }
 
   // Symptoms logged on the same calendar day as the latest entry — derived
   // from the already-fetched 30-day symptom rows (no extra query). This is

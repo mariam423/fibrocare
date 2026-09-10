@@ -8,6 +8,7 @@
 
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { decryptSensitiveData } from "@/lib/security/atRest";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { hasPermission, type UserRole } from "@/lib/auth/rbac";
@@ -459,8 +460,11 @@ export async function generateClinicalSummary(consultationId: string) {
     const recentNotes: string[] = [];
     for (const log of logs.slice(0, 10)) {
       if (log.notes) {
-        recentNotes.push(log.notes.slice(0, 200));
-        const matches = log.notes.match(medicationRegex);
+        // Notes are AES-GCM encrypted at rest — decrypt before use.
+        const plain = (await decryptSensitiveData(log.notes)) ?? "";
+        if (!plain) continue;
+        recentNotes.push(plain.slice(0, 200));
+        const matches = plain.match(medicationRegex);
         if (matches) matches.forEach((m) => medications.add(m.toLowerCase()));
       }
     }

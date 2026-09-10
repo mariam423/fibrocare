@@ -42,6 +42,7 @@ model User {
   patientConsultations Consultation[]        @relation("PatientConsultations")
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
+  subscriptions        Subscription[]
 
   @@index([role])
   @@index([signupRole])
@@ -55,9 +56,13 @@ model Subscription {
   plan             String
   status           String
   currentPeriodEnd String?
+  /// Owning user (null for legacy rows created before the link existed).
+  userId           String?
   updatedAt        DateTime @updatedAt
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([provider, externalId])
+  @@index([userId])
 }
 
 model Session {

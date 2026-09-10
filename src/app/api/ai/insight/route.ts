@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { streamText } from "ai";
 import { authOptions } from "@/lib/auth";
 import {
+  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,

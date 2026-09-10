@@ -143,9 +143,19 @@ function getCreateRequireFactory(): ((filename: string) => NodeJS.Require) | nul
  * which Node cannot resolve any package. `process.cwd()` is the real
  * project root in dev and the standalone/serverless output root in prod
  * (both contain `node_modules`), so anchor resolution there.
+ *
+ * The cwd is read through the same `globalThis` cast as
+ * `getCreateRequireFactory`: Turbopack's edge build statically rejects the
+ * literal `process.cwd()` token (a Node-only API) even though this code
+ * path can never run on the edge (createRequire is unavailable there), so
+ * the middleware bundle would otherwise fail to build.
  */
 function getRequireAnchor(): string {
-  return `${process.cwd()}/runtime-probe.cjs`;
+  const proc = (globalThis as unknown as {
+    process?: { cwd?: () => string };
+  }).process;
+  const cwd = proc?.cwd?.() ?? "/";
+  return `${cwd}/runtime-probe.cjs`;
 }
 
 /**

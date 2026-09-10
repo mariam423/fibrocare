@@ -16,6 +16,11 @@ import {
   type MedicalSummary,
 } from "@/lib/medicalSummary";
 import { getAiRuntime } from "@/lib/ai/provider";
+import {
+  decryptSensitiveData,
+  decryptLogNotes,
+  encryptSensitiveData,
+} from "@/lib/security/atRest";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -84,9 +89,12 @@ export async function requestPasswordReset(
   await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
 
   const token = crypto.randomBytes(32).toString("hex");
+  // Store only the SHA-256 of the token: a database leak must not yield
+  // usable reset links (same principle as password hashing).
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   await prisma.passwordResetToken.create({
     data: {
-      token,
+      token: tokenHash,
       userId: user.id,
       expires: new Date(Date.now() + RESET_TOKEN_TTL_MS),
     },
@@ -94,7 +102,11 @@ export async function requestPasswordReset(
 
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   const resetLink = `${baseUrl}/reset-password?token=${token}`;
-  console.log(`[auth] Password reset requested for ${email}: ${resetLink}`);
+
+  // The reset link is a bearer credential — never log it outside dev.
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[auth] Password reset requested for ${email}: ${resetLink}`);
+  }
 
   // In non-production the link is returned so the flow can be tested
   // end-to-end without an email provider. Production must send it by email.
@@ -117,8 +129,10 @@ export async function resetPassword(
     };
   }
 
+  // Look up by the same SHA-256 hash used at creation time.
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   const resetToken = await prisma.passwordResetToken.findUnique({
-    where: { token },
+    where: { token: tokenHash },
   });
   if (!resetToken || resetToken.expires < new Date()) {
     return {
@@ -362,7 +376,8 @@ export async function getAllHealthLogs() {
       where: { userId: user.id },
       orderBy: { loggedAt: 'desc' },
     });
-    return logs;
+    // Notes are AES-GCM encrypted at rest — decrypt before returning.
+    return decryptLogNotes(logs);
   } catch (error) {
     console.error("Error fetching all logs:", error);
     return [];
@@ -405,7 +420,8 @@ export async function getLatestLogs() {
       },
       take: 30,
     });
-    return logs;
+    // Notes are AES-GCM encrypted at rest — decrypt before returning.
+    return decryptLogNotes(logs);
   } catch (error) {
     console.error("Error fetching logs:", error);
     return [];
@@ -438,6 +454,8 @@ export async function getReportData() {
       analyzeHealthPatterns(user.id, 90),
       getTopSymptoms(user.id, 90),
     ]);
+    // Notes are AES-GCM encrypted at rest — decrypt before building the report.
+    await decryptLogNotes(logs);
 
     const avgPain = logs.length
       ? logs.reduce((sum, l) => sum + l.painLevel, 0) / logs.length
@@ -570,6 +588,8 @@ export async function generateMedicalSummary(): Promise<
       analyzeHealthPatterns(user.id, 30),
       getTopSymptoms(user.id, 30),
     ]);
+    // Notes are AES-GCM encrypted at rest — decrypt before summarizing.
+    await decryptLogNotes(logs);
 
     const fingerprint = summaryFingerprint(user.id, logs);
     if (cached && cached.fingerprint === fingerprint && cached.expiresAt > Date.now()) {
@@ -665,22 +685,4 @@ export async function getAiStatus() {
   };
 }
 
-/** Encrypt sensitive health data using AES-256-GCM */
-async function encryptSensitiveData(text: string): Promise<string> {
-  const key = process.env.HEALTH_DATA_ENCRYPTION_KEY;
-  if (!key) {
-    // Dev-only fallback: base64 for local testing. Production must NEVER
-    // silently store readable health data — fail loudly instead.
-    if (process.env.NODE_ENV === "production") {
-      throw new Error(
-        "HEALTH_DATA_ENCRYPTION_KEY is not configured — refusing to store plaintext health notes."
-      );
-    }
-    return Buffer.from(text).toString("base64");
-  }
-  const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
-  const encrypted = Buffer.concat([cipher.update(text, "utf8"), cipher.final()]);
-  const authTag = cipher.getAuthTag();
-  return Buffer.concat([iv, authTag, encrypted]).toString("base64");
-}
+

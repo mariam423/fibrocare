@@ -38,6 +38,9 @@ coverage/
 playwright-report/
 test-results/
 
+# Playwright auth state — contains live session cookies (JWT). Never commit.
+e2e/.auth/
+
 # demo capture working directory (scripts/capture-demo.mjs)
 tmp/
 

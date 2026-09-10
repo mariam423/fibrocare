@@ -17,6 +17,7 @@
 import { z } from "zod";
 import type { ModelMessage } from "ai";
 import { prisma } from "@/lib/prisma";
+import { decryptSensitiveData } from "@/lib/security/atRest";
 import { healthSnapshotSchema, type HealthSnapshot } from "@/lib/ai/schemas";
 import { buildHealthSnapshot } from "@/lib/ai/context";
 import { getCachedHealthSnapshot } from "@/lib/ai/snapshotCache";
@@ -176,8 +177,11 @@ export async function buildMedicationMentions(userId: string): Promise<string[]>
   const found = new Set<string>();
   for (const { notes } of noteRows) {
     if (!notes) continue;
+    // Notes are AES-GCM encrypted at rest — decrypt before scanning.
+    const plain = await decryptSensitiveData(notes);
+    if (!plain) continue;
     for (const { match, name } of MEDICATION_PATTERNS) {
-      if (match.test(notes)) found.add(name);
+      if (match.test(plain)) found.add(name);
     }
   }
   return [...found].slice(0, 6);

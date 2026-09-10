@@ -2,7 +2,9 @@ import { getServerSession } from "next-auth";
 import { streamText, tool } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { requirePermissionResponse } from "@/lib/auth/entitlement";
 import {
+  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,
@@ -83,6 +85,11 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return unauthorizedResponse();
   }
+
+  // Server-side entitlement: the AI companion is a Pro feature. The
+  // client may show it optimistically, but the route enforces it.
+  const denied = await requirePermissionResponse(session.user.id, "ai:companion");
+  if (denied) return denied;
 
   const { ok, resetAt } = await checkChatRateLimit(session.user.id);
   if (!ok) {

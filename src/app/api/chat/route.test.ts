@@ -21,6 +21,12 @@ vi.mock("next-auth", () => ({
 
 vi.mock("@/lib/auth", () => ({ authOptions: {} }));
 
+// Entitlement guard: allowed by default; individual tests override to
+// exercise the 403 Pro-gating path.
+vi.mock("@/lib/auth/entitlement", () => ({
+  requirePermissionResponse: vi.fn(async () => null),
+}));
+
 vi.mock("ai", async () => {
   const actual = await vi.importActual<typeof import("ai")>("ai");
   return { ...actual, streamText: vi.fn() };
@@ -28,6 +34,7 @@ vi.mock("ai", async () => {
 
 vi.mock("@/lib/ai/provider", () => ({
   getModel: vi.fn(),
+  getFailoverOrder: vi.fn(() => ["google"]),
   getProviderDisplayName: vi.fn(() => "Test Provider"),
   isAiConfigured: vi.fn(),
   isMockMode: vi.fn(),
@@ -135,6 +142,26 @@ describe("POST /api/chat", () => {
       "next-auth.session-token=;"
     );
     expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
+  });
+
+  it("returns 403 when the entitlement guard denies the user", async () => {
+    const { requirePermissionResponse } = await import(
+      "@/lib/auth/entitlement"
+    );
+    vi.mocked(getServerSession).mockResolvedValue(session as never);
+    vi.mocked(requirePermissionResponse).mockResolvedValueOnce(
+      Response.json(
+        { error: "This feature requires an active Pro subscription." },
+        { status: 403 }
+      )
+    );
+
+    const response = await POST(chatRequest());
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      error: "This feature requires an active Pro subscription.",
+    });
   });
 
   it("logs one privacy-safe alert after repeated chat auth failures", async () => {

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { streamText } from "ai";
 import { authOptions } from "@/lib/auth";
 import {
+  getModel,
   getProviderDisplayName,
   isAiConfigured,
   isMockMode,

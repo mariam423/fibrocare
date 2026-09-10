@@ -67,6 +67,23 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Per-IP budget on top of the per-topic limit: this endpoint is public
+  // (patient-facing Doctor Hub) and triggers LLM generation, so bound how
+  // much a single client can spend. 30 generates / minute is far beyond
+  // any legit sweep over the closed topic catalogue.
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "unknown";
+  const ipLimit = await checkRateLimitDistributed(`generate-ip:${ip}`, 30, 60_000);
+  if (!ipLimit.ok) {
+    const retryAfter = Math.max(1, Math.ceil((ipLimit.resetAt - Date.now()) / 1000));
+    return Response.json(
+      { error: "Too many article generations — try again shortly." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   const result = await ensureArticleForTopic(parsed.data.topicId, language);
   if (!result.success) {
     return Response.json({ error: result.error }, { status: 500 });

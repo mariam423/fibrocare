@@ -46,6 +46,9 @@ const PROVIDER_MODELS: Record<AiProvider, string> = {
   // so the default is the free model that verified 200 live. Override with
   // AI_MODEL=anthropic/claude-sonnet-4.5 once credits exist.
   openrouter: "nvidia/nemotron-3-super-120b-a12b:free",
+  // Groq's public models are offered at free/very low cost and are the
+  // most common success path for the rate-limited Gemini/OpenRouter tiers.
+  groq: "llama-3.3-70b-versatile",
 };
 
 /** App identity sent with every OpenRouter request (their header contract). */
@@ -120,7 +123,9 @@ export function getProviderDisplayName(): string {
       ? "OpenAI"
       : provider === "anthropic"
         ? "Claude"
-        : "OpenRouter";
+        : provider === "groq"
+          ? "Groq"
+          : "OpenRouter";
 }
 
 export function getFailoverOrder(): AiProvider[] {

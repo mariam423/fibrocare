@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SparklesIcon, AlertCircleIcon, LightbulbIcon } from "@hugeicons/core-free-icons";
+import { SparklesIcon, AlertCircleIcon, BulbIcon } from "@hugeicons/core-free-icons";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -79,7 +79,7 @@ export function CareRecommendationCard() {
               : "bg-teal-100 text-teal-600 dark:bg-teal-900/40 dark:text-teal-400"
           )}>
             <HugeiconsIcon
-              icon={isHighPriority ? AlertCircleIcon : LightbulbIcon}
+              icon={isHighPriority ? AlertCircleIcon : BulbIcon}
               className="h-5 w-5"
             />
           </div>

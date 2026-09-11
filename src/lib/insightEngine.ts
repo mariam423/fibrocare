@@ -321,7 +321,7 @@ export function analyzePainPatterns(
         "High severity pain detected in pelvic or lower back areas. Warm therapy or a compression wrap may provide relief.",
       type: "tip",
       severity: "info",
-      params: { areas: highPainAreas.map((a) => a.area) },
+      params: { areas: highPainAreas.map((a) => String(a.area)).join(", ") },
     });
   }
 
@@ -354,7 +354,18 @@ export async function analyzeHealthPatterns(
     }),
   ]);
 
-  return analyzePainPatterns(logs, symptomLogs, cycles, days);
+  return analyzePainPatterns(
+    logs,
+    symptomLogs.map((s) => ({
+      symptom: s.symptom,
+      date: s.date,
+      severity: s.severity,
+      category: s.category,
+      area: s.area ?? undefined,
+    })),
+    cycles,
+    days
+  );
 }
 
 /** Most frequently logged symptoms in the last `days`, descending. */

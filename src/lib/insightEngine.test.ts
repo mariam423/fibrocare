@@ -21,8 +21,8 @@ function pain(level: number, daysAgo: number, id = 1): PainPatternLog {
 }
 
 /** Build a SymptomLog-shaped fixture for `daysAgo` days from now. */
-function symptom(symptom: string, daysAgo: number): { symptom: string; date: string } {
-  return { symptom, date: toDateKey(new Date(Date.now() - daysAgo * DAY_MS)) };
+function symptom(symptom: string, daysAgo: number): { symptom: string; date: string; severity: number; category: "PHYSICAL" | "COGNITIVE" | "MOOD" } {
+  return { symptom, date: toDateKey(new Date(Date.now() - daysAgo * DAY_MS)), severity: 5, category: "PHYSICAL" };
 }
 
 describe("analyzePainPatterns", () => {
@@ -154,8 +154,8 @@ describe("analyzePainPatterns", () => {
       symptom("fatigue", 3),
     ];
     // Need to provide dummy severity/category for symptom fixture
-    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" }));
-    const insights = analyzePainPatterns(logs, enhancedSymptoms, []);
+    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" as const }));
+    const insights = analyzePainPatterns(logs, enhancedSymptoms, [], 30);
     const corr = insights.find((i) => i.id === "symptom-correlation");
     expect(corr).toBeDefined();
     expect(corr?.title).toBe("Symptom-Pain Link Detected");
@@ -175,8 +175,8 @@ describe("analyzePainPatterns", () => {
       pain(8, 7, 7),
     ];
     const symptoms = [symptom("stretching", 1), symptom("stretching", 2), symptom("stretching", 3)];
-    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" }));
-    const insights = analyzePainPatterns(logs, enhancedSymptoms, []);
+    const enhancedSymptoms = symptoms.map(s => ({ ...s, severity: 5, category: "PHYSICAL" as const }));
+    const insights = analyzePainPatterns(logs, enhancedSymptoms, [], 30);
     const corr = insights.find((i) => i.id === "symptom-correlation");
     expect(corr).toBeDefined();
     expect(corr?.title).toBe("Symptom Seen on Easier Days");
@@ -202,11 +202,11 @@ describe("analyzePainPatterns", () => {
   it("detects luteal-cognitive-flare when in luteal phase with high cognitive symptoms", () => {
     const logs = Array.from({ length: 5 }, (_, i) => pain(5, i + 1, i + 1));
     const cycles = [
-      { id: "c1", phase: "LUTEAL", startDate: new Date(), endDate: null }
+      { id: "c1", phase: "LUTEAL" as const, startDate: new Date(), endDate: null }
     ];
     const symptoms = [
-      { symptom: "brain fog", date: "2026-01-01", severity: 8, category: "COGNITIVE", area: "OTHER" },
-      { symptom: "focus fatigue", date: "2026-01-02", severity: 7, category: "COGNITIVE", area: "OTHER" },
+      { symptom: "brain fog", date: "2026-01-01", severity: 8, category: "COGNITIVE" as const, area: "OTHER" as const },
+      { symptom: "focus fatigue", date: "2026-01-02", severity: 7, category: "COGNITIVE" as const, area: "OTHER" as const },
     ];
     const insights = analyzePainPatterns(logs, symptoms, cycles);
     const flare = insights.find((i) => i.id === "luteal-cognitive-flare");
@@ -218,7 +218,7 @@ describe("analyzePainPatterns", () => {
   it("recommends heat therapy for high severity pelvic or lower back pain", () => {
     const logs = Array.from({ length: 5 }, (_, i) => pain(5, i + 1, i + 1));
     const symptoms = [
-      { symptom: "pelvic pain", date: "2026-01-01", severity: 8, category: "PHYSICAL", area: "PELVIC" },
+      { symptom: "pelvic pain", date: "2026-01-01", severity: 8, category: "PHYSICAL" as const, area: "PELVIC" as const },
     ];
     const insights = analyzePainPatterns(logs, symptoms, []);
     const rec = insights.find((i) => i.id === "heat-therapy-rec");

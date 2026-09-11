@@ -4,12 +4,13 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  AlertCircle01Icon,
+  AlertCircleIcon,
   Activity01Icon,
   Brain01Icon,
-  Smile01Icon,
+  SmileIcon,
   Loading01Icon
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
@@ -101,7 +102,7 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
     return (
       <Card className="w-full border-destructive/20 bg-destructive/5">
         <CardContent className="p-4 flex items-center gap-3 text-destructive text-sm">
-          <HugeiconsIcon icon={AlertCircle01Icon} className="h-4 w-4" />
+          <HugeiconsIcon icon={AlertCircleIcon} className="h-4 w-4" />
           <span>{error}</span>
         </CardContent>
       </Card>
@@ -126,10 +127,10 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
       <CardHeader className="p-4 pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold tracking-tight">
-            {t("health.doctorSummaryTitle", "Analytical Health Summary")}
+            {t("health.doctorSummaryTitle")}
           </CardTitle>
           <Badge variant="outline" className={cn("font-medium px-2 py-0.5", phaseColorClass)}>
-            {t(`health.phase.${currentPhase.toLowerCase()}`, currentPhase)}
+            {t(`health.phase.${currentPhase.toLowerCase()}` as TranslationKey)}
           </Badge>
         </div>
       </CardHeader>
@@ -138,8 +139,8 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
         {data.alerts.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-medium text-amber-600">
-              <HugeiconsIcon icon={AlertCircle01Icon} className="h-3 w-3" />
-              <span>{t("health.correlationAlerts", "Correlation Alerts")}</span>
+              <HugeiconsIcon icon={AlertCircleIcon} className="h-3 w-3" />
+              <span>{t("health.correlationAlerts")}</span>
             </div>
             <div className="grid gap-2">
               {data.alerts.map((alert) => (
@@ -159,7 +160,7 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
           {/* Top Hotspots */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">
-              {t("health.topHotspots", "Top Hotspots")}
+              {t("health.topHotspots")}
             </p>
             <div className="flex flex-wrap gap-2">
               {data.topHotspots.length > 0 ? (
@@ -169,7 +170,7 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
                     variant="secondary"
                     className="text-[13px] font-normal"
                   >
-                    {t(`health.area.${spot.area.toLowerCase()}`, spot.area)}: {spot.severity}
+                    {t(`health.area.${spot.area.toLowerCase()}` as TranslationKey)}: {spot.severity}
                   </Badge>
                 ))
               ) : (
@@ -181,22 +182,22 @@ export function DoctorHealthSummary({ patientId }: DoctorHealthSummaryProps) {
           {/* Category Averages */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">
-              {t("health.categoryAverages", "Category Averages")}
+              {t("health.categoryAverages")}
             </p>
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col items-center p-2 rounded-lg bg-muted/50 border border-border">
                 <HugeiconsIcon icon={Activity01Icon} className="h-3 w-3 mb-1 text-muted-foreground" />
-                <span className="text-[10px] text-muted-foreground uppercase">{t("health.physical", "Phys")}</span>
+                <span className="text-[10px] text-muted-foreground uppercase">{t("health.physical")}</span>
                 <span className="text-sm font-bold">{data.summary.physicalAvg}</span>
               </div>
               <div className="flex flex-col items-center p-2 rounded-lg bg-muted/50 border border-border">
                 <HugeiconsIcon icon={Brain01Icon} className="h-3 w-3 mb-1 text-muted-foreground" />
-                <span className="text-[10px] text-muted-foreground uppercase">{t("health.cognitive", "Cogn")}</span>
+                <span className="text-[10px] text-muted-foreground uppercase">{t("health.cognitive")}</span>
                 <span className="text-sm font-bold">{data.summary.cognitiveAvg}</span>
               </div>
               <div className="flex flex-col items-center p-2 rounded-lg bg-muted/50 border border-border">
-                <HugeiconsIcon icon={Smile01Icon} className="h-3 w-3 mb-1 text-muted-foreground" />
-                <span className="text-[10px] text-muted-foreground uppercase">{t("health.mood", "Mood")}</span>
+                <HugeiconsIcon icon={SmileIcon} className="h-3 w-3 mb-1 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground uppercase">{t("health.mood")}</span>
                 <span className="text-sm font-bold">{data.summary.moodAvg}</span>
               </div>
             </div>

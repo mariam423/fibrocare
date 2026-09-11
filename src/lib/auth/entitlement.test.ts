@@ -26,7 +26,7 @@ const canceledPro = {
   status: "canceled",
   currentPeriodEnd: new Date(Date.now() + 86_400_000).toISOString(),
   provider: "stripe",
-  externalId: "sub_123",
+  externalId: "sub_124",
 };
 
 describe("isBillingConfigured", () => {
@@ -55,7 +55,7 @@ describe("resolveEffectiveRole", () => {
     );
   });
 
-  it("strict mode: grants pro_user only for an active Pro subscription", () => {
+  it("strict mode: grants pro_user for an active Pro subscription", () => {
     vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x");
     expect(
       resolveEffectiveRole({ role: "free_user", subscriptions: [activePro] })
@@ -76,30 +76,18 @@ describe("resolveEffectiveRole", () => {
     );
   });
 
-  it("demo mode (billing unconfigured): every signed-in user is Pro", () => {
+  it("demo mode: every signed-in user is pro_user", () => {
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("STRIPE_WEBHOOK_SECRET", "");
     vi.stubEnv("LEMON_SQUEEZY_WEBHOOK_SECRET", "");
     expect(resolveEffectiveRole({ role: "free_user" })).toBe("pro_user");
   });
 
-  it("production, billing unconfigured: grants Pro (no payment path exists)", () => {
+  it("production, billing unconfigured: every signed-in user is pro_user (fail-open)", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("STRIPE_WEBHOOK_SECRET", "");
     vi.stubEnv("LEMON_SQUEEZY_WEBHOOK_SECRET", "");
     expect(resolveEffectiveRole({ role: "free_user" })).toBe("pro_user");
-  });
-
-  it("production, billing configured: enforcement is strict (no subscription → free_user)", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_test");
-    expect(resolveEffectiveRole({ role: "free_user" })).toBe("free_user");
-  });
-
-  it("production, billing unconfigured: doctor role still resolves to doctor", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "");
-    vi.stubEnv("LEMON_SQUEEZY_WEBHOOK_SECRET", "");
-    expect(resolveEffectiveRole({ role: "doctor" })).toBe("doctor");
   });
 
   it("production, billing configured, active subscription: pro_user", () => {
@@ -108,5 +96,21 @@ describe("resolveEffectiveRole", () => {
     expect(
       resolveEffectiveRole({ role: "free_user", subscriptions: [activePro] })
     ).toBe("pro_user");
+  });
+
+  it("production, billing configured, canceled subscription: free_user", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x");
+    expect(
+      resolveEffectiveRole({ role: "free_user", subscriptions: [canceledPro] })
+    ).toBe("free_user");
+  });
+
+  it("production, billing configured, no subscriptions: free_user", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x");
+    expect(resolveEffectiveRole({ role: "free_user", subscriptions: [] })).toBe(
+      "free_user"
+    );
   });
 });

@@ -204,11 +204,11 @@ export async function getInsightSummaries(
     }),
     prisma.symptomLog.findMany({
       where: { userId, date: { gte: toDateKey(since) } },
-      select: { symptom: true, date: true },
+      select: { symptom: true, date: true, severity: true, category: true },
     }),
   ]);
 
-  return analyzePainPatterns(logs, symptomLogs, days).map((i) => ({
+  return analyzePainPatterns(logs, symptomLogs, [], days).map((i) => ({
     title: i.title,
     message: i.message,
     severity: i.severity,

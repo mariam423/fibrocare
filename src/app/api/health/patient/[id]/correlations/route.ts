@@ -6,10 +6,10 @@ import { analyzePainPatterns, type SymptomPatternLog, type CyclePatternLog, type
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const patientId = params.id;
+    const patientId = (await params).id;
 
     // 1. Authorization
     const session = await getServerSession(authOptions);
@@ -17,7 +17,13 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (session.user.role !== "doctor") {
+    // The doctor flag is a hard DB field (see src/lib/auth/rbac.ts) —
+    // resolve it server-side rather than trusting the JWT/session shape.
+    const doctor = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    if (doctor?.role !== "doctor") {
       return NextResponse.json({ error: "Forbidden: Doctor role required" }, { status: 403 });
     }
 

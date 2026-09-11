@@ -31,8 +31,9 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-const mockDoctor = { id: "doc-1", role: "doctor", name: "Dr. Smith" };
-const mockPatient = { id: "pat-1", name: "Patient A" };
+const mockDoctorSession = {
+  user: { id: "doc-1", role: "doctor" },
+} as any;
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -40,7 +41,7 @@ afterEach(() => {
 
 describe("GET /api/health/patient/[id]/correlations", () => {
   const req = new NextRequest("http://localhost/api/health/patient/pat-1/correlations");
-  const params = { id: "pat-1" };
+  const params = Promise.resolve({ id: "pat-1" });
 
   it("returns 401 when session is missing", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null);
@@ -52,35 +53,38 @@ describe("GET /api/health/patient/[id]/correlations", () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: "user-1", role: "patient" },
     } as any);
+    // DB says the caller is not a doctor (first findUnique = role check).
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      role: "free_user",
+    } as any);
     const response = await GET(req, { params });
     expect(response.status).toBe(403);
   });
 
   it("returns 403 when doctor has no consultation with patient", async () => {
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: "doc-1", role: "doctor" },
-    } as any);
+    vi.mocked(getServerSession).mockResolvedValue(mockDoctorSession);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ role: "doctor" } as any);
     vi.mocked(prisma.consultation.findFirst).mockResolvedValue(null);
     const response = await GET(req, { params });
     expect(response.status).toBe(403);
   });
 
   it("returns 404 when patient does not exist", async () => {
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: "doc-1", role: "doctor" },
-    } as any);
-    vi.mocked(prisma.consultation.findFirst).mockResolvedValue({ id: "cons-1" });
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
+    vi.mocked(getServerSession).mockResolvedValue(mockDoctorSession);
+    vi.mocked(prisma.user.findUnique)
+      .mockResolvedValueOnce({ role: "doctor" } as any) // caller role check
+      .mockResolvedValueOnce(null); // patient lookup
+    vi.mocked(prisma.consultation.findFirst).mockResolvedValue({ id: "cons-1" } as any);
     const response = await GET(req, { params });
     expect(response.status).toBe(404);
   });
 
   it("returns 200 with analytical summary when authorized and data exists", async () => {
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: "doc-1", role: "doctor" },
-    } as any);
-    vi.mocked(prisma.consultation.findFirst).mockResolvedValue({ id: "cons-1" });
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockPatient);
+    vi.mocked(getServerSession).mockResolvedValue(mockDoctorSession);
+    vi.mocked(prisma.user.findUnique)
+      .mockResolvedValueOnce({ role: "doctor" } as any) // caller role check
+      .mockResolvedValueOnce({ id: "pat-1", name: "Patient A" } as any); // patient lookup
+    vi.mocked(prisma.consultation.findFirst).mockResolvedValue({ id: "cons-1" } as any);
 
     vi.mocked(prisma.menstrualCycle.findMany).mockResolvedValue([
       { id: "c1", phase: "LUTEAL", startDate: new Date(), endDate: null },

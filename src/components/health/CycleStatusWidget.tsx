@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CalendarMoonIcon, SparklesIcon } from "@hugeicons/core-free-icons";
+import { Moon02Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -72,7 +72,7 @@ export function CycleStatusWidget() {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold text-purple-800 dark:text-purple-300 flex items-center gap-2">
-            <HugeiconsIcon icon={CalendarMoonIcon} className="h-5 w-5" />
+            <HugeiconsIcon icon={Moon02Icon} className="h-5 w-5" />
             {phaseNames[data.phase] || data.phase}
           </CardTitle>
           <div className="text-base font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">

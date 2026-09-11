@@ -587,6 +587,35 @@ export type TranslationKey =
   | "dashboard.weekly.daysLogged"
   | "dashboard.weekly.highest"
   | "dashboard.weekly.scale"
+  | "dashboard.loading"
+  | "dashboard.noCycleData"
+  | "health.recommendations.empty"
+  | "health.recommendations.highPriority"
+  | "health.phase.menstrual"
+  | "health.phase.follicular"
+  | "health.phase.ovulatory"
+  | "health.phase.luteal"
+  | "health.phase.unknown"
+  | "health.flareWindow"
+  | "health.currentDay"
+  | "health.flareRisk"
+  | "health.symptomMap.title"
+  | "health.symptomMap.quickLog"
+  | "health.category.physical"
+  | "health.category.cognitive"
+  | "health.category.mood"
+  | "health.doctorSummaryTitle"
+  | "health.correlationAlerts"
+  | "health.topHotspots"
+  | "health.categoryAverages"
+  | "health.physical"
+  | "health.cognitive"
+  | "health.mood"
+  | "health.area.pelvic"
+  | "health.area.lower_back"
+  | "health.area.widespread"
+  | "health.area.joints"
+  | "health.area.other"
   | "dashboard.insights.title"
   | "dashboard.insights.subtitle"
   | "dashboard.insights.empty"
@@ -2176,6 +2205,35 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.support.title": "Gentle Support",
     "dashboard.support.subtitle": "Quick tools to soothe your nervous system and lift your mood.",
     "dashboard.weekly.title": "Weekly Progress",
+    "dashboard.loading": "Loading…",
+    "dashboard.noCycleData": "No cycle data yet.",
+    "health.recommendations.empty": "No recommendations yet — keep logging to unlock insights.",
+    "health.recommendations.highPriority": "High priority",
+    "health.phase.menstrual": "Menstrual",
+    "health.phase.follicular": "Follicular",
+    "health.phase.ovulatory": "Ovulatory",
+    "health.phase.luteal": "Luteal",
+    "health.phase.unknown": "Unknown phase",
+    "health.flareWindow": "Flare window",
+    "health.currentDay": "Current day",
+    "health.flareRisk": "Flare risk",
+    "health.symptomMap.title": "Symptom Map",
+    "health.symptomMap.quickLog": "Quick log",
+    "health.category.physical": "Physical",
+    "health.category.cognitive": "Cognitive",
+    "health.category.mood": "Mood",
+    "health.doctorSummaryTitle": "Analytical Health Summary",
+    "health.correlationAlerts": "Correlation Alerts",
+    "health.topHotspots": "Top Hotspots",
+    "health.categoryAverages": "Category Averages",
+    "health.physical": "Physical",
+    "health.cognitive": "Cognitive",
+    "health.mood": "Mood",
+    "health.area.pelvic": "Pelvic",
+    "health.area.lower_back": "Lower back",
+    "health.area.widespread": "Widespread",
+    "health.area.joints": "Joints",
+    "health.area.other": "Other",
     "dashboard.weekly.subtitle": "Your pain levels over the last 7 days.",
     "dashboard.weekly.avgPain": "Avg pain",
     "dashboard.weekly.daysLogged": "Days logged",
@@ -3791,6 +3849,35 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.support.title": "دعم لطيف",
     "dashboard.support.subtitle": "أدوات سريعة لتهدئة جهازك العصبي ورفع حالتك المزاجية.",
     "dashboard.weekly.title": "التقدم الأسبوعي",
+    "dashboard.loading": "جارٍ التحميل…",
+    "dashboard.noCycleData": "لا توجد بيانات دورة بعد.",
+    "health.recommendations.empty": "لا توجد توصيات بعد — استمر في التسجيل لفتح الرؤى.",
+    "health.recommendations.highPriority": "أولوية عالية",
+    "health.phase.menstrual": "الحيض",
+    "health.phase.follicular": "الجرابية",
+    "health.phase.ovulatory": "الإباضة",
+    "health.phase.luteal": "الأصفارية",
+    "health.phase.unknown": "طور غير معروف",
+    "health.flareWindow": "نافذة النوبات",
+    "health.currentDay": "اليوم الحالي",
+    "health.flareRisk": "خطر النوبة",
+    "health.symptomMap.title": "خريطة الأعراض",
+    "health.symptomMap.quickLog": "تسجيل سريع",
+    "health.category.physical": "جسدي",
+    "health.category.cognitive": "إدراكي",
+    "health.category.mood": "مزاجي",
+    "health.doctorSummaryTitle": "الملخص الصحي التحليلي",
+    "health.correlationAlerts": "تنبيهات الارتباط",
+    "health.topHotspots": "أكثر المناطق ألمًا",
+    "health.categoryAverages": "متوسطات الفئات",
+    "health.physical": "جسدي",
+    "health.cognitive": "إدراكي",
+    "health.mood": "مزاجي",
+    "health.area.pelvic": "الحوض",
+    "health.area.lower_back": "أسفل الظهر",
+    "health.area.widespread": "منتشر",
+    "health.area.joints": "المفاصل",
+    "health.area.other": "أخرى",
     "dashboard.weekly.subtitle": "مستويات ألمك خلال آخر 7 أيام.",
     "dashboard.weekly.avgPain": "متوسط الألم",
     "dashboard.weekly.daysLogged": "أيام مسجلة",

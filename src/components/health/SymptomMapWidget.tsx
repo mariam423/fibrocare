@@ -9,9 +9,10 @@ import {
   BrainIcon,
   HeartIcon,
   ActivityIcon,
-  PlusIcon
+  Add01Icon
 } from "@hugeicons/core-free-icons";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 
 interface CategoryLog {
@@ -42,8 +43,9 @@ export function SymptomMapWidget() {
     MOOD: 5,
   });
 
-  const handleValueChange = (catId: string, value: number[]) => {
-    setCategoryValues(prev => ({ ...prev, [catId]: value[0] }));
+  const handleValueChange = (catId: string, value: number | readonly number[]) => {
+    const next = Array.isArray(value) ? value : [value];
+    setCategoryValues(prev => ({ ...prev, [catId]: next[0] }));
   };
 
   const handleQuickLog = async (log: typeof QUICK_LOGS[0]) => {
@@ -82,7 +84,7 @@ export function SymptomMapWidget() {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2 text-base font-medium text-teal-700 dark:text-teal-300">
                   <HugeiconsIcon icon={cat.icon} className="h-4 w-4" />
-                  {t(`health.category.${cat.id.toLowerCase()}`)}
+                  {t(`health.category.${cat.id.toLowerCase()}` as TranslationKey)}
                 </div>
                 <span className="text-base font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-600 dark:bg-teal-900/40 dark:text-teal-400">
                   {categoryValues[cat.id]} / 10
@@ -113,7 +115,7 @@ export function SymptomMapWidget() {
                 onClick={() => handleQuickLog(log)}
                 className="text-base h-9 px-3 rounded-full border-teal-200 bg-white/50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-800/40 transition-colors"
               >
-                <HugeiconsIcon icon={PlusIcon} className="me-1 h-3 w-3" />
+                <HugeiconsIcon icon={Add01Icon} className="me-1 h-3 w-3" />
                 {log.label}
               </Button>
             ))}

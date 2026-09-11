@@ -676,6 +676,10 @@ export type TranslationKey =
   | "health.category.physical"
   | "health.category.cognitive"
   | "health.category.mood"
+  | "health.quickLog.brainFog"
+  | "health.quickLog.focusFatigue"
+  | "health.quickLog.jointPain"
+  | "health.quickLog.emotionalExhaustion"
   | "health.doctorSummaryTitle"
   | "health.correlationAlerts"
   | "health.topHotspots"
@@ -1016,6 +1020,10 @@ export type TranslationKey =
   | "insight.symptomCorrelation.positive.message"
   | "insight.symptomCorrelation.negative.title"
   | "insight.symptomCorrelation.negative.message"
+  | "insight.lutealCognitive.title"
+  | "insight.lutealCognitive.message"
+  | "insight.heatTherapy.title"
+  | "insight.heatTherapy.message"
   | "chart.emptyTitle"
   | "chart.emptyHint"
   | "chart.legendPain"
@@ -2365,6 +2373,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.category.physical": "Physical",
     "health.category.cognitive": "Cognitive",
     "health.category.mood": "Mood",
+    "health.quickLog.brainFog": "Brain Fog",
+    "health.quickLog.focusFatigue": "Focus Fatigue",
+    "health.quickLog.jointPain": "Joint Pain",
+    "health.quickLog.emotionalExhaustion": "Emotional Exhaustion",
     "health.doctorSummaryTitle": "Analytical Health Summary",
     "health.correlationAlerts": "Correlation Alerts",
     "health.topHotspots": "Top Hotspots",
@@ -2711,6 +2723,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "insight.symptomCorrelation.positive.message": "Days with \"{symptom}\" average {delta} points higher pain ({count} occurrences). Worth tracking closely.",
     "insight.symptomCorrelation.negative.title": "Symptom Seen on Easier Days",
     "insight.symptomCorrelation.negative.message": "\"{symptom}\" appears mostly on lighter days ({delta} lower pain). It may be more of an outcome than a trigger.",
+    "insight.lutealCognitive.title": "Hormonal Cognitive Influence",
+    "insight.lutealCognitive.message": "Your current luteal phase correlates with higher cognitive symptoms (brain fog/focus). This is a common hormonal pattern.",
+    "insight.heatTherapy.title": "Comfort Recommendation",
+    "insight.heatTherapy.message": "High severity pain detected in pelvic or lower back areas. Warm therapy or a compression wrap may provide relief.",
     "chart.emptyTitle": "No pain entries in the last 7 days.",
     "chart.emptyHint": "Log your check-in above to start your weekly progress.",
     "chart.legendPain": "Pain level",
@@ -4081,6 +4097,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.category.physical": "جسدي",
     "health.category.cognitive": "إدراكي",
     "health.category.mood": "مزاجي",
+    "health.quickLog.brainFog": "ضباب الدماغ",
+    "health.quickLog.focusFatigue": "إجهاد التركيز",
+    "health.quickLog.jointPain": "ألم المفاصل",
+    "health.quickLog.emotionalExhaustion": "إنهاك عاطفي",
     "health.doctorSummaryTitle": "الملخص الصحي التحليلي",
     "health.correlationAlerts": "تنبيهات الارتباط",
     "health.topHotspots": "أكثر المناطق ألمًا",
@@ -4429,6 +4449,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "insight.symptomCorrelation.positive.message": "الأيام التي فيها \"{symptom}\" يزيد الألم بمتوسط {delta} نقطة ({count} مرات). يستحق المتابعة عن قرب.",
     "insight.symptomCorrelation.negative.title": "أعراض تظهر في الأيام الأسهل",
     "insight.symptomCorrelation.negative.message": "يظهر \"{symptom}\" غالبًا في الأيام الأخف (ألم أقل بمقدار {delta} نقطة). قد يكون نتيجة وليس محفزًا.",
+    "insight.lutealCognitive.title": "تأثير هرموني إدراكي",
+    "insight.lutealCognitive.message": "يرتبط طورك الأصفري الحالي بارتفاع الأعراض الإدراكية (ضباب الدماغ/التركيز). هذا نمط هرموني شائع.",
+    "insight.heatTherapy.title": "توصية راحة",
+    "insight.heatTherapy.message": "رُصد ألم شديد في منطقتي الحوض وأسفل الظهر. قد يوفر العلاج الدافئ أو الرباط الضاغط بعض الراحة.",
     "chart.emptyTitle": "لا توجد إدخالات ألم خلال آخر 7 أيام.",
     "chart.emptyHint": "سجّل تسجيلك أعلاه لبدء تقدمك الأسبوعي.",
     "chart.legendPain": "مستوى الألم",

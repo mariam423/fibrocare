@@ -18,6 +18,8 @@ const INSIGHT_TITLE_KEYS: Partial<Record<string, TranslationKey>> = {
   "trend-worsening": "insight.trendWorsening.title",
   "trend-improving": "insight.trendImproving.title",
   "weekday-pattern": "insight.weekdayPattern.title",
+  "luteal-cognitive-flare": "insight.lutealCognitive.title",
+  "heat-therapy-rec": "insight.heatTherapy.title",
 };
 
 const INSIGHT_MESSAGE_KEYS: Partial<Record<string, TranslationKey>> = {
@@ -28,6 +30,8 @@ const INSIGHT_MESSAGE_KEYS: Partial<Record<string, TranslationKey>> = {
   "trend-worsening": "insight.trendWorsening.message",
   "trend-improving": "insight.trendImproving.message",
   "weekday-pattern": "insight.weekdayPattern.message",
+  "luteal-cognitive-flare": "insight.lutealCognitive.message",
+  "heat-therapy-rec": "insight.heatTherapy.message",
 };
 
 /**

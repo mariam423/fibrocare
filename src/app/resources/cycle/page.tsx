@@ -30,15 +30,14 @@ export default function CyclePage() {
     []
   );
 
+  // Long-form detail only — the correlation graphic renders once inside
+  // HormonalCycleSection above, so it is deliberately omitted here.
   const sections = [
     {
       title: t("cycle.overview.title"),
       icon: Moon02Icon,
       content: t("cycle.overview.content"),
       plainContent: t("cycle.overview.plain"),
-      image: "/images/cycle-correlation.jpg",
-      imageFit: "contain" as const,
-      standaloneImage: true,
     },
     {
       title: t("cycle.tracking.title"),

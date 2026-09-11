@@ -820,7 +820,7 @@ export default function Home() {
           <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
             {t("dashboard.section.health")}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             <CycleStatusWidget />
             <CareRecommendationCard />
             <SymptomMapWidget />

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SparklesIcon, AlertCircleIcon, BulbIcon } from "@hugeicons/core-free-icons";
 import { useLanguage } from "@/context/LanguageContext";
+import { localizeInsight } from "@/lib/insightLocalization";
 import { cn } from "@/lib/utils";
 
 interface Recommendation {
@@ -27,7 +28,7 @@ interface CorrelationsPayload {
 }
 
 export function CareRecommendationCard() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [hasCycle, setHasCycle] = useState(true);
   const [hasSymptoms, setHasSymptoms] = useState(true);
@@ -79,8 +80,12 @@ export function CareRecommendationCard() {
     );
   }
 
-  // Show only the top recommendation for the dashboard widget.
+  // Show only the top recommendation for the dashboard widget. Engine copy
+  // is English-only, so route it through the shared insight localizer —
+  // known ids render localized titles/messages; unknown ids fall back to
+  // the engine copy rather than leaking machine keys.
   const topRec = recommendations[0];
+  const localized = localizeInsight(topRec, locale, t);
   // The insight engine's severity union is "info" | "warning" | "critical" —
   // "warning"+ are treated as high priority here.
   const isHighPriority =
@@ -113,10 +118,10 @@ export function CareRecommendationCard() {
               "font-bold text-base leading-tight",
               isHighPriority ? "text-orange-800 dark:text-orange-300" : "text-teal-800 dark:text-teal-300"
             )}>
-              {topRec.title}
+              {localized.title}
             </h3>
             <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-              {topRec.message}
+              {localized.message}
             </p>
           </div>
         </div>

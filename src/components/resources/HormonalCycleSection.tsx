@@ -193,6 +193,9 @@ export function HormonalCycleSection({
 
           <CardContent className="relative space-y-8 p-5 sm:p-7">
             {/* ── Header ─────────────────────────────────────── */}
+            {/* NOTE: no section title here — the page h1 lives in
+                ContentPageLayout below; repeating it here made the page
+                look double-rendered. titleKey is kept for the image alt. */}
             <div className="space-y-2 text-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-medium text-rose-700 dark:text-rose-300">
                 <HugeiconsIcon
@@ -202,9 +205,6 @@ export function HormonalCycleSection({
                 />
                 {t(eyebrowKey)}
               </div>
-              <h3 className="text-xl font-bold text-foreground sm:text-2xl">
-                <BdiText text={t(titleKey)} />
-              </h3>
               <p className="mx-auto max-w-2xl text-sm leading-relaxed text-foreground/80">
                 <BdiText text={t(introKey)} />
               </p>

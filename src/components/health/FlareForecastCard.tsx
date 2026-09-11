@@ -149,7 +149,7 @@ export function FlareForecastCard({ forecast, hasCycle }: FlareForecastCardProps
   return (
     <Card
       className={cn(
-        "w-full overflow-hidden transition-all duration-500 backdrop-blur-md",
+        "w-full h-full overflow-hidden transition-all duration-500 backdrop-blur-md",
         style.ring
       )}
     >

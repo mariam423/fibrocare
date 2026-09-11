@@ -22,17 +22,25 @@ interface CategoryLog {
   value: number;
 }
 
+interface QuickLog {
+  id: string;
+  /** Machine id sent to the API — stable English identifier. */
+  symptom: string;
+  labelKey: TranslationKey;
+  category: string;
+}
+
 const CATEGORIES: CategoryLog[] = [
   { id: "PHYSICAL", label: "Physical", icon: ActivityIcon, value: 5 },
   { id: "COGNITIVE", label: "Cognitive", icon: BrainIcon, value: 5 },
   { id: "MOOD", label: "Mood", icon: HeartIcon, value: 5 },
 ];
 
-const QUICK_LOGS = [
-  { id: "brain-fog", label: "Brain Fog", category: "COGNITIVE" },
-  { id: "focus-fatigue", label: "Focus Fatigue", category: "COGNITIVE" },
-  { id: "joint-pain", label: "Joint Pain", category: "PHYSICAL" },
-  { id: "emotional-exhaustion", label: "Emotional Exhaustion", category: "MOOD" },
+const QUICK_LOGS: QuickLog[] = [
+  { id: "brain-fog", symptom: "brain-fog", labelKey: "health.quickLog.brainFog", category: "COGNITIVE" },
+  { id: "focus-fatigue", symptom: "focus-fatigue", labelKey: "health.quickLog.focusFatigue", category: "COGNITIVE" },
+  { id: "joint-pain", symptom: "joint-pain", labelKey: "health.quickLog.jointPain", category: "PHYSICAL" },
+  { id: "emotional-exhaustion", symptom: "emotional-exhaustion", labelKey: "health.quickLog.emotionalExhaustion", category: "MOOD" },
 ];
 
 export function SymptomMapWidget() {
@@ -54,7 +62,7 @@ export function SymptomMapWidget() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          symptom: log.label,
+          symptom: log.symptom,
           severity: categoryValues[log.category],
           category: log.category,
           date: new Date().toISOString().split("T")[0],
@@ -116,7 +124,7 @@ export function SymptomMapWidget() {
                 className="text-base h-9 px-3 rounded-full border-teal-200 bg-white/50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-800/40 transition-colors"
               >
                 <HugeiconsIcon icon={Add01Icon} className="me-1 h-3 w-3" />
-                {log.label}
+                {t(log.labelKey)}
               </Button>
             ))}
           </div>

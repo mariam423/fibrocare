@@ -145,7 +145,7 @@ function NoCycleCard() {
   return (
     <Card className="w-full h-full min-h-[160px] flex flex-col items-center justify-center text-center p-6 border-purple-200 dark:border-purple-900/30">
       <HugeiconsIcon icon={Moon02Icon} className="h-6 w-6 text-purple-400 mb-2" />
-      <p className="text-sm text-muted-foreground max-w-[26ch]">
+      <p className="text-sm text-muted-foreground max-w-[36ch]">
         {t("health.cycle.emptyGuidance")}
       </p>
       {!open ? (

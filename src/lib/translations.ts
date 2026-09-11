@@ -326,6 +326,54 @@ export type TranslationKey =
   | "resources.takeaway.community.1"
   | "resources.takeaway.community.2"
   | "resources.takeaway.community.3"
+  | "resources.takeaway.cycle.1"
+  | "resources.takeaway.cycle.2"
+  | "resources.takeaway.cycle.3"
+  | "resources.cycle"
+  | "cycle.title"
+  | "cycle.subtitle"
+  | "cycle.eyebrow"
+  | "cycle.intro"
+  | "cycle.mechanism.title"
+  | "cycle.mechanism.body"
+  | "cycle.phase.menstrual"
+  | "cycle.phase.menstrualSub"
+  | "cycle.phase.follicular"
+  | "cycle.phase.follicularSub"
+  | "cycle.phase.ovulatory"
+  | "cycle.phase.ovulatorySub"
+  | "cycle.phase.luteal"
+  | "cycle.phase.lutealSub"
+  | "cycle.phase.window"
+  | "cycle.phase.windowSub"
+  | "cycle.forecast.title"
+  | "cycle.forecast.body"
+  | "cycle.forecast.badge"
+  | "cycle.forecast.hint"
+  | "cycle.tips.title"
+  | "cycle.tip.spoons.title"
+  | "cycle.tip.spoons.body"
+  | "cycle.tip.heat.title"
+  | "cycle.tip.heat.body"
+  | "cycle.tip.nutrition.title"
+  | "cycle.tip.nutrition.body"
+  | "cycle.image.caption"
+  | "cycle.references.title"
+  | "cycle.references.disclaimer"
+  | "cycle.ref.cdc"
+  | "cycle.ref.cdc.detail"
+  | "cycle.ref.niams"
+  | "cycle.ref.niams.detail"
+  | "cycle.ref.acr"
+  | "cycle.ref.acr.detail"
+  | "cycle.ref.cochrane"
+  | "cycle.ref.cochrane.detail"
+  | "cycle.overview.title"
+  | "cycle.overview.content"
+  | "cycle.overview.plain"
+  | "cycle.tracking.title"
+  | "cycle.tracking.content"
+  | "cycle.tracking.plain"
   | "diagnosis.check.title"
   | "diagnosis.check.subtitle"
   | "diagnosis.check.q.widespread"
@@ -564,6 +612,7 @@ export type TranslationKey =
   | "dashboard.pro.startConsultation"
   | "dashboard.pro.badgeText"
   | "dashboard.section.insights"
+  | "dashboard.section.health"
   | "dashboard.toolkitCard.title"
   | "dashboard.toolkitCard.desc"
   | "dashboard.toolkitCard.cta"
@@ -590,7 +639,30 @@ export type TranslationKey =
   | "dashboard.loading"
   | "dashboard.noCycleData"
   | "health.recommendations.empty"
+  | "health.recommendations.noSymptoms"
+  | "health.recommendations.noCycle"
   | "health.recommendations.highPriority"
+  | "health.forecast.levelHigh"
+  | "health.forecast.levelModerate"
+  | "health.forecast.levelLow"
+  | "health.forecast.advice.pacing"
+  | "health.forecast.advice.heat"
+  | "health.forecast.advice.sleep"
+  | "health.forecast.advice.hydrate"
+  | "health.forecast.advice.gentleMovement"
+  | "health.forecast.advice.trackDaily"
+  | "health.forecast.noCycleGuidance"
+  | "health.forecast.title"
+  | "health.forecast.periodNow"
+  | "health.forecast.periodIn"
+  | "health.forecast.inWindow"
+  | "health.forecast.windowAhead"
+  | "health.cycle.emptyGuidance"
+  | "health.cycle.logCta"
+  | "health.cycle.saveCta"
+  | "health.cycle.saveError"
+  | "health.cycle.startDateAria"
+  | "health.cycle.phaseAria"
   | "health.phase.menstrual"
   | "health.phase.follicular"
   | "health.phase.ovulatory"
@@ -1964,6 +2036,54 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.takeaway.community.1": "Sharing experiences with people who understand reduces isolation.",
     "resources.takeaway.community.2": "Peer tips (heat, pacing, gentle movement) complement clinical guidance.",
     "resources.takeaway.community.3": "Mindfulness and stress reduction are part of the evidence-based toolkit.",
+    "resources.takeaway.cycle.1": "Hormone dips before the period can heighten fibromyalgia pain sensitivity and brain fog.",
+    "resources.takeaway.cycle.2": "Flares often cluster in a window 3–7 days before menstruation — plan a lighter schedule then.",
+    "resources.takeaway.cycle.3": "Tracking your cycle and symptoms together turns that rhythm into an early-warning forecast.",
+    "resources.cycle": "Fibromyalgia & Menstrual Cycle",
+    "cycle.title": "Fibromyalgia & the Menstrual Cycle: Mechanism, Pain Forecasting, and Coping",
+    "cycle.subtitle": "Why symptoms often intensify before your period — and how anticipating the pattern helps you stay ahead of it.",
+    "cycle.eyebrow": "Hormones & pain sensitivity",
+    "cycle.intro": "Many women with fibromyalgia notice symptoms surge in the days before menstruation. That is not coincidence: reproductive-hormone fluctuations interact with the same central nervous system amplification that defines fibromyalgia.",
+    "cycle.mechanism.title": "The scientific & biological link",
+    "cycle.mechanism.body": "In the late luteal phase (the days just before menstruation) estrogen and progesterone fall naturally. Estrogen helps regulate serotonin and norepinephrine — neurotransmitters that dampen pain signals in the central nervous system. When they drop, pain inhibition weakens, producing temporary heightened pain sensitivity (hyperalgesia), deeper fatigue, and stronger brain fog. On a nervous system that already amplifies signals, that dip can tip well-managed symptoms into a flare.",
+    "cycle.phase.menstrual": "Menstruation",
+    "cycle.phase.menstrualSub": "Hormones at their lowest — sensitivity often stays elevated early in bleeding days.",
+    "cycle.phase.follicular": "Follicular phase",
+    "cycle.phase.follicularSub": "Estrogen climbs — many report their best-functioning days here.",
+    "cycle.phase.ovulatory": "Ovulation",
+    "cycle.phase.ovulatorySub": "Estrogen peaks, then swings — brief sensitivity spikes are possible.",
+    "cycle.phase.luteal": "Luteal phase",
+    "cycle.phase.lutealSub": "Progesterone rises, then both hormones fall — sensitivity starts creeping up.",
+    "cycle.phase.window": "Pre-period risk window",
+    "cycle.phase.windowSub": "Roughly 3–7 days before the period — the classic flare cluster for fibromyalgia.",
+    "cycle.forecast.title": "Predicting the flare before it arrives",
+    "cycle.forecast.body": "Because the effect is rhythmic, it can be anticipated. Severe pain and muscle stiffness typically precede menstruation by 3 to 7 days. FibroCare's cycle tracking learns your interval, and the flare forecast on your dashboard opens an early-warning window — the moment to activate your flare plan: lighter schedule, heat ready, sleep protected, medication taken on time.",
+    "cycle.forecast.badge": "Flare-risk window: 3–7 days before the period",
+    "cycle.forecast.hint": "The dashboard's Flare Forecast card updates automatically as you log cycles.",
+    "cycle.tips.title": "Proactive self-care strategies",
+    "cycle.tip.spoons.title": "Spoon management",
+    "cycle.tip.spoons.body": "Trim non-essential daily tasks by roughly 30% during the pre-period window. Front-load must-dos earlier in the cycle and schedule real rest breaks.",
+    "cycle.tip.heat.title": "Thermal therapy",
+    "cycle.tip.heat.body": "Warm compresses or a warm bath relax muscle spasms and stiffness. Apply heat to pelvic and lower-back areas before the flare peaks, not after.",
+    "cycle.tip.nutrition.title": "Nutritional support",
+    "cycle.tip.nutrition.body": "Lean on anti-inflammatory foods — vegetables, omega-3 fish, whole grains — and ease off caffeine and added sugars, which can amplify sensitivity and disrupt sleep.",
+    "cycle.image.caption": "The menstrual cycle and fibromyalgia symptom intensity move together — tracking both reveals your personal pattern.",
+    "cycle.references.title": "References & academic sources",
+    "cycle.references.disclaimer": "These sources inform FibroCare's educational content. They are not medical advice — hormonal contraception and HRT change individual experiences considerably, so discuss hormonal decisions with your care team.",
+    "cycle.ref.cdc": "CDC — Fibromyalgia",
+    "cycle.ref.cdc.detail": "Federal public-health guidance on symptoms, triggers, and management.",
+    "cycle.ref.niams": "NIAMS (NIH) — Fibromyalgia",
+    "cycle.ref.niams.detail": "National Institute of Arthritis and Musculoskeletal and Skin Diseases overview.",
+    "cycle.ref.acr": "American College of Rheumatology",
+    "cycle.ref.acr.detail": "ACR diagnostic criteria and rheumatology clinical guidance.",
+    "cycle.ref.cochrane": "Cochrane Library",
+    "cycle.ref.cochrane.detail": "Systematic reviews of chronic pain and hormonal-correlation evidence.",
+    "cycle.overview.title": "What the research shows",
+    "cycle.overview.content": "Studies of menstruating women with fibromyalgia consistently report symptom intensification premenstrually and during menstruation. The proposed mechanism is the luteal drop in estrogen and progesterone reducing serotonergic and noradrenergic pain inhibition, unmasking the central sensitization that characterizes fibromyalgia. Findings vary between individuals — some report strong cyclical patterns, others none — which is exactly why personal tracking matters more than population averages.",
+    "cycle.overview.plain": "Most women with fibromyalgia feel worse just before and during their period. Falling hormones are the likely reason. Your own pattern may differ, so tracking beats guessing.",
+    "cycle.tracking.title": "Using FibroCare's cycle tools",
+    "cycle.tracking.content": "Log each cycle's start date in the dashboard's cycle tracker. After one logged cycle the correlations feed derives your current phase; after a few, the flare forecast estimates your personal risk window (cycle days, countdown, and severity) and pairs it with proactive advice. Logging symptoms daily sharpens both the correlations and the forecast.",
+    "cycle.tracking.plain": "Add your period start dates in the dashboard. The app learns your rhythm and warns you a few days early so you can plan around the flare window.",
     "diagnosis.check.title": "AI Diagnostic Readiness Checker",
     "diagnosis.check.subtitle": "Answer 4 quick questions to see how your symptoms compare with the ACR criteria — then export a summary for your doctor.",
     "diagnosis.check.q.widespread": "Widespread pain in many body areas, on both sides, above and below the waist?",
@@ -2208,7 +2328,30 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.loading": "Loading…",
     "dashboard.noCycleData": "No cycle data yet.",
     "health.recommendations.empty": "No recommendations yet — keep logging to unlock insights.",
+    "health.recommendations.noSymptoms": "Log a few symptoms and pain check-ins — insights appear once patterns emerge.",
+    "health.recommendations.noCycle": "Log your menstrual cycle to unlock hormonal correlation insights.",
     "health.recommendations.highPriority": "High priority",
+    "health.forecast.levelHigh": "High flare risk",
+    "health.forecast.levelModerate": "Moderate risk",
+    "health.forecast.levelLow": "Low risk",
+    "health.forecast.advice.pacing": "Pace yourself — schedule short rest breaks before the window opens.",
+    "health.forecast.advice.heat": "Keep a heat pad nearby; warmth eases pre-period muscle tension.",
+    "health.forecast.advice.sleep": "Protect your sleep — fatigue amplifies flare sensitivity.",
+    "health.forecast.advice.hydrate": "Stay hydrated and limit caffeine in the days ahead.",
+    "health.forecast.advice.gentleMovement": "Gentle movement (short walks, stretching) helps without pushing.",
+    "health.forecast.advice.trackDaily": "Log daily so the forecast sharpens with every cycle.",
+    "health.forecast.noCycleGuidance": "Log your menstrual cycle once to unlock your personal flare forecast.",
+    "health.forecast.title": "Flare Forecast",
+    "health.forecast.periodNow": "Period expected now",
+    "health.forecast.periodIn": "Period in ~{{days}} days",
+    "health.forecast.inWindow": "Days {{start}}–{{end}} of this cycle are your elevated-risk window — go gently.",
+    "health.forecast.windowAhead": "Risk window opens in ~{{days}} days (cycle days {{start}}–{{end}}).",
+    "health.cycle.emptyGuidance": "No cycle logged yet. Adding it lets the engine link hormonal phases to brain fog, mood and pain.",
+    "health.cycle.logCta": "Log cycle",
+    "health.cycle.saveCta": "Save cycle",
+    "health.cycle.saveError": "Could not save the cycle. Please try again.",
+    "health.cycle.startDateAria": "Cycle start date",
+    "health.cycle.phaseAria": "Cycle phase",
     "health.phase.menstrual": "Menstrual",
     "health.phase.follicular": "Follicular",
     "health.phase.ovulatory": "Ovulatory",
@@ -2771,6 +2914,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.pro.startConsultation": "Start Consultation or Chat with Doctor",
     "dashboard.pro.badgeText": "Pro",
     "dashboard.section.insights": "Insights & gentle support",
+    "dashboard.section.health": "Health tracking & insights",
     "dashboard.toolkitCard.title": "Somatic Toolkit & Exercises",
     "dashboard.toolkitCard.desc": "Gentle exercises matched to today's energy, calming offline audio, breathing guides, sleep & HRV, and medication safety.",
     "dashboard.toolkitCard.cta": "Open the Somatic Toolkit",
@@ -3608,6 +3752,54 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.takeaway.community.1": "مشاركة التجارب مع أشخاص يفهمونك تقلل الشعور بالعزلة.",
     "resources.takeaway.community.2": "نصائح الأقران (الدفء، الإيقاع المتدرج، الحركة اللطيفة) تكمل الإرشادات السريرية.",
     "resources.takeaway.community.3": "اليقظة الذهنية وتقليل التوتر جزء من الأدوات المثبتة علميًا.",
+    "resources.takeaway.cycle.1": "انخفاض الهرمونات قبل الدورة قد يزيد حساسية الألم وضباب الدماغ في الفيبروميالجيا.",
+    "resources.takeaway.cycle.2": "تتضخم الأعراض غالبًا في نافذة قبل الدورة بـ 3–7 أيام — خففي جدولك وقتها.",
+    "resources.takeaway.cycle.3": "تتبع الدورة مع الأعراض معًا يحوّل هذا الإيقاع إلى إنذار مبكر يمكن التخطيط حوله.",
+    "resources.cycle": "الفيبروميالجي والدورة الشهرية",
+    "cycle.title": "الفيبروميالجي والدورة الشهرية: الآلية، التنبؤ بالآلام، وطرق التعامل",
+    "cycle.subtitle": "لماذا تشتد الأعراض قبل الدورة — وكيف يساعدك توقع هذا النمط على البقاء متقدمًا عليه.",
+    "cycle.eyebrow": "الهرمونات وحساسية الألم",
+    "cycle.intro": "تشعر كثيراتهن من المصابات بالفيبروميالجيا بتضخم الأعراض في الأيام السابقة للحيض. هذا ليس مصادفة: تقلبات الهرمونات التناسلية تتفاعل مع نفس تضخيم إشارات الجهاز العصبي المركزي الذي يحدد الفيبروميالجيا.",
+    "cycle.mechanism.title": "العلاقة العلمية والبيولوجية",
+    "cycle.mechanism.body": "في الطور الأصفري المتأخر (الأيام السابقة مباشرة للحيض) تنخفض الأستروجين والبروجسترون بشكل طبيعي. الأستروجين ينظم السيروتونين والنورإبينفرين — ناقلين عصبيين يكبحان إشارات الألم في الجهاز العصبي المركزي. عند انخفاضهما يضعف التثبيط الألمي، فتظهر حساسية ألم مرتفعة مؤقتًا (فرط الألم)، وإرهاق أعمق، وضباب دماغ أقوى. على جهاز عصبي يضخّم الإشارات أصلًا، قد يدفع هذا الانخفاض الأعراض المستقرة إلى توهج كامل.",
+    "cycle.phase.menstrual": "الحيض",
+    "cycle.phase.menstrualSub": "الهرمونات في أدنى مستوياتها — تبقى الحساسية مرتفعة غالبًا في بداية أيام النزيف.",
+    "cycle.phase.follicular": "الطور الجريبي",
+    "cycle.phase.follicularSub": "الأستروجين يصعد — كثيرات يذكرن أفضل أيامهن هنا.",
+    "cycle.phase.ovulatory": "الإباضة",
+    "cycle.phase.ovulatorySub": "الأستروجين يبلغ ذروته ثم يتأرجح — قد تحدث نوبات حساسية قصيرة.",
+    "cycle.phase.luteal": "الطور الأصفري",
+    "cycle.phase.lutealSub": "البروجسترون يرتفع ثم ينخفض الهرمونان معًا — تبدأ الحساسية بالتسلل.",
+    "cycle.phase.window": "نافذة الخطر قبل الدورة",
+    "cycle.phase.windowSub": "نحو 3–7 أيام قبل الحيض — التوقيت الكلاسيكي لتكدس التوهجات في الفيبروميالجيا.",
+    "cycle.forecast.title": "التنبؤ بالتوهج قبل وصوله",
+    "cycle.forecast.body": "لأن التأثير إيقاعي، يمكن توقعه. الألم الشديد وتيبس العضلات يسبقان الحيض عادة بـ 3 إلى 7 أيام. يتعلم متتبع الدورة في فايبروكير فترتك، وتفتح بطاقة توقعات التوهج في لوحتك نافذة إنذار مبكر — اللحظة المناسبة لتفعيل خطة التوهج: جدول أخف، دفء جاهز، نوم محمي، ودواء في وقته.",
+    "cycle.forecast.badge": "نافذة خطر التوهج: قبل الدورة بـ 3–7 أيام",
+    "cycle.forecast.hint": "تتحدث بطاقة توقعات التوهج في لوحة التحكم تلقائيًا مع كل تسجيل دورة.",
+    "cycle.tips.title": "استراتيجيات الرعاية الذاتية الاستباقية",
+    "cycle.tip.spoons.title": "إدارة الملاعق",
+    "cycle.tip.spoons.body": "قللي المهام اليومية غير الأساسية بنحو 30% خلال أيام ما قبل الدورة. أنجزي الضروري مبكرًا في الدورة وبرمجي فترات راحة حقيقية.",
+    "cycle.tip.heat.title": "العلاج الحراري",
+    "cycle.tip.heat.body": "الكمادات الدافئة أو الحمام الدافئ يريحان تشنجات العضلات والتيبس. ضعي الدفء على منطقتي الحوض وأسفل الظهر قبل ذروة التوهج لا بعدها.",
+    "cycle.tip.nutrition.title": "الدعم الغذائي",
+    "cycle.tip.nutrition.body": "اعتمدي على الأطعمة المضادة للالتهاب — خضروات وأسماك أوميغا 3 وحبوب كاملة — وخففي الكافيين والسكريات المضافة التي قد تضخم الحساسية وتربك النوم.",
+    "cycle.image.caption": "شدة أعراض الفيبروميالجيا والدورة الشهرية تتحركان معًا — تتبع الاثنتين يكشف نمطك الشخصي.",
+    "cycle.references.title": "المراجع والمصادر الأكاديمية",
+    "cycle.references.disclaimer": "هذه المصادر تُعلم المحتوى التعليمي في فايبروكير. وهي ليست نصيحة طبية — منظمات الحمل الهرمونية وعلاج هرمون البديل تغير التجربة الفردية كثيرًا، فناقشي القرارات الهرمونية مع فريق رعايتك.",
+    "cycle.ref.cdc": "مراكز مكافحة الأمراض (CDC) — الفيبروميالجيا",
+    "cycle.ref.cdc.detail": "إرشادات الصحة العامة الفيدرالية حول الأعراض والمحفزات والإدارة.",
+    "cycle.ref.niams": "المعهد الوطني (NIH) — الفيبروميالجيا",
+    "cycle.ref.niams.detail": "نظرة معهد التهاب المفاصل والعضلات والجلد على الحالة.",
+    "cycle.ref.acr": "الكلية الأمريكية لأمراض الروماتيزم",
+    "cycle.ref.acr.detail": "معايير ACR التشخيصية والإرشادات السريرية لطب الروماتيزم.",
+    "cycle.ref.cochrane": "مكتبة كوكرين",
+    "cycle.ref.cochrane.detail": "مراجعات منهجية لأدلة الألم المزمن وارتباطه الهرموني.",
+    "cycle.overview.title": "ما يقوله البحث العلمي",
+    "cycle.overview.content": "تُظهر دراسات النساء المصابات بالفيبروميالجيا في سن الإنجاب باستمرار تضخمًا للأعراض قبل الحيض وأثناءه. الآلية المقترحة هي انخفاض الأستروجين والبروجسترون في الطور الأصفري مما يقلل التثبيط الألمي السيروتونيني والنورأدرينالي، فيكشف التحسس المركزي المميز للفيبروميالجيا. تتفاوت النتائج بين الأفراد — بعضهن يذكرن أنماطًا دورية قوية وبعضهن لا يذكرن شيئًا — ولهذا تحديدًا يتفوق التتبع الشخصي على متوسطات عامة.",
+    "cycle.overview.plain": "معظم النساء المصابات بالفيبروميالجيا يشعرن بسوء أكبر قبيل الدورة وأثناءها. السبب المحتمل هو انخفاض الهرمونات. نمطك قد يختلف، لذا التتبع أفضل من التخمين.",
+    "cycle.tracking.title": "استخدام أدوات الدورة في فايبروكير",
+    "cycle.tracking.content": "سجلي تاريخ بداية كل دورة في متتبع الدورة بلوحة التحكم. بعد أول دورة مسجلة يشتق موجز الارتباطات طورك الحالي؛ وبعد بضع دورات تقدّر بطاقة التوقعات نافذة الخطر الشخصية (أيام الدورة، والعد التنازلي، والشدة) وتقرنها بنصائح استباقية. التسجيل اليومي للأعراض يزيد دقة الارتباطات والتوقعات معًا.",
+    "cycle.tracking.plain": "أضيفي تواريخ بداية الدورة في لوحة التحكم. يتعلم التطبيق إيقاعك ويحذرك قبل أيام قليلة لتخطيط فترة التوهج مسبقًا.",
     "diagnosis.check.title": "مدقق الجاهزية للتشخيص الذكي",
     "diagnosis.check.subtitle": "أجب عن 4 أسئلة سريعة لترى كيف تقارن أعراضك بمعايير ACR — ثم صدّر ملخصًا لطبيبك.",
     "diagnosis.check.q.widespread": "ألم واسع في مناطق كثيرة من الجسم، على الجانبين وفوق وتحت الخصر؟",
@@ -3852,7 +4044,30 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.loading": "جارٍ التحميل…",
     "dashboard.noCycleData": "لا توجد بيانات دورة بعد.",
     "health.recommendations.empty": "لا توجد توصيات بعد — استمر في التسجيل لفتح الرؤى.",
+    "health.recommendations.noSymptoms": "سجّل بعض الأعراض ومتابعات الألم — تظهر الرؤى عندما تظهر الأنماط.",
+    "health.recommendations.noCycle": "سجّل دورتك الشهرية لفتح رؤى الارتباط الهرموني.",
     "health.recommendations.highPriority": "أولوية عالية",
+    "health.forecast.levelHigh": "خطر توهج مرتفع",
+    "health.forecast.levelModerate": "خطر متوسط",
+    "health.forecast.levelLow": "خطر منخفض",
+    "health.forecast.advice.pacing": "وزّع طاقتك — خصص فترات راحة قصيرة قبل بداية نافذة الخطر.",
+    "health.forecast.advice.heat": "احتفظ بوسادة حرارية قريبة؛ الدفء يخفف توتر العضلات قبل الدورة.",
+    "health.forecast.advice.sleep": "حافظ على نومك — الإرهاق يضاعف حساسية التوهج.",
+    "health.forecast.advice.hydrate": "اشرب ماءً بكميات كافية وقلل الكافيين في الأيام القادمة.",
+    "health.forecast.advice.gentleMovement": "الحركة الخفيفة (مشي قصير، تمارين إطالة) تساعد دون إجهاد.",
+    "health.forecast.advice.trackDaily": "سجّل يوميًا حتى تزداد دقة التوقعات مع كل دورة.",
+    "health.forecast.noCycleGuidance": "سجّل دورتك الشهرية مرة واحدة لتفعيل توقعات التوهج الشخصية.",
+    "health.forecast.title": "توقعات التوهج",
+    "health.forecast.periodNow": "الدورة متوقعة الآن",
+    "health.forecast.periodIn": "الدورة بعد ~{{days}} يوم",
+    "health.forecast.inWindow": "الأيام {{start}}–{{end}} من دورتك الحالية هي نافذة الخطر المرتفع — خففي الإيقاع.",
+    "health.forecast.windowAhead": "تُفتح نافذة الخطر بعد ~{{days}} يوم (أيام الدورة {{start}}–{{end}}).",
+    "health.cycle.emptyGuidance": "لم يتم تسجيل أي دورة بعد. إضافتها تتيح للمحرك ربط الأطوار الهرمونية بضباب الدماغ والمزاج والألم.",
+    "health.cycle.logCta": "تسجيل دورة",
+    "health.cycle.saveCta": "حفظ الدورة",
+    "health.cycle.saveError": "تعذر حفظ الدورة. يرجى المحاولة مرة أخرى.",
+    "health.cycle.startDateAria": "تاريخ بداية الدورة",
+    "health.cycle.phaseAria": "طور الدورة",
     "health.phase.menstrual": "الحيض",
     "health.phase.follicular": "الجرابية",
     "health.phase.ovulatory": "الإباضة",
@@ -4417,6 +4632,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "dashboard.pro.startConsultation": "بدء استشارة أو شات مع طبيب",
     "dashboard.pro.badgeText": "Pro",
     "dashboard.section.insights": "الرؤى والدعم الهادئ",
+    "dashboard.section.health": "متابعة الصحة والرؤى",
     "dashboard.toolkitCard.title": "حقيبة العناية والتمرين",
     "dashboard.toolkitCard.desc": "تمارين لطيفة تناسب طاقة اليوم، وصوت مهدّئ دون اتصال، وأدلة تنفس، والنوم وHRV، وسلامة الأدوية.",
     "dashboard.toolkitCard.cta": "فتح حقيبة العناية والتمارين",

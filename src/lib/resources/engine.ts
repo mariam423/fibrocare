@@ -579,6 +579,15 @@ export const PAGE_TAKEAWAYS: Record<string, PageTakeaway> = {
     query: "mindfulness relaxation stress reduction social connection well-being",
     chunkId: "complementary-approaches",
   },
+  cycle: {
+    bullets: [
+      "resources.takeaway.cycle.1",
+      "resources.takeaway.cycle.2",
+      "resources.takeaway.cycle.3",
+    ],
+    query: "menstrual cycle hormonal estrogen progesterone pain sensitivity premenstrual flare tracking",
+    chunkId: "hormonal-cycle-pain",
+  },
 };
 
 /** Grounding chunk for a detail page takeaway (null → unverified). */

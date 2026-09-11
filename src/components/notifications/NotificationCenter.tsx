@@ -107,21 +107,21 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
       className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/10 ring-1 ring-black/5"
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-3 sm:px-4">
+        <h2 className="min-w-0 truncate text-sm font-semibold text-foreground">
           {t("notification.title")}
           {unread > 0 && (
-            <span className="ms-2 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+            <span className="ms-2 whitespace-nowrap rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
               {unread}
             </span>
           )}
         </h2>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           {notifications.length > 0 && (
             <button
               type="button"
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:px-2 sm:text-xs"
             >
               <HugeiconsIcon
                 icon={CheckmarkCircle02Icon}
@@ -145,7 +145,7 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
       {/* List */}
       <div className="max-h-[min(60vh,26rem)] overflow-y-auto overscroll-contain">
         {notifications.length === 0 ? (
-          <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+          <p className="px-3 py-10 text-center text-sm text-muted-foreground sm:px-4">
             {t("notification.empty")}
           </p>
         ) : (
@@ -159,7 +159,7 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
                     type="button"
                     onClick={() => handleCardClick(n.id, n.actionUrl)}
                     className={cn(
-                      "flex w-full items-start gap-3 px-4 py-3 pe-10 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50",
+                      "flex w-full items-start gap-2.5 px-3 py-3 pe-10 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/50 sm:gap-3 sm:px-4",
                       !n.read && "bg-primary/[0.03]"
                     )}
                   >
@@ -176,22 +176,22 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
                         <span className="truncate text-sm font-semibold text-foreground">
                           {t(n.title, n.params)}
                         </span>
-                        <span className="shrink-0 text-[11px] text-muted-foreground">
+                        <span className="shrink-0 whitespace-nowrap text-[11px] text-muted-foreground">
                           {formatRelativeTime(n.timestamp, t)}
                         </span>
                       </span>
-                      <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                      <span className="mt-0.5 block break-words text-xs leading-relaxed text-muted-foreground">
                         {t(n.message, n.params)}
                       </span>
-                      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset">
+                      <span className="mt-1.5 inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset">
                         <span
                           className={cn(
-                            "h-1.5 w-1.5 rounded-full",
+                            "h-1.5 w-1.5 shrink-0 rounded-full",
                             !n.read ? "bg-primary" : "bg-muted-foreground/40"
                           )}
                           aria-hidden="true"
                         />
-                        {t(meta.labelKey)}
+                        <span className="truncate">{t(meta.labelKey)}</span>
                       </span>
                     </span>
                   </button>
@@ -200,7 +200,7 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
                     type="button"
                     onClick={() => dismiss(n.id)}
                     aria-label={t("notification.dismissAria")}
-                    className="absolute end-2 top-3 rounded-lg p-1 text-muted-foreground/60 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100"
+                    className="absolute end-2 top-3 rounded-lg p-1.5 text-muted-foreground/70 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:opacity-0 sm:group-hover:opacity-100"
                   >
                     <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>

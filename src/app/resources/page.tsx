@@ -16,6 +16,7 @@ import {
   RunningShoesIcon,
   HelpCircleIcon,
   Message02Icon,
+  Moon02Icon,
   ArrowRight01Icon,
   WaveIcon,
   SparklesIcon,
@@ -132,6 +133,13 @@ const CONTENT_NAV_ITEMS = [
     icon: Message02Icon,
     color: "text-rose-600 dark:text-rose-400",
     bg: "bg-rose-100 dark:bg-rose-900/40",
+  },
+  {
+    href: "/resources/cycle",
+    titleKey: "resources.cycle" as const,
+    icon: Moon02Icon,
+    color: "text-violet-600 dark:text-violet-400",
+    bg: "bg-violet-100 dark:bg-violet-900/40",
   },
 ];
 

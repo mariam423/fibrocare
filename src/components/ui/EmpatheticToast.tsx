@@ -71,7 +71,7 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
   return (
     <motion.div
       ref={containerRef}
-      className="fixed bottom-6 end-6 z-[100] w-[calc(100%-3rem)] max-w-sm sm:end-10 lg:end-12"
+      className="fixed bottom-[calc(env(safe-area-inset-bottom)+1.5rem)] end-6 z-[100] w-[calc(100%-3rem)] max-w-sm sm:end-10 lg:end-12"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="empathic-toast-title"
@@ -86,19 +86,19 @@ export function EmpatheticToast({ message, onClose, actions }: EmpatheticToastPr
       }}
       transition={motionEnabled ? { type: "spring", stiffness: 260, damping: 26, mass: 0.9 } : undefined}
     >
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md flex flex-col gap-4 text-card-foreground">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md flex flex-col gap-4 text-card-foreground sm:p-5">
         <div className="flex justify-between items-start gap-3">
-          <div className="flex gap-3">
+          <div className="flex min-w-0 gap-3">
             <div className="icon-badge h-10 w-10 shrink-0 rounded-xl">
               <HugeiconsIcon icon={HeartIcon} className="h-5 w-5" aria-hidden="true" />
             </div>
-            <div className="space-y-1 pt-0.5">
-              <p id="empathic-toast-title" className="text-sm font-semibold text-foreground">
+            <div className="min-w-0 space-y-1 pt-0.5">
+              <p id="empathic-toast-title" className="break-words text-sm font-semibold text-foreground">
                 {t("dashboard.toast.title")}
               </p>
               <p
                 id="empathic-toast-message"
-                className="text-sm text-muted-foreground leading-relaxed"
+                className="break-words text-sm text-muted-foreground leading-relaxed"
               >
                 {message}
               </p>

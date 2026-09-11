@@ -2,7 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  analyzePainPatterns,
+  type SymptomPatternLog,
+  type CyclePatternLog,
+  type PainPatternLog,
+} from "@/lib/insightEngine";
+import { deriveCycleSummary } from "@/lib/health/cycleSummary";
+import { buildFlareForecast } from "@/lib/health/flareForecast";
 
+/**
+ * Dashboard correlations feed for CycleStatusWidget + CareRecommendationCard.
+ *
+ * Response contract (the shape the widgets consume):
+ *   success: true
+ *   data.cycle:           derived cycle view | null (null → user has no cycle logged)
+ *   data.recommendations: insight engine output (empty until ≥5 pain logs)
+ *   data.hasSymptoms:     whether any symptom log exists in the window
+ *                         (lets the UI distinguish "log a cycle first" from
+ *                         "log symptoms first")
+ */
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,71 +31,85 @@ export async function GET(req: NextRequest) {
 
     const userId = session.user.id;
 
-    // Fetch last 3 cycles
+    // Most recent 3 cycles (desc) — same ordering the insight engine expects.
     const cycles = await prisma.menstrualCycle.findMany({
       where: { userId },
-      orderBy: { startDate: 'desc' },
+      orderBy: { startDate: "desc" },
       take: 3,
     });
 
-    // Fetch last 30 days of symptom logs
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const symptoms = await prisma.symptomLog.findMany({
-      where: {
-        userId,
-        createdAt: {
-          gte: thirtyDaysAgo,
-        },
-      },
-    });
+    const [symptoms, painLogs] = await Promise.all([
+      prisma.symptomLog.findMany({
+        where: { userId, date: { gte: toDateKey(thirtyDaysAgo) } },
+      }),
+      prisma.painLog.findMany({
+        where: { userId, loggedAt: { gte: thirtyDaysAgo } },
+        orderBy: { loggedAt: "asc" },
+      }),
+    ]);
 
-    // Basic Correlation Calculation:
-    // Average severity of COGNITIVE symptoms per cycle phase
-    const phaseSeverities: Record<string, { sum: number, count: number }> = {
-      MENSTRUAL: { sum: 0, count: 0 },
-      FOLLICULAR: { sum: 0, count: 0 },
-      OVULATORY: { sum: 0, count: 0 },
-      LUTEAL: { sum: 0, count: 0 },
-    };
-
-    symptoms.forEach(symptom => {
-      if (symptom.category === "COGNITIVE") {
-        // Find which cycle phase this symptom date falls into
-        const symptomDate = new Date(symptom.date);
-
-        const cycle = cycles.find(c => {
-          const start = new Date(c.startDate);
-          const end = c.endDate ? new Date(c.endDate) : new Date();
-          return symptomDate >= start && symptomDate <= end;
-        });
-
-        if (cycle) {
-          const phase = cycle.phase;
-          if (phaseSeverities[phase]) {
-            phaseSeverities[phase].sum += symptom.severity;
-            phaseSeverities[phase].count += 1;
-          }
-        }
-      }
-    });
-
-    const correlations = Object.keys(phaseSeverities).map(phase => ({
-      phase,
-      avgSeverity: phaseSeverities[phase].count > 0
-        ? parseFloat((phaseSeverities[phase].sum / phaseSeverities[phase].count).toFixed(2))
-        : null,
-      count: phaseSeverities[phase].count
+    // Map DB rows onto the insight-engine's minimal shapes.
+    const mappedCycles: CyclePatternLog[] = cycles.map((c) => ({
+      id: c.id,
+      phase: c.phase,
+      startDate: c.startDate,
+      endDate: c.endDate,
     }));
 
+    const mappedSymptoms: SymptomPatternLog[] = symptoms.map((s) => ({
+      symptom: s.symptom,
+      date: s.date,
+      severity: s.severity,
+      category: s.category,
+      area: s.area ?? undefined,
+    }));
+
+    const mappedPain: PainPatternLog[] = painLogs.map((p) => ({
+      id: p.id,
+      painLevel: p.painLevel,
+      moodTag: p.moodTag,
+      notes: p.notes,
+      loggedAt: p.loggedAt,
+    }));
+
+    const insights = analyzePainPatterns(mappedPain, mappedSymptoms, mappedCycles, 30);
+
+    // Predictive view: pre-period flare risk + proactive advice.
+    const recentAvgPain =
+      mappedPain.length > 0
+        ? mappedPain.reduce((s, p) => s + p.painLevel, 0) / mappedPain.length
+        : 0;
+    const forecast = buildFlareForecast({
+      cycles: mappedCycles,
+      symptomLogs: mappedSymptoms,
+      recentAvgPain,
+    });
+
     return NextResponse.json({
-      cycles,
-      recentSymptoms: symptoms,
-      correlations,
+      success: true,
+      data: {
+        cycle: deriveCycleSummary(mappedCycles),
+        recommendations: insights.map((i) => ({
+          id: i.id,
+          title: i.title,
+          message: i.message,
+          priority: i.severity, // "info" | "warning" | "critical"
+          type: i.type,
+        })),
+        forecast,
+        hasSymptoms: symptoms.length > 0,
+      },
     });
   } catch (error) {
     console.error("[HEALTH_CORRELATIONS_GET]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
+}
+
+/** UTC YYYY-MM-DD key — mirrors the insight engine's day bucketing. */
+function toDateKey(d: Date): string {
+  return d.toISOString().split("T")[0];
 }

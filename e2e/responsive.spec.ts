@@ -181,6 +181,78 @@ test.describe("site-wide responsive regression", () => {
       "mobile dialog should fill the viewport"
     ).toBeGreaterThan(MOBILE.width * 0.95);
   });
+
+  test("notification dropdown fits mobile without clipping or overflow", async ({
+    page,
+  }) => {
+    // Seed two notifications (one with a long unbroken string to exercise
+    // word-breaking) before any app script runs, so the panel renders cards,
+    // not just the empty state.
+    await page.addInitScript(() => {
+      const now = Date.now();
+      const seeded = [
+        {
+          id: "e2e-weather",
+          title: "notification.weather.pressureDrop.title",
+          message: "notification.weather.pressureDrop.message",
+          params: { pressure: 1006, delta: -3, humidity: 82, temperature: 24 },
+          type: "weather_trigger",
+          timestamp: now,
+          read: false,
+          actionUrl: "/dashboard",
+        },
+        {
+          id: "e2e-med",
+          title: "notification.medication.due.title",
+          message: "notification.medication.due.message",
+          params: { name: "SublingualMagnesiumCitrate300mg".repeat(8) },
+          type: "medication_reminder",
+          timestamp: now - 60_000,
+          read: false,
+          actionUrl: "/toolkit",
+        },
+      ];
+      window.localStorage.setItem(
+        "fibrocare:notifications",
+        JSON.stringify(seeded)
+      );
+    });
+
+    await unlockPrivatePage(page, "/dashboard");
+
+    const bell = page.getByRole("button", { name: "Open notifications" });
+    await expect(bell).toBeVisible();
+    await bell.click();
+
+    const dialog = page.getByRole("dialog", { name: "Notifications" });
+    await expect(dialog).toBeVisible();
+
+    // No horizontal overflow while the dropdown is open.
+    const offender = await overflowOffender(page);
+    expect(
+      offender,
+      "notification dropdown overflowed on mobile"
+    ).toBeNull();
+
+    // The panel stays inside the viewport — never clipped on either edge.
+    const box = await dialog.boundingBox();
+    expect(box, "notification dialog bounding box missing").not.toBeNull();
+    expect(box!.x, "notification panel clipped on the left").toBeGreaterThanOrEqual(0);
+    expect(
+      box!.x + box!.width,
+      "notification panel clipped on the right"
+    ).toBeLessThanOrEqual(MOBILE.width + 1);
+
+    // Per-card dismiss buttons are reachable on touch (no hover on mobile),
+    // so they must be fully visible, not opacity-0.
+    const dismiss = page.getByRole("button", { name: "Dismiss notification" });
+    const count = await dismiss.count();
+    expect(count, "seeded notification cards did not render").toBeGreaterThanOrEqual(2);
+    const dismissOpacity = await dismiss.first().evaluate((el) =>
+      Number(getComputedStyle(el).opacity)
+    );
+    expect(dismissOpacity, "dismiss button hidden on touch devices").toBeGreaterThan(0);
+  });
 });
 
 test.describe("responsive layout at tablet width", () => {

@@ -256,6 +256,20 @@ const RAW_CHUNKS: Array<Record<string, unknown>> = [
     content:
       "Listening to calming music, ambient sound, or binaural tones is a low-effort, low-cost way many people use to ease discomfort and distract from pain. Relaxing music has modest evidence for reducing perceived pain and anxiety in chronic pain populations; brown noise and binaural tones are commonly used for focus or rest, and binaural beats are best experienced through headphones. Effects are subjective — what helps one person may not help another — and audio therapy works best as one tool alongside pacing, movement, and rest, never as a replacement for medical care.",
   },
+  {
+    id: "hormonal-cycle-pain",
+    title: "Menstrual cycle hormonal fluctuations and fibromyalgia pain",
+    source: "FibroCare clinical summary of research on female reproductive hormones and central pain sensitivity in fibromyalgia",
+    domains: ["flares", "pacing"],
+    keywords: [
+      "hormones", "hormonal", "menstrual", "menstruation", "period",
+      "cycle", "estrogen", "progesterone", "luteal", "premenstrual",
+      "pms", "serotonin", "hyperalgesia", "flare forecast", "tracking",
+      "الهرمونات", "الحيض", "الدورة", "الطمث", "الأستروجين",
+    ],
+    content:
+      "Research consistently reports that fibromyalgia symptoms in menstruating women often intensify in the days just before and during menstruation. The proposed mechanism involves natural drops in estrogen and progesterone during the late luteal phase: estrogen modulates serotonin and norepinephrine — neurotransmitters that dampen pain signals in the central nervous system — so falling levels can transiently heighten pain sensitivity (hyperalgesia), worsen fatigue, and intensify brain fog. Because the effect is rhythmic, tracking cycles alongside daily symptoms (as FibroCare's cycle tracker and flare forecast do) can reveal a personal pattern, typically a flare-risk window beginning roughly 3 to 7 days before the period. Planning ahead for that window — lighter schedule, heat therapy, protected sleep, hydration, and an anti-inflammatory diet — helps reduce its impact. Hormonal contraception or HRT changes individual experiences considerably, so decisions about hormones belong with a clinician.",
+  },
 ];
 
 /** Validated knowledge base — a malformed chunk throws at module load. */

@@ -149,7 +149,7 @@ describe("CARD_SUMMARIES grounding (RAG)", () => {
 });
 
 describe("detail-page takeaway grounding (RAG)", () => {
-  it("covers all seven resource pages with 3 localized bullets each", () => {
+  it("covers all resource detail pages with 3 localized bullets each", () => {
     const expectedPages = [
       "about",
       "diagnosis",
@@ -158,6 +158,7 @@ describe("detail-page takeaway grounding (RAG)", () => {
       "exercises",
       "faq",
       "community",
+      "cycle",
     ];
     for (const [pageId, takeaway] of Object.entries(PAGE_TAKEAWAYS)) {
       expect(takeaway.bullets).toHaveLength(3);
@@ -179,9 +180,10 @@ describe("detail-page takeaway grounding (RAG)", () => {
     }
   });
 
-  it("returns the grounded chunk for both detail pages", () => {
+  it("returns the grounded chunk for the registered detail pages", () => {
     expect(groundingTakeaway("about")?.id).toBe("acr-criteria-2010");
     expect(groundingTakeaway("diagnosis")?.id).toBe("acr-criteria-2010");
+    expect(groundingTakeaway("cycle")?.id).toBe("hormonal-cycle-pain");
   });
 
   it("grounds the ACR criteria and blood-test citations", () => {

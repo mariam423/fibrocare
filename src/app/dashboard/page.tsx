@@ -51,6 +51,7 @@ import { PostMealFatigueSection } from "@/components/dashboard/PostMealFatigueSe
 import { SymptomTracker } from "@/components/logging/SymptomTracker";
 import { CycleStatusWidget } from "@/components/health/CycleStatusWidget";
 import { SymptomMapWidget } from "@/components/health/SymptomMapWidget";
+import { FlareForecastWidget } from "@/components/health/FlareForecastCard";
 import { CareRecommendationCard } from "@/components/health/CareRecommendationCard";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
@@ -291,13 +292,6 @@ export default function Home() {
           </div>
         </ScrollReveal>
         </motion.div>
-
-        {/* ── Health Tracking Hub ────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-          <CycleStatusWidget />
-          <CareRecommendationCard />
-          <SymptomMapWidget />
-        </div>
 
         {/* ── Today ──────────────────────────────────── */}
         <ScrollReveal as="section" className="space-y-5">
@@ -820,6 +814,19 @@ export default function Home() {
 
         {/* Recent Logs - full activity list */}
         <RecentLogsWidget logs={recentLogs} columns={3} />
+
+        {/* ── Health Tracking Hub (bottom: insights after operations) ── */}
+        <ScrollReveal as="section" className="space-y-4 pt-2">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-emerald-300/80">
+            {t("dashboard.section.health")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            <CycleStatusWidget />
+            <CareRecommendationCard />
+            <SymptomMapWidget />
+            <FlareForecastWidget />
+          </div>
+        </ScrollReveal>
       </main>
 
       <AnimatePresence>

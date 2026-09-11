@@ -11,22 +11,37 @@ interface Recommendation {
   id: string;
   title: string;
   message: string;
-  priority: "low" | "medium" | "high";
+  priority: "info" | "warning" | "critical";
+  // Note: the insight engine emits no "high" severity — high priority UI is
+  // driven by "warning"/"critical" only.
   type: string;
+}
+
+interface CorrelationsPayload {
+  success?: boolean;
+  data?: {
+    cycle: unknown;
+    recommendations: Recommendation[];
+    hasSymptoms: boolean;
+  };
 }
 
 export function CareRecommendationCard() {
   const { t } = useLanguage();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [hasCycle, setHasCycle] = useState(true);
+  const [hasSymptoms, setHasSymptoms] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRecommendations() {
       try {
         const res = await fetch("/api/health/correlations");
-        const result = await res.json();
-        if (result.success && result.data?.recommendations) {
+        const result: CorrelationsPayload = await res.json();
+        if (result.success && result.data) {
           setRecommendations(result.data.recommendations);
+          setHasCycle(result.data.cycle !== null);
+          setHasSymptoms(result.data.hasSymptoms);
         }
       } catch (e) {
         console.error("Failed to fetch recommendations", e);
@@ -48,18 +63,28 @@ export function CareRecommendationCard() {
   }
 
   if (recommendations.length === 0) {
+    // Distinguish why: the engine needs ≥5 pain logs, a cycle for hormonal
+    // correlations, or simply more time — say so instead of a blank card.
+    const guidance = !hasSymptoms
+      ? t("health.recommendations.noSymptoms")
+      : !hasCycle
+        ? t("health.recommendations.noCycle")
+        : t("health.recommendations.empty");
     return (
       <Card className="w-full h-full min-h-[160px] flex items-center justify-center text-center p-6">
         <div className="text-muted-foreground text-sm">
-          {t("health.recommendations.empty")}
+          {guidance}
         </div>
       </Card>
     );
   }
 
-  // Show only the top recommendation for the dashboard widget
+  // Show only the top recommendation for the dashboard widget.
   const topRec = recommendations[0];
-  const isHighPriority = topRec.priority === "high";
+  // The insight engine's severity union is "info" | "warning" | "critical" —
+  // "warning"+ are treated as high priority here.
+  const isHighPriority =
+    topRec.priority === "critical" || topRec.priority === "warning";
 
   return (
     <Card

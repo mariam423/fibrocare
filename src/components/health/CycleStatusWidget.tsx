@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Moon02Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
@@ -48,11 +50,7 @@ export function CycleStatusWidget() {
 
   if (!data) {
     return (
-      <Card className="w-full h-full min-h-[160px] flex items-center justify-center">
-        <div className="text-muted-foreground text-sm">
-          {t("dashboard.noCycleData")}
-        </div>
-      </Card>
+      <NoCycleCard />
     );
   }
 
@@ -108,6 +106,81 @@ export function CycleStatusWidget() {
           </div>
         </div>
       </CardContent>
+    </Card>
+  );
+}
+
+/** Empty state with an inline cycle logger so the correlation engine has data to work with. */
+function NoCycleCard() {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [phase, setPhase] = useState<"MENSTRUAL" | "FOLLICULAR" | "OVULATORY" | "LUTEAL">("MENSTRUAL");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleLog(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/health/cycle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startDate, phase }),
+      });
+      if (!res.ok) {
+        setError(t("health.cycle.saveError"));
+        return;
+      }
+      // Refresh server components / other widgets on the page.
+      window.location.reload();
+    } catch {
+      setError(t("health.cycle.saveError"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className="w-full h-full min-h-[160px] flex flex-col items-center justify-center text-center p-6 border-purple-200 dark:border-purple-900/30">
+      <HugeiconsIcon icon={Moon02Icon} className="h-6 w-6 text-purple-400 mb-2" />
+      <p className="text-sm text-muted-foreground max-w-[26ch]">
+        {t("health.cycle.emptyGuidance")}
+      </p>
+      {!open ? (
+        <Button variant="outline" size="sm" className="mt-3" onClick={() => setOpen(true)}>
+          {t("health.cycle.logCta")}
+        </Button>
+      ) : (
+        <form onSubmit={handleLog} className="mt-3 flex flex-col gap-2 items-center">
+          <div className="flex gap-2">
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="h-9 w-40 text-base"
+              aria-label={t("health.cycle.startDateAria")}
+              required
+            />
+            <select
+              value={phase}
+              onChange={(e) => setPhase(e.target.value as typeof phase)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-base"
+              aria-label={t("health.cycle.phaseAria")}
+            >
+              <option value="MENSTRUAL">{t("health.phase.menstrual")}</option>
+              <option value="FOLLICULAR">{t("health.phase.follicular")}</option>
+              <option value="OVULATORY">{t("health.phase.ovulatory")}</option>
+              <option value="LUTEAL">{t("health.phase.luteal")}</option>
+            </select>
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" size="sm" disabled={saving} className="w-40">
+            {saving ? t("dashboard.save.saving") : t("health.cycle.saveCta")}
+          </Button>
+        </form>
+      )}
     </Card>
   );
 }

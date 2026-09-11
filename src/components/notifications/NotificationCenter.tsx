@@ -104,7 +104,7 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
     <div
       role="dialog"
       aria-label={t("notification.title")}
-      className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/10 ring-1 ring-black/5"
+      className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/10 ring-1 ring-black/5"
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-4 py-3">

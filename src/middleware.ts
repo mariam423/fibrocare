@@ -74,6 +74,11 @@ export async function middleware(request: NextRequest) {
       }
     } catch (e) {
       console.error("[middleware] Token validation error:", e);
+      // If decryption fails, the token is corrupted or the secret changed.
+      // Clear the cookie to prevent a decryption-failure loop and guide the user to re-auth.
+      const response = NextResponse.next();
+      response.cookies.set("next-auth.session-token", "", { maxAge: 0 });
+      return response;
     }
   }
 

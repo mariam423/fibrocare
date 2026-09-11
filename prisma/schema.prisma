@@ -34,6 +34,7 @@ model User {
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
   subscriptions        Subscription[]
+  cycles               MenstrualCycle[]
 
   // Indexes added in the perf migration:
   //  - `role` is filtered for "all doctors" / "all pro users" admin queries.
@@ -97,12 +98,15 @@ model PainLog {
 }
 
 model SymptomLog {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   symptom   String
   date      String
+  severity  Int             @default(5)
+  category  SymptomCategory @default(PHYSICAL)
+  area      PainArea?
   userId    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, symptom, date])
   @@index([userId, date])
@@ -198,4 +202,40 @@ model ConsultationMessage {
   // the composite covers the same lookup AND the ORDER BY.
   @@index([consultationId, createdAt])
   @@index([senderId])
+}
+
+enum CyclePhase {
+  MENSTRUAL
+  FOLLICULAR
+  OVULATORY
+  LUTEAL
+}
+
+enum SymptomCategory {
+  PHYSICAL
+  COGNITIVE
+  MOOD
+}
+
+enum PainArea {
+  PELVIC
+  LOWER_BACK
+  WIDESPREAD
+  JOINTS
+  OTHER
+}
+
+model MenstrualCycle {
+  id              String     @id @default(cuid())
+  userId          String
+  startDate       DateTime
+  endDate         DateTime?
+  phase           CyclePhase
+  overallSeverity Int        @default(5)
+  notes           String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startDate])
 }

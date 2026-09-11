@@ -56,10 +56,15 @@ const DEV_FALLBACK_SECRET = "fibrocare-dev-only-fallback-secret-not-for-producti
  * `src/middleware.ts` so both layers agree on the same secret.
  */
 export function getJwtSecret(): string | undefined {
-  return (
-    process.env.NEXTAUTH_SECRET ??
-    (process.env.NODE_ENV === "production" ? undefined : DEV_FALLBACK_SECRET)
-  );
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (secret) return secret;
+
+  if (process.env.NODE_ENV === "production") {
+    console.error("[auth] CRITICAL: NEXTAUTH_SECRET is missing in production. Sessions will fail.");
+    return undefined;
+  }
+
+  return DEV_FALLBACK_SECRET;
 }
 
 export const authOptions: NextAuthOptions = {

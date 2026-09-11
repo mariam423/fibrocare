@@ -60,7 +60,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute end-0 top-11 z-50">
+        <div className="absolute end-0 top-full mt-2 z-50 w-[calc(100vw-2.5rem)] max-w-xs sm:w-80">
           <NotificationCenter onClose={() => setOpen(false)} />
         </div>
       )}

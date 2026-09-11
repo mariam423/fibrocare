@@ -82,20 +82,17 @@ describe("resolveEffectiveRole", () => {
     expect(resolveEffectiveRole({ role: "free_user" })).toBe("pro_user");
   });
 
-  it("production, billing unconfigured: fails closed to free_user", () => {
+  it("production, billing unconfigured: grants Pro (no payment path exists)", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("STRIPE_WEBHOOK_SECRET", "");
     vi.stubEnv("LEMON_SQUEEZY_WEBHOOK_SECRET", "");
-    expect(resolveEffectiveRole({ role: "free_user" })).toBe("free_user");
+    expect(resolveEffectiveRole({ role: "free_user" })).toBe("pro_user");
   });
 
-  it("production, billing unconfigured, stale active subscription: still free_user", () => {
+  it("production, billing configured: enforcement is strict (no subscription → free_user)", () => {
     vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "");
-    vi.stubEnv("LEMON_SQUEEZY_WEBHOOK_SECRET", "");
-    expect(
-      resolveEffectiveRole({ role: "free_user", subscriptions: [activePro] })
-    ).toBe("free_user");
+    vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_test");
+    expect(resolveEffectiveRole({ role: "free_user" })).toBe("free_user");
   });
 
   it("production, billing unconfigured: doctor role still resolves to doctor", () => {

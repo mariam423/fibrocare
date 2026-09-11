@@ -5,11 +5,22 @@
  * data level (server routes can call `assertPermission` before serving):
  *
  *   guest     — signed out: public content only.
- *   free_user — signed in: logging, dashboard, somatic toolkit, offline mode.
- *   pro_user  — signed in + active subscription: adds the AI-heavy and
- *               export features.
- *   doctor    — verified medical professional: publishing content and
- *               managing patient consultations.
+ *   free_user — signed in: logging, dashboard.
+ *   pro_user  — signed in + (entitlement): AI companion, toolkits,
+ *               attachment-agnostic reports, predictor, consultations.
+ *   doctor    — verified medical professional: publishing + consultations.
+ *
+ * Authorization model (see `resolveEffectiveRole` in
+ * `src/lib/auth/entitlement.ts` for the authoritative resolution):
+ *
+ *   - doctor role is a hard DB flag and always wins.
+ *   - When billing webhook secrets are configured (an ACTIVE subscription
+ *     row for the user exists) → `pro_user`, otherwise `free_user`.
+ *   - When billing is NOT configured, every signed-in user resolves to
+ *     `pro_user` in every environment — production included. There is no
+ *     payment path available in that state, so gating would only break
+ *     the app; the moment billing envs are configured, enforcement
+ *     becomes strict and fail-closed automatically.
  *
  * Health data itself (logs, symptoms) is never gated behind Pro: a patient
  * must always be able to read and record their own data. Pro gates only

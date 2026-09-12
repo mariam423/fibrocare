@@ -41,18 +41,22 @@ test.describe("route view transitions", () => {
     await expect(greeting).toBeVisible();
     await expect(greeting).not.toContainText("User", { timeout: 30_000 });
 
-    const healthLogsLink = page.getByRole("link", { name: "Health Logs", exact: true }).first();
+    // Navigate via one of the header's desktop quick links (GlobalNavHeader
+    // renders quick links on section roots like /dashboard). "Profile" is a
+    // stable top-level route with a real <h1>, unlike card links whose
+    // accessible names include descriptions (breaks exact matching).
+    const profileLink = page.getByRole("link", { name: "Profile", exact: true }).first();
     for (let attempt = 0; attempt < 3; attempt++) {
-      await healthLogsLink.click();
+      await profileLink.click();
       try {
-        await expect(page).toHaveURL(/\/health-logs/, { timeout: 30_000 });
+        await expect(page).toHaveURL(/\/profile/, { timeout: 30_000 });
         break;
       } catch {
         // Pre-hydration click — retry like the smoke tests do.
       }
     }
-    await expect(page).toHaveURL(/\/health-logs/);
-    await expect(page.getByRole("heading", { name: "Health Logs" })).toBeVisible();
+    await expect(page).toHaveURL(/\/profile/);
+    await expect(page.getByRole("heading", { name: "User Profile" })).toBeVisible();
 
     const count = await page.evaluate(
       () => Number(sessionStorage.getItem("__vtCount") || 0)

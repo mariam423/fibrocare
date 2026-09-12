@@ -27,7 +27,7 @@ export function AiPublishingAssistant({ onArticleGenerated }: AiPublishingAssist
     if (!notes.trim()) return;
     setError(null);
     startTransition(async () => {
-      const result = await aiPublishingAssistant(notes);
+      const result = await aiPublishingAssistant({ notes });
       if (result.success && result.data) {
         onArticleGenerated(result.data);
         setNotes("");

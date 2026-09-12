@@ -119,6 +119,13 @@ model DoctorPost {
   content        String
   tags           String   @default("")
   verifiedStatus String   @default("pending")
+  /// Content kind for the Direct Doctor Publishing Hub:
+  ///  - "article"  — structured patient-education articles
+  ///  - "research" — research summaries / paper digests
+  ///  - "status"   — short clinical status updates / personal posts
+  /// Defaults to "article" (the historical behavior; pre-migration rows
+  /// are all articles). Indexed for kind-filtered feeds.
+  kind           String   @default("article")
   /// Origin of the post. `"ai"` rows are produced by the curated AI
   /// article generator (see `doctor-article-actions.ts`) and surface
   /// only in the `AiArticleLibrary`. `"manual"` rows are written by
@@ -142,6 +149,7 @@ model DoctorPost {
   @@index([verifiedStatus])
   @@index([source])
   @@index([language])
+  @@index([kind])
 }
 
 /// Per-user reaction on a verified Doctor Hub article.

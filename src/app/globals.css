@@ -1519,3 +1519,30 @@ html.motion-reduce .hero-image-breathe {
     );
   }
 }
+
+/* --- Volumetric body maps (FibroCare 3D pain maps) ---
+ * Severity-driven region glows breathe gently. The custom property
+ * --fc-glow-max scales the pulse peak with the logged severity so higher
+ * pain genuinely glows brighter. Suppressed by the global reduced-motion
+ * guards above (and by prefers-reduced-motion directly). */
+@keyframes bodyGlowPulse {
+  0%,
+  100% {
+    opacity: calc(var(--fc-glow-max, 0.8) * 0.55);
+  }
+  50% {
+    opacity: var(--fc-glow-max, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body-glow-pulse {
+    animation: none !important;
+    opacity: var(--fc-glow-max, 0.8) !important;
+  }
+}
+
+html.motion-reduce .body-glow-pulse {
+  animation: none !important;
+  opacity: var(--fc-glow-max, 0.8) !important;
+}

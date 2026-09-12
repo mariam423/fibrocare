@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Chatting01Icon, Loading01Icon, Add01Icon, AiMagicIcon } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -73,7 +74,8 @@ export default function ProConsultationsPage() {
 
   return (
     <RouteTransition>
-      <main className="container mx-auto max-w-5xl px-4 py-12 space-y-8">
+      <GlobalNavHeader />
+      <main className="container mx-auto max-w-5xl px-4 py-12 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-8">
         <ScrollReveal>
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
             <div className="flex items-center gap-4 min-w-0 sm:gap-5">

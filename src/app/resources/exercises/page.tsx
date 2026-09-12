@@ -8,7 +8,7 @@ import {
   SwimmingIcon,
   LightbulbOffIcon,
 } from "@hugeicons/core-free-icons";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import {
   ContentPageLayout,
@@ -112,7 +112,7 @@ export default function ExercisesPage() {
   return (
     <RouteTransition>
     <div>
-      <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
+      <GlobalNavHeader />
       <main className="container mx-auto max-w-4xl p-4 pt-[calc(env(safe-area-inset-top)+5rem)] sm:p-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:p-8 pb-24 mb-10">
         <ContentPageLayout
           titleKey="exercises.title"

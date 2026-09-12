@@ -32,7 +32,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useHealth } from "@/context/HealthContext";
 import { usePrivacy } from "@/components/auth/PrivacyLock";
 import { getCurrentUser, updateUserName, getStreak, getAllHealthLogs } from "../actions";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { PrivacySecurityCard } from "@/components/settings/PrivacySecurityCard";
 import { PricingModal } from "@/components/pricing/PricingModal";
 
@@ -113,7 +113,7 @@ export default function ProfilePage() {
   return (
     <RouteTransition>
     <div className="min-h-[100dvh] text-foreground transition-colors duration-500">
-      <AppHeader backHref="/dashboard" />
+      <GlobalNavHeader />
 
       <main className="pb-32 pt-[calc(env(safe-area-inset-top)+5rem)] px-4 sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:px-8 space-y-8 max-w-2xl mx-auto">
         {/* Hero Header */}

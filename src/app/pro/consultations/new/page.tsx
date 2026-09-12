@@ -6,6 +6,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon, Loading01Icon } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +52,8 @@ export default function NewConsultationPage() {
 
   return (
     <RouteTransition>
-      <main className="container mx-auto max-w-xl px-4 py-12 space-y-6">
+      <GlobalNavHeader />
+      <main className="container mx-auto max-w-xl px-4 py-12 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6">
         <ScrollReveal>
           <div className="flex items-center gap-3">
             <Button

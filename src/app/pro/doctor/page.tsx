@@ -34,6 +34,7 @@ import {
   Stethoscope02Icon,
 } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,7 +148,8 @@ export default function DoctorHubPage() {
   if (!isDoctor) {
     return (
       <RouteTransition>
-        <main className="container mx-auto max-w-5xl px-4 py-8 space-y-6 sm:space-y-8 sm:py-12">
+        <GlobalNavHeader />
+        <main className="container mx-auto max-w-5xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6 sm:space-y-8 sm:py-12 sm:pt-[calc(env(safe-area-inset-top)+2rem)]">
           <ScrollReveal>
             <div className="text-center space-y-3">
               <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-36 sm:w-36">
@@ -208,7 +210,8 @@ export default function DoctorHubPage() {
 
   return (
     <RouteTransition>
-      <main className="container mx-auto max-w-5xl px-4 py-8 space-y-6 sm:space-y-8 sm:py-12">
+      <GlobalNavHeader />
+      <main className="container mx-auto max-w-5xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6 sm:space-y-8 sm:py-12 sm:pt-[calc(env(safe-area-inset-top)+2rem)]">
         <ScrollReveal>
           <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-5 sm:text-start">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-24 sm:w-24">

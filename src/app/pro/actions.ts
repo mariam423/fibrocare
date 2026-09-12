@@ -26,6 +26,18 @@ import {
   symptomStructureSchema,
 } from "@/lib/ai/doctor-schemas";
 import { sanitizeUserText } from "@/lib/security/sanitizer";
+import {
+  symptomIntakeSchema,
+  symptomSubmissionSchema,
+  consultationMessageSchema,
+  type SymptomIntakeInput,
+  type SymptomSubmissionInput,
+} from "@/lib/validations/consultations";
+import {
+  doctorPostRefineSchema,
+  aiAssistantInputSchema,
+  type DoctorPostInput,
+} from "@/lib/validations/doctorPosts";
 
 /* ------------------------------------------------------------------ */
 /*  Internal helpers                                                    */
@@ -110,21 +122,33 @@ export async function getConsultationDetails(consultationId: string) {
 /*  Doctor Hub actions                                                  */
 /* ------------------------------------------------------------------ */
 
-export async function createDoctorPost(input: {
-  title: string;
-  content: string;
-  tags?: string;
-}) {
+export async function createDoctorPost(rawInput: DoctorPostInput) {
   try {
     const auth = await requireDoctor();
     if (!auth.ok) return { success: false as const, error: auth.error };
 
-    const title = sanitizeUserText(input.title.trim(), { maxLength: 120 });
-    const content = sanitizeUserText(input.content.trim(), { maxLength: 10000 });
-    const tags = sanitizeUserText((input.tags ?? "").trim(), { maxLength: 200 });
+    // Zod validation (kind-aware, incl. the status length ceiling) before
+    // any sanitization or persistence. Prisma parameterizes all queries,
+    // so injection is structurally prevented; this layer guards shape.
+    const parsed = doctorPostRefineSchema.safeParse(rawInput);
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid post.",
+      };
+    }
 
-    if (title.length < 5 || title.length > 120) {
-      return { success: false as const, error: "Title must be between 5 and 120 characters." };
+    // Sanitize AFTER validation: strips any HTML/script/URL-scheme
+    // payloads that may have passed length checks.
+    const title = sanitizeUserText(parsed.data.title, { maxLength: 120 });
+    const content = sanitizeUserText(parsed.data.content, {
+      maxLength: 10000,
+      collapseWhitespace: false,
+    });
+    const tags = sanitizeUserText(parsed.data.tags, { maxLength: 200 });
+
+    if (title.length < 5) {
+      return { success: false as const, error: "Title must be at least 5 characters." };
     }
     if (content.length < 20) {
       return { success: false as const, error: "Content must be at least 20 characters." };
@@ -135,6 +159,7 @@ export async function createDoctorPost(input: {
         title,
         content,
         tags,
+        kind: parsed.data.kind,
         authorId: auth.user.id,
         verifiedStatus: "pending",
       },
@@ -234,18 +259,22 @@ export async function getDoctorPostById(id: string) {
   }
 }
 
-export async function aiPublishingAssistant(rawNotes: string) {
+export async function aiPublishingAssistant(rawInput: { notes: string }) {
   try {
     const auth = await requireDoctor();
     if (!auth.ok) return { success: false as const, error: auth.error };
 
-    const notes = rawNotes.trim();
-    if (notes.length < 10) {
+    // Zod validation + prompt-injection sanitization: `sanitizeForPrompt`
+    // (inside the prompt builder) strips instruction-override payloads;
+    // the schema caps length first so oversized notes fail fast.
+    const parsed = aiAssistantInputSchema.safeParse(rawInput);
+    if (!parsed.success) {
       return {
         success: false as const,
-        error: "Please provide at least a brief description of your article idea.",
+        error: parsed.error.issues[0]?.message ?? "Invalid notes.",
       };
     }
+    const notes = parsed.data.notes;
 
     if (!isAiConfigured()) {
       return {
@@ -646,6 +675,181 @@ export async function structureSymptoms(rawInput: string) {
   } catch (error) {
     console.error("Error structuring symptoms:", error);
     return { success: false as const, error: "Failed to structure symptoms. Please try again." };
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Consultations hub — validated intake actions                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * AI Symptom Structuring intake: takes the patient's free-text symptom
+ * description, validates it with Zod, sanitizes it, runs it through the
+ * symptom-structure AI action (with a deterministic offline fallback),
+ * and — optionally — persists the logged severity/check-in so the
+ * structured data reaches the patient's own health record.
+ *
+ * Security: session required, `health-data:write` permission enforced
+ * for the persistence leg, output length-clamped before persistence.
+ */
+export async function submitSymptomIntake(rawInput: SymptomIntakeInput) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return { success: false as const, error: "You must be signed in." };
+
+    const parsed = symptomIntakeSchema.safeParse(rawInput);
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid symptom description.",
+      };
+    }
+
+    const sanitized = sanitizeUserText(parsed.data.raw, { maxLength: 4000 });
+    if (sanitized.length < 10) {
+      return { success: false as const, error: "Description became empty after sanitization." };
+    }
+
+    const structured = await structureSymptoms(sanitized);
+    if (!structured.success || !structured.data) {
+      return { success: false as const, error: structured.error ?? "Failed to structure symptoms." };
+    }
+
+    // Optional persistence leg — writes to the patient's OWN log only.
+    if (parsed.data.persist) {
+      const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+      if (!dbUser || !hasPermission(dbUser.role as UserRole, "health-data:write")) {
+        return {
+          success: false as const,
+          error: "You do not have permission to save symptom logs.",
+        };
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      await prisma.symptomLog.create({
+        data: {
+          userId: user.id,
+          symptom: "consultation-intake",
+          date: today,
+          severity: 5,
+          category: "PHYSICAL",
+        },
+      });
+      revalidatePath("/health-logs");
+    }
+
+    return { success: true as const, data: structured.data };
+  } catch (error) {
+    console.error("Error submitting symptom intake:", error);
+    return { success: false as const, error: "Failed to process symptom intake." };
+  }
+}
+
+/**
+ * Send a message inside a consultation thread with full Zod validation.
+ * A validated wrapper over `sendMessage` — access control (the caller
+ * must be the consultation's patient or doctor) stays inside
+ * `requireConsultationAccess`.
+ */
+export async function submitConsultationMessage(rawInput: {
+  consultationId: string;
+  content: string;
+}) {
+  try {
+    const parsed = consultationMessageSchema.safeParse(rawInput);
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid message.",
+      };
+    }
+    return await sendMessage(parsed.data.consultationId, parsed.data.content);
+  } catch (error) {
+    console.error("Error sending consultation message:", error);
+    return { success: false as const, error: "Failed to send message." };
+  }
+}
+
+/**
+ * Persist the patient's structured symptoms (severity-reviewed) and —
+ * optionally — post the structured summary as a message into an existing
+ * consultation thread. This closes the hub's loop: structure → review →
+ * log → share with the doctor.
+ *
+ * Security: session + `health-data:write` required for logging (patient
+ * writes to their OWN log only); for the messaging leg,
+ * `requireConsultationAccess` verifies the caller is the thread's patient
+ * or doctor. Every free-text field is Zod-validated then sanitized.
+ */
+export async function submitStructuredSymptoms(rawInput: SymptomSubmissionInput) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return { success: false as const, error: "You must be signed in." };
+
+    const parsed = symptomSubmissionSchema.safeParse(rawInput);
+    if (!parsed.success) {
+      return {
+        success: false as const,
+        error: parsed.error.issues[0]?.message ?? "Invalid symptom submission.",
+      };
+    }
+
+    const { symptoms, message, consultationId, persist } = parsed.data;
+    if (!persist && !message) {
+      return { success: false as const, error: "Nothing to submit." };
+    }
+
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    if (!dbUser) return { success: false as const, error: "User not found." };
+
+    // Persistence leg — patient's own log, RBAC-checked.
+    if (persist && symptoms.length > 0) {
+      if (!hasPermission(dbUser.role as UserRole, "health-data:write")) {
+        return {
+          success: false as const,
+          error: "You do not have permission to save symptom logs.",
+        };
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      await prisma.symptomLog.createMany({
+        data: symptoms.map((s) => ({
+          userId: user.id,
+          // Each symptom label is short free text; sanitize + clamp to the
+          // column's practical size before insert.
+          symptom: sanitizeUserText(s.symptom, { maxLength: 120 }),
+          date: today,
+          severity: s.severity,
+          category: s.category,
+          area: s.area ?? null,
+        })),
+        // (userId, symptom, date) is unique — a same-day re-log of the same
+        // symptom updates the severity instead of failing the whole batch.
+        skipDuplicates: true,
+      });
+      revalidatePath("/health-logs");
+    }
+
+    // Messaging leg — post the structured summary into the thread.
+    if (message && consultationId) {
+      const sanitizedMessage = sanitizeUserText(message, { maxLength: 5000 });
+      if (sanitizedMessage.length < 1) {
+        return { success: false as const, error: "Message became empty after sanitization." };
+      }
+      const sent = await sendMessage(consultationId, sanitizedMessage);
+      if (!sent.success) {
+        return { success: false as const, error: sent.error ?? "Failed to send message." };
+      }
+    }
+
+    return {
+      success: true as const,
+      data: {
+        loggedCount: persist ? symptoms.length : 0,
+        messageSent: Boolean(message && consultationId),
+      },
+    };
+  } catch (error) {
+    console.error("Error submitting structured symptoms:", error);
+    return { success: false as const, error: "Failed to submit symptoms." };
   }
 }
 

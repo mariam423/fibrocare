@@ -7,6 +7,7 @@ import {
   ClipboardListIcon,
   File01Icon,
   BookOpen01Icon,
+  Chatting01Icon,
   ChevronRightIcon,
 } from "@hugeicons/core-free-icons";
 import { DepthCard } from "@/components/ui/DepthCard";
@@ -52,13 +53,20 @@ const ACTIONS: QuickAction[] = [
     icon: BookOpen01Icon,
     hoverBorder: "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
   },
+  {
+    href: "/dashboard/consultations",
+    titleKey: "quickActions.consultations.title",
+    descriptionKey: "quickActions.consultations.description",
+    icon: Chatting01Icon,
+    hoverBorder: "group-hover:border-teal-300 dark:group-hover:border-teal-700",
+  },
 ];
 
 export function QuickActions() {
   const { t } = useLanguage();
   return (
     <section aria-label={t("quickActions.ariaLabel")}>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {ACTIONS.map((action, index) => (
           <li key={action.href} className="h-full">
             <DepthCard tilt={4} delay={index * 0.06} className="h-full">

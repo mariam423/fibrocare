@@ -65,7 +65,7 @@ import { FluidSlider } from "@/components/logging/FluidSlider";
 import { EmpatheticToast } from "@/components/ui/EmpatheticToast";
 import { RecoveryPanel } from "@/components/support/RecoveryCards";
 import FlareEmergencyMode from "@/components/dashboard/FlareEmergencyMode";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { AiStatusBadge } from "@/components/ai/AiStatusBadge";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useProFeature } from "@/hooks/useProFeature";
@@ -244,7 +244,7 @@ export default function Home() {
   return (
     <RouteTransition>
     <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
-      <AppHeader />
+      <GlobalNavHeader />
       <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-12 pt-[calc(env(safe-area-inset-top)+5rem)] pb-28 sm:pt-[calc(env(safe-area-inset-top)+6rem)] sm:pb-32 lg:pt-32 space-y-8 lg:space-y-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
         <motion.div ref={welcomeRef} style={{ y: welcomeYSpring, opacity: welcomeOpacity }}>

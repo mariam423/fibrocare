@@ -1,6 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+/**
+ * SymptomMapWidget — dashboard symptom logging with a live 3D pain map.
+ *
+ * The Physical / Cognitive / Mood sliders drive severity glows on a
+ * volumetric body figure (emerald → amber → orange → rose as values rise).
+ * The figure sits on a PerspectiveStage (pointer tilt + drag rotation) and
+ * floats above a soft floor reflection. Quick-log chips post to the
+ * symptoms API exactly as before.
+ */
+
+import * as React from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -9,17 +20,23 @@ import {
   BrainIcon,
   HeartIcon,
   ActivityIcon,
-  Add01Icon
+  Add01Icon,
 } from "@hugeicons/core-free-icons";
+import { PerspectiveStage } from "@/components/ui/PerspectiveStage";
+import {
+  VolumetricBody,
+  type BodyRegionId,
+} from "@/components/ui/VolumetricBody";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
-import { cn } from "@/lib/utils";
 
 interface CategoryLog {
   id: string;
   label: string;
-  icon: any;
+  icon: typeof ActivityIcon;
   value: number;
+  /** Regions lit by this category, weighted by its slider value. */
+  regions: BodyRegionId[];
 }
 
 interface QuickLog {
@@ -31,9 +48,27 @@ interface QuickLog {
 }
 
 const CATEGORIES: CategoryLog[] = [
-  { id: "PHYSICAL", label: "Physical", icon: ActivityIcon, value: 5 },
-  { id: "COGNITIVE", label: "Cognitive", icon: BrainIcon, value: 5 },
-  { id: "MOOD", label: "Mood", icon: HeartIcon, value: 5 },
+  {
+    id: "PHYSICAL",
+    label: "Physical",
+    icon: ActivityIcon,
+    value: 5,
+    regions: ["lowerBack", "knees", "joints", "hips"],
+  },
+  {
+    id: "COGNITIVE",
+    label: "Cognitive",
+    icon: BrainIcon,
+    value: 5,
+    regions: ["neck", "shoulders"],
+  },
+  {
+    id: "MOOD",
+    label: "Mood",
+    icon: HeartIcon,
+    value: 5,
+    regions: ["arms", "joints"],
+  },
 ];
 
 const QUICK_LOGS: QuickLog[] = [
@@ -85,6 +120,27 @@ export function SymptomMapWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 flex-1">
+        {/* Live 3D pain map — glows track the sliders */}
+        <div className="relative mx-auto w-full max-w-[190px] select-none">
+          <PerspectiveStage
+            className="aspect-[100/125] w-full"
+            resting={{ rotateX: 7, rotateY: -7 }}
+            tiltDeg={6}
+          >
+            <VolumetricBody
+              severity={{
+                lowerBack: categoryValues.PHYSICAL,
+                knees: categoryValues.PHYSICAL,
+                joints: Math.round((categoryValues.PHYSICAL + categoryValues.MOOD) / 2),
+                hips: categoryValues.PHYSICAL,
+                neck: categoryValues.COGNITIVE,
+                shoulders: categoryValues.COGNITIVE,
+                arms: categoryValues.MOOD,
+              }}
+            />
+          </PerspectiveStage>
+        </div>
+
         {/* Categorized Sliders */}
         <div className="grid grid-cols-1 gap-4">
           {CATEGORIES.map((cat) => (

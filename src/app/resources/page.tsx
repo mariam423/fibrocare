@@ -28,7 +28,7 @@ import { DepthCard } from "@/components/ui/DepthCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { RouteTransition } from "@/components/ui/RouteTransition";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { useLanguage } from "@/context/LanguageContext";
 import { useHealth } from "@/context/HealthContext";
 import { useMotionEnabled } from "@/hooks/useMotionEnabled";
@@ -437,7 +437,7 @@ export default function ResourcesPage() {
   return (
     <RouteTransition>
     <div className="text-foreground transition-colors duration-500">
-      <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
+      <GlobalNavHeader />
 
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 pt-[calc(env(safe-area-inset-top)+5rem)] space-y-5 max-w-6xl pb-24 mb-10">
         <ScrollReveal as="section" className="space-y-2 text-center max-w-2xl mx-auto">

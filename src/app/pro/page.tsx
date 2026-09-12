@@ -12,6 +12,7 @@ import {
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -59,7 +60,8 @@ export default function ProLandingPage() {
 
   return (
     <RouteTransition>
-      <main className="mx-auto max-w-4xl px-4 py-12 space-y-16">
+      <GlobalNavHeader />
+      <main className="mx-auto max-w-4xl px-4 py-10 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-16">
         {/* Hero */}
         <ScrollReveal>
           <div className="text-center space-y-4">

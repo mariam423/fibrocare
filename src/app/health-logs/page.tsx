@@ -39,7 +39,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 import { getAllHealthLogs, deletePainLog } from "../actions";
 import type { HealthLog } from "@/lib/types";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -225,7 +225,7 @@ export default function HealthLogsPage() {
   return (
     <RouteTransition>
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
-      <AppHeader backHref="/dashboard" />
+      <GlobalNavHeader />
 
       <main className="pb-16 pt-[calc(env(safe-area-inset-top)+5rem)] px-4 sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:px-8 max-w-5xl mx-auto space-y-8">
         {/* Page header */}

@@ -11,6 +11,7 @@ import {
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,8 @@ export default function ConsultationDetailPage() {
 
   return (
     <RouteTransition>
-      <main className="container mx-auto max-w-3xl px-4 py-8 space-y-6">
+      <GlobalNavHeader />
+      <main className="container mx-auto max-w-3xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6">
         <ScrollReveal>
           <div className="flex items-center gap-3">
             <Button

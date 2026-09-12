@@ -18,6 +18,37 @@ export type TranslationKey =
   | "nav.language"
   | "nav.switchToArabic"
   | "nav.switchToEnglish"
+  | "nav.breadcrumb"
+  | "nav.goBack"
+  | "nav.mainMenu"
+  | "nav.primaryNav"
+  | "consultationsHub.title"
+  | "consultationsHub.subtitle"
+  | "consultationsHub.viewAllThreads"
+  | "consultationsHub.intakeTitle"
+  | "consultationsHub.intakeDescription"
+  | "consultationsHub.persistOption"
+  | "consultationsHub.processing"
+  | "consultationsHub.structureAction"
+  | "consultationsHub.copy"
+  | "consultationsHub.intakeFailed"
+  | "consultationsHub.briefDescription"
+  | "consultationsHub.briefLoading"
+  | "consultationsHub.briefEmpty"
+  | "consultationsHub.messagingTitle"
+  | "consultationsHub.messagingDescription"
+  | "consultationsHub.loadingThreads"
+  | "consultationsHub.sendFailed"
+  | "consultationsHub.severitySlider"
+  | "consultationsHub.reviewShareTitle"
+  | "consultationsHub.logToRecordOption"
+  | "consultationsHub.shareThreadLabel"
+  | "consultationsHub.shareThreadPlaceholder"
+  | "consultationsHub.submitAction"
+  | "consultationsHub.submitting"
+  | "consultationsHub.submitFailed"
+  | "consultationsHub.loggedPart"
+  | "consultationsHub.sentPart"
   | "auth.login.title"
   | "auth.login.description"
   | "header.themeLight"
@@ -184,6 +215,7 @@ export type TranslationKey =
   | "resources.bodyMap.clear"
   | "resources.bodyMap.heatHint"
   | "resources.bodyMap.movementHint"
+  | "resources.bodyMap.rotateHint"
   | "resources.semantic.matched"
   | "resources.semantic.clear"
   | "resources.effort.low"
@@ -781,6 +813,8 @@ export type TranslationKey =
   | "quickActions.reports.description"
   | "quickActions.resources.title"
   | "quickActions.resources.description"
+  | "quickActions.consultations.title"
+  | "quickActions.consultations.description"
   | "logging.presets.ariaLabel"
   | "logging.presets.calmDay"
   | "logging.presets.mildFlare"
@@ -1076,6 +1110,7 @@ export type TranslationKey =
   | "bodyMap.point.arms"
   | "bodyMap.point.lowerBack"
   | "bodyMap.point.knees"
+  | "bodyMap.viewGroupAria"
   | "medication.title"
   | "medication.subtitle"
   | "medication.morningSupplement"
@@ -1615,6 +1650,15 @@ export type TranslationKey =
   | "doctor.postTagsPlaceholder"
   | "doctor.aiAssistPlaceholder"
   | "doctor.postSubmitted"
+  | "doctor.postEditorDescription"
+  | "doctor.postKindLabel"
+  | "doctor.kind.article"
+  | "doctor.kind.research"
+  | "doctor.kind.status"
+  | "doctor.postContentStatus"
+  | "doctor.postAiToggle"
+  | "doctor.postAiToggleDescription"
+  | "doctor.postSubmittedStatus"
   | "consultation.title"
   | "consultation.subtitle"
   | "consultation.newConsultation"
@@ -1736,6 +1780,37 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.language": "Language",
     "nav.switchToArabic": "Switch to Arabic",
     "nav.switchToEnglish": "Switch to English",
+    "nav.breadcrumb": "Breadcrumb",
+    "nav.goBack": "Go back",
+    "nav.mainMenu": "Menu",
+    "nav.primaryNav": "Primary navigation",
+    "consultationsHub.title": "Consultations & Symptom Structuring",
+    "consultationsHub.subtitle": "Organize your symptoms with AI, review your clinical brief, and message your care team securely.",
+    "consultationsHub.viewAllThreads": "View all threads",
+    "consultationsHub.intakeTitle": "AI Symptom Structuring",
+    "consultationsHub.intakeDescription": "Describe how you've been feeling in your own words — the AI organizes it into a clear, clinical-ready summary.",
+    "consultationsHub.persistOption": "Also save this check-in to my health log",
+    "consultationsHub.processing": "Structuring…",
+    "consultationsHub.structureAction": "Structure my symptoms",
+    "consultationsHub.copy": "Copy",
+    "consultationsHub.intakeFailed": "Couldn't structure the symptoms. Please try again.",
+    "consultationsHub.briefDescription": "Your 30-day AI clinical executive brief, ready to share with your doctor.",
+    "consultationsHub.briefLoading": "Preparing your brief…",
+    "consultationsHub.briefEmpty": "No clinical brief available yet — log your symptoms for a few days to generate one.",
+    "consultationsHub.messagingTitle": "Secure Messaging",
+    "consultationsHub.messagingDescription": "End-to-end access-controlled threads with your verified doctors. Only you and your doctor can read these messages.",
+    "consultationsHub.loadingThreads": "Loading your threads…",
+    "consultationsHub.sendFailed": "Message couldn't be sent. Please try again.",
+    "consultationsHub.severitySlider": "severity, out of 10",
+    "consultationsHub.reviewShareTitle": "Review & share",
+    "consultationsHub.logToRecordOption": "Save these symptoms to my health log",
+    "consultationsHub.shareThreadLabel": "Share the summary with a doctor",
+    "consultationsHub.shareThreadPlaceholder": "Choose a conversation…",
+    "consultationsHub.submitAction": "Save & share",
+    "consultationsHub.submitting": "Submitting…",
+    "consultationsHub.submitFailed": "Submission failed. Please try again.",
+    "consultationsHub.loggedPart": "{count} symptom(s) saved to your log",
+    "consultationsHub.sentPart": "Summary sent to your doctor",
     "header.themeLight": "Switch to light mode",
     "header.themeDark": "Switch to dark mode",
     "ai.statusLabel": "AI Care Companion",
@@ -1902,6 +1977,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.bodyMap.clear": "Clear selection",
     "resources.bodyMap.heatHint": "Heat therapy may help here",
     "resources.bodyMap.movementHint": "Gentle movement may help here",
+    "resources.bodyMap.rotateHint": "Drag or tilt to explore in 3D",
     "resources.semantic.matched": "Matched: {category}",
     "resources.semantic.clear": "Clear search",
     "resources.effort.low": "Low effort",
@@ -2483,6 +2559,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "quickActions.reports.description": "Export a summary for your care team",
     "quickActions.resources.title": "Care Resources",
     "quickActions.resources.description": "Gentle guidance and practical tips",
+    "quickActions.consultations.title": "Consultations",
+    "quickActions.consultations.description": "Structure symptoms and message your doctor",
     "logging.presets.ariaLabel": "Quick check-in presets",
     "logging.presets.calmDay": "Calm Day",
     "logging.presets.mildFlare": "Mild Flare",
@@ -2779,6 +2857,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.point.arms": "Arms",
     "bodyMap.point.lowerBack": "Lower Back",
     "bodyMap.point.knees": "Knees",
+    "bodyMap.viewGroupAria": "Body view",
     "medication.title": "Today's Medications",
     "medication.subtitle": "Track your doses",
     "medication.morningSupplement": "Morning Supplement",
@@ -3340,6 +3419,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.postTagsPlaceholder": "sleep, pain management, exercise",
     "doctor.aiAssistPlaceholder": "e.g., New research on sleep hygiene for fibromyalgia patients…",
     "doctor.postSubmitted": "Article submitted for review!",
+    "doctor.postEditorDescription": "Write as a verified doctor — your post is reviewed before it appears to patients.",
+    "doctor.postKindLabel": "Content type",
+    "doctor.kind.article": "Article",
+    "doctor.kind.research": "Research summary",
+    "doctor.kind.status": "Status update",
+    "doctor.postContentStatus": "Status update",
+    "doctor.postAiToggle": "AI assist — structure my notes",
+    "doctor.postAiToggleDescription": "The AI organizes your raw clinical notes into a clear, evidence-backed draft (ACR/Mayo-aligned patient guidance). You review and edit everything before publishing.",
+    "doctor.postSubmittedStatus": "Status update submitted for review!",
     "consultation.title": "Consultations",
     "consultation.subtitle": "Secure messaging with your care team",
     "consultation.newConsultation": "New Consultation",
@@ -3460,6 +3548,37 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "nav.language": "اللغة",
     "nav.switchToArabic": "التبديل إلى العربية",
     "nav.switchToEnglish": "التبديل إلى الإنجليزية",
+    "nav.breadcrumb": "مسار التنقل",
+    "nav.goBack": "رجوع",
+    "nav.mainMenu": "القائمة",
+    "nav.primaryNav": "التنقل الرئيسي",
+    "consultationsHub.title": "الاستشارات وهيكلة الأعراض",
+    "consultationsHub.subtitle": "نظم أعراضك بالذكاء الاصطناعي، راجع تقريرك السريري، وراسل فريق الرعاية بأمان.",
+    "consultationsHub.viewAllThreads": "عرض كل المحادثات",
+    "consultationsHub.intakeTitle": "هيكلة الأعراض بالذكاء الاصطناعي",
+    "consultationsHub.intakeDescription": "اوصف شعورك بكلماتك الخاصة — وسيقوم الذكاء الاصطناعي بتنظيمها في ملخص واضح جاهز طبيًا.",
+    "consultationsHub.persistOption": "حفظ هذا التسجيل أيضًا في سجلي الصحي",
+    "consultationsHub.processing": "جارٍ الهيكلة…",
+    "consultationsHub.structureAction": "هيكلة أعراضي",
+    "consultationsHub.copy": "نسخ",
+    "consultationsHub.intakeFailed": "تعذّرت هيكلة الأعراض. حاول مرة أخرى.",
+    "consultationsHub.briefDescription": "تقريرك السريري التنفيذي لآخر 30 يومًا، جاهز لمشاركته مع طبيبك.",
+    "consultationsHub.briefLoading": "جارٍ إعداد تقريرك…",
+    "consultationsHub.briefEmpty": "لا يوجد تقرير سريري بعد — سجّل أعراضك لبضعة أيام لإنشاء واحد.",
+    "consultationsHub.messagingTitle": "المراسلة الآمنة",
+    "consultationsHub.messagingDescription": "محادثات محمية بصلاحيات صارمة مع أطبائك المعتمدين. أنت وطبيبك فقط من يمكنه قراءة هذه الرسائل.",
+    "consultationsHub.loadingThreads": "جارٍ تحميل محادثاتك…",
+    "consultationsHub.sendFailed": "تعذّر إرسال الرسالة. حاول مرة أخرى.",
+    "consultationsHub.severitySlider": "الشدة من 10",
+    "consultationsHub.reviewShareTitle": "راجع وشارك",
+    "consultationsHub.logToRecordOption": "احفظ هذه الأعراض في سجلي الصحي",
+    "consultationsHub.shareThreadLabel": "شارك الملخص مع طبيبك",
+    "consultationsHub.shareThreadPlaceholder": "اختر محادثة…",
+    "consultationsHub.submitAction": "حفظ ومشاركة",
+    "consultationsHub.submitting": "جارٍ الإرسال…",
+    "consultationsHub.submitFailed": "تعذّر الإرسال. حاول مرة أخرى.",
+    "consultationsHub.loggedPart": "تم حفظ {count} عرض/أعراض في سجلك",
+    "consultationsHub.sentPart": "تم إرسال الملخص إلى طبيبك",
     "header.themeLight": "التبديل إلى الوضع الفاتح",
     "header.themeDark": "التبديل إلى الوضع الداكن",
     "ai.statusLabel": "المساعد الذكي",
@@ -3626,6 +3745,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.bodyMap.clear": "مسح الاختيار",
     "resources.bodyMap.heatHint": "قد يساعد العلاج بالحرارة هنا",
     "resources.bodyMap.movementHint": "قد تساعد الحركة اللطيفة هنا",
+    "resources.bodyMap.rotateHint": "اسحب أو أمِل للاستكشاف ثلاثي الأبعاد",
     "resources.semantic.matched": "مطابق: {category}",
     "resources.semantic.clear": "مسح البحث",
     "resources.effort.low": "جهد منخفض",
@@ -4207,6 +4327,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "quickActions.reports.description": "صدّر ملخصًا لفريق الرعاية الخاص بك",
     "quickActions.resources.title": "موارد الرعاية",
     "quickActions.resources.description": "إرشادات لطيفة ونصائح عملية",
+    "quickActions.consultations.title": "الاستشارات",
+    "quickActions.consultations.description": "نظم أعراضك وراسل طبيبك",
     "logging.presets.ariaLabel": "إعدادات التسجيل السريعة",
     "logging.presets.calmDay": "يوم هادئ",
     "logging.presets.mildFlare": "نوبة خفيفة",
@@ -4505,6 +4627,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.point.arms": "الذراعان",
     "bodyMap.point.lowerBack": "الظهر السفلي",
     "bodyMap.point.knees": "الركبتان",
+    "bodyMap.viewGroupAria": "عرض الجسم",
     "medication.title": "أدوية اليوم",
     "medication.subtitle": "تتبع جرعاتك",
     "medication.morningSupplement": "مكمل الصباح",
@@ -5066,6 +5189,15 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.postTagsPlaceholder": "نوم, إدارة الألم, تمارين",
     "doctor.aiAssistPlaceholder": "مثال: أبحاث جديدة عن نظافة النوم لمرضى الفيبروميالغيا…",
     "doctor.postSubmitted": "تم تقديم المقال للمراجعة!",
+    "doctor.postEditorDescription": "اكتب كطبيب موثق — يُراجع منشورك قبل ظهوره للمرضى.",
+    "doctor.postKindLabel": "نوع المحتوى",
+    "doctor.kind.article": "مقال",
+    "doctor.kind.research": "ملخص بحثي",
+    "doctor.kind.status": "تحديث حالة",
+    "doctor.postContentStatus": "التحديث",
+    "doctor.postAiToggle": "مساعد الذكاء الاصطناعي — هيكلة ملاحظاتي",
+    "doctor.postAiToggleDescription": "ينظم الذكاء الاصطناعي ملاحظاتك السريرية الخام في مسودة واضحة مدعومة بالأدلة (إرشادات للمرضى وفق ACR ومايو كلينك). تراجع وتعدّل كل شيء قبل النشر.",
+    "doctor.postSubmittedStatus": "تم إرسال التحديث للمراجعة!",
     "consultation.title": "الاستشارات",
     "consultation.subtitle": "رسائل آمنة مع فريق رعايتك",
     "consultation.newConsultation": "استشارة جديدة",

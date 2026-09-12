@@ -20,7 +20,7 @@ import {
 import { getReportData } from "@/app/actions";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { SegmentedFilter, type SegmentedFilterOption } from "@/components/ui/SegmentedFilter";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
@@ -163,7 +163,7 @@ export default function ReportsPage() {
   return (
     <RouteTransition>
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
-      <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
+      <GlobalNavHeader />
 
       <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-[calc(env(safe-area-inset-top)+5rem)] pb-8 lg:pb-10 space-y-8 max-w-4xl">
         <ScrollReveal as="section" className="space-y-2">

@@ -8,7 +8,7 @@
 import React from "react";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { MedicationSafetyCard } from "@/components/medications/MedicationSafetyCard";
 import { SomaticToolkitCard } from "@/components/somatic/SomaticToolkitCard";
 import { SleepHrvCard } from "@/components/sleep/SleepHrvCard";
@@ -22,7 +22,7 @@ export default function ToolkitPage() {
   return (
     <RouteTransition>
       <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
-        <AppHeader backHref="/dashboard" backLabel={t("nav.backToDashboard")} />
+        <GlobalNavHeader />
 
         <main className="max-w-4xl mx-auto px-4 lg:px-8 pt-[calc(env(safe-area-inset-top)+5rem)] pb-10 space-y-6">
           <ScrollReveal as="section" className="space-y-2">

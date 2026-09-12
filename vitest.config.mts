@@ -9,7 +9,12 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    pool: "threads",
+    // "forks" over "threads": on Windows the threads pool intermittently
+    // fails to spawn workers ("Timeout waiting for worker to respond"),
+    // which aborts the whole run before any test executes. Forks is the
+    // upstream Vitest default since v2 for exactly this reason and runs
+    // this suite reliably on win32, macOS, and Linux alike.
+    pool: "forks",
     testTimeout: 30_000,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     exclude: ["node_modules", ".next", "e2e"],

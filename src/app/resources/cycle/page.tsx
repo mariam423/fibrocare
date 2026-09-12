@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { Moon02Icon } from "@hugeicons/core-free-icons";
-import AppHeader from "@/components/layout/AppHeader";
+import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ContentPageLayout } from "@/components/resources/ContentPageLayout";
 import { HormonalCycleSection } from "@/components/resources/HormonalCycleSection";
@@ -50,7 +50,7 @@ export default function CyclePage() {
   return (
     <RouteTransition>
       <div>
-        <AppHeader backHref="/resources" backLabel={t("nav.backToDashboard")} />
+        <GlobalNavHeader />
         <main className="container mx-auto max-w-4xl space-y-5 p-4 pt-[calc(env(safe-area-inset-top)+5rem)] pb-24 sm:p-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:p-8 mb-10">
           {/* 1. Immersive visual section: mechanism → forecast → self-care
                 → correlation graphic → references */}

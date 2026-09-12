@@ -1,25 +1,27 @@
 "use client";
 
 /**
- * VolumetricBody — shared 2.5D body figure for FibroCare's pain maps.
+ * VolumetricBody — medical-grade anatomical silhouette for FibroCare pain maps.
  *
- * A layered SVG silhouette that reads as volumetric rather than flat:
- *  - head as a shaded ellipse with a subtle jaw line
- *  - neck as a trapezoid bridging head and shoulders
- *  - shoulders as curved deltoid caps, not horizontal bars
- *  - torso filled with a vertical light-to-shadow gradient, anatomically
- *    tapered (narrower at the waist, wider at the hips)
- *  - cylindrical limb strokes with lateral light gradients
- *  - knees as joint ellipses
- *  - rim light along the silhouette edge ("glass" 3D border)
- *  - a soft contact shadow anchoring the figure to a floor plane
+ * A refined 2.5D SVG figure built for clinical readability rather than
+ * cartoon abstraction:
+ *  - head as a smooth oval with a subtle jaw/sternum axis
+ *  - neck as a tapered bridge between head and trapezius
+ *  - shoulders as smooth deltoid caps (elliptical, not blobby)
+ *  - torso tapered at the waist, wider at the ribs and hips, filled with a
+ *    vertical light-to-shadow gradient plus a subtle medial shadow line
+ *  - arms as two-segment limbs (upper arm + forearm) with lateral cylinder
+ *    shading so each limb reads as rounded, not flat
+ *  - forearm→hand fade so the wrist end is soft
+ *  - legs as thigh + calf segments with tapering strokes
+ *  - knees as joint ellipses, elbows as joint dots
+ *  - a subtle sternum/rib suggestion line for anatomical grounding
+ *  - rim light ("glass" edge) along the silhouette
  *  - severity-driven region glows (emerald → amber → orange → rose)
+ *  - front view + back view (spine + blade suggestion) toggle
  *
- * Regions accept a numeric severity 0–10; glow intensity, hue, and a
- * pulsing halo scale with it. Hotspot anchors use the same coordinate
- * space as the silhouette so clickable nodes land exactly on the anatomy.
- * All animation is pure CSS keyframes, so it is GPU-friendly on mobile and
- * silenced by the app's global reduced-motion guards in globals.css.
+ * All severity nodes are pure CSS-animated radial glows, GPU-friendly on
+ * mobile and silenced by the app's global reduced-motion guards.
  * Unique gradient ids per instance avoid SVG id collisions when several
  * figures render on one page.
  */
@@ -31,10 +33,14 @@ export type BodyRegionId =
   | "neck"
   | "shoulders"
   | "upperArms"
+  | "forearms"
   | "elbows"
   | "lowerBack"
+  | "ribs"
   | "hips"
+  | "thighs"
   | "knees"
+  | "ankles"
   | "joints";
 
 /** Severity 0–10 → hue ramp (emerald → amber → orange → rose). */
@@ -64,14 +70,24 @@ export interface VolumetricBodyProps {
  * floating hotspot nodes are visually correct.
  */
 const REGION_SPOTS: Record<BodyRegionId, { cx: number; cy: number; r: number }> = {
-  neck:       { cx: 50, cy: 17.5, r: 5 },
-  shoulders:  { cx: 50, cy: 25.5, r: 13 },
-  upperArms:  { cx: 50, cy: 36, r: 9.5 },
-  elbows:     { cx: 50, cy: 48, r: 5.5 },
-  lowerBack:  { cx: 50, cy: 52, r: 8 },
-  hips:       { cx: 50, cy: 62, r: 9.5 },
-  knees:      { cx: 50, cy: 78, r: 7 },
-  joints:     { cx: 50, cy: 46, r: 20 },
+  neck:       { cx: 50, cy: 18, r: 5 },
+  shoulders:  { cx: 50, cy: 26, r: 13 },
+  upperArms:  { cx: 31, cy: 32, r: 9 },
+  upperArmsR: { cx: 69, cy: 32, r: 9 },
+  forearms:   { cx: 25, cy: 48, r: 8 },
+  forearmsR:  { cx: 75, cy: 48, r: 8 },
+  elbows:     { cx: 28, cy: 42, r: 5.5 },
+  elbowsR:    { cx: 72, cy: 42, r: 5.5 },
+  lowerBack:  { cx: 50, cy: 52, r: 7.5 },
+  ribs:       { cx: 50, cy: 38, r: 9 },
+  hips:       { cx: 50, cy: 63, r: 10 },
+  thighs:     { cx: 42, cy: 72, r: 8.5 },
+  thighsR:    { cx: 58, cy: 72, r: 8.5 },
+  knees:      { cx: 42, cy: 80, r: 7 },
+  kneesR:     { cx: 58, cy: 80, r: 7 },
+  ankles:     { cx: 42, cy: 90, r: 5 },
+  anklesR:    { cx: 58, cy: 90, r: 5 },
+  joints:     { cx: 50, cy: 50, r: 18 },
 };
 
 export function VolumetricBody({
@@ -97,34 +113,52 @@ export function VolumetricBody({
       aria-hidden="true"
     >
       <defs>
-        {/* Vertical body shading: lit chest → shadowed legs */}
+        {/* Body shading: lit upper chest → shadowed lower legs */}
         <linearGradient id={id("bodyFill")} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(94,234,212,0.28)" />
-          <stop offset="30%" stopColor="rgba(19,78,74,0.5)" />
-          <stop offset="100%" stopColor="rgba(6,45,42,0.64)" />
+          <stop offset="0%" stopColor="rgba(94,234,212,0.26)" />
+          <stop offset="28%" stopColor="rgba(19,78,74,0.48)" />
+          <stop offset="100%" stopColor="rgba(6,45,42,0.62)" />
         </linearGradient>
 
-        {/* Lateral cylinder shading for limbs (light wraps the form) */}
-        <linearGradient id={id("limbL")} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(13,63,60,0.72)" />
-          <stop offset="55%" stopColor="rgba(45,212,191,0.4)" />
-          <stop offset="100%" stopColor="rgba(13,63,60,0.72)" />
+        {/* Lateral cylinder shading — light wraps each limb form */}
+        <linearGradient id={id("limbUpperL")} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(13,63,60,0.7)" />
+          <stop offset="50%" stopColor="rgba(45,212,191,0.42)" />
+          <stop offset="100%" stopColor="rgba(13,63,60,0.7)" />
         </linearGradient>
-        <linearGradient id={id("limbR")} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(13,63,60,0.72)" />
-          <stop offset="55%" stopColor="rgba(45,212,191,0.4)" />
-          <stop offset="100%" stopColor="rgba(13,63,60,0.72)" />
+        <linearGradient id={id("limbUpperR")} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(13,63,60,0.7)" />
+          <stop offset="50%" stopColor="rgba(45,212,191,0.42)" />
+          <stop offset="100%" stopColor="rgba(13,63,60,0.7)" />
+        </linearGradient>
+        <linearGradient id={id("limbLowerL")} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(13,63,60,0.68)" />
+          <stop offset="50%" stopColor="rgba(45,212,191,0.38)" />
+          <stop offset="100%" stopColor="rgba(13,63,60,0.68)" />
+        </linearGradient>
+        <linearGradient id={id("limbLowerR")} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(13,63,60,0.68)" />
+          <stop offset="50%" stopColor="rgba(45,212,191,0.38)" />
+          <stop offset="100%" stopColor="rgba(13,63,60,0.68)" />
         </linearGradient>
 
-        {/* Head: spherical shading */}
+        {/* Head: spherical shading with a subtle top highlight */}
         <radialGradient id={id("head")} cx="38%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="rgba(153,246,228,0.5)" />
-          <stop offset="100%" stopColor="rgba(15,64,60,0.6)" />
+          <stop offset="0%" stopColor="rgba(153,246,228,0.48)" />
+          <stop offset="100%" stopColor="rgba(15,64,60,0.58)" />
         </radialGradient>
+
+        {/* Torso medial shadow: subtle vertical line for anatomical depth */}
+        <linearGradient id={id("torsoMedial")} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="rgba(2,12,10,0)" />
+          <stop offset="48%" stopColor="rgba(2,12,10,0.12)" />
+          <stop offset="52%" stopColor="rgba(2,12,10,0.12)" />
+          <stop offset="100%" stopColor="rgba(2,12,10,0)" />
+        </linearGradient>
 
         {/* Ambient floor glow */}
         <radialGradient id={id("floor")} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(45,212,191,0.14)" />
+          <stop offset="0%" stopColor="rgba(45,212,191,0.13)" />
           <stop offset="70%" stopColor="rgba(45,212,191,0.04)" />
           <stop offset="100%" stopColor="rgba(45,212,191,0)" />
         </radialGradient>
@@ -135,7 +169,7 @@ export function VolumetricBody({
           return (
             <radialGradient key={region} id={id(`glow-${region}`)} cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor={hue.stop} />
-              <stop offset="45%" stopColor={`rgba(${hue.glow},0.26)`} />
+              <stop offset="42%" stopColor={`rgba(${hue.glow},0.24)`} />
               <stop offset="100%" stopColor={`rgba(${hue.glow},0)`} />
             </radialGradient>
           );
@@ -143,73 +177,80 @@ export function VolumetricBody({
       </defs>
 
       {/* Contact shadow anchoring the figure to a floor plane */}
-      <ellipse cx="50" cy="96" rx="15" ry="2.4" fill="rgba(2,12,10,0.34)" />
+      <ellipse cx="50" cy="96" rx="14" ry="2.2" fill="rgba(2,12,10,0.32)" />
       {/* Ambient floor glow */}
-      <ellipse cx="50" cy="92" rx="28" ry="6.5" fill={`url(#${id("floor")})`} />
+      <ellipse cx="50" cy="92" rx="26" ry="6" fill={`url(#${id("floor")})`} />
 
-      {/* Limbs first so the torso overlaps them cleanly */}
+      {/* Lower limbs first so the torso overlaps cleanly */}
       <g fill="none" strokeLinecap="round">
-        {/* Arms: deltoid → elbow → forearm → hand */
-        /* Left arm — starts at left shoulder cap, drapes down */}
+        {/* Left leg: thigh then calf */}
         <path
-          d="M31,27 C28,31 26,37 24.5,42 C23.5,46 22.8,50 22.2,54"
-          stroke={`url(#${id("limbL")})`}
-          strokeWidth="5.4"
-        />
-        {/* Right arm */}
-        <path
-          d="M69,27 C72,31 74,37 75.5,42 C76.5,46 77.2,50 77.8,54"
-          stroke={`url(#${id("limbR")})`}
-          strokeWidth="5.4"
-        />
-
-        {/* Forearms — slightly thinner, continuing the line */}
-        <path
-          d="M22.2,54 C21.8,58 21.4,62 21.2,66"
-          stroke={`url(#${id("limbL")})`}
-          strokeWidth="4.2"
-        />
-        <path
-          d="M77.8,54 C78.2,58 78.6,62 78.8,66"
-          stroke={`url(#${id("limbR")})`}
-          strokeWidth="4.2"
-        />
-
-        {/* Legs: thigh into calf, tapered */}
-        <path
-          d="M43.5,64 C43,68 42.2,72 41.8,76"
-          stroke={`url(#${id("limbL")})`}
+          d="M43.2,65 C42.6,70 42,74 41.6,77"
+          stroke={`url(#${id("limbUpperL")})`}
           strokeWidth="8.4"
         />
         <path
-          d="M41.8,76 C41.4,80 40.8,85 40.4,90"
-          stroke={`url(#${id("limbL")})`}
+          d="M41.6,77 C41.2,81 40.6,85 40.2,90"
+          stroke={`url(#${id("limbLowerL")})`}
           strokeWidth="6.2"
         />
+        {/* Right leg */}
         <path
-          d="M56.5,64 C57,68 57.8,72 58.2,76"
-          stroke={`url(#${id("limbR")})`}
+          d="M56.8,65 C57.4,70 58,74 58.4,77"
+          stroke={`url(#${id("limbUpperR")})`}
           strokeWidth="8.4"
         />
         <path
-          d="M58.2,76 C58.6,80 59.2,85 59.6,90"
-          stroke={`url(#${id("limbR")})`}
+          d="M58.4,77 C58.8,81 59.4,85 59.8,90"
+          stroke={`url(#${id("limbLowerR")})`}
           strokeWidth="6.2"
         />
       </g>
 
+      {/* Arms: two-segment limbs for anatomical realism */}
+      <g fill="none" strokeLinecap="round">
+        {/* Left upper arm: deltoid cap → elbow */}
+        <path
+          d="M31.4,27 C29,30 27,34 26,38"
+          stroke={`url(#${id("limbUpperL")})`}
+          strokeWidth="5.2"
+        />
+        {/* Left forearm: elbow → wrist, slightly thinner */}
+        <path
+          d="M26,38 C25,41 24.2,44 23.8,47"
+          stroke={`url(#${id("limbLowerL")})`}
+          strokeWidth="4.2"
+        />
+        {/* Right upper arm */}
+        <path
+          d="M68.6,27 C71,30 73,34 74,38"
+          stroke={`url(#${id("limbUpperR")})`}
+          strokeWidth="5.2"
+        />
+        {/* Right forearm */}
+        <path
+          d="M74,38 C75,41 75.8,44 76.2,47"
+          stroke={`url(#${id("limbLowerR")})`}
+          strokeWidth="4.2"
+        />
+      </g>
+
+      {/* Hands: soft fade ellipses at the wrist ends */}
+      <ellipse cx="23.4" cy="47.5" rx="2" ry="2.4" fill="rgba(13,63,60,0.5)" />
+      <ellipse cx="76.6" cy="47.5" rx="2" ry="2.4" fill="rgba(13,63,60,0.5)" />
+
       {/* Head & neck */}
-      <rect x="46.4" y="13" width="7.2" height="5" rx="2.6" fill="rgba(19,78,74,0.52)" />
-      <ellipse cx="50" cy="8" rx="5.2" ry="5.8" fill={`url(#${id("head")})`} />
-      {/* Jaw hint for anatomical grounding */}
+      <rect x="46.4" y="13.2" width="7.2" height="5" rx="2.6" fill="rgba(19,78,74,0.5)" />
+      <ellipse cx="50" cy="8.2" rx="5.2" ry="5.8" fill={`url(#${id("head")})`} />
+      {/* Jaw/sternum axis hint */}
       <path
         d="M45.6,10 C46,11.2 48,11.6 50,11.4 C52,11.6 54,11.2 54.4,10"
         fill="none"
-        stroke="rgba(153,246,228,0.12)"
+        stroke="rgba(153,246,228,0.1)"
         strokeWidth="0.4"
       />
 
-      {/* Torso — anatomically tapered: narrower waist, wider hips/shoulders */}
+      {/* Torso — anatomically tapered: wider at ribs/hips, narrower at waist */}
       <path
         d="M44.5,17
            C41,18.5 34,20 31,22.5
@@ -235,15 +276,27 @@ export function VolumetricBody({
         fill={`url(#${id("bodyFill")})`}
       />
 
-      {/* Anatomy lines: front (clavicles, sternum) or back (spine, blades) */}
-      <g fill="none" stroke="rgba(153,246,228,0.14)" strokeWidth="0.5" strokeLinecap="round">
+      {/* Torso medial shadow line (subtle anatomical depth) */}
+      <path
+        d="M50,19 L50,58"
+        stroke={`url(#${id("torsoMedial")})`}
+        strokeWidth="1.4"
+        fill="none"
+      />
+
+      {/* Anatomy lines: front (clavicles, sternum, ribs) or back (spine, blades) */}
+      <g fill="none" stroke="rgba(153,246,228,0.13)" strokeWidth="0.5" strokeLinecap="round">
         {backView ? (
           <>
+            {/* spine */}
             <path d="M50,19 L50,58" strokeDasharray="1.6 1.2" />
+            {/* shoulder blades */}
             <path d="M38.5,26.5 C42,23.8 46.5,23.6 49,26" />
             <path d="M61.5,26.5 C58,23.8 53.5,23.6 51,26" />
+            {/* latissimus suggestion */}
             <path d="M46.5,30 C45.5,38 46,48 47.4,56" />
             <path d="M53.5,30 C54.5,38 54,48 52.6,56" />
+            {/* pelvic crest */}
             <path d="M43,60.5 C45,63.2 48,63.6 49.5,62.2" />
             <path d="M57,60.5 C55,63.2 52,63.6 50.5,62.2" />
           </>
@@ -252,9 +305,8 @@ export function VolumetricBody({
             {/* clavicle lines */}
             <path d="M36.5,22.5 C40.5,21 46,20.8 49.5,22" />
             <path d="M63.5,22.5 C59.5,21 54,20.8 50.5,22" />
-            {/* upper sternum hint */}
+            {/* upper sternum */}
             <path d="M47,29.5 C48.5,30.2 51.5,30.2 53,29.5" />
-            <path d="M46.8,34 C48.4,34.6 51.6,34.6 53.2,34" />
             {/* sternum line */}
             <path d="M50,23.5 L50,44" strokeDasharray="0.4 1.1" />
             {/* costal arc hints */}
@@ -262,14 +314,20 @@ export function VolumetricBody({
             <path d="M47.2,42 C48.4,42.6 51.6,42.6 52.8,42" />
           </>
         )}
-        {/* Joint markers: knees + elbows */}
-        <circle cx="41.4" cy="75.4" r="2.1" strokeOpacity="0.5" />
-        <circle cx="58.6" cy="75.4" r="2.1" strokeOpacity="0.5" />
-        <circle cx="23.4" cy="50" r="1.7" strokeOpacity="0.45" />
-        <circle cx="76.6" cy="50" r="1.7" strokeOpacity="0.45" />
-        {/* Shoulder joint caps */}
-        <circle cx="31" cy="27" r="2.2" strokeOpacity="0.4" />
-        <circle cx="69" cy="27" r="2.2" strokeOpacity="0.4" />
+
+        {/* Joint markers */}
+        {/* Shoulder caps */}
+        <circle cx="31.4" cy="27" r="2.2" strokeOpacity="0.4" />
+        <circle cx="68.6" cy="27" r="2.2" strokeOpacity="0.4" />
+        {/* Elbows */}
+        <circle cx="26" cy="38" r="1.7" strokeOpacity="0.45" />
+        <circle cx="74" cy="38" r="1.7" strokeOpacity="0.45" />
+        {/* Knees */}
+        <circle cx="41.6" cy="77" r="2.1" strokeOpacity="0.5" />
+        <circle cx="58.4" cy="77" r="2.1" strokeOpacity="0.5" />
+        {/* Ankles */}
+        <circle cx="40.2" cy="90" r="1.6" strokeOpacity="0.4" />
+        <circle cx="59.8" cy="90" r="1.6" strokeOpacity="0.4" />
       </g>
 
       {/* Glass rim light along the silhouette edge */}
@@ -296,7 +354,7 @@ export function VolumetricBody({
            C53.5,16.4 51.5,16.2 50,16.2
            C48.5,16.2 46.5,16.4 44.5,17 Z"
         fill="none"
-        stroke="rgba(153,246,228,0.26)"
+        stroke="rgba(153,246,228,0.24)"
         strokeWidth="0.5"
       />
 
@@ -328,7 +386,7 @@ export function VolumetricBody({
           cy={REGION_SPOTS[highlight].cy}
           r={REGION_SPOTS[highlight].r * 0.5}
           fill="none"
-          stroke="rgba(153,246,228,0.82)"
+          stroke="rgba(153,246,228,0.8)"
           strokeWidth="0.7"
           strokeDasharray="2 1.4"
           className="motion-safe:animate-[spin_14s_linear_infinite]"

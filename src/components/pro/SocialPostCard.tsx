@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { HeartIcon, MessageSquareIcon, ShareIcon, VerifiedIcon } from "@hugeicons/core-free-icons";
+import { HeartIcon, Message01Icon, ShareIcon, BadgeCheckIcon } from "@hugeicons/core-free-icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
@@ -72,7 +72,7 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
               </div>
             </div>
             <div className="absolute -bottom-1 -right-1 rounded-full bg-white p-0.5 text-emerald-500 shadow-sm dark:bg-slate-800">
-              <HugeiconsIcon icon={VerifiedIcon} className="h-3 w-3" />
+              <HugeiconsIcon icon={BadgeCheckIcon} className="h-3 w-3" />
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
               size="sm"
               className="h-8 px-2 text-xs text-muted-foreground hover:bg-emerald-500/10"
             >
-              <HugeiconsIcon icon={MessageSquareIcon} className="me-1.5 h-4 w-4" />
+              <HugeiconsIcon icon={Message01Icon} className="me-1.5 h-4 w-4" />
               {post.commentsCount}
             </Button>
           </div>

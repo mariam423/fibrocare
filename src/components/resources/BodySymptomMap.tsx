@@ -1,13 +1,15 @@
 "use client";
 
 /**
- * Interactive Body-Symptom Map — volumetric 3D edition.
+ * BodySymptomMap — resources filter map for FibroCare.
  *
- * A layered, rim-lit body figure sits on a PerspectiveStage (pointer tilt +
- * drag-to-rotate). Tap-to-select hotspots float above the surface on
- * translateZ and glow by region profile: joint/muscle regions warm amber
- * (heat therapy match), movement regions glow emerald. Fully RTL-safe
- * (absolute hotspot positions mirror automatically) and keyboard-accessible
+ * A medical-grade volumetric body on a PerspectiveStage (pointer tilt;
+ * drag is deliberately disabled here so taps always reach the hotspots).
+ * Tap a body area to filter localized care resources by region.
+ *
+ * Design: glossy Midnight Emerald silhouette with rim-lit edge, soft severity
+ * glows, and crisp luminous touch nodes that match the anatomy beneath them.
+ * Fully RTL-safe (logical properties + rtl: variants) and keyboard-accessible
  * (each hotspot is a real button with aria-pressed).
  */
 
@@ -17,31 +19,27 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { FlameIcon, Activity01Icon, Rotate01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { PerspectiveStage } from "@/components/ui/PerspectiveStage";
-import {
-  VolumetricBody,
-  type BodyRegionId,
-} from "@/components/ui/VolumetricBody";
+import { VolumetricBody, type BodyRegionId } from "@/components/ui/VolumetricBody";
 import { useLanguage } from "@/context/LanguageContext";
 import { useMotionEnabled } from "@/hooks/useMotionEnabled";
 import { cn } from "@/lib/utils";
-import { BODY_PARTS, type BodyPartId } from "@/lib/resources/engine";  /** Body-map parts → volumetric regions with a gentle ambient severity.
-   *  Bilateral parts (shoulders, knees) map onto the same central region
-   *  since the silhouette is a single figure — two hotspots share one glow. */
-  const PART_TO_REGION: Record<BodyPartId, { region: BodyRegionId; severity: number }> = {
-    neck: { region: "neck", severity: 4 },
-    shoulders: { region: "shoulders", severity: 4 },
-    lowerBack: { region: "lowerBack", severity: 5 },
-    hips: { region: "hips", severity: 3 },
-    knees: { region: "knees", severity: 4 },
-    joints: { region: "joints", severity: 3 },
-  };
+import { BODY_PARTS, type BodyPartId } from "@/lib/resources/engine";
+
+/** Body-map parts → volumetric regions. Bilateral parts share a central
+ *  region on this single-figure silhouette; two hotspots still light one glow. */
+const PART_TO_REGION: Record<BodyPartId, { region: BodyRegionId; severity: number }> = {
+  neck:       { region: "neck", severity: 4 },
+  shoulders:  { region: "shoulders", severity: 4 },
+  lowerBack:  { region: "lowerBack", severity: 5 },
+  hips:       { region: "hips", severity: 3 },
+  knees:      { region: "knees", severity: 4 },
+  joints:     { region: "joints", severity: 3 },
+};
 
 interface Hotspot {
   part: BodyPartId;
-  /** Percentage position over the silhouette container. */
   left: number;
   top: number;
-  /** Depth layer above the body surface (px of translateZ). */
   z: number;
 }
 
@@ -49,8 +47,7 @@ const HOTSPOTS: Hotspot[] = [
   { part: "neck", left: 50, top: 17, z: 14 },
   { part: "shoulders", left: 30, top: 25, z: 18 },
   { part: "shoulders", left: 70, top: 25, z: 18 },
-  { part: "joints", left: 10, top: 44, z: 26 },
-  { part: "joints", left: 90, top: 44, z: 26 },
+  { part: "joints", left: 50, top: 48, z: 26 },
   { part: "lowerBack", left: 50, top: 51, z: 8 },
   { part: "hips", left: 50, top: 61, z: 10 },
   { part: "knees", left: 33, top: 78, z: 16 },
@@ -66,7 +63,6 @@ export function BodySymptomMap({
 }) {
   const { t } = useLanguage();
   const motionEnabled = useMotionEnabled();
-  const profile = selected ? BODY_PARTS[selected] : null;
 
   const severity = React.useMemo(() => {
     const map: Partial<Record<BodyRegionId, number>> = {};
@@ -80,14 +76,6 @@ export function BodySymptomMap({
     }
     return map;
   }, [selected]);
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (!motionEnabled) return;
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      onSelect(selected ?? "neck");
-    }
-  };
 
   return (
     <div className="w-full rounded-2xl border border-emerald-500/20 bg-white/70 shadow-lg shadow-emerald-950/20 backdrop-blur-xl dark:bg-slate-900/60">
@@ -109,7 +97,7 @@ export function BodySymptomMap({
       </div>
 
       <div className="flex flex-col items-center gap-4 px-5 py-5 sm:flex-row sm:justify-center sm:gap-10">
-        {/* Volumetric body on a 3D stage */}
+        {/* Medical-grade body on a 3D stage — tilt only, no drag hijack */}
         <div className="relative w-full max-w-[220px] shrink-0 select-none">
           <PerspectiveStage
             className="aspect-[250/420] w-full overflow-visible"
@@ -117,49 +105,17 @@ export function BodySymptomMap({
             tiltDeg={6}
             dragRotate={false}
           >
-            {/* Depth halo behind the figure */}
+            {/* Soft depth halo behind the figure */}
             <div
               aria-hidden="true"
               className="absolute inset-x-6 top-4 -z-10 h-[85%] rounded-[50%] bg-teal-400/10 blur-2xl"
             />
             <VolumetricBody
               severity={severity}
-              highlight={
-                selected ? PART_TO_REGION[selected].region : null
-              }
+              highlight={selected ? PART_TO_REGION[selected].region : null}
             />
 
-            {/* Central joints bracelet — a dedicated widespread-pain node. */}
-            <motion.button
-              type="button"
-              onClick={() => onSelect(selected === "joints" ? null : "joints")}
-              aria-pressed={selected === "joints"}
-              aria-label={t("resources.bodyMap.part.joints")}
-              className="absolute"
-              style={{
-                left: "50%",
-                top: "44%",
-                translateX: "-50%",
-                translateY: "-50%",
-                translateZ: "28px",
-              }}
-              whileHover={motionEnabled ? { scale: 1.15 } : undefined}
-              whileTap={motionEnabled ? { scale: 0.92 } : undefined}
-            >
-              <span
-                className={cn(
-                  "block h-7 w-7 rounded-full border-2 transition-all duration-300",
-                  selected === "joints"
-                    ? "scale-110 border-emerald-200 bg-emerald-400/90 shadow-[0_0_24px_rgba(16,185,129,0.65)]"
-                    : "border-emerald-300/60 bg-emerald-500/30 shadow-[0_2px_10px_rgba(2,12,10,0.35)] hover:scale-110 hover:bg-emerald-500/55"
-                )}
-              />
-              <span
-                className="pointer-events-none absolute inset-x-1 top-0.5 h-1.5 rounded-full bg-white/45 blur-[2px]"
-              />
-            </motion.button>
-
-            {/* Floating hotspots — real buttons hovering above the surface */}
+            {/* Crisp floating hotspots — real buttons over the surface */}
             {HOTSPOTS.map((spot, idx) => {
               const isActive = selected === spot.part;
               return (
@@ -167,7 +123,6 @@ export function BodySymptomMap({
                   key={`${spot.part}-${idx}`}
                   type="button"
                   onClick={() => onSelect(isActive ? null : spot.part)}
-                  onKeyDown={handleKeyDown}
                   aria-pressed={isActive}
                   aria-label={t(BODY_PARTS[spot.part].labelKey)}
                   className="group absolute"
@@ -186,7 +141,7 @@ export function BodySymptomMap({
                       "block h-6 w-6 rounded-full border transition-all duration-300",
                       isActive
                         ? "scale-110 border-emerald-200 bg-emerald-400/90 shadow-[0_0_20px_rgba(16,185,129,0.65)]"
-                        : "border-emerald-300/60 bg-emerald-500/30 shadow-[0_2px_10px_rgba(2,12,10,0.35)] hover:scale-110 hover:bg-emerald-500/55"
+                        : "border-emerald-300/60 bg-emerald-500/30 shadow-[0_2px_10px_rgba(2,12,10,0.35)] hover:scale-110 hover:bg-emerald-500/55",
                     )}
                   />
                   {/* Specular top-light on the node */}
@@ -202,29 +157,28 @@ export function BodySymptomMap({
             })}
           </PerspectiveStage>
 
-          {/* Rotation affordance */}              <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-                <HugeiconsIcon icon={Rotate01Icon} className="h-3.5 w-3.5" aria-hidden="true" />
-                {t("resources.bodyMap.rotateHint")}
-              </p>
-              {/* Touch affordance note: hotspots are buttons, the stage only
-                  tilts — taps don't start a drag. */}
-              <p className="text-[11px] text-muted-foreground">
-                {t("resources.bodyMap.tapHint")}
-              </p>
+          {/* Rotation affordance */}
+          <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+            <HugeiconsIcon icon={Rotate01Icon} className="h-3.5 w-3.5" aria-hidden="true" />
+            {t("resources.bodyMap.rotateHint")}
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            {t("resources.bodyMap.tapHint")}
+          </p>
         </div>
 
         {/* Selected region details */}
         <div className="w-full max-w-xs text-sm">
-          {profile ? (
+          {selected ? (
             <div className="space-y-3">
-              <p className="font-semibold text-foreground">{t(profile.labelKey)}</p>
-              {profile.heat && (
+              <p className="font-semibold text-foreground">{t(BODY_PARTS[selected].labelKey)}</p>
+              {BODY_PARTS[selected].heat && (
                 <p className="flex items-center gap-2 rounded-xl border border-orange-500/20 bg-orange-500/10 px-3 py-2 text-orange-700 dark:text-orange-300">
                   <HugeiconsIcon icon={FlameIcon} className="h-4 w-4 shrink-0" aria-hidden="true" />
                   {t("resources.bodyMap.heatHint")}
                 </p>
               )}
-              {profile.movement && (
+              {BODY_PARTS[selected].movement && (
                 <p className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-emerald-700 dark:text-emerald-300">
                   <HugeiconsIcon icon={Activity01Icon} className="h-4 w-4 shrink-0" aria-hidden="true" />
                   {t("resources.bodyMap.movementHint")}

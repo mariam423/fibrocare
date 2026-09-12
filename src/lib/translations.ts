@@ -216,6 +216,7 @@ export type TranslationKey =
   | "resources.bodyMap.heatHint"
   | "resources.bodyMap.movementHint"
   | "resources.bodyMap.rotateHint"
+  | "resources.bodyMap.tapHint"
   | "resources.semantic.matched"
   | "resources.semantic.clear"
   | "resources.effort.low"
@@ -406,6 +407,84 @@ export type TranslationKey =
   | "cycle.tracking.title"
   | "cycle.tracking.content"
   | "cycle.tracking.plain"
+  | "cycleTracker.title"
+  | "cycleTracker.subtitle"
+  | "cycleTracker.logCta"
+  | "cycleTracker.insightLabel"
+  | "cycleTracker.insightShort"
+  | "cycleTracker.symptomChip.ache"
+  | "cycleTracker.symptomChip.sleep"
+  | "cycleTracker.symptomChip.fog"
+  | "cycleTracker.symptomChip.fatigue"
+  | "cycleTracker.disclaimer"
+  | "cycleTracker.symptom.menstrual"
+  | "cycleTracker.symptom.follicular"
+  | "cycleTracker.symptom.ovulatory"
+  | "cycleTracker.symptom.luteal"
+  | "cycleTracker.symptom.window"
+  | "cycleTracker.insight.menstrual"
+  | "cycleTracker.insight.follicular"
+  | "cycleTracker.insight.ovulatory"
+  | "cycleTracker.insight.luteal"
+  | "cycleTracker.title"
+  | "cycleTracker.subtitle"
+  | "cycleTracker.logCta"
+  | "cycleTracker.insightLabel"
+  | "cycleTracker.insightShort"
+  | "cycleTracker.symptomChip.ache"
+  | "cycleTracker.symptomChip.sleep"
+  | "cycleTracker.symptomChip.fog"
+  | "cycleTracker.symptomChip.fatigue"
+  | "cycleTracker.disclaimer"
+  | "cycleTracker.symptom.menstrual"
+  | "cycleTracker.symptom.follicular"
+  | "cycleTracker.symptom.ovulatory"
+  | "cycleTracker.symptom.luteal"
+  | "cycleTracker.symptom.window"
+  | "cycleTracker.insight.menstrual"
+  | "cycleTracker.insight.follicular"
+  | "cycleTracker.insight.ovulatory"
+  | "cycleTracker.insight.luteal"
+  | "cycleTracker.insight.window"
+  | "cycleTracker.title"
+  | "cycleTracker.subtitle"
+  | "cycleTracker.logCta"
+  | "cycleTracker.insightLabel"
+  | "cycleTracker.insightShort"
+  | "cycleTracker.symptomChip.ache"
+  | "cycleTracker.symptomChip.sleep"
+  | "cycleTracker.symptomChip.fog"
+  | "cycleTracker.symptomChip.fatigue"
+  | "cycleTracker.disclaimer"
+  | "cycleTracker.symptom.menstrual"
+  | "cycleTracker.symptom.follicular"
+  | "cycleTracker.symptom.ovulatory"
+  | "cycleTracker.symptom.luteal"
+  | "cycleTracker.symptom.window"
+  | "cycleTracker.insight.menstrual"
+  | "cycleTracker.insight.follicular"
+  | "cycleTracker.insight.ovulatory"
+  | "cycleTracker.insight.luteal"
+  | "cycleTracker.title"
+  | "cycleTracker.subtitle"
+  | "cycleTracker.logCta"
+  | "cycleTracker.insightLabel"
+  | "cycleTracker.insightShort"
+  | "cycleTracker.symptomChip.ache"
+  | "cycleTracker.symptomChip.sleep"
+  | "cycleTracker.symptomChip.fog"
+  | "cycleTracker.symptomChip.fatigue"
+  | "cycleTracker.disclaimer"
+  | "cycleTracker.symptom.menstrual"
+  | "cycleTracker.symptom.follicular"
+  | "cycleTracker.symptom.ovulatory"
+  | "cycleTracker.symptom.luteal"
+  | "cycleTracker.symptom.window"
+  | "cycleTracker.insight.menstrual"
+  | "cycleTracker.insight.follicular"
+  | "cycleTracker.insight.ovulatory"
+  | "cycleTracker.insight.luteal"
+  | "cycleTracker.insight.window"
   | "diagnosis.check.title"
   | "diagnosis.check.subtitle"
   | "diagnosis.check.q.widespread"
@@ -1107,7 +1186,7 @@ export type TranslationKey =
   | "bodyMap.emptyHint"
   | "bodyMap.point.neck"
   | "bodyMap.point.shoulders"
-  | "bodyMap.point.arms"
+  | "bodyMap.point.upperArms"
   | "bodyMap.point.lowerBack"
   | "bodyMap.point.knees"
   | "bodyMap.viewGroupAria"
@@ -1978,6 +2057,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.bodyMap.heatHint": "Heat therapy may help here",
     "resources.bodyMap.movementHint": "Gentle movement may help here",
     "resources.bodyMap.rotateHint": "Drag or tilt to explore in 3D",
+    "resources.bodyMap.tapHint": "Tap a glowing node to log pain there",
     "resources.semantic.matched": "Matched: {category}",
     "resources.semantic.clear": "Clear search",
     "resources.effort.low": "Low effort",
@@ -2168,6 +2248,26 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "cycle.tracking.title": "Using FibroCare's cycle tools",
     "cycle.tracking.content": "Log each cycle's start date in the dashboard's cycle tracker. After one logged cycle the correlations feed derives your current phase; after a few, the flare forecast estimates your personal risk window (cycle days, countdown, and severity) and pairs it with proactive advice. Logging symptoms daily sharpens both the correlations and the forecast.",
     "cycle.tracking.plain": "Add your period start dates in the dashboard. The app learns your rhythm and warns you a few days early so you can plan around the flare window.",
+    "cycleTracker.title": "Cycle Symptom Tracker",
+    "cycleTracker.subtitle": "How fibromyalgia symptoms typically shift across your cycle phases — and how to work with each one",
+    "cycleTracker.logCta": "Log today's symptoms",
+    "cycleTracker.insightLabel": "Coping insight",
+    "cycleTracker.insightShort": "Insight",
+    "cycleTracker.symptomChip.ache": "Muscle ache",
+    "cycleTracker.symptomChip.sleep": "Sleep",
+    "cycleTracker.symptomChip.fog": "Brain fog",
+    "cycleTracker.symptomChip.fatigue": "Fatigue",
+    "cycleTracker.disclaimer": "This is a general pattern, not a substitute for medical advice — every body responds differently.",
+    "cycleTracker.symptom.menstrual": "During menstruation, estrogen and progesterone drop sharply — central pain sensitivity rises, which is why muscle aches and joint pain often feel worse than the rest of the month. Fatigue also tends to peak, partly from sleep fragmentation alongside the hormonal shift.",
+    "cycleTracker.symptom.follicular": "As estrogen climbs after bleeding stops, serotonin and norepinephrine settle back down — the pain burden is often at its lightest and you may feel more energetic. This is usually the window where gentle movement and heat therapy are most effective.",
+    "cycleTracker.symptom.ovulatory": "Mid-cycle, estrogen peaks then drops quickly — this can cause a short-lived swing that affects energy and focus more than pain itself. Many people with fibromyalgia notice a brief window of clarity, then fatigue starts to creep back in.",
+    "cycleTracker.symptom.luteal": "In the second half of the cycle, progesterone rises then falls — this is the stretch where pain often begins climbing, stiffness settles in, and fatigue increases. Pacing and heat therapy become more important here.",
+    "cycleTracker.symptom.window": "The pre-period window (roughly 3–7 days before bleeding): this phase is associated with the sharpest swing in pain sensitivity, fatigue, and mental exhaustion for many people with fibromyalgia — and it is the window FibroCare aims to flag early once your cycle data is in.",
+    "cycleTracker.insight.menstrual": "Plan heavy tasks earlier in the month. This is a rest-friendly phase — prioritise heat therapy, gentle stretching, and sleep hygiene rather than pushing through.",
+    "cycleTracker.insight.follicular": "This is the best window for gentle walking and movement in your range — energy is often better and the body responds to motion more easily.",
+    "cycleTracker.insight.ovulatory": "Expect a brief energy and focus swing. Don't chase it — take short breaks and schedule the heavy tasks around your genuine peak, not the calendar.",
+    "cycleTracker.insight.luteal": "Start pacing now — lower the intensity, use heat therapy before the ache kicks in, and watch your sleep closely.",
+    "cycleTracker.insight.window": "This is the window where planning ahead makes the difference — use the flare forecast in the app to back off before it starts, and remember this phase is temporary.",
     "diagnosis.check.title": "AI Diagnostic Readiness Checker",
     "diagnosis.check.subtitle": "Answer 4 quick questions to see how your symptoms compare with the ACR criteria — then export a summary for your doctor.",
     "diagnosis.check.q.widespread": "Widespread pain in many body areas, on both sides, above and below the waist?",
@@ -2854,7 +2954,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.emptyHint": "Tap a body area to mark pain",
     "bodyMap.point.neck": "Neck",
     "bodyMap.point.shoulders": "Shoulders",
-    "bodyMap.point.arms": "Arms",
+    "bodyMap.point.upperArms": "Upper arms",
     "bodyMap.point.lowerBack": "Lower Back",
     "bodyMap.point.knees": "Knees",
     "bodyMap.viewGroupAria": "Body view",
@@ -3746,6 +3846,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "resources.bodyMap.heatHint": "قد يساعد العلاج بالحرارة هنا",
     "resources.bodyMap.movementHint": "قد تساعد الحركة اللطيفة هنا",
     "resources.bodyMap.rotateHint": "اسحب أو أمِل للاستكشاف ثلاثي الأبعاد",
+    "resources.bodyMap.tapHint": "اضغط على عقدة متوهجة لتسجيل الألم فيها",
     "resources.semantic.matched": "مطابق: {category}",
     "resources.semantic.clear": "مسح البحث",
     "resources.effort.low": "جهد منخفض",
@@ -3936,6 +4037,26 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "cycle.tracking.title": "استخدام أدوات الدورة في فايبروكير",
     "cycle.tracking.content": "سجلي تاريخ بداية كل دورة في متتبع الدورة بلوحة التحكم. بعد أول دورة مسجلة يشتق موجز الارتباطات طورك الحالي؛ وبعد بضع دورات تقدّر بطاقة التوقعات نافذة الخطر الشخصية (أيام الدورة، والعد التنازلي، والشدة) وتقرنها بنصائح استباقية. التسجيل اليومي للأعراض يزيد دقة الارتباطات والتوقعات معًا.",
     "cycle.tracking.plain": "أضيفي تواريخ بداية الدورة في لوحة التحكم. يتعلم التطبيق إيقاعك ويحذرك قبل أيام قليلة لتخطيط فترة التوهج مسبقًا.",
+    "cycleTracker.title": "متتبع أعراض الدورة",
+    "cycleTracker.subtitle": "كيف تتأثر بأعراض الفبروميالغيا عبر مراحل الدورة — وكيف تتعاملين مع كل مرحلة",
+    "cycleTracker.logCta": "تسجيل أعراض اليوم",
+    "cycleTracker.insightLabel": "رؤية تعامل",
+    "cycleTracker.insightShort": "تعامل",
+    "cycleTracker.symptomChip.ache": "ألم العضلات",
+    "cycleTracker.symptomChip.sleep": "نوم",
+    "cycleTracker.symptomChip.fog": "ضبابية",
+    "cycleTracker.symptomChip.fatigue": "تعب",
+    "cycleTracker.disclaimer": "هذه نمط عام وليس بديلاً عن النصيحة الطبية — كل جسم يستجيب بشكل مختلف.",
+    "cycleTracker.symptom.menstrual": "أثناء الدورة الشهرية، تنخفض هرمونات الإستروجين والبروجستيرون بسرعة — مما يرفع حساسية الألم المركزية، لذا غالبًا ما يشعر بألم العضلات وألم المفاصل أسوأ مما هو عليه في بقية الشهر. التعب أيضًا يميل إلى الذروة، جزئيًا بسبب تق 만이다 النوم مع التحول الهرموني.",
+    "cycleTracker.symptom.follicular": "مع صعود الإستروجين بعد توقف النزيف، تعود مستويات السيروتونين والنورأدرينالين إلى استقرارها — غالبًا ما يكون عبء الألم أخف ما يكون وقد تشعرين بمزيد من الطاقة. عادةً ما تكون هذه هي النافذة التي يكون فيها الحركة اللطيفة وعلاج الحرارة الأكثر فعالية.",
+    "cycleTracker.symptom.ovulatory": "في منتصف الدورة، يبلغ الإستروجين ذروته ثم يسقط بسرعة — مما قد يسبب تذبذبًا قصيرًا يؤثر على الطاقة والتركيز أكثر من الألم بحد ذاته. العديد من المصابين بالفبروميالغيا يلاحظون نافذة قصيرة من الوضوح، ثم يبدأ التعب في العودة.",
+    "cycleTracker.symptom.luteal": "في النصف الثاني من الدورة، يرتفع البروجستيرون ثم يهبط — وهذه هي الفترة التي يبدأ فيها الألم في التصاعد، وتظهر تصلب، ويزيد التعب. يصبح التنظيم وعلاج الحرارة أكثر أهمية هنا.",
+    "cycleTracker.symptom.window": "نافذة ما قبل الدورة (تقريبًا 3-7 أيام قبل النزيف): ترتبط هذه المرحلة بأكبر تقلب في حساسية الألم والتعب والإرهاق الذهني للكثير من المصابين بالفبروميالغيا — وهي النافذة التي يهدف FibroCare إلى تنبيهك إليها مبكرًا بمجرد إدخال بيانات دورتك.",
+    "cycleTracker.insight.menstrual": "خططي للمهمات الثقيلة في وقت مبكر من الشهر. هذه مرحلة مليئة بالراحة — اعطائي أولوية لعلاج الحرارة والامتداد اللطيف وصحة النوم بدلاً من التغلب.",
+    "cycleTracker.insight.follicular": "هذه هي النافذة المثلى للمشي اللطيف والحركة ضمن نطاقك — غالبًا ما تكون الطاقة أفضل وينجب الجسم الاستجابة للحركة بسهولة أكبر.",
+    "cycleTracker.insight.ovulatory": "توقعي تذبذبًا قصيرًا في الطاقة والتركيز. لا تتبعيها — خذي استراحات قصيرة وجدي المهام الثقيلة حول ذروتك الحقيقية، ليس التقويم.",
+    "cycleTracker.insight.luteal": "ابدأي التنظيم الآن — خففي الكثافة، واستخدمي علاج الحرارة قبل أن يبدأ الألم، وراقبي نومك عن كثب.",
+    "cycleTracker.insight.window": "هذه هي النافذة التي يصبح فيها التخطيط مسبقًا هو الفرق — استخدمي تنبؤ النوبة في التطبيق للتراجع قبل أن يبدأ، وتذكري أن هذه المرحلة مؤقتة.",
     "diagnosis.check.title": "مدقق الجاهزية للتشخيص الذكي",
     "diagnosis.check.subtitle": "أجب عن 4 أسئلة سريعة لترى كيف تقارن أعراضك بمعايير ACR — ثم صدّر ملخصًا لطبيبك.",
     "diagnosis.check.q.widespread": "ألم واسع في مناطق كثيرة من الجسم، على الجانبين وفوق وتحت الخصر؟",
@@ -4624,7 +4745,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.emptyHint": "اضغط على منطقة في الجسم لتحديد الألم",
     "bodyMap.point.neck": "الرقبة",
     "bodyMap.point.shoulders": "الكتفان",
-    "bodyMap.point.arms": "الذراعان",
+    "bodyMap.point.upperArms": "الذراعان العلويان",
     "bodyMap.point.lowerBack": "الظهر السفلي",
     "bodyMap.point.knees": "الركبتان",
     "bodyMap.viewGroupAria": "عرض الجسم",

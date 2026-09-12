@@ -25,12 +25,8 @@ const DAILY_QUOTE_KEYS: TranslationKey[] = [
 
 export function DailyQuoteWidget() {
   const { t } = useLanguage();
-  const [quoteKey, setQuoteKey] = useState<TranslationKey>(DAILY_QUOTE_KEYS[0]);
-
-  useEffect(() => {
-    const dayIndex = Math.floor(Date.now() / 86_400_000);
-    setQuoteKey(DAILY_QUOTE_KEYS[dayIndex % DAILY_QUOTE_KEYS.length]);
-  }, []);
+  const dayIndex = Math.floor(Date.now() / 86_400_000);
+  const quoteKey = DAILY_QUOTE_KEYS[dayIndex % DAILY_QUOTE_KEYS.length];
 
   return (
     <DepthCard tilt={3} delay={0.12} float>

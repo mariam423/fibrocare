@@ -41,7 +41,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AiPublishingAssistant } from "@/components/pro/AiPublishingAssistant";
 import { PostEditor } from "@/components/pro/PostEditor";
-import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
+import { DoctorSocialFeed } from "@/components/pro/DoctorSocialFeed";
 import { DoctorOwnPosts, type DoctorOwnPost } from "@/components/pro/DoctorOwnPosts";
 import { AiArticleLibrary, type AiArticle } from "@/components/pro/AiArticleLibrary";
 import { useLanguage } from "@/context/LanguageContext";
@@ -190,7 +190,7 @@ export default function DoctorHubPage() {
 
           {posts.length > 0 ? (
             <ScrollReveal delay={0.15}>
-              <DoctorContentFeed posts={posts} />
+              <DoctorSocialFeed />
             </ScrollReveal>
           ) : null}
 
@@ -344,9 +344,9 @@ export default function DoctorHubPage() {
         </ScrollReveal>
 
         {posts.length > 0 ? (
-          <ScrollReveal delay={0.2}>
-            <DoctorContentFeed posts={posts} />
-          </ScrollReveal>
+            <ScrollReveal delay={0.2}>
+              <DoctorSocialFeed />
+            </ScrollReveal>
         ) : null}
 
         <ScrollReveal delay={0.25}>

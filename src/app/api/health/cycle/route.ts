@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CycleLogSchema } from "@/lib/validations/health";
+import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,8 +27,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(cycle, { status: 201 });
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
     }
     console.error("[HEALTH_CYCLE_POST]", error);

@@ -43,6 +43,7 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [content, setContent] = useState(initialData?.content ?? "");
   const [tags, setTags] = useState(initialData?.tags ?? "");
+  const [mediaUrl, setMediaUrl] = useState("");
   const [aiAssist, setAiAssist] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -80,13 +81,20 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
         }
       }
 
-      const result = await createDoctorPost({ title: finalTitle, content: finalContent, tags, kind });
+      const result = await createDoctorPost({
+        title: finalTitle,
+        content: finalContent,
+        tags,
+        kind,
+        mediaUrls: mediaUrl ? [mediaUrl] : []
+      });
       if (result.success) {
         setSuccess(true);
         setSuccessKind(kind);
         setTitle("");
         setContent("");
         setTags("");
+        setMediaUrl("");
         setKind("article");
         setAiAssist(false);
         onSaved?.();
@@ -187,6 +195,22 @@ export function PostEditor({ initialData, onSaved }: PostEditorProps) {
             data-testid="doctor-post-tags"
           />
         </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="doctor-post-media" className="text-sm font-medium">
+            {t("doctor.postMedia") ?? "Media URL"}
+          </label>
+          <input
+            id="doctor-post-media"
+            type="text"
+            value={mediaUrl}
+            onChange={(e) => setMediaUrl(e.target.value)}
+            placeholder="https://..."
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            disabled={isPending}
+          />
+        </div>
+
 
         {/* AI assist toggle --------------------------------------------- */}
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-3">

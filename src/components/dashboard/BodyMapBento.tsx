@@ -28,7 +28,7 @@ interface TriggerPoint {
 const TRIGGER_POINTS: TriggerPoint[] = [
   { id: "neck", tKey: "bodyMap.point.neck", x: 50, y: 18, region: "neck", z: 14 },
   { id: "shoulders", tKey: "bodyMap.point.shoulders", x: 50, y: 26, region: "shoulders", z: 16 },
-  { id: "arms", tKey: "bodyMap.point.arms", x: 50, y: 38, region: "arms", z: 22 },
+  { id: "upperArms", tKey: "bodyMap.point.upperArms", x: 50, y: 38, region: "upperArms", z: 22 },
   { id: "lowerBack", tKey: "bodyMap.point.lowerBack", x: 50, y: 52, region: "lowerBack", z: 8 },
   { id: "knees", tKey: "bodyMap.point.knees", x: 50, y: 72, region: "knees", z: 14 },
 ];

@@ -43,7 +43,7 @@ beforeEach(() => {
 
 const ALL_PARTS = Object.keys(BODY_PARTS) as BodyPartId[];
 /** Two hotspots exist per bilateral region; every part has ≥1 hotspot. */
-const HOTSPOT_COUNT = 9;
+const HOTSPOT_COUNT = 10; // 9 body hotspots + 1 central joints bracelet
 
 describe("BodySymptomMap hotspots (accessibility)", () => {
   it("renders one tappable hotspot per mapped position with a real label", () => {

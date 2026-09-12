@@ -108,10 +108,16 @@ export async function GET(request: Request) {
 
   const posts = await prisma.doctorPost.findMany({
     where,
-    include: { author: { select: { id: true, name: true } } },
+    include: {
+      author: { select: { id: true, name: true } },
+      _count: {
+        select: { reactions: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
+
 
   return Response.json({ posts });
 }

@@ -30,6 +30,7 @@ model User {
   symptomLogs          SymptomLog[]
   doctorPosts          DoctorPost[]
   articleReactions     ArticleReaction[]
+  comments              Comment[]
   patientConsultations Consultation[]        @relation("PatientConsultations")
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
@@ -141,9 +142,11 @@ model DoctorPost {
   language       String   @default("en")
   authorId       String
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  mediaUrls      String[] @default([])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   reactions      ArticleReaction[]
+  comments       Comment[]
 
   @@index([authorId])
   @@index([verifiedStatus])
@@ -175,6 +178,20 @@ model ArticleReaction {
   // "Show me everything this user reacted to" — backs the user history
   // view. Without this index, the query is a full scan as the table
   // grows past a few thousand rows.
+  @@index([userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      DoctorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
   @@index([userId])
 }
 

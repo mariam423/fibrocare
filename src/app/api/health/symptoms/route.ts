@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SymptomLogSchema } from "@/lib/validations/health";
+import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,8 +39,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(symptomLog, { status: 201 });
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
     }
     console.error("[HEALTH_SYMPTOMS_POST]", error);

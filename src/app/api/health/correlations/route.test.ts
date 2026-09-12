@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { getServerSession } from "next-auth";
 import { GET } from "./route";
 import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
 
 vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
@@ -22,14 +23,18 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
-const req = new (require("next/server").NextRequest)(
+const req = new NextRequest(
   "http://localhost/api/health/correlations"
 );
 
-function mockDb({ cycles = [] as any[], symptoms = [] as any[], painLogs = [] as any[] }) {
-  vi.mocked(prisma.menstrualCycle.findMany).mockResolvedValue(cycles);
-  vi.mocked(prisma.symptomLog.findMany).mockResolvedValue(symptoms);
-  vi.mocked(prisma.painLog.findMany).mockResolvedValue(painLogs);
+function mockDb({ cycles = [], symptoms = [], painLogs = [] }: {
+  cycles?: unknown[];
+  symptoms?: unknown[];
+  painLogs?: unknown[];
+}) {
+  vi.mocked(prisma.menstrualCycle.findMany).mockResolvedValue(cycles as any);
+  vi.mocked(prisma.symptomLog.findMany).mockResolvedValue(symptoms as any);
+  vi.mocked(prisma.painLog.findMany).mockResolvedValue(painLogs as any);
 }
 
 describe("GET /api/health/correlations", () => {

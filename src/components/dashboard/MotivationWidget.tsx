@@ -438,7 +438,11 @@ export function MotivationWidget() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Sync toggle to locale changes
-  useEffect(() => setShowArabic(locale === "ar"), [locale]);
+  useEffect(() => {
+    if (showArabic !== (locale === "ar")) {
+      setShowArabic(locale === "ar");
+    }
+  }, [locale, showArabic]);
 
   // ── Auto-rotate every 20 seconds ──
   useEffect(() => {

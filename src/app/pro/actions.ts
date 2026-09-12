@@ -122,10 +122,11 @@ export async function getConsultationDetails(consultationId: string) {
 /*  Doctor Hub actions                                                  */
 /* ------------------------------------------------------------------ */
 
-export async function createDoctorPost(rawInput: DoctorPostInput) {
+export async function createDoctorPost(rawInput: DoctorPostInput & { mediaUrls?: string[] }) {
   try {
     const auth = await requireDoctor();
     if (!auth.ok) return { success: false as const, error: auth.error };
+
 
     // Zod validation (kind-aware, incl. the status length ceiling) before
     // any sanitization or persistence. Prisma parameterizes all queries,
@@ -162,8 +163,10 @@ export async function createDoctorPost(rawInput: DoctorPostInput) {
         kind: parsed.data.kind,
         authorId: auth.user.id,
         verifiedStatus: "pending",
+        mediaUrls: rawInput.mediaUrls ?? [],
       },
     });
+
 
     revalidatePath("/pro/doctor");
     return {

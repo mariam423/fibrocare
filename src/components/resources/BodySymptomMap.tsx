@@ -24,17 +24,17 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { useMotionEnabled } from "@/hooks/useMotionEnabled";
 import { cn } from "@/lib/utils";
-import { BODY_PARTS, type BodyPartId } from "@/lib/resources/engine";
-
-/** Body-map parts → volumetric regions with a gentle ambient severity. */
-const PART_TO_REGION: Record<BodyPartId, { region: BodyRegionId; severity: number }> = {
-  neck: { region: "neck", severity: 4 },
-  shoulders: { region: "shoulders", severity: 4 },
-  lowerBack: { region: "lowerBack", severity: 5 },
-  hips: { region: "hips", severity: 3 },
-  knees: { region: "knees", severity: 4 },
-  joints: { region: "joints", severity: 3 },
-};
+import { BODY_PARTS, type BodyPartId } from "@/lib/resources/engine";  /** Body-map parts → volumetric regions with a gentle ambient severity.
+   *  Bilateral parts (shoulders, knees) map onto the same central region
+   *  since the silhouette is a single figure — two hotspots share one glow. */
+  const PART_TO_REGION: Record<BodyPartId, { region: BodyRegionId; severity: number }> = {
+    neck: { region: "neck", severity: 4 },
+    shoulders: { region: "shoulders", severity: 4 },
+    lowerBack: { region: "lowerBack", severity: 5 },
+    hips: { region: "hips", severity: 3 },
+    knees: { region: "knees", severity: 4 },
+    joints: { region: "joints", severity: 3 },
+  };
 
 interface Hotspot {
   part: BodyPartId;
@@ -47,14 +47,14 @@ interface Hotspot {
 
 const HOTSPOTS: Hotspot[] = [
   { part: "neck", left: 50, top: 17, z: 14 },
-  { part: "shoulders", left: 30, top: 23.5, z: 18 },
-  { part: "shoulders", left: 70, top: 23.5, z: 18 },
-  { part: "joints", left: 13, top: 40, z: 24 },
-  { part: "joints", left: 87, top: 40, z: 24 },
-  { part: "lowerBack", left: 50, top: 42, z: 8 },
-  { part: "hips", left: 50, top: 54, z: 10 },
-  { part: "knees", left: 32, top: 78, z: 16 },
-  { part: "knees", left: 68, top: 78, z: 16 },
+  { part: "shoulders", left: 30, top: 25, z: 18 },
+  { part: "shoulders", left: 70, top: 25, z: 18 },
+  { part: "joints", left: 10, top: 44, z: 26 },
+  { part: "joints", left: 90, top: 44, z: 26 },
+  { part: "lowerBack", left: 50, top: 51, z: 8 },
+  { part: "hips", left: 50, top: 61, z: 10 },
+  { part: "knees", left: 33, top: 78, z: 16 },
+  { part: "knees", left: 67, top: 78, z: 16 },
 ];
 
 export function BodySymptomMap({
@@ -110,11 +110,12 @@ export function BodySymptomMap({
 
       <div className="flex flex-col items-center gap-4 px-5 py-5 sm:flex-row sm:justify-center sm:gap-10">
         {/* Volumetric body on a 3D stage */}
-        <div className="relative w-full max-w-[240px] shrink-0 select-none">
+        <div className="relative w-full max-w-[220px] shrink-0 select-none">
           <PerspectiveStage
-            className="aspect-[200/320] w-full"
+            className="aspect-[250/420] w-full overflow-visible"
             resting={{ rotateX: 6, rotateY: -8 }}
-            tiltDeg={7}
+            tiltDeg={6}
+            dragRotate={false}
           >
             {/* Depth halo behind the figure */}
             <div
@@ -127,6 +128,36 @@ export function BodySymptomMap({
                 selected ? PART_TO_REGION[selected].region : null
               }
             />
+
+            {/* Central joints bracelet — a dedicated widespread-pain node. */}
+            <motion.button
+              type="button"
+              onClick={() => onSelect(selected === "joints" ? null : "joints")}
+              aria-pressed={selected === "joints"}
+              aria-label={t("resources.bodyMap.part.joints")}
+              className="absolute"
+              style={{
+                left: "50%",
+                top: "44%",
+                translateX: "-50%",
+                translateY: "-50%",
+                translateZ: "28px",
+              }}
+              whileHover={motionEnabled ? { scale: 1.15 } : undefined}
+              whileTap={motionEnabled ? { scale: 0.92 } : undefined}
+            >
+              <span
+                className={cn(
+                  "block h-7 w-7 rounded-full border-2 transition-all duration-300",
+                  selected === "joints"
+                    ? "scale-110 border-emerald-200 bg-emerald-400/90 shadow-[0_0_24px_rgba(16,185,129,0.65)]"
+                    : "border-emerald-300/60 bg-emerald-500/30 shadow-[0_2px_10px_rgba(2,12,10,0.35)] hover:scale-110 hover:bg-emerald-500/55"
+                )}
+              />
+              <span
+                className="pointer-events-none absolute inset-x-1 top-0.5 h-1.5 rounded-full bg-white/45 blur-[2px]"
+              />
+            </motion.button>
 
             {/* Floating hotspots — real buttons hovering above the surface */}
             {HOTSPOTS.map((spot, idx) => {
@@ -171,11 +202,15 @@ export function BodySymptomMap({
             })}
           </PerspectiveStage>
 
-          {/* Rotation affordance */}
-          <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-            <HugeiconsIcon icon={Rotate01Icon} className="h-3.5 w-3.5" aria-hidden="true" />
-            {t("resources.bodyMap.rotateHint")}
-          </p>
+          {/* Rotation affordance */}              <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+                <HugeiconsIcon icon={Rotate01Icon} className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("resources.bodyMap.rotateHint")}
+              </p>
+              {/* Touch affordance note: hotspots are buttons, the stage only
+                  tilts — taps don't start a drag. */}
+              <p className="text-[11px] text-muted-foreground">
+                {t("resources.bodyMap.tapHint")}
+              </p>
         </div>
 
         {/* Selected region details */}

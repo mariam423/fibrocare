@@ -67,7 +67,7 @@ const CATEGORIES: CategoryLog[] = [
     label: "Mood",
     icon: HeartIcon,
     value: 5,
-    regions: ["arms", "joints"],
+    regions: ["upperArms", "joints"],
   },
 ];
 
@@ -135,7 +135,7 @@ export function SymptomMapWidget() {
                 hips: categoryValues.PHYSICAL,
                 neck: categoryValues.COGNITIVE,
                 shoulders: categoryValues.COGNITIVE,
-                arms: categoryValues.MOOD,
+                upperArms: categoryValues.MOOD,
               }}
             />
           </PerspectiveStage>

@@ -78,17 +78,18 @@ export async function GET(
     // Map to Insight Engine shapes
     const mappedCycles: CyclePatternLog[] = cycles.map((c) => ({
       id: c.id,
-      phase: c.phase as any,
+      phase: c.phase,
       startDate: c.startDate,
       endDate: c.endDate,
     }));
+
 
     const mappedSymptoms: SymptomPatternLog[] = symptomLogs.map((s) => ({
       symptom: s.symptom,
       date: s.date,
       severity: s.severity,
-      category: s.category as any,
-      area: s.area as any,
+      category: s.category,
+      area: s.area,
     }));
 
     const mappedPain: PainPatternLog[] = painLogs.map((p) => ({

@@ -6,6 +6,7 @@ import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ContentPageLayout } from "@/components/resources/ContentPageLayout";
 import { HormonalCycleSection } from "@/components/resources/HormonalCycleSection";
+import { CycleSymptomTracker } from "@/components/resources/CycleSymptomTracker";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   PAGE_TAKEAWAYS,
@@ -65,7 +66,10 @@ export default function CyclePage() {
             image="/images/cycle-correlation.jpg"
           />
 
-          {/* 2. Long-form clinical detail with foggy-mode + citations */}
+          {/* 2. Fibromyalgia-specific symptom tracker */}
+          <CycleSymptomTracker />
+
+          {/* 3. Long-form clinical detail with foggy-mode + citations */}
           <ContentPageLayout
             titleKey="cycle.title"
             subtitleKey="cycle.subtitle"

@@ -22,7 +22,7 @@ async function resolveEventUserId(
   rawBody: string,
   provider: "stripe" | "lemon-squeezy"
 ): Promise<string | null> {
-  let event: any;
+  let event: unknown;
   try {
     event = JSON.parse(rawBody);
   } catch {

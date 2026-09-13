@@ -9,9 +9,9 @@ const commentSchema = z.object({
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const postId = params.id;
+  const postId = (await params).id;
 
   const comments = await prisma.comment.findMany({
     where: { postId },
@@ -26,14 +26,14 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const postId = params.id;
+  const postId = (await params).id;
   const userId = session.user.id;
 
   try {

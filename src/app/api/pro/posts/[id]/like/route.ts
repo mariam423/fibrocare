@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const postId = params.id;
+  const postId = (await params).id;
   const userId = session.user.id;
 
   // We only support "like" for the social feed interaction

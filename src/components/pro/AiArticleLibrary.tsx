@@ -586,11 +586,11 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         </ScrollReveal>
       ) : (
         <div
-          className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl mx-auto px-4"
+          className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl mx-auto px-4"
           data-testid="ai-article-grid"
         >
           {articles.map((article, i) => (
-            <ScrollReveal key={article.id} delay={Math.min(i * 0.04, 0.3)}>
+            <ScrollReveal key={article.id} delay={Math.min(i * 0.04, 0.3)} className="h-full">
               <AiArticleCard
                 article={article}
                 badge={

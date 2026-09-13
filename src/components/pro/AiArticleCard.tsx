@@ -153,7 +153,7 @@ export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps)
         // through the dedup. The card already inherits the
         // document `dir`; we don't re-pin it here.
         lang={article.language}
-        className="relative flex h-auto flex-col"
+        className="relative flex h-full flex-col"
         style={{ "--card-spacing": "1.5rem" } as React.CSSProperties}
       >
         <CardHeader>

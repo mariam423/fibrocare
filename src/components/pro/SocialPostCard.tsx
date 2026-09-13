@@ -56,13 +56,13 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
   };
 
   return (
-    <Card className="group relative overflow-hidden border-emerald-500/20 bg-white/70 shadow-sm ring-1 ring-emerald-500/10 backdrop-blur-xl transition-all hover:shadow-md dark:bg-slate-900/70">
+    <Card className="group relative flex h-full flex-col overflow-hidden border-emerald-500/20 bg-white/70 shadow-sm ring-1 ring-emerald-500/10 backdrop-blur-xl transition-all hover:shadow-md dark:bg-slate-900/70">
       {/* Category Badge */}
       <div className="absolute right-0 top-0 flex h-8 items-center bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
         {kindLabels[post.kind] ?? post.kind}
       </div>
 
-      <CardContent className="p-6">
+      <CardContent className="flex flex-1 flex-col p-6">
         <div className="flex items-start gap-3">
           {/* Doctor Profile */}
           <div className="relative">
@@ -118,7 +118,7 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-between border-t border-emerald-500/10 pt-3">
+        <div className="mt-auto flex items-center justify-between border-t border-emerald-500/10 pt-3">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"

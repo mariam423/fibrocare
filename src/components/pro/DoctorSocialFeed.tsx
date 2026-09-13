@@ -108,9 +108,9 @@ export function DoctorSocialFeed() {
         <FeedFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3 w-full mx-auto max-w-7xl">
+      <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 w-full mx-auto max-w-7xl">
         {posts.map((post, i) => (
-          <ScrollReveal key={post.id} delay={i * 0.1}>
+          <ScrollReveal key={post.id} delay={i * 0.1} className="h-full">
             <SocialPostCard
               post={post}
               onLike={handleLike}

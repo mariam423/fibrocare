@@ -95,7 +95,7 @@ export function DoctorSocialFeed() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold tracking-tight text-foreground">
@@ -108,7 +108,7 @@ export function DoctorSocialFeed() {
         <FeedFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3 w-full mx-auto max-w-7xl">
         {posts.map((post, i) => (
           <ScrollReveal key={post.id} delay={i * 0.1}>
             <SocialPostCard

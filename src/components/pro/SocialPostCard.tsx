@@ -41,7 +41,7 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
     setLikesCount(prev => nextLiked ? prev + 1 : prev - 1);
 
     try {
-      await onLike(post.id, liked);
+      await onLike(post.id, nextLiked);
     } catch (e) {
       // Rollback
       setLiked(!nextLiked);
@@ -62,7 +62,7 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
         {kindLabels[post.kind] ?? post.kind}
       </div>
 
-      <CardContent className="p-5">
+      <CardContent className="p-6">
         <div className="flex items-start gap-3">
           {/* Doctor Profile */}
           <div className="relative">

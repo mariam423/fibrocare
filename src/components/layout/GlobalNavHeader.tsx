@@ -87,7 +87,7 @@ function crumbKeyFor(pathname: string): string | null {
 const QUICK_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
   { href: "/dashboard", labelKey: "nav.dashboard" },
   { href: "/pro/doctor", labelKey: "nav.doctorHub" },
-  { href: "/pro/consultations", labelKey: "nav.consultations" },
+  { href: "/dashboard/consultations", labelKey: "nav.consultations" },
   { href: "/profile", labelKey: "nav.profile" },
 ];
 
@@ -159,7 +159,7 @@ export default function GlobalNavHeader() {
   return (
     <header
       data-testid="global-nav-header"
-      className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 dark:bg-slate-900/85 dark:border-emerald-500/10"
+      className="sticky top-0 z-50 relative w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 dark:bg-slate-900/85 dark:border-emerald-500/10"
     >
       {/* 3D glass stack: top specular highlight over a translucent slab */}
       <div

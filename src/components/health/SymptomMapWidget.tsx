@@ -132,9 +132,9 @@ export function SymptomMapWidget() {
       </CardHeader>
       <CardContent className="space-y-6 flex-1">
         {/* Live 3D pain heatmap — smooth intensity pools across zones */}
-        <div className="relative mx-auto w-full max-w-[190px] select-none">
+        <div className="relative mx-auto w-full max-w-[200px] select-none">
           <PerspectiveStage
-            className="aspect-[100/125] w-full overflow-visible"
+            className="aspect-square w-full overflow-visible"
             resting={{ rotateX: 7, rotateY: -7 }}
             tiltDeg={6}
           >

@@ -45,13 +45,13 @@ interface Hotspot {
 
 const HOTSPOTS: Hotspot[] = [
   { part: "neck", left: 50, top: 17, z: 14 },
-  { part: "shoulders", left: 30, top: 25, z: 18 },
-  { part: "shoulders", left: 70, top: 25, z: 18 },
-  { part: "joints", left: 50, top: 48, z: 26 },
-  { part: "lowerBack", left: 50, top: 51, z: 8 },
-  { part: "hips", left: 50, top: 61, z: 10 },
-  { part: "knees", left: 33, top: 78, z: 16 },
-  { part: "knees", left: 67, top: 78, z: 16 },
+  { part: "shoulders", left: 35, top: 21.5, z: 18 },
+  { part: "shoulders", left: 65, top: 21.5, z: 18 },
+  { part: "joints", left: 50, top: 41, z: 26 },
+  { part: "lowerBack", left: 50, top: 46, z: 8 },
+  { part: "hips", left: 50, top: 50.5, z: 10 },
+  { part: "knees", left: 43.4, top: 74, z: 16 },
+  { part: "knees", left: 56.6, top: 74, z: 16 },
 ];
 
 export function BodySymptomMap({
@@ -100,7 +100,7 @@ export function BodySymptomMap({
         {/* Medical-grade body on a 3D stage — tilt only, no drag hijack */}
         <div className="relative w-full max-w-[220px] shrink-0 select-none">
           <PerspectiveStage
-            className="aspect-[250/420] w-full overflow-visible"
+            className="aspect-square w-full overflow-visible"
             resting={{ rotateX: 6, rotateY: -8 }}
             tiltDeg={6}
             dragRotate={false}

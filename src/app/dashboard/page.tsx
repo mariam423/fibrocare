@@ -596,7 +596,7 @@ export default function Home() {
 
         {/* Quick-action buttons */}
         <ScrollReveal delay={0.05}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <Link href="/pro/doctor" className="group block">
               <Card className="h-full transition-colors group-hover:bg-muted/50">
                 <CardContent className="flex items-center gap-4 py-5">
@@ -610,24 +610,6 @@ export default function Home() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.browseDoctors")}</p>
                     <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70 line-clamp-1">{t("dashboard.pro.subtitle")}</p>
-                  </div>
-                  <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 shrink-0 text-slate-400 dark:text-emerald-200/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" aria-hidden="true" />
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href="/pro/consultations" className="group block">
-              <Card className="h-full transition-colors group-hover:bg-muted/50">
-                <CardContent className="flex items-center gap-4 py-5">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-emerald-500/20 shadow-lg shadow-emerald-950/10">
-                    <img
-                      src="/images/الاستشارات .jpg"
-                      alt="Consultations"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold leading-tight">{t("dashboard.pro.startConsultation")}</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-emerald-200/70 line-clamp-1">{t("consultation.symptomHelperDescription")}</p>
                   </div>
                   <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 shrink-0 text-slate-400 dark:text-emerald-200/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" aria-hidden="true" />
                 </CardContent>
@@ -699,7 +681,7 @@ export default function Home() {
                     <CardTitle className="text-base">{t("dashboard.pro.symptomHelper")}</CardTitle>
                   </div>
                   <Link
-                    href="/pro/consultations"
+                    href="/dashboard/consultations"
                     className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline"
                   >
                     {t("dashboard.pro.viewAll")}
@@ -714,7 +696,7 @@ export default function Home() {
                 <PatientAssistant
                   consultationId=""
                   onStructured={() => {
-                    router.push("/pro/consultations/new");
+                    router.push("/dashboard/consultations");
                   }}
                 />
               </CardContent>

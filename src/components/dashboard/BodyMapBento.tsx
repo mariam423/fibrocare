@@ -26,11 +26,11 @@ interface TriggerPoint {
 }
 
 const TRIGGER_POINTS: TriggerPoint[] = [
-  { id: "neck", tKey: "bodyMap.point.neck", x: 50, y: 18, region: "neck", z: 14 },
-  { id: "shoulders", tKey: "bodyMap.point.shoulders", x: 50, y: 26, region: "shoulders", z: 16 },
-  { id: "upperArms", tKey: "bodyMap.point.upperArms", x: 50, y: 38, region: "upperArms", z: 22 },
-  { id: "lowerBack", tKey: "bodyMap.point.lowerBack", x: 50, y: 52, region: "lowerBack", z: 8 },
-  { id: "knees", tKey: "bodyMap.point.knees", x: 50, y: 72, region: "knees", z: 14 },
+  { id: "neck", tKey: "bodyMap.point.neck", x: 50, y: 17, region: "neck", z: 14 },
+  { id: "shoulders", tKey: "bodyMap.point.shoulders", x: 50, y: 22, region: "shoulders", z: 16 },
+  { id: "upperArms", tKey: "bodyMap.point.upperArms", x: 50, y: 29.5, region: "upperArms", z: 22 },
+  { id: "lowerBack", tKey: "bodyMap.point.lowerBack", x: 50, y: 46, region: "lowerBack", z: 8 },
+  { id: "knees", tKey: "bodyMap.point.knees", x: 50, y: 74, region: "knees", z: 14 },
 ];
 
 type BodyView = "front" | "back";
@@ -91,7 +91,7 @@ export function BodyMapBento() {
         {/* Body map — volumetric figure on a 3D stage */}
         <div className="relative mx-auto w-48 select-none px-2 py-1">
           <PerspectiveStage
-            className="aspect-[100/110] w-full"
+            className="aspect-square w-full"
             resting={{ rotateX: 6, rotateY: view === "front" ? -6 : 6 }}
             flipped={view === "back"}
             tiltDeg={6}

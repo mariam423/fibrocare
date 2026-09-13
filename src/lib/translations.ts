@@ -1734,6 +1734,10 @@ export type TranslationKey =
   | "doctor.kind.article"
   | "doctor.kind.research"
   | "doctor.kind.status"
+  | "doctor.socialFeedTitle"
+  | "doctor.socialFeedSubtitle"
+  | "doctor.filter.all"
+  | "doctor.postMedia"
   | "doctor.postContentStatus"
   | "doctor.postAiToggle"
   | "doctor.postAiToggleDescription"
@@ -3524,6 +3528,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.kind.article": "Article",
     "doctor.kind.research": "Research summary",
     "doctor.kind.status": "Status update",
+    "doctor.socialFeedTitle": "Professional Feed",
+    "doctor.socialFeedSubtitle": "Insights from the medical community",
+    "doctor.filter.all": "All",
+    "doctor.postMedia": "Media URL",
     "doctor.postContentStatus": "Status update",
     "doctor.postAiToggle": "AI assist — structure my notes",
     "doctor.postAiToggleDescription": "The AI organizes your raw clinical notes into a clear, evidence-backed draft (ACR/Mayo-aligned patient guidance). You review and edit everything before publishing.",
@@ -5315,6 +5323,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.kind.article": "مقال",
     "doctor.kind.research": "ملخص بحثي",
     "doctor.kind.status": "تحديث حالة",
+    "doctor.socialFeedTitle": "الملف المهني",
+    "doctor.socialFeedSubtitle": "رؤى من المجتمع الطبي",
+    "doctor.filter.all": "الكل",
+    "doctor.postMedia": "رابط الوسائط",
     "doctor.postContentStatus": "التحديث",
     "doctor.postAiToggle": "مساعد الذكاء الاصطناعي — هيكلة ملاحظاتي",
     "doctor.postAiToggleDescription": "ينظم الذكاء الاصطناعي ملاحظاتك السريرية الخام في مسودة واضحة مدعومة بالأدلة (إرشادات للمرضى وفق ACR ومايو كلينك). تراجع وتعدّل كل شيء قبل النشر.",

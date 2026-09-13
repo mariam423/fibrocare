@@ -168,7 +168,7 @@ export default function GlobalNavHeader() {
       />
       <div className="bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200/40 dark:border-emerald-500/8">
         <div className="pt-[env(safe-area-inset-top)]">
-          <div className="container mx-auto flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="container mx-auto flex h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 max-w-6xl">
             {/* Brand */}
             <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">

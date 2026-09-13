@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { unlockPrivatePage } from "./helpers/privacy";
+import { unlockPrivatePage, seedLocale } from "./helpers/privacy";
 
 /**
  * End-to-end test for the AI-Generated Article Library on the Doctor Hub.
@@ -76,10 +76,12 @@ test.describe("Doctor Hub: AI-Generated Article Library", () => {
   test("Arabic locale renders the localized title and AR-only strings", async ({
     page,
   }) => {
-    // Seed the language preference before the app reads it on hydration.
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-language", "ar");
-    });
+    // Seed the language preference through the app's real persistence
+    // channel — the `fibrocare-locale` cookie the SSR layout reads — so
+    // the very first server render is Arabic. (A localStorage seed alone
+    // no longer flips the first paint: the provider trusts the server
+    // locale to avoid hydration mismatches.)
+    await seedLocale(page.context(), "ar");
 
     await unlockPrivatePage(page, "/pro/doctor");
     const library = page.getByTestId("ai-article-library");

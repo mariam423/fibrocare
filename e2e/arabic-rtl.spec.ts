@@ -133,19 +133,27 @@ test.describe("Arabic i18n & RTL", () => {
 
     await test.step("the Readex Pro typeface is applied", async () => {
       // Readex Pro is the app-wide typeface (Arabic + Latin); assert the
-      // computed stack on a rendered Arabic element to lock it in.
-      const nav = page.getByRole("navigation", { name: "Primary" });
-      await expect(nav.getByRole("link", { name: "لوحة التحكم" })).toHaveCSS(
+      // computed stack on a rendered Arabic element to lock it in. The
+      // header localizes its nav aria-label too ("Primary navigation" /
+      // "التنقل الرئيسي"), so match either.
+      const nav = page.getByRole("navigation", {
+        name: /Primary navigation|التنقل الرئيسي/,
+      });
+      await expect(nav.getByRole("link", { name: "اللوحة الرئيسية" })).toHaveCSS(
         "font-family",
         /Readex Pro/
       );
     });
 
     await test.step("nav links render in Arabic", async () => {
-      const nav = page.getByRole("navigation", { name: "Primary" });
-      await expect(nav.getByRole("link", { name: "لوحة التحكم" })).toBeVisible();
-      await expect(nav.getByRole("link", { name: "سجلات الصحة" })).toBeVisible();
-      await expect(nav.getByRole("link", { name: "الموارد" })).toBeVisible();
+      // The header's quick links are localized through the same keys the
+      // rest of the app uses (nav.dashboard → "اللوحة الرئيسية", etc.).
+      const nav = page.getByRole("navigation", {
+        name: /Primary navigation|التنقل الرئيسي/,
+      });
+      await expect(nav.getByRole("link", { name: "اللوحة الرئيسية" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "قسم الأطباء" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "الاستشارات" })).toBeVisible();
       await expect(nav.getByRole("link", { name: "الملف الشخصي" })).toBeVisible();
     });
   });

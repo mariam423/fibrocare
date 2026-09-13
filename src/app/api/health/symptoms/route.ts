@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(symptomLog, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof ZodError) {
-      return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
+      return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
     }
     console.error("[HEALTH_SYMPTOMS_POST]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

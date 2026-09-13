@@ -281,20 +281,21 @@ test.describe("Zen Portal QA", () => {
     await expect(
       page.getByRole("button", { name: "Back to Dashboard" })
     ).toBeVisible();
+    await expect(page.getByText(/Breathe [InOut]/).first()).toBeVisible();
     await expect(
-      page.getByText("Breathe in").or(page.getByText("Breathe out"))
-    ).toBeVisible();
-    await expect(
-      page.getByRole("group", { name: "Ambient Sound Mixer" })
+      page.getByRole("group", { name: /Ambient Sound Mixer|Soundscape mixer/ })
     ).toBeVisible();
   });
 
   test("dark mode toggle works", async ({ page }) => {
     await unlockPrivatePage(page, "/zen");
-    await expect(page.getByRole("button", { name: "Ultra dark" })).toBeVisible();
-    await page.getByRole("button", { name: "Ultra dark" }).click();
+    // The zen control is "Ultra Dark" (zen.ultraDark); activating it swaps
+    // the same button's label to "Exit Ultra Dark" (zen.exitUltraDark).
+    const toggle = page.getByRole("button", { name: "Ultra Dark" });
+    await expect(toggle).toBeVisible();
+    await toggle.click();
     await expect(
-      page.getByRole("button", { name: "Exit dark mode" })
+      page.getByRole("button", { name: "Exit Ultra Dark" })
     ).toBeVisible();
   });
 
@@ -330,7 +331,7 @@ test.describe("Zen Portal QA", () => {
     expect(Math.abs((contentBox?.x ?? 0) + (contentBox?.width ?? 0) / 2 - viewport.width / 2)).toBeLessThanOrEqual(2);
     expect(Math.abs((contentBox?.y ?? 0) + (contentBox?.height ?? 0) / 2 - viewport.height / 2)).toBeLessThanOrEqual(2);
 
-    const mixer = page.getByRole("group", { name: "Ambient Sound Mixer" });
+    const mixer = page.getByRole("group", { name: /Ambient Sound Mixer|Soundscape mixer/ });
     const mixerBox = await mixer.boundingBox();
     expect(mixerBox).not.toBeNull();
     expect(Math.abs((mixerBox?.x ?? 0) + (mixerBox?.width ?? 0) / 2 - viewport.width / 2)).toBeLessThanOrEqual(2);

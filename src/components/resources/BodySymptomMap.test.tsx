@@ -43,7 +43,7 @@ beforeEach(() => {
 
 const ALL_PARTS = Object.keys(BODY_PARTS) as BodyPartId[];
 /** Two hotspots exist per bilateral region; every part has ≥1 hotspot. */
-const HOTSPOT_COUNT = 10; // 9 body hotspots + 1 central joints bracelet
+const HOTSPOT_COUNT = 8; // body hotspots (no central joints bracelet in the filtering map)
 
 describe("BodySymptomMap hotspots (accessibility)", () => {
   it("renders one tappable hotspot per mapped position with a real label", () => {
@@ -114,11 +114,11 @@ describe("BodySymptomMap hotspots (accessibility)", () => {
     expect(screen.getByText("resources.bodyMap.movementHint")).toBeInTheDocument();
   });
 
-  it("supports ArrowLeft to select the first region", () => {
+  it("does not navigate by arrow keys (each hotspot is its own button)", () => {
     const onSelect = vi.fn();
     render(<BodySymptomMap selected={null} onSelect={onSelect} />);
     const first = screen.getAllByRole("button", { pressed: false })[0];
     fireEvent.keyDown(first, { key: "ArrowLeft" });
-    expect(onSelect).toHaveBeenCalledWith("neck");
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

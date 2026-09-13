@@ -5,6 +5,32 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 /**
+ * Minimal shapes of the provider payloads this helper reads. Every field
+ * is `unknown` on purpose: the webhook body is untrusted, so values are
+ * narrowed with runtime `typeof` checks before use — the interfaces only
+ * exist to make the access chains type-safe.
+ */
+interface StripeEventShape {
+  data?: {
+    object?: {
+      client_reference_id?: unknown;
+      customer_email?: unknown;
+    };
+  };
+}
+
+interface LemonSqueezyEventShape {
+  meta?: {
+    custom_data?: unknown;
+  };
+  data?: {
+    attributes?: {
+      user_email?: unknown;
+    };
+  };
+}
+
+/**
  * Best-effort user linkage from a verified billing event.
  *
  * Returns the owning FibroCare user id when the event carries one:
@@ -22,15 +48,16 @@ async function resolveEventUserId(
   rawBody: string,
   provider: "stripe" | "lemon-squeezy"
 ): Promise<string | null> {
-  let event: unknown;
+  let event_: unknown;
   try {
-    event = JSON.parse(rawBody);
+    event_ = JSON.parse(rawBody);
   } catch {
     return null;
   }
 
   let userId: string | null = null;
   if (provider === "stripe") {
+    const event = event_ as StripeEventShape | null;
     const ref = event?.data?.object?.client_reference_id;
     if (typeof ref === "string" && ref) userId = ref;
     if (!userId) {
@@ -44,11 +71,13 @@ async function resolveEventUserId(
       }
     }
   } else {
-    const custom = event?.meta?.custom_data;
-    const ref =
-      (typeof custom === "object" && custom !== null &&
-        (custom.user_id ?? custom.userId)) ||
-      null;
+    const event = event_ as LemonSqueezyEventShape | null;
+    const custom: unknown = event?.meta?.custom_data;
+    const customObj =
+      typeof custom === "object" && custom !== null
+        ? (custom as { user_id?: unknown; userId?: unknown })
+        : undefined;
+    const ref = customObj ? (customObj.user_id ?? customObj.userId) : null;
     if (typeof ref === "string" && ref) userId = ref;
     if (!userId) {
       const email = event?.data?.attributes?.user_email;

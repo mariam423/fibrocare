@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { unlockPrivatePage } from "./helpers/privacy";
+import { unlockPrivatePage, seedLocale } from "./helpers/privacy";
 
 /**
  * Language-isolation regression coverage for Doctor Hub.
@@ -62,10 +62,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
     page,
   }) => {
     // Seed EN before any app script runs (legacy localStorage key).
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "en");
-      document.cookie = "fibrocare-locale=en; path=/";
-    });
+    await seedLocale(page.context(), "en");
     await unlockPrivatePage(page, "/pro/doctor");
 
     // The library renders for both doctor and patient roles — we
@@ -107,10 +104,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
   test("AR locale renders no Latin-script content leaks in the article card", async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "ar");
-      document.cookie = "fibrocare-locale=ar; path=/";
-    });
+    await seedLocale(page.context(), "ar");
     await unlockPrivatePage(page, "/pro/doctor");
 
     const library = page.getByTestId("ai-article-library");
@@ -153,10 +147,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
     page,
   }) => {
     // EN
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "en");
-      document.cookie = "fibrocare-locale=en; path=/";
-    });
+    await seedLocale(page.context(), "en");
     await unlockPrivatePage(page, "/pro/doctor");
     const readingEn = page.getByTestId("ai-article-reading").first();
     await expect(readingEn).toBeVisible({ timeout: 60_000 });
@@ -167,10 +158,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
     // across navigations in the same page, so calling it again
     // here is enough to flip both the cookie and the localStorage
     // key — the next unlockPrivatePage will read the AR value.
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "ar");
-      document.cookie = "fibrocare-locale=ar; path=/";
-    });
+    await seedLocale(page.context(), "ar");
     await unlockPrivatePage(page, "/pro/doctor");
     const readingAr = page.getByTestId("ai-article-reading").first();
     await expect(readingAr).toBeVisible({ timeout: 60_000 });
@@ -181,20 +169,14 @@ test.describe("Doctor Hub: strict language isolation", () => {
     page,
   }) => {
     // EN
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "en");
-      document.cookie = "fibrocare-locale=en; path=/";
-    });
+    await seedLocale(page.context(), "en");
     await unlockPrivatePage(page, "/pro/doctor");
     const topicsEn = page.getByTestId("ai-article-topics").first();
     await expect(topicsEn).toBeVisible({ timeout: 60_000 });
     await expect(topicsEn).toHaveAttribute("aria-label", "Article topics");
 
     // AR
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "ar");
-      document.cookie = "fibrocare-locale=ar; path=/";
-    });
+    await seedLocale(page.context(), "ar");
     await unlockPrivatePage(page, "/pro/doctor");
     const topicsAr = page.getByTestId("ai-article-topics").first();
     await expect(topicsAr).toBeVisible({ timeout: 60_000 });
@@ -215,10 +197,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
     page,
   }) => {
     // EN
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "en");
-      document.cookie = "fibrocare-locale=en; path=/";
-    });
+    await seedLocale(page.context(), "en");
     await unlockPrivatePage(page, "/pro/doctor");
     await expect(page.getByTestId("ai-article-card").first()).toBeVisible({
       timeout: 60_000,
@@ -240,10 +219,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
     }
 
     // AR
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "ar");
-      document.cookie = "fibrocare-locale=ar; path=/";
-    });
+    await seedLocale(page.context(), "ar");
     await unlockPrivatePage(page, "/pro/doctor");
     await expect(page.getByTestId("ai-article-card").first()).toBeVisible({
       timeout: 60_000,
@@ -273,10 +249,7 @@ test.describe("Doctor Hub: strict language isolation", () => {
   test("opening a card in AR shows an Arabic-script body", async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem("fibrocare-locale", "ar");
-      document.cookie = "fibrocare-locale=ar; path=/";
-    });
+    await seedLocale(page.context(), "ar");
     await unlockPrivatePage(page, "/pro/doctor");
     const firstCard = page.getByTestId("ai-article-card").first();
     await expect(firstCard).toBeVisible({ timeout: 60_000 });

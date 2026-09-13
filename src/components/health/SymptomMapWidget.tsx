@@ -32,6 +32,9 @@ import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 
 interface ZoneHeat {
+  id: string;
+  labelKey: TranslationKey;
+  icon: typeof ActivityIcon;
   regions: BodyRegionId[];
   /** Aggregated intensity 0–10 for the zone, blended from sliders. */
   intensity: number;
@@ -55,19 +58,19 @@ const ZONES: Array<{
     id: "physical",
     labelKey: "health.category.physical",
     icon: ActivityIcon,
-    regions: ["lowerBack", "ribs", "hips", "thighs", "thighsR", "knees", "kneesR", "ankles", "anklesR", "upperArms", "upperArmsR", "joints"],
+    regions: ["lowerBack", "ribs", "hips", "thighs", "knees", "ankles", "upperArms", "joints"],
   },
   {
     id: "cognitive",
     labelKey: "health.category.cognitive",
     icon: BrainIcon,
-    regions: ["neck", "shoulders", "upperArms", "upperArmsR", "forearms", "forearmsR"],
+    regions: ["neck", "shoulders", "upperArms", "forearms"],
   },
   {
     id: "mood",
     labelKey: "health.category.mood",
     icon: HeartIcon,
-    regions: ["upperArms", "upperArmsR", "forearms", "forearmsR", "joints", "shoulders", "hips"],
+    regions: ["upperArms", "forearms", "joints", "shoulders", "hips"],
   },
 ];
 
@@ -113,7 +116,10 @@ export function SymptomMapWidget() {
   };
 
   const zones: ZoneHeat[] = ZONES.map((zone) => ({
-    ...zone,
+    id: zone.id,
+    labelKey: zone.labelKey,
+    icon: zone.icon,
+    regions: zone.regions,
     intensity: zoneValues[zone.id] ?? 5,
   }));
 
@@ -139,17 +145,10 @@ export function SymptomMapWidget() {
                 ribs: zones[0].intensity,
                 hips: Math.round((zones[0].intensity + zones[2].intensity) / 2),
                 thighs: zones[0].intensity,
-                thighsR: zones[0].intensity,
                 knees: zones[0].intensity,
-                kneesR: zones[0].intensity,
                 ankles: Math.max(1, zones[0].intensity - 2),
-                anklesR: Math.max(1, zones[0].intensity - 2),
                 upperArms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                upperArmsR: Math.round((zones[1].intensity + zones[2].intensity) / 2),
                 forearms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                forearmsR: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                elbows: Math.round(zones[1].intensity),
-                elbowsR: Math.round(zones[1].intensity),
                 neck: zones[1].intensity,
                 shoulders: Math.round((zones[1].intensity + zones[2].intensity) / 2),
                 joints: Math.round((zones[0].intensity + zones[2].intensity) / 2),

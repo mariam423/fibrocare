@@ -40,10 +40,13 @@ async function submitWhenHydrated(
   }
 }
 
-/** Switch the app to Arabic via the header toggle. */
+/** Switch the app to Arabic via the header toggle. The header localizes
+ *  its nav aria-label ("Primary navigation" / "التنقل الرئيسي"). */
 async function switchToArabic(page: Page) {
   // Wait for the nav to hydrate before checking for the toggle button.
-  const nav = page.getByRole("navigation", { name: "Primary" });
+  const nav = page.getByRole("navigation", {
+    name: /Primary navigation|التنقل الرئيسي/,
+  });
   await expect(nav).toBeVisible({ timeout: 30_000 });
 
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -57,7 +60,9 @@ async function switchToArabic(page: Page) {
     } catch {
       await page.reload({ waitUntil: "domcontentloaded" });
       // Re-wait for hydration after reload
-      await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible({ timeout: 30_000 });
+      await expect(
+        page.getByRole("navigation", { name: /Primary navigation|التنقل الرئيسي/ })
+      ).toBeVisible({ timeout: 30_000 });
       continue;
     }
     try {
@@ -103,7 +108,9 @@ test.describe("Landing page QA", () => {
     const startBtn = page.getByRole("link", { name: /Start|Get started/i });
     await expect(startBtn.first()).toBeVisible();
 
-    const nav = page.getByRole("navigation", { name: "Primary" });
+    const nav = page.getByRole("navigation", {
+      name: /Primary navigation|التنقل الرئيسي/,
+    });
     await expect(nav).toBeVisible();
   });
 
@@ -181,10 +188,31 @@ test.describe("Auth flows QA", () => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
     await page.waitForSelector("#name", { timeout: 20_000 });
 
-    await page.locator("#name").fill("Test User");
-    await page.locator("#email").fill("test@example.com");
-    await page.locator("#password").fill("password123");
-    await page.locator("#confirm-password").fill("differentpassword");
+    // On a cold dev-server compile, hydration can land mid-fill and wipe
+    // the inputs — submit would then fire the name-required path instead
+    // of the mismatch path. Verify every field still holds its value
+    // right before clicking (mirrors auth.setup.ts's fillAndVerify).
+    const fields: Array<[string, string]> = [
+      ["#name", "Test User"],
+      ["#email", "test@example.com"],
+      ["#password", "password123"],
+      ["#confirm-password", "differentpassword"],
+    ];
+    for (let attempt = 0; attempt < 3; attempt++) {
+      for (const [selector, value] of fields) {
+        await page.locator(selector).fill(value);
+      }
+      try {
+        for (const [selector, value] of fields) {
+          await expect(page.locator(selector)).toHaveValue(value, { timeout: 5_000 });
+        }
+        break;
+      } catch {
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await page.waitForSelector("#name", { timeout: 20_000 });
+      }
+    }
+
     await submitWhenHydrated(page, "Create account", "#name");
 
     await expect(page.getByText("Passwords do not match.")).toBeVisible({ timeout: 10_000 });
@@ -222,7 +250,9 @@ test.describe("Arabic RTL public pages QA", () => {
     await expectBrandMirrored(page, "rtl");
 
     // Verify the page has Arabic content (nav links should be in Arabic)
-    const nav = page.getByRole("navigation", { name: "Primary" });
+    const nav = page.getByRole("navigation", {
+      name: /Primary navigation|التنقل الرئيسي/,
+    });
     await expect(nav).toBeVisible();
   });
 

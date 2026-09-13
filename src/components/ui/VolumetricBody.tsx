@@ -72,21 +72,16 @@ export interface VolumetricBodyProps {
 const REGION_SPOTS: Record<BodyRegionId, { cx: number; cy: number; r: number }> = {
   neck:       { cx: 50, cy: 18, r: 5 },
   shoulders:  { cx: 50, cy: 26, r: 13 },
-  upperArms:  { cx: 31, cy: 32, r: 9 },
-  upperArmsR: { cx: 69, cy: 32, r: 9 },
-  forearms:   { cx: 25, cy: 48, r: 8 },
-  forearmsR:  { cx: 75, cy: 48, r: 8 },
-  elbows:     { cx: 28, cy: 42, r: 5.5 },
-  elbowsR:    { cx: 72, cy: 42, r: 5.5 },
+  upperArms:  { cx: 31, cy: 32, r: 9 },  forearms:   { cx: 25, cy: 48, r: 8 },
+
+  elbows:     { cx: 42, cy: 42, r: 5.5 },
+
   lowerBack:  { cx: 50, cy: 52, r: 7.5 },
   ribs:       { cx: 50, cy: 38, r: 9 },
   hips:       { cx: 50, cy: 63, r: 10 },
   thighs:     { cx: 42, cy: 72, r: 8.5 },
-  thighsR:    { cx: 58, cy: 72, r: 8.5 },
   knees:      { cx: 42, cy: 80, r: 7 },
-  kneesR:     { cx: 58, cy: 80, r: 7 },
   ankles:     { cx: 42, cy: 90, r: 5 },
-  anklesR:    { cx: 58, cy: 90, r: 5 },
   joints:     { cx: 50, cy: 50, r: 18 },
 };
 

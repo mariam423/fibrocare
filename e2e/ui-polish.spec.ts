@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { unlockPrivatePage } from "./helpers/privacy";
 
 /**
  * UI polish smoke checks for the crisp-canvas design pass:
@@ -43,7 +44,7 @@ test.describe("UI polish smoke", () => {
 
   test("dashboard segmented presets render and toggle in light mode", async ({ page }) => {
     await test.step("load the hydrated dashboard", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
     });
 
@@ -80,7 +81,7 @@ test.describe("UI polish smoke", () => {
 
   test("logging a severe flare surfaces the empathetic toast", async ({ page }) => {
     await test.step("load the hydrated dashboard", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
       await dismissToastIfVisible(page);
     });
@@ -108,7 +109,7 @@ test.describe("UI polish smoke", () => {
 
   test("segmented presets and toast render in dark mode", async ({ page }) => {
     await test.step("load the hydrated dashboard and switch to dark mode", async () => {
-      await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/dashboard");
       await awaitHydratedDashboard(page);
 
       await page.getByRole("button", { name: "Switch to dark mode" }).click();
@@ -140,7 +141,7 @@ test.describe("UI polish smoke", () => {
 
   test("health-logs renders its severity filter or the empty state", async ({ page }) => {
     await test.step("load health logs", async () => {
-      await page.goto("/health-logs", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/health-logs");
       await expect(page.getByRole("heading", { name: "Health Logs" })).toBeVisible();
     });
 
@@ -208,7 +209,7 @@ test.describe("UI polish smoke", () => {
 
   test("reports page renders its snapshot and insight filter when available", async ({ page }) => {
     await test.step("load reports", async () => {
-      await page.goto("/reports", { waitUntil: "domcontentloaded" });
+      await unlockPrivatePage(page, "/reports");
       await expect(page.getByRole("heading", { name: "Medical Reports" })).toBeVisible();
     });
 

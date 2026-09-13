@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(cycle, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof ZodError) {
-      return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
+      return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
     }
     console.error("[HEALTH_CYCLE_POST]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

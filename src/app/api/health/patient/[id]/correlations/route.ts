@@ -89,7 +89,9 @@ export async function GET(
       date: s.date,
       severity: s.severity,
       category: s.category,
-      area: s.area,
+      // Prisma stores area as nullable; the Insight Engine models "no area"
+      // as optional (undefined), so normalize null away at the boundary.
+      area: s.area ?? undefined,
     }));
 
     const mappedPain: PainPatternLog[] = painLogs.map((p) => ({

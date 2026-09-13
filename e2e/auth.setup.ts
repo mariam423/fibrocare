@@ -1,4 +1,4 @@
-import { test as setup, expect } from "@playwright/test";
+import { test as setup, expect, type APIRequestContext } from "@playwright/test";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 
 const E2E_EMAIL = process.env.E2E_EMAIL ?? "e2e.smoke@fibrocare.local";
@@ -6,6 +6,23 @@ const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "FibroCareE2E2026!";
 const STORAGE_STATE = "e2e/.auth/user.json";
 
 setup.setTimeout(120_000);
+
+/**
+ * Promotes the signed-in throwaway account to the `doctor` role.
+ *
+ * Runs on EVERY setup invocation — including the stored-session reuse path.
+ * The role lives in the DATABASE, not the session cookie, so a wiped/reset
+ * dev database would leave the stored session valid but the account back on
+ * `PATIENT`, silently hiding every doctor-only surface (manual publishing
+ * composer, own-posts). The endpoint is idempotent, so re-asserting is free.
+ */
+async function promoteToDoctor(request: APIRequestContext): Promise<boolean> {
+  const promoteToken = process.env.E2E_PROMOTE_TOKEN ?? "e2e-promote";
+  const promoteRes = await request.post("/api/e2e/promote-doctor", {
+    headers: { "x-e2e-token": promoteToken },
+  });
+  return promoteRes.ok();
+}
 
 /** True once a session is established: the app root or the authenticated
  *  dashboard landing page (the post-login/signup redirect target — the
@@ -85,8 +102,14 @@ setup("authenticate as throwaway account", async ({ page }) => {
       await page.context().addCookies(storedState.cookies ?? []);
       await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
       if (isAuthed(page.url())) {
-        await page.context().storageState({ path: STORAGE_STATE });
-        return;
+        // Re-assert the DB role before reusing the stored session (see
+        // promoteToDoctor — a reset database silently demotes the account).
+        if (await promoteToDoctor(page.context().request)) {
+          await page.context().storageState({ path: STORAGE_STATE });
+          return;
+        }
+        // Promotion endpoint unavailable — fall through to the full
+        // auth path below, which surfaces a hard failure instead.
       }
       await page.context().clearCookies();
     } catch {
@@ -187,14 +210,8 @@ setup("authenticate as throwaway account", async ({ page }) => {
   // The endpoint is gated by `E2E_PROMOTE_TOKEN` (set on the dev
   // webServer in playwright.config.ts) and is disabled in any
   // environment that hasn't opted in.
-  const promoteToken = process.env.E2E_PROMOTE_TOKEN ?? "e2e-promote";
-  const promoteRes = await page.context().request.post("/api/e2e/promote-doctor", {
-    headers: { "x-e2e-token": promoteToken },
-  });
-  if (!promoteRes.ok()) {
-    throw new Error(
-      `Failed to promote E2E user to doctor role: ${promoteRes.status()} ${await promoteRes.text()}`
-    );
+  if (!(await promoteToDoctor(page.context().request))) {
+    throw new Error("Failed to promote E2E user to doctor role");
   }
 
   await page.context().storageState({ path: STORAGE_STATE });

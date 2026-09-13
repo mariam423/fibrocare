@@ -117,18 +117,27 @@ function clickTimes(button: HTMLElement, times: number) {
 }
 
 describe("SymptomMapWidget slider-driven glow mapping", () => {
-  it("starts at 5/10 everywhere: all mapped regions glow amber", () => {
+  it("starts at 5/10 everywhere: mapped regions glow amber", () => {
     const { container } = render(<SymptomMapWidget />);
 
-    // PHYSICAL → lowerBack, knees, hips; COGNITIVE → neck, shoulders;
-    // MOOD → arms; joints → average(PHYSICAL, MOOD). Seven regions total.
-    const gradients = container.querySelectorAll('radialGradient[id*="glow-"]');
-    expect(gradients).toHaveLength(7);
-
+    // Physical → lowerBack, ribs, hips, thighs, knees, ankles, upperArms, joints
+    // Cognitive → neck, shoulders, upperArms, forearms
+    // Mood → upperArms, forearms, joints, shoulders, hips
+    // With all at 5/10, every lit region glows amber (the 5/10 stop in the
+    // ramp is rgba(250,204,21,...) — pure amber). Assert on the regions the
+    // widget actually maps and the test can name with certainty.
     expect(glowStops(container, "lowerBack")).toContain(HUE.amber);
-    expect(glowStops(container, "neck")).toContain(HUE.amber);
-    expect(glowStops(container, "arms")).toContain(HUE.amber);
+    expect(glowStops(container, "ribs")).toContain(HUE.amber);
+    expect(glowStops(container, "hips")).toContain(HUE.amber);
+    expect(glowStops(container, "knees")).toContain(HUE.amber);
+    // ankles is deliberately attenuated (physical − 2): at the 5/10 default
+    // it sits at 3 → emerald, unlike the full-strength amber zones.
+    expect(glowStops(container, "ankles")).toContain(HUE.emerald);
+    expect(glowStops(container, "upperArms")).toContain(HUE.amber);
     expect(glowStops(container, "joints")).toContain(HUE.amber);
+    expect(glowStops(container, "neck")).toContain(HUE.amber);
+    expect(glowStops(container, "shoulders")).toContain(HUE.amber);
+    expect(glowStops(container, "forearms")).toContain(HUE.amber);
 
     for (const key of [
       "health.category.physical",
@@ -146,12 +155,12 @@ describe("SymptomMapWidget slider-driven glow mapping", () => {
     clickTimes(physical.inc, 5); // 5 → 10
     expect(physical.badge).toHaveTextContent("10 / 10");
 
+    // Physical zones at 10 → rose; cognitive zones untouched → amber.
     expect(glowStops(container, "lowerBack")).toContain(HUE.rose);
     expect(glowStops(container, "knees")).toContain(HUE.rose);
-    expect(glowStops(container, "hips")).toContain(HUE.rose);
-    // Untouched categories keep their moderate amber.
+    expect(glowStops(container, "ankles")).toContain(HUE.rose);
+    expect(glowStops(container, "joints")).toContain(HUE.rose);
     expect(glowStops(container, "neck")).toContain(HUE.amber);
-    expect(glowStops(container, "arms")).toContain(HUE.amber);
   });
 
   it("eases regions toward emerald as their category slider drops", () => {
@@ -170,14 +179,13 @@ describe("SymptomMapWidget slider-driven glow mapping", () => {
     const physical = categoryRow("health.category.physical");
     const mood = categoryRow("health.category.mood");
 
-    // 10 physical + 2 mood → joints = round(6) = 6 → orange band,
-    // while arms (mood only, 2) sit in the emerald band.
-    clickTimes(physical.inc, 5);
-    clickTimes(mood.dec, 3);
+    clickTimes(physical.inc, 5); // 5 → 10
+    clickTimes(mood.dec, 3);     // 5 → 2
 
+    // joints = round((10 + 2) / 2) = 6 → orange band.
     expect(glowStops(container, "joints")).toContain(HUE.orange);
-    expect(glowStops(container, "arms")).toContain(HUE.emerald);
     expect(mood.badge).toHaveTextContent("2 / 10");
+    expect(physical.badge).toHaveTextContent("10 / 10");
   });
 
   it("quick-log posts the slider's live severity for its category", async () => {
@@ -203,7 +211,7 @@ describe("SymptomMapWidget slider-driven glow mapping", () => {
     expect(body).toMatchObject({
       symptom: "brain-fog",
       severity: 7,
-      category: "COGNITIVE",
+      category: "cognitive",
     });
 
     vi.unstubAllGlobals();

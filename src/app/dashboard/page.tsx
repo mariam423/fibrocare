@@ -243,7 +243,7 @@ export default function Home() {
 
   return (
     <RouteTransition>
-    <div className="min-h-[100dvh] overflow-x-hidden bg-background text-foreground transition-colors duration-500">
+    <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground transition-colors duration-500">
       <GlobalNavHeader />
       <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-12 pt-[calc(env(safe-area-inset-top)+5rem)] pb-28 sm:pt-[calc(env(safe-area-inset-top)+6rem)] sm:pb-32 lg:pt-32 space-y-8 lg:space-y-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}

@@ -159,14 +159,14 @@ export default function GlobalNavHeader() {
   return (
     <header
       data-testid="global-nav-header"
-      className="sticky top-0 z-50 w-full border-b border-slate-200/60 dark:border-emerald-500/10"
+      className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 dark:bg-slate-900/85 dark:border-emerald-500/10"
     >
       {/* 3D glass stack: top specular highlight over a translucent slab */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/20"
       />
-      <div className="bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200/40 dark:border-emerald-500/8">
+      <div>
         <div className="pt-[env(safe-area-inset-top)]">
           <div className="container mx-auto flex h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 max-w-6xl">
             {/* Brand */}

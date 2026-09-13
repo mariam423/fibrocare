@@ -29,7 +29,6 @@ import { PerspectiveStage } from "@/components/ui/PerspectiveStage";
 import { VolumetricBody, type BodyRegionId } from "@/components/ui/VolumetricBody";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
-import { cn } from "@/lib/utils";
 
 interface ZoneHeat {
   id: string;

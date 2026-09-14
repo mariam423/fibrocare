@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   CalendarArrowUpIcon,
@@ -12,6 +15,26 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+
+// The calm-resonance 3D field loads only client-side (never in the server
+// bundle) so the WebGL artwork cannot cause hydration errors; the loading
+// node matches the fixed icon height, so there is no layout shift.
+const CalmResonance3D = dynamic(
+  () =>
+    import("@/components/ui/CalmResonance3D").then((m) => m.CalmResonance3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none mx-auto flex w-full max-w-[220px] select-none items-center justify-center"
+        style={{ height: 132 }}
+      >
+        <div className="h-16 w-16 animate-pulse rounded-full bg-teal-500/10 blur-[2px]" />
+      </div>
+    ),
+  }
+);
 
 /**
  * Client-side mirror of the API's forecast payload
@@ -154,6 +177,18 @@ export function FlareForecastCard({ forecast, hasCycle }: FlareForecastCardProps
       )}
     >
       <CardContent className="p-4 space-y-3">
+        {/* Calm Resonance field — nervous-system relaxation waves */}
+        <div className="flex flex-col items-center gap-1.5">
+          <CalmResonance3D className="max-w-[220px]" />
+          <p className="max-w-[30ch] text-center text-xs font-medium leading-snug text-muted-foreground">
+            {forecast.level === "high"
+              ? t("health.forecast.calmHigh")
+              : forecast.level === "moderate"
+                ? t("health.forecast.calmModerate")
+                : t("health.forecast.calmLow")}
+          </p>
+        </div>
+
         {/* Header row: level badge + countdown */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -215,6 +250,13 @@ export function FlareForecastCard({ forecast, hasCycle }: FlareForecastCardProps
             </li>
           ))}
         </ul>
+
+        {/* Calm-session CTA */}
+        <Link href="/zen" className="block pt-0.5">
+          <Button variant="outline" size="sm" className="w-full text-muted-foreground">
+            {t("health.forecast.calmCta")}
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );

@@ -768,6 +768,10 @@ export type TranslationKey =
   | "health.forecast.periodIn"
   | "health.forecast.inWindow"
   | "health.forecast.windowAhead"
+  | "health.forecast.calmHigh"
+  | "health.forecast.calmModerate"
+  | "health.forecast.calmLow"
+  | "health.forecast.calmCta"
   | "health.cycle.emptyGuidance"
   | "health.cycle.logCta"
   | "health.cycle.saveCta"
@@ -2547,6 +2551,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.forecast.periodIn": "Period in ~{{days}} days",
     "health.forecast.inWindow": "Days {{start}}–{{end}} of this cycle are your elevated-risk window — go gently.",
     "health.forecast.windowAhead": "Risk window opens in ~{{days}} days (cycle days {{start}}–{{end}}).",
+    "health.forecast.calmHigh": "Energy protection mode — rest is your strength today.",
+    "health.forecast.calmModerate": "Gentle balance — short rests keep your momentum steady.",
+    "health.forecast.calmLow": "Calm baseline — your body is in a steady, resilient rhythm.",
+    "health.forecast.calmCta": "Open a calm session",
     "health.cycle.emptyGuidance": "No cycle logged yet. Adding it lets the engine link hormonal phases to brain fog, mood and pain.",
     "health.cycle.logCta": "Log cycle",
     "health.cycle.saveCta": "Save cycle",
@@ -4353,6 +4361,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.forecast.periodIn": "الدورة بعد ~{{days}} يوم",
     "health.forecast.inWindow": "الأيام {{start}}–{{end}} من دورتك الحالية هي نافذة الخطر المرتفع — خففي الإيقاع.",
     "health.forecast.windowAhead": "تُفتح نافذة الخطر بعد ~{{days}} يوم (أيام الدورة {{start}}–{{end}}).",
+    "health.forecast.calmHigh": "وضع حماية الطاقة — الراحة قوتك اليوم.",
+    "health.forecast.calmModerate": "توازن هادئ — فترات الراحة القصيرة تحافظ على استقرارك.",
+    "health.forecast.calmLow": "قاعدة الهدوء — جسمك في إيقاع مستقر ومرن.",
+    "health.forecast.calmCta": "افتح جلسة هدوء",
     "health.cycle.emptyGuidance": "لم يتم تسجيل أي دورة بعد. إضافتها تتيح للمحرك ربط الأطوار الهرمونية بضباب الدماغ والمزاج والألم.",
     "health.cycle.logCta": "تسجيل دورة",
     "health.cycle.saveCta": "حفظ الدورة",

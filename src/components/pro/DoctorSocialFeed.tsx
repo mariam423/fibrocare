@@ -14,6 +14,7 @@ interface Post {
   kind: string;
   mediaUrls: string[];
   author: { id: string; name: string };
+  verifiedStatus: string;
   reactionsCount: number;
   commentsCount: number;
   createdAt?: string;
@@ -40,6 +41,7 @@ export function DoctorSocialFeed() {
         tags: string;
         kind: string;
         author: { id: string; name: string };
+        verifiedStatus?: string;
         _count?: { reactions: number; comments: number };
         mediaUrls?: string[];
         createdAt?: string;
@@ -51,6 +53,7 @@ export function DoctorSocialFeed() {
         kind: p.kind,
         mediaUrls: p.mediaUrls || [],
         author: p.author,
+        verifiedStatus: p.verifiedStatus ?? "verified",
         reactionsCount: p._count?.reactions || 0,
         commentsCount: p._count?.comments || 0,
         createdAt: p.createdAt,

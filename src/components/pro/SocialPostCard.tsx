@@ -46,6 +46,7 @@ interface SocialPostCardProps {
       id: string;
       name: string;
     };
+    verifiedStatus?: string;
     reactionsCount: number;
     commentsCount: number;
     createdAt?: string;
@@ -109,6 +110,8 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
 
   const when = timeAgo(post.createdAt, locale);
   const media = post.mediaUrls?.filter(Boolean) ?? [];
+  const isVerified = post.verifiedStatus === "verified";
+  const displayName = `Dr. ${post.author.name ?? "Unknown"}`;
 
   return (
     <article
@@ -124,27 +127,33 @@ export function SocialPostCard({ post, onLike }: SocialPostCardProps) {
                 {post.author.name?.[0] ?? "D"}
               </div>
             </div>
-            <span className="absolute -bottom-0.5 -end-0.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-white shadow-sm">
-              <HugeiconsIcon
-                icon={BadgeCheckIcon}
-                className="h-3 w-3"
-                aria-hidden="true"
-              />
-            </span>
+            {isVerified && (
+              <span className="absolute -bottom-0.5 -end-0.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-white shadow-sm">
+                <HugeiconsIcon
+                  icon={BadgeCheckIcon}
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                />
+              </span>
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <span className="truncate text-sm font-bold text-foreground">
-                {post.author.name}
+                {displayName}
               </span>
-              <HugeiconsIcon
-                icon={BadgeCheckIcon}
-                className="h-3.5 w-3.5 shrink-0 text-emerald-500"
-                aria-hidden="true"
-              />
+              {isVerified && (
+                <HugeiconsIcon
+                  icon={BadgeCheckIcon}
+                  className="h-3.5 w-3.5 shrink-0 text-emerald-500"
+                  aria-hidden="true"
+                />
+              )}
             </div>
             <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className="truncate">{t("doctor.verified")}</span>
+              <span className="truncate">
+                {isVerified ? t("doctor.verified") : t("doctor.pending")}
+              </span>
               {when && (
                 <>
                   <span aria-hidden="true">·</span>

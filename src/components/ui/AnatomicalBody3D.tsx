@@ -98,6 +98,10 @@ const CAM_MIN_DIST = 3.6;
 const CAM_MAX_DIST = 8.5;
 const CAM_DEFAULT_DIST = 6.1;
 const SPRITE_BASE = 0.42;
+/** Marker core as a fraction of its configured radius (subtle focus node). */
+const MARKER_SIZE = 0.45;
+/** Marker core opacity so the anatomy stays visible through the point. */
+const MARKER_OPACITY = 0.35;
 const AUTO_ROTATE_SPEED = 0.12;
 
 function isWebGLAvailable(): boolean {
@@ -615,8 +619,8 @@ function buildViewer(
         }
         const mat = entry.sprite.material as THREE.SpriteMaterial;
         mat.color.set(band.hex);
-        mat.opacity = 0.28 + (value / 10) * 0.45;
-        entry.base = SPRITE_BASE * (0.8 + (value / 10) * 0.9);
+        mat.opacity = 0.16 + (value / 10) * 0.3;
+        entry.base = SPRITE_BASE * (0.5 + (value / 10) * 0.6);
         entry.sprite.visible = true;
       }
     }
@@ -649,8 +653,13 @@ function buildViewer(
       let entry = markerMap.get(hs.id);
       if (!entry) {
         const shell = new THREE.Mesh(
-          new THREE.SphereGeometry(hs.radius ?? 0.05, 12, 10),
-          new THREE.MeshBasicMaterial({ toneMapped: false })
+          new THREE.SphereGeometry((hs.radius ?? 0.05) * MARKER_SIZE, 12, 10),
+          new THREE.MeshPhongMaterial({
+            transparent: true,
+            opacity: MARKER_OPACITY,
+            depthWrite: false,
+            toneMapped: false,
+          })
         );
         shell.position.set(hs.position[0], hs.position[1], hs.position[2]);
         const halo = new THREE.Sprite(
@@ -669,12 +678,13 @@ function buildViewer(
       }
       const active = current.selected.has(hs.id) || current.hovered === hs.id;
       const color = active ? (hs.activeColor ?? "#5eead4") : (hs.color ?? "#2dd4bf");
-      const shellMat = entry.shell.material as THREE.MeshBasicMaterial;
+      const shellMat = entry.shell.material as THREE.MeshPhongMaterial;
       shellMat.color.set(color);
+      shellMat.emissive.set(color);
       const haloMat = entry.halo.material as THREE.SpriteMaterial;
       haloMat.color.set(color);
-      haloMat.opacity = active ? 0.75 : 0.35;
-      entry.baseScale = (hs.radius ?? 0.05) * (active ? 13 : 9);
+      haloMat.opacity = active ? 0.45 : 0.2;
+      entry.baseScale = (hs.radius ?? 0.05) * (active ? 6.2 : 4.0);
       entry.shell.scale.setScalar(active ? 1.35 : 1);
     }
     for (const [id, entry] of markerMap) {

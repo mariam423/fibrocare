@@ -4,10 +4,29 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import dynamic from "next/dynamic";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Moon02Icon, SparklesIcon } from "@hugeicons/core-free-icons";
-import { cn } from "@/lib/utils";
+import { Moon02Icon } from "@hugeicons/core-free-icons";
 import { useLanguage } from "@/context/LanguageContext";
+
+// WebGL orb icon loads only client-side (never in the server bundle) so the
+// empty state's 3D artwork cannot cause hydration errors; the loading node
+// matches the icon's fixed height, so there is no layout shift.
+const CycleOrbit3D = dynamic(
+  () => import("@/components/ui/CycleOrbit3D").then((m) => m.CycleOrbit3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none mx-auto flex w-full max-w-[210px] select-none items-center justify-center"
+        style={{ height: 132 }}
+      >
+        <div className="h-16 w-16 animate-pulse rounded-full bg-teal-500/10 blur-[2px]" />
+      </div>
+    ),
+  }
+);
 
 interface CycleData {
   phase: "MENSTRUAL" | "FOLLICULAR" | "OVULATORY" | "LUTEAL";
@@ -143,8 +162,8 @@ function NoCycleCard() {
   }
 
   return (
-    <Card className="w-full h-full min-h-[160px] flex flex-col items-center justify-center text-center p-6 border-purple-200 dark:border-purple-900/30">
-      <HugeiconsIcon icon={Moon02Icon} className="h-6 w-6 text-purple-400 mb-2" />
+    <Card className="w-full h-full min-h-[200px] flex flex-col items-center justify-center text-center p-6 border-purple-200 dark:border-purple-900/30 overflow-hidden">
+      <CycleOrbit3D className="max-w-[210px]" />
       <p className="text-sm text-muted-foreground max-w-[36ch]">
         {t("health.cycle.emptyGuidance")}
       </p>

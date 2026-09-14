@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Chatting01Icon, Loading01Icon, Add01Icon, AiMagicIcon } from "@hugeicons/core-free-icons";
+import { Chatting01Icon, Loading01Icon, Add01Icon, AiMagicIcon, MessageSecure02Icon } from "@hugeicons/core-free-icons";
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -75,33 +75,37 @@ export default function ProConsultationsPage() {
   return (
     <RouteTransition>
       <GlobalNavHeader />
-      <main className="container mx-auto max-w-5xl px-4 py-12 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-8">
+      <main className="container mx-auto max-w-5xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6 sm:space-y-8 sm:py-12 sm:pt-[calc(env(safe-area-inset-top)+2rem)]">
         <ScrollReveal>
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-            <div className="flex items-center gap-4 min-w-0 sm:gap-5">
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-lg shadow-emerald-950/15 ring-1 ring-emerald-500/10 sm:h-24 sm:w-24">
-                <img
-                  src="/images/الاستشارات .jpg"
-                  alt="Consultations"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="min-w-0 space-y-1">
-                <WordReveal
-                  as="h1"
-                  text={t("consultation.title")}
-                  className="text-2xl font-bold tracking-tight"
-                />
-                <p className="text-muted-foreground">{t("consultation.subtitle")}</p>
-              </div>
+          <div className="text-center space-y-3">
+            <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+              <img
+                src="/images/الاستشارات .jpg"
+                alt="Consultations"
+                className="h-full w-full object-cover"
+              />
             </div>
-            {hasAccess && role !== "doctor" && (
-              <Button render={<Link href="/pro/consultations/new" />} className="shrink-0 self-stretch sm:self-auto">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              <HugeiconsIcon icon={MessageSecure02Icon} className="h-3 w-3" aria-hidden="true" />
+              {t("pro.page.consultationsBadge")}
+            </span>
+            <WordReveal
+              as="h1"
+              text={t("consultation.title")}
+              className="text-balance text-2xl font-bold tracking-tight"
+            />
+            <p className="mx-auto max-w-xl text-pretty text-muted-foreground">
+              {t("consultation.subtitle")}
+            </p>
+          </div>
+          {hasAccess && role !== "doctor" && (
+            <div className="flex justify-center mt-4">
+              <Button render={<Link href="/pro/consultations/new" />}>
                 <HugeiconsIcon icon={Add01Icon} className="me-2 h-4 w-4" />
                 {t("consultation.newConsultation")}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </ScrollReveal>
 
         {/* Consultations list — only for users with access */}

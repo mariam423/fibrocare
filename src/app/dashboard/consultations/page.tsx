@@ -30,6 +30,7 @@ import {
   ClipboardIcon,
   InformationCircleIcon,
   Loading01Icon,
+  MessageSecure02Icon,
   SentIcon,
   Shield01Icon,
   Time04Icon,
@@ -37,6 +38,7 @@ import {
 import { RouteTransition } from "@/components/ui/RouteTransition";
 import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { WordReveal } from "@/components/ui/WordReveal";
 import { DepthCard } from "@/components/ui/DepthCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -244,23 +246,34 @@ export default function ConsultationsHubPage() {
       >
         {/* Hero ---------------------------------------------------------- */}
         <ScrollReveal>
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-                {t("consultationsHub.title")}
-              </h1>
-              <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                {t("consultationsHub.subtitle")}
-              </p>
+          <div className="text-center space-y-3">
+            <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10">
+              <img
+                src="/images/الاستشارات .jpg"
+                alt="Consultations"
+                className="h-full w-full object-cover"
+              />
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => router.push("/pro/consultations/new")}>
-                {t("consultation.newConsultation")}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => router.push("/pro/consultations")}>
-                {t("consultationsHub.viewAllThreads")}
-              </Button>
-            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              <HugeiconsIcon icon={MessageSecure02Icon} className="h-3 w-3" aria-hidden="true" />
+              {t("pro.page.consultationsBadge")}
+            </span>
+            <WordReveal
+              as="h1"
+              text={t("consultationsHub.title")}
+              className="text-balance text-2xl font-bold tracking-tight"
+            />
+            <p className="mx-auto max-w-xl text-pretty text-muted-foreground">
+              {t("consultationsHub.subtitle")}
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => router.push("/pro/consultations/new")}>
+              {t("consultation.newConsultation")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => router.push("/pro/consultations")}>
+              {t("consultationsHub.viewAllThreads")}
+            </Button>
           </div>
         </ScrollReveal>
 

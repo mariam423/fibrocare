@@ -62,6 +62,12 @@ vi.mock("@/components/ui/ScrollReveal", () => ({
   ScrollReveal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock("@/components/ui/WordReveal", () => ({
+  WordReveal: ({ text, as: Tag = "span" }: { text: string; as?: React.ElementType }) => (
+    <Tag>{text}</Tag>
+  ),
+}));
+
 vi.mock("@/components/pricing/PricingModal", () => ({
   PricingModal: () => null,
 }));

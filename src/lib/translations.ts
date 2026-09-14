@@ -1721,6 +1721,7 @@ export type TranslationKey =
   | "doctor.aiLibrary.refreshError"
   | "doctor.aiLibrary.minutesShort"
   | "doctor.aiLibrary.topicsAria"
+  | "doctor.aiLibrary.aiGenerated"
   | "doctor.reactions.like"
   | "doctor.reactions.helpful"
   | "doctor.reactions.signInHint"
@@ -3527,6 +3528,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.refreshError": "Could not refresh the library. Please try again.",
     "doctor.aiLibrary.minutesShort": "min",
     "doctor.aiLibrary.topicsAria": "Article topics",
+    "doctor.aiLibrary.aiGenerated": "AI-generated",
     "doctor.reactions.like": "Like",
     "doctor.reactions.helpful": "Helpful",
     "doctor.reactions.signInHint": "Sign in to react.",
@@ -5334,6 +5336,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.aiLibrary.refreshError": "تعذّر تحديث المكتبة. حاول مرة أخرى.",
     "doctor.aiLibrary.minutesShort": "د",
     "doctor.aiLibrary.topicsAria": "مواضيع المقالات",
+    "doctor.aiLibrary.aiGenerated": "مولّد بالذكاء الاصطناعي",
     "doctor.reactions.like": "إعجاب",
     "doctor.reactions.helpful": "مفيد",
     "doctor.reactions.signInHint": "سجّل الدخول للتفاعل.",

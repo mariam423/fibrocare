@@ -205,6 +205,9 @@ export function AiArticleCard({ article, badge, reactions, variant = "card" }: A
                       {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
                     </span>
                   </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
+                    {t("doctor.aiLibrary.aiGenerated")}
+                  </span>
                 </div>
               </div>
             </div>

@@ -156,7 +156,7 @@ if (!isStatus) {
   }
 }
 
-const result = runPrisma(null, false);
+const result = runPrisma(prismaArgs, false);
 
 if (result.error) {
   console.error("[db-migrate-pg] Failed to spawn prisma:", result.error);

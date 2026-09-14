@@ -323,11 +323,11 @@ export function HormonalCycleSection({
             {/* ── Correlation graphic ────────────────────────── */}
             {image && (
               <figure className="border-t border-rose-500/15 pt-5">
-                <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl border border-emerald-500/20 bg-white/50 shadow-lg shadow-emerald-950/15 backdrop-blur-xl sm:aspect-[16/9] dark:bg-slate-950/40">
+                <div className="relative mx-auto aspect-[10/11] w-full max-w-md overflow-hidden rounded-2xl border border-emerald-500/20 bg-white/50 shadow-lg shadow-emerald-950/15 backdrop-blur-xl dark:bg-slate-950/40">
                   <img
                     src={image}
                     alt={t(titleKey)}
-                    className="h-full w-full object-contain"
+                    className="h-full w-full object-cover"
                     loading="lazy"
                   />
                   <div

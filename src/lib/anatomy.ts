@@ -138,13 +138,13 @@ export const TENDER_POINT_ANCHORS: Record<
   ],
   // Upper border midpoint of the trapezius.
   trapezius: [
-    [-0.28, 2.76, -0.1],
-    [0.28, 2.76, -0.1],
+    [-0.28, 2.78, -0.16],
+    [0.28, 2.78, -0.16],
   ],
   // Above the scapular spine, medial border.
   supraspinatus: [
-    [-0.3, 2.6, -0.24],
-    [0.3, 2.6, -0.24],
+    [-0.31, 2.58, -0.26],
+    [0.31, 2.58, -0.26],
   ],
   // Costochondral junction of the 2nd rib.
   secondRib: [

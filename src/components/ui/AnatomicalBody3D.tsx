@@ -98,10 +98,10 @@ const CAM_MIN_DIST = 3.6;
 const CAM_MAX_DIST = 8.5;
 const CAM_DEFAULT_DIST = 6.1;
 const SPRITE_BASE = 0.42;
-/** Marker core as a fraction of its configured radius (small, simple dot). */
-const MARKER_SIZE = 0.26;
-/** Marker core opacity — quiet, keeps the anatomy beneath readable. */
-const MARKER_OPACITY = 0.4;
+/** Marker core as a fraction of its configured radius (tiny, keeps anatomy readable). */
+const MARKER_SIZE = 0.2;
+/** Marker core opacity — very quiet so the anatomy beneath stays clear. */
+const MARKER_OPACITY = 0.3;
 const AUTO_ROTATE_SPEED = 0.12;
 
 function isWebGLAvailable(): boolean {
@@ -262,13 +262,13 @@ export function AnatomicalBody3D({
           >
             <span
               aria-hidden="true"
-              className="block h-4 w-4 rounded-full transition-all duration-200"
+              className="block h-1.5 w-1.5 rounded-full transition-all duration-200"
               style={{
-                background: `radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85), ${color} 62%)`,
+                background: `radial-gradient(circle at 35% 30%, rgba(255,255,255,0.9), ${color} 66%)`,
                 boxShadow: active
-                  ? `0 0 ${hotspot.radius ? 14 : 10}px ${color}`
-                  : `0 0 7px rgba(45,212,191,0.55)`,
-                transform: active ? "scale(1.15)" : undefined,
+                  ? `0 0 ${hotspot.radius ? 8 : 6}px ${color}`
+                  : `0 0 3px rgba(45,212,191,0.4)`,
+                transform: active ? "scale(1.25)" : undefined,
               }}
             />
             <span
@@ -508,22 +508,33 @@ function buildViewer(
   let raf = 0;
   let lastTime = 0;
   const tmp = new THREE.Vector3();
+  const focus = new THREE.Vector3(0, TARGET_Y, 0);
+  const viewDir = new THREE.Vector3();
+  const toMarker = new THREE.Vector3();
 
   const projectButtons = () => {
     const width = root.clientWidth;
     const height = root.clientHeight;
     if (!width || !height || !buttonRefs.current) return;
     camera.updateMatrixWorld(true);
+    // Which hemisphere faces the camera decides whether a marker sits on the
+    // near (readable) or far (occluded) side of the body. A marker behind the
+    // figure is dimmed so it never paints over the anatomy the user sees.
+    viewDir.copy(camera.position).sub(focus).normalize();
     for (const hotspot of dataRef.current?.hotspots ?? []) {
       const el = buttonRefs.current.get(hotspot.id);
       if (!el) continue;
       tmp.set(hotspot.position[0], hotspot.position[1], hotspot.position[2]);
       tmp.project(camera);
       const behind = tmp.z > 1;
+      toMarker
+        .set(hotspot.position[0], hotspot.position[1], hotspot.position[2])
+        .sub(focus);
+      const occluded = !behind && toMarker.dot(viewDir) < 0;
       const px = (tmp.x * 0.5 + 0.5) * width;
       const py = (-tmp.y * 0.5 + 0.5) * height;
       el.style.transform = `translate(-50%, -50%) translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
-      el.style.opacity = behind ? "0.12" : "1";
+      el.style.opacity = behind ? "0.12" : occluded ? "0.22" : "1";
       el.style.pointerEvents = behind ? "none" : "auto";
     }
   };
@@ -683,8 +694,8 @@ function buildViewer(
       shellMat.emissive.set(color);
       const haloMat = entry.halo.material as THREE.SpriteMaterial;
       haloMat.color.set(color);
-      haloMat.opacity = active ? 0.4 : 0.16;
-      entry.baseScale = (hs.radius ?? 0.05) * (active ? 2.8 : 2.1);
+      haloMat.opacity = active ? 0.3 : 0.12;
+      entry.baseScale = (hs.radius ?? 0.05) * (active ? 1.9 : 1.35);
       entry.shell.scale.setScalar(active ? 1.2 : 1);
     }
     for (const [id, entry] of markerMap) {

@@ -44,6 +44,8 @@ import {
 } from "@/lib/ai/doctor-article-schemas";
 import { revalidateTag, unstable_cache } from "next/cache";
 import { AI_ARTICLES_TAG, AI_ARTICLES_TTL_SECONDS } from "@/app/pro/doctor-article-cache";
+import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
+import { requirePermissionResponse } from "@/lib/auth/entitlement";
 
 /**
  * Curated, locally-authored fallback articles. Used when AI is offline
@@ -477,6 +479,26 @@ export async function ensureArticleForTopic(
       return { success: false, error: "You must be signed in." };
     }
 
+    // Server actions are directly callable endpoints — the same LLM-budget
+    // entitlement the /api/ai/articles routes enforce must also hold here,
+    // or any signed-in patient could burn generation spend by invoking the
+    // action directly.
+    const denied = await requirePermissionResponse(session.user.id, "doctor:publish");
+    if (denied) {
+      return { success: false, error: "You must be a verified doctor to generate articles." };
+    }
+
+    // Coarse per-user budget (mirrors the API route's per-IP guard):
+    // 30 generations / minute per user.
+    const { ok } = await checkRateLimitDistributed(
+      `generate-user:${session.user.id}`,
+      30,
+      60_000
+    );
+    if (!ok) {
+      return { success: false, error: "Too many article generations — try again shortly." };
+    }
+
     const topic = findTopic(topicId);
     if (!topic) {
       return { success: false, error: "Unknown topic." };
@@ -622,6 +644,18 @@ export async function seedDoctorArticleLibrary(): Promise<{
 }> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
+    return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
+  }
+
+  // Server actions are directly callable — apply the same doctor
+  // entitlement + per-IP budget the /api/ai/articles/seed route enforces
+  // before running the (LLM-heavy) seeding loop.
+  const denied = await requirePermissionResponse(session.user.id, "doctor:publish");
+  if (denied) {
+    return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
+  }
+  const { ok } = await checkRateLimitDistributed(`seed:${session.user.id}`, 2, 60 * 60 * 1000);
+  if (!ok) {
     return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
   }
 

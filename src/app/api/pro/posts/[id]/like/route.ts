@@ -34,13 +34,19 @@ export async function POST(
     return Response.json({ liked: false });
   }
 
-  await prisma.articleReaction.create({
-    data: {
-      userId,
-      postId,
-      kind,
-    },
-  });
+  try {
+    await prisma.articleReaction.create({
+      data: {
+        userId,
+        postId,
+        kind,
+      },
+    });
+  } catch {
+    // Unknown postId (FK violation) or a concurrent double-toggle —
+    // report a clean 404 instead of an unhandled 500.
+    return Response.json({ error: "Post not found" }, { status: 404 });
+  }
 
   return Response.json({ liked: true });
 }

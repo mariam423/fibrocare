@@ -13,6 +13,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { hasPermission, type UserRole } from "@/lib/auth/rbac";
 import { getModel, isAiConfigured, isMockMode } from "@/lib/ai/provider";
+import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import {
   buildDoctorPublishingPrompt,
   buildClinicalSummaryPrompt,
@@ -199,15 +200,35 @@ export async function getDoctorPosts(options?: {
   manualOnly?: boolean;
 }) {
   try {
+    // Server actions are publicly reachable endpoints — a signed-in
+    // session is required, and the `status` filter is not caller-ownable:
+    // arbitrary caller-chosen statuses would let any visitor read
+    // pending/rejected drafts. Only doctors may filter by status, and
+    // only within their own authorId scope; everyone else sees verified
+    // rows only.
+    const user = await getSessionUser();
+    if (!user) return { success: false as const, error: "You must be signed in." };
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    const isDoctor = dbUser ? hasPermission(dbUser.role as UserRole, "doctor:publish") : false;
+
     const where: Record<string, unknown> = {};
-    if (options?.status) where.verifiedStatus = options.status;
-    if (options?.authorId) where.authorId = options.authorId;
-    // `manualOnly` defaults to true: DoctorContentFeed must never show
-    // an AI-generated article that the AiArticleLibrary already shows.
-    // The split is enforced at the data layer so the public page
-    // cannot accidentally render the same post in two sections.
+    if (options?.status) {
+      if (!isDoctor) {
+        return { success: false as const, error: "You must be a verified doctor to filter by status." };
+      }
+      where.verifiedStatus = options.status;
+      // A doctor may only ever list their own pending/rejected drafts.
+      where.authorId = user.id;
+    } else if (options?.authorId) {
+      // authorId filtering is allowed only for the caller's own id.
+      where.authorId = user.id;
+    }
     if (options?.manualOnly !== false) {
-      where.source = "manual";
+      where.source = options?.status ? undefined : "manual";
     }
 
     const posts = await prisma.doctorPost.findMany({
@@ -646,6 +667,17 @@ export async function structureSymptoms(rawInput: string) {
   try {
     const user = await getSessionUser();
     if (!user) return { success: false as const, error: "You must be signed in." };
+
+    // This action triggers a live LLM call — bound it like the other
+    // one-shot AI features (10 req / 60 s per user) so a script hammering
+    // the action directly cannot run up provider spend.
+    const { ok } = await checkFeatureRateLimit(user.id);
+    if (!ok) {
+      return {
+        success: false as const,
+        error: "Give the AI a moment — try again shortly.",
+      };
+    }
 
     const input = rawInput.trim();
     if (input.length < 5) {

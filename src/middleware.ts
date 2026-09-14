@@ -75,9 +75,17 @@ export async function middleware(request: NextRequest) {
     } catch (e) {
       console.error("[middleware] Token validation error:", e);
       // If decryption fails, the token is corrupted or the secret changed.
-      // Clear the cookie to prevent a decryption-failure loop and guide the user to re-auth.
-      const response = NextResponse.next();
-      response.cookies.set("next-auth.session-token", "", { maxAge: 0 });
+      // Fail CLOSED: clear the undecryptable cookie and bounce to /login.
+      // (The previous `NextResponse.next()` here served the protected page
+      // shell to any request whose cookie failed verification — a fail-open
+      // path that contradicted this middleware's own contract.)
+      const signInUrl = new URL("/login", request.url);
+      signInUrl.searchParams.set("callbackUrl", pathname);
+      const response = NextResponse.redirect(signInUrl);
+      response.cookies.set("next-auth.session-token", "", {
+        maxAge: 0,
+        path: "/",
+      });
       return response;
     }
   }

@@ -157,7 +157,8 @@ export function FlareForecastCard({ forecast, hasCycle }: FlareForecastCardProps
     // No cycle history → the forecast needs a first data point. Keep it
     // compact; the CycleStatusWidget next to it owns the logging form.
     return (
-      <Card className="w-full min-h-[96px] flex items-center justify-center text-center p-4 border-border/60 bg-muted/30">
+      <Card className="w-full min-h-[96px] flex flex-col items-center justify-center text-center gap-3 p-4 border-border/60 bg-muted/30">
+        <CalmResonance3D className="max-w-[220px]" />
         <div className="flex items-center gap-2.5 text-muted-foreground text-sm">
           <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{t("health.forecast.noCycleGuidance")}</span>

@@ -1,39 +1,51 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
-import { useMotionEnabled } from "@/hooks/useMotionEnabled";
-import { PerspectiveStage } from "@/components/ui/PerspectiveStage";
 import {
-  VolumetricBody,
+  PAIN_GROUP_COLOR,
+  TENDER_POINT_ANCHORS,
   type BodyRegionId,
-} from "@/components/ui/VolumetricBody";
+  type PainGroupId,
+  type TenderPointId,
+} from "@/lib/anatomy";
+import { AnatomicalBody3D } from "@/components/ui/AnatomicalBody3D";
 import { cn } from "@/lib/utils";
 
-interface TriggerPoint {
-  id: string;
+/**
+ * The classic 18 fibromyalgia tender points (ACR 1990) as 9 bilateral pairs.
+ * Each pair toggles as one control but renders two interactive markers (one
+ * per side) so the pain nodes land on the actual anatomy.
+ */
+const TENDER_POINTS: ReadonlyArray<{
+  id: TenderPointId;
   tKey: string;
-  /** Percentage position over the figure container. */
-  x: number;
-  y: number;
-  /** Region lit when this point is selected. */
   region: BodyRegionId;
-  /** Depth layer above the surface (px of translateZ). */
-  z: number;
-}
-
-const TRIGGER_POINTS: TriggerPoint[] = [
-  { id: "neck", tKey: "bodyMap.point.neck", x: 50, y: 17, region: "neck", z: 14 },
-  { id: "shoulders", tKey: "bodyMap.point.shoulders", x: 50, y: 22, region: "shoulders", z: 16 },
-  { id: "upperArms", tKey: "bodyMap.point.upperArms", x: 50, y: 29.5, region: "upperArms", z: 22 },
-  { id: "lowerBack", tKey: "bodyMap.point.lowerBack", x: 50, y: 46, region: "lowerBack", z: 8 },
-  { id: "knees", tKey: "bodyMap.point.knees", x: 50, y: 74, region: "knees", z: 14 },
+  group: PainGroupId;
+}> = [
+  // Suboccipital muscle insertions at the base of the skull.
+  { id: "occiput", tKey: "bodyMap.point.occiput", region: "neck", group: "muscles" },
+  // C5–C7 transverse processes / interspinous.
+  { id: "lowCervical", tKey: "bodyMap.point.lowCervical", region: "neck", group: "joints" },
+  // Upper border midpoint of the trapezius.
+  { id: "trapezius", tKey: "bodyMap.point.trapezius", region: "shoulders", group: "muscles" },
+  // Above the scapular spine, medial border.
+  { id: "supraspinatus", tKey: "bodyMap.point.supraspinatus", region: "shoulders", group: "muscles" },
+  // Costochondral junction of the 2nd rib.
+  { id: "secondRib", tKey: "bodyMap.point.secondRib", region: "ribs", group: "joints" },
+  // 2 cm distal to the lateral epicondyle (elbow).
+  { id: "epicondyle", tKey: "bodyMap.point.epicondyle", region: "elbows", group: "joints" },
+  // Upper outer quadrant of the gluteal region.
+  { id: "gluteal", tKey: "bodyMap.point.gluteal", region: "hips", group: "muscles" },
+  // Posterior to the greater trochanter prominence.
+  { id: "trochanter", tKey: "bodyMap.point.trochanter", region: "hips", group: "mobility" },
+  // Medial fat pad, proximal to the knee joint line.
+  { id: "knee", tKey: "bodyMap.point.knees", region: "knees", group: "joints" },
 ];
 
-type BodyView = "front" | "back";
+/** Both side suffixes; a single toggle state controls each bilateral pair. */
+const SIDES = ["-l", "-r"] as const;
 
 const PAIN_LEGEND_KEYS = [
   { tKey: "bodyMap.mobility" as const, color: "bg-teal-400", shadow: "shadow-[0_0_6px_rgba(45,212,191,0.5)]" },
@@ -42,40 +54,80 @@ const PAIN_LEGEND_KEYS = [
   { tKey: "bodyMap.groups" as const, color: "bg-emerald-800", shadow: "shadow-[0_0_6px_rgba(6,95,70,0.5)]" },
 ];
 
+type BodyView = "front" | "back";
+
 export function BodyMapBento() {
   const { t } = useLanguage();
-  const reduceMotion = useReducedMotion();
-  const motionEnabled = useMotionEnabled();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [view, setView] = useState<BodyView>("front");
+  const [selected, setSelected] = React.useState<Set<TenderPointId>>(new Set());
+  const [hoveredBtn, setHoveredBtn] = React.useState<string | null>(null);
+  const [view, setView] = React.useState<BodyView>("front");
 
-  const toggle = React.useCallback((id: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+  const pairId = React.useCallback((btnId: string): TenderPointId => {
+    return btnId.replace(/[-][lr]$/, "") as TenderPointId;
   }, []);
 
-  const activePoints = TRIGGER_POINTS.filter((p) => selected.has(p.id));
+  const toggle = React.useCallback(
+    (btnId: string) => {
+      const id = pairId(btnId);
+      setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    },
+    [pairId]
+  );
 
-  // Severity per region: selected points glow strongest.
+  const setHover = React.useCallback((btnId: string | null) => {
+    setHoveredBtn(btnId);
+  }, []);
+
+  // One button per side; the whole pair lights when its point is toggled.
+  const hotspots = React.useMemo(
+    () =>
+      TENDER_POINTS.flatMap((point) =>
+        SIDES.map((side, idx) => {
+          const anchor = TENDER_POINT_ANCHORS[point.id][idx];
+          return {
+            id: `${point.id}${side}`,
+            label: t(point.tKey as TranslationKey),
+            position: anchor,
+            color: PAIN_GROUP_COLOR[point.group],
+            activeColor: "#5eead4",
+          };
+        })
+      ),
+    [t]
+  );
+
+  const selectedButtonIds = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const id of selected) SIDES.forEach((side) => set.add(`${id}${side}`));
+    return set;
+  }, [selected]);
+
+  const hoveredPoint = hoveredBtn ? pairId(hoveredBtn) : null;
+  const activePoints = TENDER_POINTS.filter((point) => selected.has(point.id));
+
+  // Severity per region: a selected point glows strongest, hovered points
+  // medium. Both sides light because regions are bilateral.
   const severity = React.useMemo(() => {
     const map: Partial<Record<BodyRegionId, number>> = {};
-    for (const point of TRIGGER_POINTS) {
-      const isOn = selected.has(point.id);
-      const isHovered = hovered === point.id;
-      if (isOn || isHovered) {
-        map[point.region] = Math.max(map[point.region] ?? 0, isOn ? 8 : 5);
+    for (const point of TENDER_POINTS) {
+      if (selected.has(point.id)) {
+        map[point.region] = Math.max(map[point.region] ?? 0, 8);
+      } else if (hoveredPoint === point.id) {
+        map[point.region] = Math.max(map[point.region] ?? 0, 5);
       }
     }
     return map;
-  }, [selected, hovered]);
+  }, [selected, hoveredPoint]);
+
+  const highlight = React.useMemo(
+    () => TENDER_POINTS.find((point) => point.id === hoveredPoint)?.region ?? null,
+    [hoveredPoint]
+  );
 
   return (
     <div className="flex flex-1 flex-col p-6">
@@ -88,114 +140,24 @@ export function BodyMapBento() {
         </p>
       </div>
       <div className="flex flex-1 flex-col justify-between space-y-4">
-        {/* Body map — volumetric figure on a 3D stage */}
+        {/* Body map — 3D anatomical viewer with interactive tender points */}
         <div className="relative mx-auto w-48 select-none px-2 py-1">
-          <PerspectiveStage
+          <AnatomicalBody3D
             className="aspect-square w-full"
-            resting={{ rotateX: 6, rotateY: view === "front" ? -6 : 6 }}
-            flipped={view === "back"}
-            tiltDeg={6}
-          >
-            <VolumetricBody
-              backView={view === "back"}
-              severity={severity}
-              highlight={
-                hovered
-                  ? TRIGGER_POINTS.find((p) => p.id === hovered)?.region ?? null
-                  : null
-              }
-            />
-            {/* Trigger point dots */}
-            {TRIGGER_POINTS.map((point) => {
-              const isActive = selected.has(point.id);
-              const isHovered = hovered === point.id;
-              return (
-                <motion.button
-                  key={point.id}
-                  type="button"
-                  onClick={() => toggle(point.id)}
-                  onMouseEnter={() => setHovered(point.id)}
-                  onMouseLeave={() => setHovered(null)}
-                  onFocus={() => setHovered(point.id)}
-                  onBlur={() => setHovered(null)}
-                  aria-label={t(point.tKey as TranslationKey)}
-                  aria-pressed={isActive}
-                  className={cn(
-                    "absolute flex items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50 focus-visible:ring-offset-2",
-                    isActive
-                      ? "h-6 w-6"
-                      : isHovered
-                        ? "h-5 w-5"
-                        : "h-4 w-4"
-                  )}
-                  style={{
-                    left: `${point.x}%`,
-                    top: `${point.y}%`,
-                    translateX: "-50%",
-                    translateY: "-50%",
-                    translateZ: `${point.z}px`,
-                  }}
-                  whileHover={motionEnabled ? { scale: 1.2 } : undefined}
-                  whileTap={motionEnabled ? { scale: 0.9 } : undefined}
-                >
-                  {/* Radiant halo — gently pulses when active */}
-                  {(isActive || isHovered) && (
-                    <motion.span
-                      className={cn(
-                        "absolute inset-0 rounded-full",
-                        isActive ? "bg-teal-400/40" : "bg-teal-400/25"
-                      )}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={
-                        isActive && !reduceMotion
-                          ? { scale: [1.5, 2.6, 1.5], opacity: [0.55, 0, 0.55] }
-                          : { scale: isActive ? 2.2 : 1.8, opacity: 0.8 }
-                      }
-                      transition={
-                        isActive && !reduceMotion
-                          ? { duration: 2.2, repeat: Infinity, ease: "easeOut" }
-                          : { duration: 0.5, ease: "easeOut" }
-                      }
-                    />
-                  )}
-                  {/* Inner corona ring for active points */}
-                  {isActive && (
-                    <motion.span
-                      className="absolute inset-0 rounded-full border border-teal-300/70"
-                      initial={{ scale: 1, opacity: 0.9 }}
-                      animate={
-                        reduceMotion
-                          ? { scale: 1.4, opacity: 0.7 }
-                          : { scale: [1.1, 1.9, 1.1], opacity: [0.8, 0.15, 0.8] }
-                      }
-                      transition={
-                        reduceMotion
-                          ? { duration: 0.4 }
-                          : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
-                      }
-                    />
-                  )}
-                  {/* Core dot with a luminous center */}
-                  <span
-                    className={cn(
-                      "relative z-10 h-full w-full rounded-full transition-colors duration-200",
-                      isActive
-                        ? "bg-gradient-to-br from-teal-200 via-teal-300 to-teal-500 shadow-[0_0_16px_rgba(45,212,191,0.75)]"
-                        : isHovered
-                          ? "bg-gradient-to-br from-teal-300 to-teal-600 shadow-[0_0_10px_rgba(45,212,191,0.5)]"
-                          : "bg-teal-600/60"
-                    )}
-                  />
-                </motion.button>
-              );
-            })}
-          </PerspectiveStage>
+            severity={severity}
+            highlight={highlight}
+            backView={view === "back"}
+            hotspots={hotspots}
+            selected={selectedButtonIds}
+            onSelect={toggle}
+            onHover={setHover}
+          />
 
           {/* Front / Back view toggle */}
           <div
             role="group"
             aria-label={t("bodyMap.viewGroupAria")}
-            className="absolute end-0 top-0 flex flex-col gap-1"
+            className="absolute end-0 top-0 z-20 flex flex-col gap-1"
           >
             {(["front", "back"] as const).map((v) => (
               <button
@@ -220,16 +182,13 @@ export function BodyMapBento() {
         {activePoints.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {activePoints.map((point) => (
-              <motion.span
+              <span
                 key={point.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
                 className="inline-flex items-center gap-1 rounded-full border border-teal-500/20 bg-teal-500/10 px-2.5 py-0.5 text-xs font-medium text-teal-300"
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
                 {t(point.tKey as TranslationKey)}
-              </motion.span>
+              </span>
             ))}
           </div>
         )}

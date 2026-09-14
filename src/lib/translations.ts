@@ -1189,6 +1189,14 @@ export type TranslationKey =
   | "bodyMap.point.upperArms"
   | "bodyMap.point.lowerBack"
   | "bodyMap.point.knees"
+  | "bodyMap.point.occiput"
+  | "bodyMap.point.lowCervical"
+  | "bodyMap.point.trapezius"
+  | "bodyMap.point.supraspinatus"
+  | "bodyMap.point.secondRib"
+  | "bodyMap.point.epicondyle"
+  | "bodyMap.point.gluteal"
+  | "bodyMap.point.trochanter"
   | "bodyMap.viewGroupAria"
   | "medication.title"
   | "medication.subtitle"
@@ -1736,6 +1744,10 @@ export type TranslationKey =
   | "doctor.kind.status"
   | "doctor.socialFeedTitle"
   | "doctor.socialFeedSubtitle"
+  | "doctor.composerPlaceholder"
+  | "doctor.feed.like"
+  | "doctor.feed.comment"
+  | "doctor.feed.share"
   | "doctor.filter.all"
   | "doctor.postMedia"
   | "doctor.postContentStatus"
@@ -2961,6 +2973,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.point.upperArms": "Upper arms",
     "bodyMap.point.lowerBack": "Lower Back",
     "bodyMap.point.knees": "Knees",
+    "bodyMap.point.occiput": "Occiput",
+    "bodyMap.point.lowCervical": "Low Cervical",
+    "bodyMap.point.trapezius": "Trapezius",
+    "bodyMap.point.supraspinatus": "Supraspinatus",
+    "bodyMap.point.secondRib": "Second Rib",
+    "bodyMap.point.epicondyle": "Elbow (Epicondyle)",
+    "bodyMap.point.gluteal": "Gluteal",
+    "bodyMap.point.trochanter": "Greater Trochanter",
     "bodyMap.viewGroupAria": "Body view",
     "medication.title": "Today's Medications",
     "medication.subtitle": "Track your doses",
@@ -3530,6 +3550,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.kind.status": "Status update",
     "doctor.socialFeedTitle": "Professional Feed",
     "doctor.socialFeedSubtitle": "Insights from the medical community",
+    "doctor.composerPlaceholder": "Share an article, research, or clinical insight…",
+    "doctor.feed.like": "Like",
+    "doctor.feed.comment": "Comment",
+    "doctor.feed.share": "Share",
     "doctor.filter.all": "All",
     "doctor.postMedia": "Media URL",
     "doctor.postContentStatus": "Status update",
@@ -4756,6 +4780,14 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "bodyMap.point.upperArms": "الذراعان العلويان",
     "bodyMap.point.lowerBack": "الظهر السفلي",
     "bodyMap.point.knees": "الركبتان",
+    "bodyMap.point.occiput": "القفا",
+    "bodyMap.point.lowCervical": "أسفل الرقبة",
+    "bodyMap.point.trapezius": "شبه المنحرف",
+    "bodyMap.point.supraspinatus": "فوق الشوكة",
+    "bodyMap.point.secondRib": "الضلع الثاني",
+    "bodyMap.point.epicondyle": "مرفق الكوع",
+    "bodyMap.point.gluteal": "الألوية",
+    "bodyMap.point.trochanter": "المدور الأكبر",
     "bodyMap.viewGroupAria": "عرض الجسم",
     "medication.title": "أدوية اليوم",
     "medication.subtitle": "تتبع جرعاتك",
@@ -5325,6 +5357,10 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.kind.status": "تحديث حالة",
     "doctor.socialFeedTitle": "الملف المهني",
     "doctor.socialFeedSubtitle": "رؤى من المجتمع الطبي",
+    "doctor.composerPlaceholder": "شارك مقالاً أو بحثاً أو رؤية سريرية…",
+    "doctor.feed.like": "إعجاب",
+    "doctor.feed.comment": "تعليق",
+    "doctor.feed.share": "مشاركة",
     "doctor.filter.all": "الكل",
     "doctor.postMedia": "رابط الوسائط",
     "doctor.postContentStatus": "التحديث",

@@ -20,8 +20,9 @@
  *  - The topic picker is a horizontally scrollable chip row with edge
  *    fade + scroll-snap; on wider screens (>= md) it falls back to
  *    flex-wrap so users can still see all chips at once.
- *  - Article cards stack into a single column on phones, two on small
- *    tablets, three on desktops — matches the rest of the site.
+ *  - Article cards render as a continuous, full-width feed column
+ *    (the Doctor Hub's primary reading mode) rather than a multi-column
+ *    grid.
  *  - The library has explicit horizontal padding so the edge-faded chip
  *    row aligns with the page gutter.
  *  - The refresh action is a pill button in the card header that is
@@ -586,17 +587,18 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         </ScrollReveal>
       ) : (
         <div
-          className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl mx-auto px-4"
+          className="w-full space-y-5"
           data-testid="ai-article-grid"
         >
           {articles.map((article, i) => (
-            <ScrollReveal key={article.id} delay={Math.min(i * 0.04, 0.3)} className="h-full">
+            <ScrollReveal key={article.id} delay={Math.min(i * 0.04, 0.3)}>
               <AiArticleCard
                 article={article}
                 badge={
                   isFresh(article.createdAt) ? t("doctor.aiLibrary.newBadge") : undefined
                 }
                 reactions={reactions[article.id]}
+                variant="feed"
               />
             </ScrollReveal>
           ))}

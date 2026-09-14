@@ -29,29 +29,19 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import {
+  severityBand,
+  type BodyRegionId,
+} from "@/lib/anatomy";
 
-export type BodyRegionId =
-  | "neck"
-  | "shoulders"
-  | "upperArms"
-  | "forearms"
-  | "elbows"
-  | "lowerBack"
-  | "ribs"
-  | "hips"
-  | "thighs"
-  | "knees"
-  | "ankles"
-  | "joints";
+export type { BodyRegionId };
 
-/** Severity 0–10 → hue ramp (emerald → amber → orange → rose). */
+/** Shared 0–10 hue ramp → SVG stop color + rgb glow string. */
 function severityHue(severity: number): { stop: string; glow: string } {
-  const s = Math.max(0, Math.min(10, severity));
-  if (s === 0) return { stop: "rgba(16,185,129,0)", glow: "transparent" };
-  if (s <= 3) return { stop: "rgba(52,211,153,0.55)", glow: "16,185,129" };
-  if (s <= 5) return { stop: "rgba(250,204,21,0.6)", glow: "250,204,21" };
-  if (s <= 7) return { stop: "rgba(251,146,60,0.65)", glow: "251,146,60" };
-  return { stop: "rgba(251,113,133,0.7)", glow: "251,113,133" };
+  const band = severityBand(severity);
+  if (band.stopAlpha === 0)
+    return { stop: "rgba(16,185,129,0)", glow: "transparent" };
+  return { stop: `rgba(${band.rgb},${band.stopAlpha})`, glow: band.rgb };
 }
 
 export interface VolumetricBodyProps {
@@ -82,6 +72,7 @@ const REGION_POOLS: Record<
   lowerBack: [{ cx: 50, cy: 46, r: 8 }],
   ribs:      [{ cx: 50, cy: 35, r: 8.6 }],
   hips:      [{ cx: 50, cy: 50.5, r: 8.4 }],
+  lowerAbdomen: [{ cx: 50, cy: 44, r: 7 }],
   thighs:    [{ cx: 44.3, cy: 61, r: 6.6 }, { cx: 55.7, cy: 61, r: 6.6 }],
   knees:     [{ cx: 43.4, cy: 74, r: 5.8 }, { cx: 56.6, cy: 74, r: 5.8 }],
   ankles:    [{ cx: 42.2, cy: 87.5, r: 4.4 }, { cx: 57.8, cy: 87.5, r: 4.4 }],

@@ -9,8 +9,8 @@
  * the look the user asked for in the reference video: glossy anatomical form,
  * smooth intensity pools, crisp luminous nodes, Midnight Emerald palette.
  *
- * The body sits on a PerspectiveStage (pointer tilt + drag rotation). Quick-log
- * chips post to the symptoms API exactly as before.
+ * The body sits on a shareable 3D stage (pointer tilt + drag rotation).
+ * Quick-log chips post to the symptoms API exactly as before.
  */
 
 import * as React from "react";
@@ -25,8 +25,8 @@ import {
   ActivityIcon,
   Add01Icon,
 } from "@hugeicons/core-free-icons";
-import { PerspectiveStage } from "@/components/ui/PerspectiveStage";
-import { VolumetricBody, type BodyRegionId } from "@/components/ui/VolumetricBody";
+import { AnatomicalBody3D } from "@/components/ui/AnatomicalBody3D";
+import type { BodyRegionId } from "@/lib/anatomy";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 
@@ -57,7 +57,7 @@ const ZONES: Array<{
     id: "physical",
     labelKey: "health.category.physical",
     icon: ActivityIcon,
-    regions: ["lowerBack", "ribs", "hips", "thighs", "knees", "ankles", "upperArms", "joints"],
+    regions: ["lowerBack", "ribs", "hips", "lowerAbdomen", "thighs", "knees", "ankles", "upperArms", "joints"],
   },
   {
     id: "cognitive",
@@ -133,27 +133,23 @@ export function SymptomMapWidget() {
       <CardContent className="space-y-6 flex-1">
         {/* Live 3D pain heatmap — smooth intensity pools across zones */}
         <div className="relative mx-auto w-full max-w-[200px] select-none">
-          <PerspectiveStage
-            className="aspect-square w-full overflow-visible"
-            resting={{ rotateX: 7, rotateY: -7 }}
-            tiltDeg={6}
-          >
-            <VolumetricBody
-              severity={{
-                lowerBack: zones[0].intensity,
-                ribs: zones[0].intensity,
-                hips: Math.round((zones[0].intensity + zones[2].intensity) / 2),
-                thighs: zones[0].intensity,
-                knees: zones[0].intensity,
-                ankles: Math.max(1, zones[0].intensity - 2),
-                upperArms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                forearms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                neck: zones[1].intensity,
-                shoulders: Math.round((zones[1].intensity + zones[2].intensity) / 2),
-                joints: Math.round((zones[0].intensity + zones[2].intensity) / 2),
-              }}
-            />
-          </PerspectiveStage>
+          <AnatomicalBody3D
+            className="aspect-square w-full"
+            severity={{
+              lowerBack: zones[0].intensity,
+              ribs: zones[0].intensity,
+              hips: Math.round((zones[0].intensity + zones[2].intensity) / 2),
+              lowerAbdomen: zones[0].intensity,
+              thighs: zones[0].intensity,
+              knees: zones[0].intensity,
+              ankles: Math.max(1, zones[0].intensity - 2),
+              upperArms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
+              forearms: Math.round((zones[1].intensity + zones[2].intensity) / 2),
+              neck: zones[1].intensity,
+              shoulders: Math.round((zones[1].intensity + zones[2].intensity) / 2),
+              joints: Math.round((zones[0].intensity + zones[2].intensity) / 2),
+            }}
+          />
         </div>
 
         {/* Categorized sliders — each drives a zone intensity */}

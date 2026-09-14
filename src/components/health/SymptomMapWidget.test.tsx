@@ -129,6 +129,7 @@ describe("SymptomMapWidget slider-driven glow mapping", () => {
     expect(glowStops(container, "lowerBack")).toContain(HUE.amber);
     expect(glowStops(container, "ribs")).toContain(HUE.amber);
     expect(glowStops(container, "hips")).toContain(HUE.amber);
+    expect(glowStops(container, "lowerAbdomen")).toContain(HUE.amber);
     expect(glowStops(container, "knees")).toContain(HUE.amber);
     // ankles is deliberately attenuated (physical − 2): at the 5/10 default
     // it sits at 3 → emerald, unlike the full-strength amber zones.
@@ -157,6 +158,7 @@ describe("SymptomMapWidget slider-driven glow mapping", () => {
 
     // Physical zones at 10 → rose; cognitive zones untouched → amber.
     expect(glowStops(container, "lowerBack")).toContain(HUE.rose);
+    expect(glowStops(container, "lowerAbdomen")).toContain(HUE.rose);
     expect(glowStops(container, "knees")).toContain(HUE.rose);
     expect(glowStops(container, "ankles")).toContain(HUE.rose);
     expect(glowStops(container, "joints")).toContain(HUE.rose);

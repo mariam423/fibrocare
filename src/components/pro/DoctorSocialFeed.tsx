@@ -16,6 +16,7 @@ interface Post {
   author: { id: string; name: string };
   reactionsCount: number;
   commentsCount: number;
+  createdAt?: string;
 }
 
 export function DoctorSocialFeed() {
@@ -41,6 +42,7 @@ export function DoctorSocialFeed() {
         author: { id: string; name: string };
         _count?: { reactions: number; comments: number };
         mediaUrls?: string[];
+        createdAt?: string;
       }) => ({
         id: p.id,
         title: p.title,
@@ -51,6 +53,7 @@ export function DoctorSocialFeed() {
         author: p.author,
         reactionsCount: p._count?.reactions || 0,
         commentsCount: p._count?.comments || 0,
+        createdAt: p.createdAt,
       }));
 
       setPosts(enhancedPosts);
@@ -62,10 +65,19 @@ export function DoctorSocialFeed() {
   }, [filter]);
 
   useEffect(() => {
-    fetchPosts();
+    // Defer to a microtask so the loading flag is not set
+    // synchronously inside the effect body (react-hooks rule).
+    let cancelled = false;
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      fetchPosts();
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [fetchPosts]);
 
-  const handleLike = async (postId: string, currentlyLiked: boolean) => {
+  const handleLike = async (postId: string) => {
     try {
       const res = await fetch(`/api/pro/posts/${postId}/like`, { method: "POST" });
       if (!res.ok) throw new Error("Like failed");
@@ -88,17 +100,20 @@ export function DoctorSocialFeed() {
 
   if (posts.length === 0) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-muted-foreground">{t("doctor.noPosts")}</p>
+      <div className="rounded-2xl border border-dashed border-border/70 bg-card/40 px-4 py-14 text-center backdrop-blur-sm">
+        <h3 className="text-base font-semibold text-foreground">
+          {t("doctor.socialFeedTitle") ?? "Professional Feed"}
+        </h3>
+        <p className="mt-2 text-sm text-muted-foreground">{t("doctor.noPosts")}</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 px-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="w-full">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+          <h2 className="text-lg font-bold tracking-tight text-foreground">
             {t("doctor.socialFeedTitle") ?? "Professional Feed"}
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -108,9 +123,9 @@ export function DoctorSocialFeed() {
         <FeedFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
-      <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3 w-full mx-auto max-w-7xl">
+      <div className="space-y-5">
         {posts.map((post, i) => (
-          <ScrollReveal key={post.id} delay={i * 0.1} className="h-full">
+          <ScrollReveal key={post.id} delay={Math.min(i * 0.05, 0.3)}>
             <SocialPostCard
               post={post}
               onLike={handleLike}

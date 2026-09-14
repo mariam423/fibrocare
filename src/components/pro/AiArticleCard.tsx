@@ -29,6 +29,7 @@ import {
   Stethoscope02Icon,
   BookOpen01Icon,
   CheckmarkBadge01Icon,
+  BadgeCheckIcon,
 } from "@hugeicons/core-free-icons";
 import {
   Card,
@@ -100,6 +101,13 @@ interface AiArticleCardProps {
    *  state. Server Component callers should populate this from
    *  `getArticleReactions`. */
   reactions?: ArticleReactionsState;
+  /**
+   * "card" (default) renders the compact boxed card used on wide
+   * multi-column surfaces. "feed" renders the article as a native,
+   * full-width social feed post with an author header — the Doctor
+   * Hub's primary reading mode.
+   */
+  variant?: "card" | "feed";
 }
 
 function formatDate(iso: string, locale: "en" | "ar"): string {
@@ -114,7 +122,7 @@ function formatDate(iso: string, locale: "en" | "ar"): string {
   }
 }
 
-export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps) {
+export function AiArticleCard({ article, badge, reactions, variant = "card" }: AiArticleCardProps) {
   const { t, locale } = useLanguage();
   const [open, setOpen] = useState(false);
 
@@ -156,51 +164,145 @@ export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps)
         className="relative flex h-full flex-col"
         style={{ "--card-spacing": "1.5rem" } as React.CSSProperties}
       >
-        <CardHeader>
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-            {badge && (
+        {variant === "feed" ? (
+          <CardHeader className="border-b border-border/40 pb-3">
+            <div className="flex items-center gap-3">
+              <div className="relative shrink-0">
+                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 p-px">
+                  <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-base font-bold text-emerald-700 dark:bg-slate-800 dark:text-emerald-300">
+                    {article.authorName?.[0] ?? "M"}
+                  </div>
+                </div>
+                <span className="absolute -bottom-0.5 -end-0.5 grid h-4 w-4 place-items-center rounded-full bg-emerald-500 text-white shadow-sm">
+                  <HugeiconsIcon
+                    icon={BadgeCheckIcon}
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-bold text-foreground">
+                    {article.authorName}
+                  </span>
+                  <span className="truncate text-[11px] text-muted-foreground">
+                    {article.authorTitle}
+                  </span>
+                </div>
+                <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <span data-testid="ai-article-date">{date}</span>
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1"
+                    data-testid="ai-article-reading"
+                  >
+                    <HugeiconsIcon
+                      icon={Clock01Icon}
+                      className="h-3 w-3"
+                      aria-hidden="true"
+                    />
+                    <span dir="ltr" className="tabular-nums">
+                      {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+        ) : (
+          <CardHeader>
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+              {badge && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-primary"
+                  data-testid="ai-article-badge"
+                >
+                  <HugeiconsIcon
+                    icon={CheckmarkBadge01Icon}
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                  />
+                  {badge}
+                </span>
+              )}
               <span
-                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-primary"
-                data-testid="ai-article-badge"
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                data-testid="ai-article-authority"
               >
                 <HugeiconsIcon
-                  icon={CheckmarkBadge01Icon}
+                  icon={Stethoscope02Icon}
                   className="h-3 w-3"
                   aria-hidden="true"
                 />
-                {badge}
+                <span className="truncate">{article.authorityLabel}</span>
               </span>
-            )}
-            <span
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-              data-testid="ai-article-authority"
-            >
-              <HugeiconsIcon
-                icon={Stethoscope02Icon}
-                className="h-3 w-3"
-                aria-hidden="true"
-              />
-              <span className="truncate">{article.authorityLabel}</span>
-            </span>
-            <span
-              className="inline-flex shrink-0 items-center gap-1"
-              data-testid="ai-article-reading"
-            >
-              <HugeiconsIcon
-                icon={Clock01Icon}
-                className="h-3 w-3"
-                aria-hidden="true"
-              />
-              {/*
-                Pin the number+unit to LTR so Arabic digits and the
-                unit abbreviation keep the correct visual order inside
-                the AR locale (the parent flows RTL).
-              */}
-              <span dir="ltr" className="tabular-nums">
-                {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
+              <span
+                className="inline-flex shrink-0 items-center gap-1"
+                data-testid="ai-article-reading"
+              >
+                <HugeiconsIcon
+                  icon={Clock01Icon}
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                />
+                {/*
+                  Pin the number+unit to LTR so Arabic digits and the
+                  unit abbreviation keep the correct visual order inside
+                  the AR locale (the parent flows RTL).
+                */}
+                <span dir="ltr" className="tabular-nums">
+                  {article.readingMinutes} {t("doctor.aiLibrary.minutesShort")}
+                </span>
               </span>
-            </span>
-          </div>
+            </div>
+            <CardTitle
+              className="text-base leading-snug"
+              data-testid="ai-article-title"
+            >
+              {article.title}
+            </CardTitle>
+            <CardDescription
+              className="line-clamp-3"
+              data-testid="ai-article-summary"
+            >
+              {article.summary}
+            </CardDescription>
+          </CardHeader>
+        )}
+        <CardContent
+          className={cn(
+            "flex flex-1 flex-col gap-3",
+            variant === "feed" && "gap-3.5"
+          )}
+        >
+          {variant === "feed" && (
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+              {badge && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-primary"
+                  data-testid="ai-article-badge"
+                >
+                  <HugeiconsIcon
+                    icon={CheckmarkBadge01Icon}
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                  />
+                  {badge}
+                </span>
+              )}
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                data-testid="ai-article-authority"
+              >
+                <HugeiconsIcon
+                  icon={Stethoscope02Icon}
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                />
+                <span className="truncate">{article.authorityLabel}</span>
+              </span>
+            </div>
+          )}
           <CardTitle
             className="text-base leading-snug"
             data-testid="ai-article-title"
@@ -208,13 +310,13 @@ export function AiArticleCard({ article, badge, reactions }: AiArticleCardProps)
             {article.title}
           </CardTitle>
           <CardDescription
-            className="line-clamp-3"
+            className={cn(
+              variant === "feed" ? "line-clamp-4" : "line-clamp-3"
+            )}
             data-testid="ai-article-summary"
           >
             {article.summary}
           </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-3">
           {visibleTags.length > 0 && (
             <div
               className="flex flex-wrap gap-1.5"

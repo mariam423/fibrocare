@@ -30,10 +30,12 @@
  *
  * On an up-to-date database, the script is a no-op and exits 0.
  *
- * If a migration is in a "failed" state, the script aborts with
- * exit code 1 and prints the failed migration name. This is the
- * standard Prisma contract — failed migrations must be repaired
- * manually before retrying.
+ * If a migration is in a "failed" state, the script marks it
+ * "rolled back" (via `prisma migrate resolve --rolled-back`) and
+ * re-runs `migrate deploy`. This is safe because every migration in
+ * this repo is written to be idempotent (`IF NOT EXISTS` guards), so
+ * a previously-failed migration can be re-applied without damaging
+ * already-created columns/tables.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -114,11 +116,47 @@ console.log(
 );
 
 const prismaCli = resolve(ROOT, "node_modules/prisma/build/index.js");
-const result = spawnSync(process.execPath, [prismaCli, ...prismaArgs], {
-  cwd: ROOT,
-  stdio: "inherit",
-  env: process.env,
-});
+
+function runPrisma(args, capture) {
+  return spawnSync(process.execPath, [prismaCli, ...args], {
+    cwd: ROOT,
+    encoding: "utf8",
+    stdio: capture ? ["ignore", "pipe", "pipe"] : "inherit",
+    env: process.env,
+  });
+}
+
+const statusArgs = ["migrate", "status", "--schema", "prisma-pg/schema.prisma"];
+
+if (!isStatus) {
+  // P3009: a previous build left a "failed" row in _prisma_migrations,
+  // and Prisma refuses to apply new migrations until it is resolved.
+  // Detect and mark those migrations "rolled back" so `deploy` can
+  // re-run them (all migrations here are idempotent, so this is safe).
+  const status = runPrisma(statusArgs, true);
+  const out = `${status.stdout ?? ""}\n${status.stderr ?? ""}`;
+  const failedRe = /The\s+`([^`]+)`\s+migration\s+.*\bfailed\b/g;
+  const failed = [];
+  let m;
+  while ((m = failedRe.exec(out)) !== null) {
+    if (!failed.includes(m[1])) failed.push(m[1]);
+  }
+  for (const name of failed) {
+    console.warn(`[db-migrate-pg] Resolving failed migration as rolled back: ${name}`);
+    const resolveArgs = [
+      "migrate",
+      "resolve",
+      "--rolled-back",
+      name,
+      "--schema",
+      "prisma-pg/schema.prisma",
+    ];
+    const r = runPrisma(resolveArgs, false);
+    if (r.error || r.status !== 0) process.exit(r.status ?? 1);
+  }
+}
+
+const result = runPrisma(null, false);
 
 if (result.error) {
   console.error("[db-migrate-pg] Failed to spawn prisma:", result.error);

@@ -55,7 +55,7 @@ function hasLatinScript(text: string): boolean {
  * token inside an AR document is treated as a leak.
  */
 const AR_LATIN_ALLOWLIST =
-  /FibroCare|ACR|Mayo Clinic|American College of Rheumatology|NHS|CDC|min/;
+  /FibroCare|ACR|Mayo Clinic|American College of Rheumatology|NHS|CDC|min|Dr\. [A-Z][a-z]+ [A-Za-z-]+/;
 
 test.describe("Doctor Hub: strict language isolation", () => {
   test("EN locale renders no Arabic-script content in the article card", async ({

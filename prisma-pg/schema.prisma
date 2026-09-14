@@ -1,17 +1,9 @@
-// Postgres-flavored Prisma schema, used by `prisma migrate diff` to
-// generate the initial Neon migration. The real schema is
-// `schema.prisma` (provider = "sqlite") which is what `prisma
-// generate` and the runtime read. This file is read only by
-// `npm run db:migrate:pg`.
-//
-// Why a separate file instead of overriding the provider via the
-// CLI: `prisma migrate diff --to-schema-datamodel` parses the file
-// directly and reads the `provider =` line, so the source-of-truth
-// has to be on disk. Splitting the file keeps `schema.prisma`
-// SQLite-compatible for local dev (the dev path), while letting the
-// deploy path emit Postgres-flavoured SQL.
-//
-// Every model is identical to `schema.prisma`. Keep the two in sync.
+// Postgres mirror of `prisma/schema.prisma` (the canonical schema —
+// provider is `postgresql` in both files since the Neon cutover). This
+// file is read by `npm run db:migrate:pg` and by the CI e2e workflow
+// (`npx prisma migrate deploy --schema prisma-pg/schema.prisma`), so its
+// migration tree (`prisma-pg/migrations/`) must contain every migration
+// in `prisma/migrations/` re-emitted for Postgres. Keep the two in sync.
 
 generator client {
   provider = "prisma-client-js"
@@ -39,6 +31,7 @@ model User {
   symptomLogs          SymptomLog[]
   doctorPosts          DoctorPost[]
   articleReactions     ArticleReaction[]
+  comments              Comment[]
   patientConsultations Consultation[]        @relation("PatientConsultations")
   doctorConsultations  Consultation[]        @relation("DoctorConsultations")
   sentMessages         ConsultationMessage[]
@@ -121,18 +114,39 @@ model DoctorPost {
   content        String
   tags           String   @default("")
   verifiedStatus String   @default("pending")
+  /// Content kind for the Direct Doctor Publishing Hub:
+  ///  - "article"  — structured patient-education articles
+  ///  - "research" — research summaries / paper digests
+  ///  - "status"   — short clinical status updates / personal posts
+  /// Defaults to "article" (the historical behavior; pre-migration rows
+  /// are all articles). Indexed for kind-filtered feeds.
+  kind           String   @default("article")
+  /// Origin of the post. `"ai"` rows are produced by the curated AI
+  /// article generator (see `doctor-article-actions.ts`) and surface
+  /// only in the `AiArticleLibrary`. `"manual"` rows are written by
+  /// a verified doctor through the publishing composer and surface
+  /// only in `DoctorContentFeed`. The default is `"manual"` so any
+  /// pre-migration row is treated as doctor-written.
   source         String   @default("manual")
+  /// Language of the post body and title. `"en"` and `"ar"` are
+  /// the only values written by the AI generator; manual posts
+  /// default to `"en"`. The library dedupes by `(slug, language)`,
+  /// not by slug alone, so an EN post and an AR post on the same
+  /// topic coexist as two cards.
   language       String   @default("en")
   authorId       String
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  mediaUrls      String[] @default([])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   reactions      ArticleReaction[]
+  comments       Comment[]
 
   @@index([authorId])
   @@index([verifiedStatus])
   @@index([source])
   @@index([language])
+  @@index([kind])
 }
 
 model ArticleReaction {
@@ -146,6 +160,20 @@ model ArticleReaction {
 
   @@unique([userId, postId, kind])
   @@index([postId, kind])
+  @@index([userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      DoctorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
   @@index([userId])
 }
 

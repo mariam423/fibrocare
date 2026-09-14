@@ -137,14 +137,26 @@ test.describe("Doctor Hub: AI-Generated Article Library", () => {
 
     // The topic picker is the horizontally-scrollable container. On phone
     // it must allow horizontal scroll (scrollWidth > clientWidth on the
-    // inner scroller) so the user can swipe to see all topics.
+    // inner scroller) so the user can swipe to see all topics. Wait for
+    // the chips to actually render first — measuring while the picker
+    // shows its narrow loading spinner makes the assertion meaningless
+    // (a spinner never overflows, so the check would pass/fail on load
+    // timing rather than layout).
+    const firstTopicChip = page.locator("[data-testid^='ai-article-topic-']").first();
+    await expect(firstTopicChip).toBeVisible({ timeout: 60_000 });
+
     const pickerMetrics = await page.evaluate(() => {
       const outer = document.querySelector(
         "[data-testid='ai-article-topics']"
       ) as HTMLElement | null;
-      const inner = outer?.querySelector(
-        "div.scrollbar-none"
-      ) as HTMLElement | null;
+      // The testid sits on the scrollable list itself (the element that
+      // carries the localized aria-label), so the inner scroller is the
+      // same node; fall back to a child scroller for older markup.
+      const inner = (outer?.classList.contains("scrollbar-none")
+        ? outer
+        : (outer?.querySelector(
+            "div.scrollbar-none"
+          ) as HTMLElement | null)) as HTMLElement | null;
       if (!outer || !inner) return null;
       return {
         outerWidth: outer.clientWidth,
@@ -177,6 +189,28 @@ test.describe("Doctor Hub: AI-Generated Article Library", () => {
     await readButton.click();
     const body = page.getByTestId("ai-article-body");
     await expect(body).toBeVisible({ timeout: 10_000 });
+    // The dialog opens with an entrance animation (scale/translate), so a
+    // single getBoundingClientRect right after the click can catch it
+    // mid-flight (a few px short of full width). Poll until the geometry
+    // settles at full-viewport width instead of asserting once.
+    await expect
+      .poll(
+        async () => {
+          const width = await page.evaluate(() => {
+            const popup = document.querySelector(
+              "[data-slot='dialog-content']"
+            ) as HTMLElement | null;
+            if (!popup) return Number.POSITIVE_INFINITY;
+            return popup.getBoundingClientRect().width;
+          });
+          return Math.abs(width - 390);
+        },
+        {
+          timeout: 10_000,
+          message: "dialog should settle at full viewport width on phone",
+        }
+      )
+      .toBeLessThanOrEqual(4);
     const dialogMetrics = await page.evaluate(() => {
       const popup = document.querySelector(
         "[data-slot='dialog-content']"
@@ -186,12 +220,6 @@ test.describe("Doctor Hub: AI-Generated Article Library", () => {
       return { width: r.width, height: r.height, x: r.x, y: r.y };
     });
     expect(dialogMetrics, "dialog content should exist").not.toBeNull();
-    // Full-screen on mobile: the dialog should span (almost) the full
-    // viewport. Allow a 2px tolerance for borders/transforms.
-    expect(
-      Math.abs(dialogMetrics!.width - 390),
-      "dialog should span viewport width on phone"
-    ).toBeLessThanOrEqual(4);
     expect(dialogMetrics!.x).toBeLessThanOrEqual(2);
 
     await page.keyboard.press("Escape");

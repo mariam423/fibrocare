@@ -43,7 +43,13 @@ import {
   type GeneratedArticleResult,
 } from "@/lib/ai/doctor-article-schemas";
 import { revalidateTag, unstable_cache } from "next/cache";
-import { AI_ARTICLES_TAG, AI_ARTICLES_TTL_SECONDS } from "@/app/pro/doctor-article-cache";
+import {
+  AI_ARTICLES_TAG,
+  AI_ARTICLES_TTL_SECONDS,
+  SEED_INFLIGHT_TTL_MS,
+  SEED_RATE_LIMIT,
+  SEED_RATE_WINDOW_MS,
+} from "@/app/pro/doctor-article-cache";
 import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
 import { requirePermissionResponse } from "@/lib/auth/entitlement";
 
@@ -430,6 +436,93 @@ function arabicFallbackSummary(topic: ArticleTopic): string {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Seed-state gate (shared server-side knowledge for the library)      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * In-process "seed started" marker.
+ *
+ * Seeds run on ONE server instance (the instance whose API route
+ * received the POST), so an instance-local timestamp is the correct
+ * scope: visitors routed to that same instance skip the redundant
+ * POST, while other instances either POST (idempotent, rate-limited)
+ * or find the rows via their own list cache. This is deliberately NOT
+ * a distributed lock — the seed itself is idempotent and de-duped
+ * against a closed catalogue; the marker only trims redundant POSTs
+ * from concurrent first visitors.
+ */
+let seedInFlightUntil = 0;
+
+function markSeedInFlight(): void {
+  seedInFlightUntil = Date.now() + SEED_INFLIGHT_TTL_MS;
+}
+
+function isSeedInFlight(): boolean {
+  return Date.now() < seedInFlightUntil;
+}
+
+/**
+ * Cached count of verified AI-generated articles per language, keyed
+ * by `(language)` and sharing the list's tag + TTL: any seed that
+ * creates rows calls `revalidateTag(AI_ARTICLES_TAG)`, which clears
+ * this count together with the list — so "library empty" is decided
+ * from data at most 60s old, not from a per-visitor DB hit.
+ */
+const cachedVerifiedAiArticleCount = unstable_cache(
+  async (language: "en" | "ar") =>
+    prisma.doctorPost.count({
+      where: { verifiedStatus: "verified", language, source: "ai" },
+    }),
+  ["ai-articles-seed-state"],
+  {
+    revalidate: AI_ARTICLES_TTL_SECONDS,
+    tags: [AI_ARTICLES_TAG],
+  }
+);
+
+/**
+ * Server-side answer to "should I trigger the article seed?".
+ *
+ * The library client consults this BEFORE POSTing
+ * `/api/ai/articles/seed`, so a flood of concurrent first visitors on
+ * a fresh deploy collapses to (at most) one actual seed POST per
+ * instance instead of one per visitor:
+ *
+ *  - `needsSeed: false` — the library has verified AI rows (the
+ *    client's list view was a stale empty cache). The stale list tag
+ *    is revalidated here so the client's immediate re-list computes
+ *    fresh rows instead of showing a phantom empty state.
+ *  - `seedInFlight: true` — another visitor on this instance started
+ *    a seed moments ago; skip the POST and re-list shortly. Their
+ *    seed's own `revalidateTag` (or the fresh list call) surfaces the
+ *    rows.
+ *
+ * On any internal failure the action fails OPEN (needsSeed: true),
+ * which reproduces the client's pre-existing behavior exactly — the
+ * seed endpoint stays idempotent and rate-limited, so the fallback is
+ * always safe.
+ */
+export async function getAiLibrarySeedState(
+  language: "en" | "ar" = "en"
+): Promise<{ needsSeed: boolean; seedInFlight: boolean }> {
+  try {
+    const count = await cachedVerifiedAiArticleCount(language);
+    if (count > 0) {
+      // Library is populated but the client saw an empty list — a stale
+      // cache entry. Invalidate it so the client's re-list computes the
+      // real rows. Safe to call from a server action (Next only allows
+      // revalidateTag in actions / route handlers).
+      revalidateTag(AI_ARTICLES_TAG, "max");
+      return { needsSeed: false, seedInFlight: isSeedInFlight() };
+    }
+    return { needsSeed: true, seedInFlight: isSeedInFlight() };
+  } catch (error) {
+    console.error("[ai-articles] seed-state check failed:", error);
+    return { needsSeed: true, seedInFlight: false };
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Public actions                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -648,16 +741,30 @@ export async function seedDoctorArticleLibrary(): Promise<{
   }
 
   // Server actions are directly callable — apply the same doctor
-  // entitlement + per-IP budget the /api/ai/articles/seed route enforces
-  // before running the (LLM-heavy) seeding loop.
+  // entitlement + per-user budget the /api/ai/articles/seed route
+  // enforces before running the (LLM-heavy) seeding loop.
   const denied = await requirePermissionResponse(session.user.id, "doctor:publish");
   if (denied) {
     return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
   }
-  const { ok } = await checkRateLimitDistributed(`seed:${session.user.id}`, 2, 60 * 60 * 1000);
+  // Per-user budget, imported from the shared cache module so the
+  // action and the API route can never drift apart. Pinned by
+  // route.test.ts.
+  const { ok } = await checkRateLimitDistributed(
+    `seed:${session.user.id}`,
+    SEED_RATE_LIMIT,
+    SEED_RATE_WINDOW_MS
+  );
   if (!ok) {
     return { generated: 0, total: ARTICLE_TOPICS.length * 2 };
   }
+
+  // Mark the seed as started for concurrent first visitors: while this
+  // marker is hot, `getAiLibrarySeedState` reports seedInFlight and the
+  // library client skips its own POST. Scope is instance-local — that is
+  // the right granularity for an in-process cache (see the comment on
+  // the marker above).
+  markSeedInFlight();
 
   let generated = 0;
   // The total is the cartesian product of topics × languages so the

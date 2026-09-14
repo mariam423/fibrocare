@@ -1,0 +1,98 @@
+name: e2e
+
+# Full Playwright suite on every PR, so cold-server flakiness (slow
+# dev-server compiles, hydration races, i18n drift) is caught BEFORE
+# merge rather than on a scheduled run or a deploy.
+#
+# Database: the Prisma schema and migration lock are PostgreSQL-only
+# (Neon in production), so the job provisions a throwaway Postgres
+# service container and applies prisma-pg/migrations with `migrate
+# deploy`. The e2e throwaway account, its doctor promotion, and all
+# spec data live only in this database — nothing external is touched.
+#
+# The chromium project runs the whole authenticated suite serially
+# (workers: 1, per playwright.config.ts) and the public project runs
+# unauthenticated; the dedicated pwa/live/live-chat suites keep their
+# own workflows/configs and are intentionally excluded here.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Playwright e2e (chromium + public)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fibrocare
+          POSTGRES_PASSWORD: fibrocare
+          POSTGRES_DB: fibrocare_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fibrocare"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Read by scripts/run-e2e-env.mjs when it writes .env for CI.
+      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_e2e
+      NEXTAUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Node dependencies
+        # No package-lock.json is committed, so use `npm install` rather
+        # than `npm ci` (matches build-verify.yml).
+        run: npm install
+
+      - name: Generate Prisma client
+        run: npx prisma generate --schema prisma-pg/schema.prisma
+
+      - name: Install Playwright (Node) + Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Create .env for CI
+        # Shared with build-verify.yml: builds the gitignored .env from
+        # the service container's connection string. A random
+        # NEXTAUTH_SECRET is fine here — sessions only need to survive
+        # the single job that mints them (the e2e storage state is
+        # created and consumed within this same run).
+        run: node scripts/run-e2e-env.mjs
+
+      - name: Apply Postgres migrations
+        run: npx prisma migrate deploy --schema prisma-pg/schema.prisma
+
+      - name: Run Playwright suite
+        # CI mode flips reuseExistingServer off and enables retries (see
+        # playwright.config.ts); the webServer boots its own dev server
+        # on :3000 against the migrated Postgres database.
+        run: npx playwright test --project=chromium --project=public
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

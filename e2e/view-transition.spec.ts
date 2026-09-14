@@ -45,7 +45,18 @@ test.describe("route view transitions", () => {
     // renders quick links on section roots like /dashboard). "Profile" is a
     // stable top-level route with a real <h1>, unlike card links whose
     // accessible names include descriptions (breaks exact matching).
-    const profileLink = page.getByRole("link", { name: "Profile", exact: true }).first();
+    //
+    // Same-document marker: set right before the click. A client-side
+    // (SPA) navigation keeps the JS realm alive, so the marker survives;
+    // any full document load (reload / native navigation) wipes it. We
+    // assert on this instead of `performance.navigation.type` because the
+    // dev server's HMR recovery can reload the page during the privacy
+    // unlock BEFORE the click — that earlier reload says nothing about
+    // whether THIS click was a client-side navigation.
+    await page.evaluate(() => {
+      (window as unknown as { __vtSameDoc?: boolean }).__vtSameDoc = true;
+    });
+    const profileLink = page.getByRole("link", { name: "Profile", exact: true }).first();;
     for (let attempt = 0; attempt < 3; attempt++) {
       await profileLink.click();
       try {
@@ -61,13 +72,16 @@ test.describe("route view transitions", () => {
     const count = await page.evaluate(
       () => Number(sessionStorage.getItem("__vtCount") || 0)
     );
-    const navType = await page.evaluate(
-      () =>
-        (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined)
-          ?.type ?? "unknown"
+    const sameDocument = await page.evaluate(
+      () => (window as unknown as { __vtSameDoc?: boolean }).__vtSameDoc === true
     );
-    console.log("navigation type:", navType, "| startViewTransition calls:", count);
-    expect(navType, "expected a client-side (same-document) navigation").toBe("navigate");
+    console.log(
+      "same-document navigation:",
+      sameDocument,
+      "| startViewTransition calls:",
+      count
+    );
+    expect(sameDocument, "expected a client-side (same-document) navigation").toBe(true);
     expect(count, "expected startViewTransition to have fired").toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });

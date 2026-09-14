@@ -53,7 +53,7 @@ export function LandingNav() {
 
           <nav
             className="hidden items-center gap-6 md:flex lg:gap-8"
-            aria-label="Primary"
+            aria-label={t("nav.primaryNav")}
           >
             {NAV_LINKS.map((link) => (
               <a

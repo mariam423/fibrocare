@@ -201,34 +201,47 @@ export async function getDoctorPosts(options?: {
 }) {
   try {
     // Server actions are publicly reachable endpoints — a signed-in
-    // session is required, and the `status` filter is not caller-ownable:
-    // arbitrary caller-chosen statuses would let any visitor read
-    // pending/rejected drafts. Only doctors may filter by status, and
-    // only within their own authorId scope; everyone else sees verified
-    // rows only.
+    // session is required for any read.
     const user = await getSessionUser();
     if (!user) return { success: false as const, error: "You must be signed in." };
 
+    // The `status` filter is not caller-ownable: an unauthenticated
+    // visitor used to be able to pass status=pending/rejected and read
+    // unpublished drafts. The rule now is:
+    //   - "verified" is safe for any signed-in caller (it is the public
+    //     feed's own filter — the dashboard uses it);
+    //   - any other status (pending/rejected) is doctor-only and is
+    //     ALWAYS scoped to the caller's own authorId, so a doctor can
+    //     only ever list their own drafts;
+    //   - a caller-supplied authorId is clamped to the caller's own id —
+    //     one user can never enumerate another user's posts.
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: { role: true },
     });
-    const isDoctor = dbUser ? hasPermission(dbUser.role as UserRole, "doctor:publish") : false;
+    if (!dbUser) return { success: false as const, error: "User not found." };
+    const isDoctor = hasPermission(dbUser.role as UserRole, "doctor:publish");
 
     const where: Record<string, unknown> = {};
-    if (options?.status) {
-      if (!isDoctor) {
-        return { success: false as const, error: "You must be a verified doctor to filter by status." };
+    const requestedStatus = options?.status;
+    if (requestedStatus) {
+      if (requestedStatus !== "verified" && !isDoctor) {
+        return {
+          success: false as const,
+          error: "You must be a verified doctor to filter by this status.",
+        };
       }
-      where.verifiedStatus = options.status;
-      // A doctor may only ever list their own pending/rejected drafts.
-      where.authorId = user.id;
-    } else if (options?.authorId) {
-      // authorId filtering is allowed only for the caller's own id.
+      where.verifiedStatus = requestedStatus;
+    }
+    if ((requestedStatus && requestedStatus !== "verified") || options?.authorId) {
       where.authorId = user.id;
     }
-    if (options?.manualOnly !== false) {
-      where.source = options?.status ? undefined : "manual";
+    // `manualOnly` defaults to true: DoctorContentFeed must never show
+    // an AI-generated article that the AiArticleLibrary already shows.
+    // (The doctor's own-drafts view skips the source filter so it also
+    // sees AI rows they authored.)
+    if (options?.manualOnly !== false && !(requestedStatus && requestedStatus !== "verified")) {
+      where.source = "manual";
     }
 
     const posts = await prisma.doctorPost.findMany({

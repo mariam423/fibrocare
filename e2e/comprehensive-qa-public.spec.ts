@@ -24,6 +24,28 @@ async function submitWhenHydrated(
   for (let attempt = 0; attempt < 3; attempt++) {
     const button = page.getByRole("button", { name: buttonName });
     await expect(button).toBeEnabled({ timeout: 20_000 });
+    // Hydration gate: wait until React has actually attached to the form
+    // subtree (fiber key on the input) before clicking. A pre-hydration
+    // click native-submits the form (GET with empty fields), which the
+    // URL check below catches — but on a cold dev server that can burn
+    // all three retries before React ever mounts. Waiting for the fiber
+    // makes the first click land on the real handler.
+    try {
+      await page.waitForFunction(
+        (sel) => {
+          const el = document.querySelector(sel);
+          return (
+            !!el &&
+            Object.keys(el).some((k) => k.startsWith("__reactFiber$"))
+          );
+        },
+        reloadSelector,
+        { timeout: 30_000 }
+      );
+    } catch {
+      // Fiber probe unavailable (markup change) — fall through; the
+      // post-click navigation check below still guards the race.
+    }
     await button.click();
     // Hydrated forms never navigate on validation failures. If the URL
     // gains a query string or the form fields disappear, we raced hydration
@@ -189,16 +211,18 @@ test.describe("Auth flows QA", () => {
     await page.waitForSelector("#name", { timeout: 20_000 });
 
     // On a cold dev-server compile, hydration can land mid-fill and wipe
-    // the inputs — submit would then fire the name-required path instead
-    // of the mismatch path. Verify every field still holds its value
-    // right before clicking (mirrors auth.setup.ts's fillAndVerify).
+    // the inputs — the submit then fires the name-required path instead
+    // of the mismatch path (mirrors auth.setup.ts's fillAndVerify race).
+    // Fill, verify, AND submit inside one loop: if the fields were wiped
+    // between verification and the click (or the alert surfaced the
+    // name-required path), reset and retry from a clean load.
     const fields: Array<[string, string]> = [
       ["#name", "Test User"],
       ["#email", "test@example.com"],
       ["#password", "password123"],
       ["#confirm-password", "differentpassword"],
     ];
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < 4; attempt++) {
       for (const [selector, value] of fields) {
         await page.locator(selector).fill(value);
       }
@@ -206,16 +230,28 @@ test.describe("Auth flows QA", () => {
         for (const [selector, value] of fields) {
           await expect(page.locator(selector)).toHaveValue(value, { timeout: 5_000 });
         }
-        break;
       } catch {
         await page.reload({ waitUntil: "domcontentloaded" });
         await page.waitForSelector("#name", { timeout: 20_000 });
+        continue;
+      }
+
+      await page.getByRole("button", { name: "Create account" }).click();
+      try {
+        await expect(page.getByText("Passwords do not match.")).toBeVisible({
+          timeout: 5_000,
+        });
+        return;
+      } catch {
+        // Wrong validation path (fields wiped before the click landed) —
+        // reset and try again.
+        await page.goto("/signup", { waitUntil: "domcontentloaded" });
+        await page.waitForSelector("#name", { timeout: 20_000 });
       }
     }
-
-    await submitWhenHydrated(page, "Create account", "#name");
-
-    await expect(page.getByText("Passwords do not match.")).toBeVisible({ timeout: 10_000 });
+    throw new Error(
+      "Signup never reached the password-mismatch validation path"
+    );
   });
 
   test("login links to signup and forgot-password", async ({ page }) => {

@@ -16,6 +16,37 @@ jobs:
     name: Build + accessibility audit
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    # The Prisma schema and migration lock are PostgreSQL-only (Neon in
+    # production), so the build needs a real Postgres: `npm run build`
+    # runs scripts/db-migrate-pg.mjs, which applies prisma-pg/migrations
+    # before compiling. Provisioning a throwaway service container keeps
+    # the job hermetic (no external database is ever touched).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fibrocare
+          POSTGRES_PASSWORD: fibrocare
+          POSTGRES_DB: fibrocare_build
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fibrocare"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # db-migrate-pg.mjs (run inside `npm run build`) reads the
+      # connection string from process env — it does not load .env —
+      # so the job exports it directly. The same values are written
+      # into .env by scripts/run-e2e-env.mjs for the Next runtime.
+      DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
+      DIRECT_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
+      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
+      NEXTAUTH_URL: http://localhost:3000
+
     steps:
       - uses: actions/checkout@v4
 
@@ -48,22 +79,20 @@ jobs:
       - name: Install Playwright (Node) + Chromium for e2e
         run: npx playwright install --with-deps chromium
 
-      # .env is gitignored, so CI builds its own. NEXTAUTH_SECRET is
-      # required: the runtime a11y audit signs in a throwaway account and
-      # NextAuth refuses to sign JWTs without it. The audit's dev server
-      # binds to port 3000, matching NEXTAUTH_URL. DATABASE_URL is inert
-      # for Prisma today (the schema hardcodes file:./dev.db) but is kept
-      # for future env-based configuration.
+      # .env is gitignored, so CI builds its own via the shared script
+      # (same file e2e.yml uses, so the two workflows cannot drift).
+      # NEXTAUTH_SECRET is required: the runtime a11y audit signs in a
+      # throwaway account and NextAuth refuses to sign JWTs without it.
+      # The audit's dev server binds to port 3000, matching NEXTAUTH_URL.
       - name: Create .env for CI
-        run: |
-          echo 'DATABASE_URL="file:./dev.db"' > .env
-          echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" >> .env
-          echo 'NEXTAUTH_URL=http://localhost:3000' >> .env
+        run: node scripts/run-e2e-env.mjs
 
-      - name: Create SQLite database from migrations
-        # The single committed migration is self-contained (all tables), so
-        # a fresh prisma/dev.db is fully built by `migrate deploy`.
-        run: npx prisma migrate deploy
+      - name: Apply Postgres migrations
+        # Explicit schema path: prisma-pg/migrations is the canonical
+        # Postgres chain (the one production applies via db-migrate-pg.mjs).
+        # This is a pre-flight of the same migrate deploy that `npm run
+        # build` runs, so failures surface with a clear step name.
+        run: npx prisma migrate deploy --schema prisma-pg/schema.prisma
 
       - name: Unit tests + AI mock coverage gate
         # Vitest runs the unit suite; the coverage config enforces 100%

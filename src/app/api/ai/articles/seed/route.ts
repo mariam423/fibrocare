@@ -7,14 +7,22 @@
  * feed never shows the empty state.
  *
  * The endpoint requires authentication (session cookie), but seeding runs
- * LLM generation, so it is rate-limited per client IP: 2 seeds per hour.
- * The work itself is bounded (closed topic catalogue, persisted + de-duped),
- * the limiter just stops a script from hammering it.
+ * LLM generation, so it is rate-limited per client IP: 12 seeds / 5 minutes.
+ * The limit only guards hammering — the work itself is bounded twice over:
+ * the topic catalogue is closed and the seed de-dupes by (topic, language),
+ * so a populated library makes every seed a pure DB read (zero LLM calls).
+ * The generous budget exists so a fresh deploy self-seeds reliably even
+ * when several first visitors (or e2e suites) mount the empty library
+ * concurrently and retry.
  */
 
 import { NextRequest } from "next/server";
 import { seedDoctorArticleLibrary } from "@/app/pro/doctor-article-actions";
 import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
+import {
+  SEED_RATE_LIMIT,
+  SEED_RATE_WINDOW_MS,
+} from "@/app/pro/doctor-article-cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { requirePermissionResponse } from "@/lib/auth/entitlement";
@@ -40,12 +48,13 @@ export async function POST(request: NextRequest) {
   const denied = await requirePermissionResponse(session.user.id, "doctor:publish");
   if (denied) return denied;
 
-  // Per-IP budget: 2 seeds / hour. The seed is idempotent, so a legit
-  // client never needs more.
+  // Per-IP budget, imported from the shared cache module so the route
+  // and the server action can never drift apart. Pinned by
+  // route.test.ts.
   const { ok, resetAt } = await checkRateLimitDistributed(
     `seed:${clientIp(request)}`,
-    2,
-    60 * 60 * 1000
+    SEED_RATE_LIMIT,
+    SEED_RATE_WINDOW_MS
   );
   if (!ok) {
     const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));

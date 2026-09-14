@@ -98,10 +98,10 @@ const CAM_MIN_DIST = 3.6;
 const CAM_MAX_DIST = 8.5;
 const CAM_DEFAULT_DIST = 6.1;
 const SPRITE_BASE = 0.42;
-/** Marker core as a fraction of its configured radius (delicate pinpoint). */
-const MARKER_SIZE = 0.225;
-/** Marker core opacity so the anatomy stays visible through the point. */
-const MARKER_OPACITY = 0.35;
+/** Marker core as a fraction of its configured radius (small, simple dot). */
+const MARKER_SIZE = 0.26;
+/** Marker core opacity — quiet, keeps the anatomy beneath readable. */
+const MARKER_OPACITY = 0.4;
 const AUTO_ROTATE_SPEED = 0.12;
 
 function isWebGLAvailable(): boolean {
@@ -683,9 +683,9 @@ function buildViewer(
       shellMat.emissive.set(color);
       const haloMat = entry.halo.material as THREE.SpriteMaterial;
       haloMat.color.set(color);
-      haloMat.opacity = active ? 0.4 : 0.18;
-      entry.baseScale = (hs.radius ?? 0.05) * (active ? 3.1 : 2.0);
-      entry.shell.scale.setScalar(active ? 1.35 : 1);
+      haloMat.opacity = active ? 0.4 : 0.16;
+      entry.baseScale = (hs.radius ?? 0.05) * (active ? 2.8 : 2.1);
+      entry.shell.scale.setScalar(active ? 1.2 : 1);
     }
     for (const [id, entry] of markerMap) {
       if (!wantedMarkers.has(id)) {

@@ -52,9 +52,11 @@ import { useLanguage } from "@/context/LanguageContext";
 import { AiArticleCard, type AiArticle } from "./AiArticleCard";
 import {
   ensureArticleForTopic,
+  getAiLibrarySeedState,
   listArticleTopics,
   listPublishedArticles,
 } from "@/app/pro/doctor-article-actions";
+import { decideSeedAction } from "@/app/pro/doctor-article-cache";
 import { getArticleReactions } from "@/app/pro/article-reaction-actions";
 import { cn } from "@/lib/utils";
 
@@ -268,23 +270,55 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
         //    The list is filtered to the active locale so an Arabic
         //    reader lands on the Arabic rendering of the curated
         //    topics, not a half-empty feed.
-        const list = await listPublishedArticles(
-          12,
-          locale === "ar" ? "ar" : "en"
-        );
+        const language = locale === "ar" ? "ar" : "en";
+        const list = await listPublishedArticles(12, language);
         if (!cancelled && list.success && list.data.length > 0) {
           setArticles(dedupeArticles(list.data.map(toAiArticle)));
           return;
         }
-        // 2. Seed via the public endpoint. The seed endpoint is
+        // 2. Consult the SERVER-side seed state before POSTing. On a
+        //    fresh deploy many first visitors mount an empty library at
+        //    once; this check collapses their seed POSTs to (at most)
+        //    one per server instance:
+        //      - needsSeed: false → the library actually has rows (the
+        //        empty list was a stale cache); the action revalidates
+        //        the list tag, so re-listing below computes real rows.
+        //      - seedInFlight: true → another visitor's seed just
+        //        started on this instance; skip the POST and re-list
+        //        shortly — their seed revalidates the same tag.
+        //    On failure the action fails open (needsSeed: true), which
+        //    is exactly the pre-existing behavior: POST + idempotent,
+        //    rate-limited endpoint.
+        const state = await getAiLibrarySeedState(language);
+        const decision = decideSeedAction(state);
+        if (!cancelled && decision === "skip-listed") {
+          const fresh = await listPublishedArticles(12, language);
+          if (fresh.success && fresh.data.length > 0) {
+            setArticles(dedupeArticles(fresh.data.map(toAiArticle)));
+            return;
+          }
+          // Fresh list came back empty too (rare race) — fall through
+          // to the normal seed path so the empty state still resolves.
+        } else if (!cancelled && decision === "skip-inflight") {
+          // Give the running seed a moment, then re-list. Its
+          // revalidateTag invalidates the list cache, so this computes
+          // fresh rows.
+          await new Promise((r) => setTimeout(r, 4_000));
+          const after = await listPublishedArticles(12, language);
+          if (!cancelled && after.success && after.data.length > 0) {
+            setArticles(dedupeArticles(after.data.map(toAiArticle)));
+            return;
+          }
+          // Seed hasn't landed rows yet — fall through and POST anyway;
+          // the endpoint is idempotent + rate-limited, worst case it's
+          // one redundant request after a 90s window.
+        }
+        // 3. Seed via the public endpoint. The seed endpoint is
         //    language-agnostic — it writes both languages at once
         //    — so a single call covers all locales.
         await fetch("/api/ai/articles/seed", { method: "POST" });
-        // 3. Reload in the active locale.
-        const after = await listPublishedArticles(
-          12,
-          locale === "ar" ? "ar" : "en"
-        );
+        // 4. Reload in the active locale.
+        const after = await listPublishedArticles(12, language);
         if (!cancelled && after.success) {
           setArticles(dedupeArticles(after.data.map(toAiArticle)));
         }
@@ -301,14 +335,20 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
     };
   }, [initialArticles.length, locale, t]);
 
-  // Lazy-load the topic picker. We use a derived state ref to avoid
-  // calling setState synchronously inside the effect.
-  const shouldLoadTopics = topics.length === 0 && !loadingTopics;
+  // Lazy-load the topic picker. The effect is keyed on `topics.length`
+  // ONLY: keying it on a derived flag that includes `loadingTopics`
+  // made the effect cancel itself — the deferred `setLoadingTopics(true)`
+  // re-rendered the component, flipped the derived flag, re-ran the
+  // effect (whose cleanup set `cancelled`), and the in-flight
+  // `listArticleTopics()` result was then dropped, leaving the picker
+  // stuck on the loading state forever.
   useEffect(() => {
-    if (!shouldLoadTopics) return;
+    if (topics.length > 0) return;
     let cancelled = false;
     // Defer the loading flag to a microtask so the effect body never
-    // sets state synchronously.
+    // sets state synchronously. This is safe here: the state change
+    // does not alter this effect's dependency (`topics.length`), so it
+    // cannot re-run or cancel the fetch below.
     Promise.resolve().then(() => {
       if (cancelled) return;
       setLoadingTopics(true);
@@ -326,7 +366,7 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
     return () => {
       cancelled = true;
     };
-  }, [shouldLoadTopics]);
+  }, [topics.length]);
 
   const handleGenerate = useCallback(
     (topicId: string) => {
@@ -509,14 +549,12 @@ export function AiArticleLibrary({ initialArticles }: AiArticleLibraryProps) {
              * Mobile: horizontal scroller with snap + edge fade.
              * ≥ md: wraps freely so all chips are visible at once.
              */}
-            <div
-              className="-mx-(--card-spacing) sm:mx-0"
-              data-testid="ai-article-topics"
-            >
+            <div className="-mx-(--card-spacing) sm:mx-0">
               <div
                 className="scrollbar-none scroll-fade-x flex gap-2 overflow-x-auto px-(--card-spacing) py-1 snap-x snap-mandatory touch-pan-x sm:flex-wrap sm:overflow-visible sm:px-0 sm:py-0 sm:[mask-image:none] sm:[-webkit-mask-image:none]"
                 role="list"
                 aria-label={t("doctor.aiLibrary.topicsAria")}
+                data-testid="ai-article-topics"
               >
                 {loadingTopics ? (
                   <span className="inline-flex shrink-0 items-center gap-2 px-2 text-xs text-muted-foreground">

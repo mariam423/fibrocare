@@ -12,6 +12,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+import { CycleOrbit3D } from "@/components/ui/CycleOrbit3D";
 
 /**
  * Client-side mirror of the API's forecast payload
@@ -134,8 +135,9 @@ export function FlareForecastCard({ forecast, hasCycle }: FlareForecastCardProps
     // No cycle history → the forecast needs a first data point. Keep it
     // compact; the CycleStatusWidget next to it owns the logging form.
     return (
-      <Card className="w-full min-h-[96px] flex items-center justify-center text-center p-4 border-border/60 bg-muted/30">
-        <div className="flex items-center gap-2.5 text-muted-foreground text-sm">
+      <Card className="w-full min-h-[150px] flex flex-col items-center justify-center text-center gap-2 overflow-hidden p-4 pt-5 border-border/60 bg-muted/30">
+        <CycleOrbit3D className="max-w-[220px]" />
+        <div className="flex items-center gap-2.5 pt-1 text-muted-foreground text-sm">
           <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{t("health.forecast.noCycleGuidance")}</span>
         </div>

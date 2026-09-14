@@ -1,25 +1,29 @@
 -- Bring the Postgres chain up to parity with prisma/schema.prisma:
---
--- 1. `Comment` table — the comments feature on verified Doctor Hub
---    articles (src/app/api/pro/posts/[id]/comments). Missed when the
---    feature landed because only prisma/migrations/ was updated, and
---    that tree has since drifted out of replayable shape; this pg tree
---    is the one production applies (db-migrate-pg.mjs via npm run build).
--- 2. `DoctorPost.kind` — article | research | status content kinds for
---    the publishing hub (mirrors 20260912000000_add_doctor_post_kind).
--- 3. `DoctorPost.mediaUrls` — String[] default {} on DoctorPost.
---
--- Every pre-migration row keeps its defaults: existing posts are
--- articles, no comments exist yet on fresh deploys of this chain.
+-- Made idempotent — columns/indexes/tables are skipped if they already exist.
 
--- AlterTable
-ALTER TABLE "DoctorPost" ADD COLUMN "kind" TEXT NOT NULL DEFAULT 'article';
+-- AlterTable (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'DoctorPost' AND column_name = 'kind'
+  ) THEN
+    ALTER TABLE "DoctorPost" ADD COLUMN "kind" TEXT NOT NULL DEFAULT 'article';
+  END IF;
+END $$;
 
--- AlterTable
-ALTER TABLE "DoctorPost" ADD COLUMN "mediaUrls" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'DoctorPost' AND column_name = 'mediaUrls'
+  ) THEN
+    ALTER TABLE "DoctorPost" ADD COLUMN "mediaUrls" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
+  END IF;
+END $$;
 
--- CreateTable
-CREATE TABLE "Comment" (
+-- CreateTable (idempotent)
+CREATE TABLE IF NOT EXISTS "Comment" (
     "id" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -30,17 +34,28 @@ CREATE TABLE "Comment" (
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex (feed filtering by kind: /pro/doctor kind tabs)
-CREATE INDEX "DoctorPost_kind_idx" ON "DoctorPost"("kind");
+-- CreateIndex (idempotent)
+CREATE INDEX IF NOT EXISTS "DoctorPost_kind_idx" ON "DoctorPost"("kind");
+CREATE INDEX IF NOT EXISTS "Comment_postId_createdAt_idx" ON "Comment"("postId", "createdAt");
+CREATE INDEX IF NOT EXISTS "Comment_userId_idx" ON "Comment"("userId");
 
--- CreateIndex (comments are listed per post, oldest first)
-CREATE INDEX "Comment_postId_createdAt_idx" ON "Comment"("postId", "createdAt");
+-- AddForeignKey (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'Comment_postId_fkey'
+  ) THEN
+    ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postId_fkey"
+      FOREIGN KEY ("postId") REFERENCES "DoctorPost"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 
--- CreateIndex (per-user comment history lookup)
-CREATE INDEX "Comment_userId_idx" ON "Comment"("userId");
-
--- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postId_fkey" FOREIGN KEY ("postId") REFERENCES "DoctorPost"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'Comment_userId_fkey'
+  ) THEN
+    ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey"
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;

@@ -15,6 +15,7 @@ import {
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { MaskedReveal } from "@/components/ui/MaskedReveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { DepthCard } from "@/components/ui/DepthCard";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/translations";
 
@@ -37,7 +38,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.about",
     copy: "about.overview",
     icon: BookOpen01Icon,
-    thumbnail: "/images/medical/trigger-points.svg",
+    thumbnail: "/images/loading about.jpg",
     tint: "oklab(0.55 0.06 150)",
   },
   {
@@ -46,7 +47,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.diagnosis",
     copy: "diagnosis.subtitle",
     icon: StethoscopeIcon,
-    thumbnail: "/images/medical/diagnosis-criteria.svg",
+    thumbnail: "/images/loading Diagnosis.jpg",
     tint: "oklab(0.55 0.06 280)",
   },
   {
@@ -55,7 +56,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.treatment",
     copy: "treatment.subtitle",
     icon: HeartPulseIcon,
-    thumbnail: "/images/medical/treatment-management.svg",
+    thumbnail: "/images/loading Treatment & Self-Care .jpg",
     tint: "oklab(0.58 0.06 45)",
   },
   {
@@ -64,7 +65,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.exercises",
     copy: "exercises.subtitle",
     icon: YogaIcon,
-    thumbnail: "/images/medical/gentle-movement.svg",
+    thumbnail: "/images/loading ex.jpg",
     tint: "oklab(0.55 0.05 190)",
   },
   {
@@ -73,7 +74,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.nutrition",
     copy: "nutrition.subtitle",
     icon: AppleIcon,
-    thumbnail: "/images/medical/anti-inflammatory-foods.svg",
+    thumbnail: "/images/loading food.jpg",
     tint: "oklab(0.56 0.06 120)",
   },
   {
@@ -82,7 +83,7 @@ const RESOURCES: ResourceCard[] = [
     title: "resources.faq",
     copy: "faq.subtitle",
     icon: BubbleChatQuestionIcon,
-    thumbnail: "/images/medical/pain-pathway.svg",
+    thumbnail: "/images/loading FAQ.jpg",
     tint: "oklab(0.56 0.05 230)",
   },
 ];
@@ -137,14 +138,22 @@ export function ResourcesSection() {
                   as="article"
                   className="surface-crisp hover-lift glow-card group flex h-full flex-col rounded-3xl border-border overflow-hidden"
                 >
-                  <div className="relative aspect-video w-full overflow-hidden">
-                    <Image
-                      src={resource.thumbnail}
-                      alt={t(resource.title)}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+                  <DepthCard
+                    tilt={5}
+                    hover
+                    animateIn={false}
+                    className="mx-4 mt-4"
+                  >
+                    <div className="relative aspect-video w-full overflow-hidden rounded-2xl ring-1 ring-border/50 shadow-lg shadow-foreground/5">
+                      <Image
+                        src={resource.thumbnail}
+                        alt={t(resource.title)}
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    </div>
+                  </DepthCard>
                   <div className="p-6 sm:p-7">
                     <span
                       className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-foreground ring-1 ring-border"

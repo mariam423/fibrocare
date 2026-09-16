@@ -6,12 +6,15 @@ import React, {
   useContext,
   useEffect,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { usePathname } from "next/navigation";
 import { PrivacyKeypad, PrivacySetup } from "./PrivacyKeypad";
-
-const STORAGE_KEY = "fibrocare-privacy-pin";
+import {
+  getPrivacyStatus,
+  removePrivacyPin,
+  setPrivacyPin,
+  verifyPrivacyPin,
+} from "@/app/actions";
 
 /** Routes that must stay accessible before sign-in (no privacy gate). */
 const PUBLIC_AUTH_PATHS = [
@@ -39,116 +42,124 @@ function isPublicAuthPath(pathname: string): boolean {
 export interface PrivacyContextValue {
   /** True while the app content is hidden behind the lock screen. */
   isLocked: boolean;
-  /** True once a PIN has been set up. */
+  /** True once a PIN has been set up (enables the lock). */
   isEnabled: boolean;
-  /** Whether the lock has been configured at all (setup screen shown). */
+  /** True when the PIN+unlock state has been resolved from the server. */
   isConfigured: boolean;
-  /** Re-lock the app immediately. */
+  /** "checking" while the server-backed state is still loading. */
+  status: "checking" | "ready";
+  /** Re-lock the app immediately (client-side; the cookie stays valid). */
   lock: () => void;
-  /** Unlock the app after a valid PIN (used by the lock screen). */
+  /** Mark the app unlocked and remount the app tree so data refetches. */
   unlock: () => void;
-  /** Verify a PIN against the stored hash. */
+  /** Verify a PIN against the server-side bcrypt hash. */
   verifyPin: (pin: string) => Promise<boolean>;
-  /** Set a new PIN (overwrites any existing one). */
-  setPin: (pin: string) => Promise<void>;
+  /** Set a new PIN server-side (overwrites any existing one). */
+  setPin: (pin: string) => Promise<boolean>;
   /** Remove the PIN and disable the lock entirely. */
-  disable: () => Promise<void>;
+  disable: () => Promise<boolean>;
+  /** Incremented on each unlock/setup/disable — remounts the app tree. */
+  mountKey: number;
 }
 
 const PrivacyContext = createContext<PrivacyContextValue | null>(null);
 
-async function sha256(input: string): Promise<string> {
-  if (typeof crypto !== "undefined" && crypto.subtle) {
-    const data = new TextEncoder().encode(`fibrocare::${input}`);
-    const digest = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(digest))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-  // Fallback for non-secure contexts: simple deterministic hash.
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    hash = (hash * 31 + input.charCodeAt(i)) | 0;
-  }
-  return `fallback-${Math.abs(hash)}`;
-}
-
-function readStoredPin(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function subscribeToPinStore(onChange: () => void) {
-  window.addEventListener("fibrocare-pin-change", onChange);
-  return () => window.removeEventListener("fibrocare-pin-change", onChange);
-}
-
+/**
+ * Server-backed privacy lock.
+ *
+ * The PIN and the "unlocked" decision now live on the server:
+ *  - `privacyPinConfigured` / `pinHash` come from the signed-in user's row;
+ *  - unlocking sets an httpOnly, HMAC-signed cookie that client scripts
+ *    cannot read or forge — a stolen session cookie alone no longer
+ *    bypasses the lock;
+ *  - the data server actions refuse to return health data while locked.
+ *
+ * localStorage is no longer the authority; the legacy
+ * `fibrocare-privacy-pin` key (if present from an old session) is ignored.
+ */
 export function PrivacyProvider({ children }: { children: React.ReactNode }) {
-  const storedPin = useSyncExternalStore(
-    subscribeToPinStore,
-    readStoredPin,
-    () => null
-  );
+  const [status, setStatus] = useState<"checking" | "ready">("checking");
+  const [configured, setConfigured] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
+  // Bumping this key remounts the app tree below — on a successful unlock
+  // every page's data actions re-run now that the unlock cookie is valid.
+  const [mountKey, setMountKey] = useState(0);
 
-  const verifyPin = useCallback(
-    async (pin: string) => {
-      if (!storedPin) return false;
-      const hash = await sha256(pin);
-      return hash === storedPin;
-    },
-    [storedPin]
-  );
+  // Resolve the lock state from the server once on mount (per full load).
+  useEffect(() => {
+    let cancelled = false;
+    getPrivacyStatus()
+      .then(({ configured: isOn }) => {
+        if (cancelled) return;
+        setConfigured(isOn);
+        setIsLocked(isOn);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setConfigured(false);
+        setIsLocked(false);
+      })
+      .finally(() => {
+        if (!cancelled) setStatus("ready");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const verifyPin = useCallback(async (pin: string) => {
+    const result = await verifyPrivacyPin(pin);
+    return result.success;
+  }, []);
 
   const setPin = useCallback(async (pin: string) => {
-    const hash = await sha256(pin);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, hash);
-    } catch {
-      // storage unavailable — still unlock for this session
-    }
-    // Force a re-read of the store by bumping a key on window.
-    window.dispatchEvent(new Event("fibrocare-pin-change"));
+    const result = await setPrivacyPin(pin);
+    if (!result.success) return false;
+    setConfigured(true);
     setIsLocked(false);
+    setMountKey((k) => k + 1);
+    return true;
   }, []);
 
   const disable = useCallback(async () => {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
-    window.dispatchEvent(new Event("fibrocare-pin-change"));
+    const result = await removePrivacyPin();
+    if (!result.success) return false;
+    setConfigured(false);
     setIsLocked(false);
+    setMountKey((k) => k + 1);
+    return true;
   }, []);
 
   const lock = useCallback(() => setIsLocked(true), []);
-  const unlock = useCallback(() => setIsLocked(false), []);
+  // unlock() also remounts the tree so freshly-unlocked pages refetch their
+  // data (the actions only succeed once the unlock cookie exists).
+  const unlock = useCallback(() => {
+    setIsLocked(false);
+    setMountKey((k) => k + 1);
+  }, []);
 
   // Re-lock when the tab is hidden (screen / app switch).
   useEffect(() => {
     const onVisibility = () => {
-      if (document.hidden && storedPin) setIsLocked(true);
+      if (document.hidden && configured) setIsLocked(true);
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, [storedPin]);
+  }, [configured]);
 
   return (
     <PrivacyContext.Provider
       value={{
         isLocked,
-        isEnabled: !!storedPin,
-        isConfigured: !!storedPin,
+        isEnabled: configured,
+        isConfigured: configured,
+        status,
         lock,
         unlock,
         verifyPin,
         setPin,
         disable,
+        mountKey,
       }}
     >
       {children}
@@ -166,11 +177,14 @@ export function usePrivacy(): PrivacyContextValue {
 
 /**
  * Gates the app behind the privacy lock. The lock is optional: it only kicks
- * in once a PIN has been configured. Public auth routes (/login, /signup,
- * /forgot-password, /reset-password) are always accessible.
+ * in once a PIN has been configured server-side. Public auth routes (/login,
+ * /signup, /forgot-password, /reset-password) are always accessible.
+ *
+ * While locked (or before the server state resolves) the app content is NOT
+ * rendered at all — no data actions run behind the gate.
  */
 export function PrivacyGate({ children }: { children: React.ReactNode }) {
-  const { isLocked, isConfigured } = usePrivacy();
+  const { isLocked, isConfigured, status, mountKey } = usePrivacy();
   const pathname = usePathname();
 
   if (
@@ -179,6 +193,14 @@ export function PrivacyGate({ children }: { children: React.ReactNode }) {
     isPublicAuthPath(pathname)
   ) {
     return <>{children}</>;
+  }
+
+  if (status === "checking") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+      </div>
+    );
   }
 
   if (!isConfigured) {
@@ -207,5 +229,12 @@ export function PrivacyGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  // Unlocked: render the app content. The keyed, display:contents wrapper
+  // remounts this subtree after an unlock so data actions re-run with the
+  // (now valid) unlock cookie — without adding a layout box.
+  return (
+    <div key={mountKey} className="contents">
+      {children}
+    </div>
+  );
 }

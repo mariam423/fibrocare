@@ -1,14 +1,16 @@
 import { test, expect, type Locator } from "@playwright/test";
-import { unlockPrivatePage } from "./helpers/privacy";
+import { LOCK_DIALOG_TIMEOUT_MS, unlockPrivatePage } from "./helpers/privacy";
 
 /**
  * PIN privacy lock — verifies the lock screen renders its core surfaces and
  * that their text is crisp (no blur filter, full opacity).
  *
- * The app hashes PINs as sha256(`fibrocare::${pin}`) before storing them in
- * localStorage under `fibrocare-privacy-pin` (see PrivacyLock.tsx), so we
- * seed the same value before any app script runs and unlock through the
- * real keypad (the gate re-locks on every full page load).
+ * The PIN now lives server-side: the account's `pinHash` (bcrypt over
+ * `userId:pin`) decides between the first-run setup dialog and the lock
+ * screen, and unlocking issues an httpOnly signed cookie. The helpers below
+ * drive the real keypad, so every assertion reflects the actual server
+ * flow. The account's PIN is always "1234" because the helpers only ever
+ * enter that value.
  */
 
 const LOCK_TITLE = "Your space is locked";
@@ -57,9 +59,6 @@ test.describe("PIN lock screen", () => {
     // Key lock-screen text must be sharp, not blurred/faded by a parent.
     await expectCrispText(title);
     await expectCrispText(page.getByText("Forgot PIN?", { exact: true }));
-    await expectCrispText(
-      page.getByRole("button", { name: "Use Biometrics", exact: true })
-    );
     await expectCrispText(page.getByRole("button", { name: "Digit 1" }));
   });
 
@@ -76,23 +75,49 @@ test.describe("PIN lock screen", () => {
     await expect(page).toHaveURL(/\/forgot-password/, { timeout: 15_000 });
   });
 
-  test("Use Biometrics unlocks the space in headless Chrome", async ({ page }) => {
+  test("the lock cannot be bypassed without the PIN server-side", async ({
+    page,
+  }) => {
     await unlockPrivatePage(page, "/dashboard");
 
     await page.reload({ waitUntil: "domcontentloaded" });
     const title = page.getByRole("heading", { name: LOCK_TITLE });
     await expect(title).toBeVisible();
 
-    // The biometrics action must never sit dead — it unlocks the space and
-    // confirms with a toast (headless Chrome has no platform authenticator,
-    // but the demo path still resolves rather than failing silently).
-    await page
-      .getByRole("button", { name: "Use Biometrics", exact: true })
-      .click();
-    await expect(title).toHaveCount(0, { timeout: 10_000 });
+    // A wrong PIN must leave the space locked (and the gate refuses the
+    // wrong value, not some client-side compare).
+    for (const digit of ["9", "9", "9", "9"]) {
+      await page
+        .getByRole("dialog")
+        .getByRole("button", { name: `Digit ${digit}` })
+        .click();
+    }
     await expect(
-      page.getByText("Biometric authentication successful")
-    ).toBeVisible();
+      page.getByRole("dialog").getByRole("alert"),
+      { timeout: LOCK_DIALOG_TIMEOUT_MS }
+    ).toHaveText("Incorrect PIN. Try again.");
+    await expect(title).toBeVisible({ timeout: 10_000 });
+
+    // Headless Chromium has no platform authenticator and no registered
+    // credential, so the app must NOT offer a biometric shortcut that a
+    // script could press without an OS check. ("Lock Now" is reachable on
+    // the profile page; here we assert the escape hatch is simply absent.)
+    await expect(
+      page.getByRole("button", { name: "Use Biometrics" })
+    ).toHaveCount(0);
+
+    // The real PIN unlocks.
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Digit 1" })
+      .click();
+    for (const digit of ["2", "3", "4"]) {
+      await page
+        .getByRole("dialog")
+        .getByRole("button", { name: `Digit ${digit}` })
+        .click();
+    }
+    await expect(title).toHaveCount(0, { timeout: LOCK_DIALOG_TIMEOUT_MS });
   });
 });
 

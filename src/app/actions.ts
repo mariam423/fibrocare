@@ -23,6 +23,18 @@ import {
   decryptLogNotes,
   encryptSensitiveData,
 } from "@/lib/security/atRest";
+import {
+  getClientIp,
+  hashPin,
+  isActionLocked,
+  isPrivacyUnlocked,
+  isValidPinFormat,
+  issuePrivacyUnlock,
+  PIN_LOCKOUT_MS,
+  PIN_MAX_FAILED_ATTEMPTS,
+  revokePrivacyUnlock,
+  verifyPinHash,
+} from "@/lib/security/privacyPin";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -80,12 +92,19 @@ export async function registerUser(input: {
     };
   }
 
+  // Hash BEFORE the existence lookup: signup must not leak whether an
+  // email is already registered via response text OR timing (a fresh
+  // 10-round bcrypt here keeps known/unknown emails indistinguishable).
+  const passwordHash = await bcrypt.hash(password, 10);
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { success: false, error: "An account with this email already exists." };
+    // Generic message — never "that account already exists".
+    return {
+      success: false,
+      error: "We couldn't create your account. Please try again.",
+    };
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
     data: { name, email, passwordHash, signupRole },
   });
@@ -101,9 +120,24 @@ export async function requestPasswordReset(
     return { success: false, error: "Please enter a valid email address." };
   }
 
+  // Rate-limit the recovery entry point: per-IP (10/15min, anti-mass-
+  // probe) and per-email (5/15min, anti-annoyance). On exhaustion we
+  // return the generic success so the limit itself never reveals which
+  // emails exist.
+  const clientIp = await getClientIp();
+  const [ipLimit, emailLimit] = await Promise.all([
+    checkRateLimitDistributed(`reset-ip:${clientIp}`, 10, 15 * 60 * 1000),
+    checkRateLimitDistributed(`reset-email:${email}`, 5, 15 * 60 * 1000),
+  ]);
+  if (!ipLimit.ok || !emailLimit.ok) {
+    return { success: true };
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    // Generic response: do not reveal whether the account exists.
+    // Generic response + a dummy bcrypt pass so unknown and known emails
+    // cost the same: no existence/timing oracle.
+    await bcrypt.hash("reset-timing-equalizer", 10);
     return { success: true };
   }
 
@@ -160,6 +194,18 @@ export async function resetPassword(
     };
   }
 
+  // Per-IP cap on reset CONSUMPTION so a leaked link can't be drawn on
+  // repeatedly (returns the same generic error on exhaustion).
+  const clientIp = await getClientIp();
+  const { ok: ipOk } = await checkRateLimitDistributed(
+    `reset-consume-ip:${clientIp}`,
+    10,
+    15 * 60 * 1000
+  );
+  if (!ipOk) {
+    return { success: false, error: "This reset link is invalid or has expired. Please request a new one." };
+  }
+
   // Look up by the same SHA-256 hash used at creation time.
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   const resetToken = await prisma.passwordResetToken.findUnique({
@@ -197,13 +243,209 @@ async function getSessionUser() {
   return prisma.user.findUnique({ where: { id: session.user.id } });
 }
 
+/** Client-safe view of the user — NEVER includes passwordHash/pinHash. */
+function toSafeUser(user: NonNullable<Awaited<ReturnType<typeof getSessionUser>>>) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    signupRole: user.signupRole,
+    hydrationCount: user.hydrationCount,
+    createdAt: user.createdAt,
+    privacyPinConfigured: user.pinHash !== null,
+  };
+}
+
 export async function getCurrentUser() {
   try {
-    return await getSessionUser();
+    const user = await getSessionUser();
+    if (!user) return null;
+    return toSafeUser(user);
   } catch (error) {
     console.error("Error getting current user:", error);
     return null;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Privacy PIN (app lock)                                              */
+/* ------------------------------------------------------------------ */
+
+export type PrivacyPinResult =
+  | { success: true }
+  | { success: false; error: string; retryAfter?: number };
+
+const PIN_MANAGE_LIMIT = 5;
+const PIN_MANAGE_WINDOW_MS = 15 * 60 * 1000;
+
+/** Whether the signed-in user has configured the app lock. */
+export async function getPrivacyStatus(): Promise<{ configured: boolean }> {
+  const user = await getSessionUser();
+  return { configured: !!user?.pinHash };
+}
+
+/**
+ * Create or change the privacy PIN. First-time setup (no existing PIN on
+ * the account) may happen from the setup dialog without an unlock cookie;
+ * changing an EXISTING PIN requires the session to be currently unlocked
+ * (the profile card is only reachable once unlocked). Sets a signed unlock
+ * cookie on success so the user is not relocked immediately after.
+ */
+export async function setPrivacyPin(pin: string): Promise<PrivacyPinResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "You must be signed in." };
+  }
+  const pinValue = String(pin ?? "");
+  if (!isValidPinFormat(pinValue)) {
+    return { success: false, error: "Your PIN must be exactly 4 digits." };
+  }
+
+  const clientIp = await getClientIp();
+  const [{ ok: ipOk }, { ok: userOk }] = await Promise.all([
+    checkRateLimitDistributed(`privacy-pin-set-ip:${clientIp}`, PIN_MANAGE_LIMIT, PIN_MANAGE_WINDOW_MS),
+    checkRateLimitDistributed(`privacy-pin-set:${user.id}`, PIN_MANAGE_LIMIT, PIN_MANAGE_WINDOW_MS),
+  ]);
+  if (!ipOk || !userOk) {
+    return { success: false, error: "Too many PIN changes — try again in a few minutes." };
+  }
+
+  // Changing an existing PIN still demands the current lock is open.
+  if (user.pinHash && !(await isPrivacyUnlocked(user.id))) {
+    return { success: false, error: "Unlock FibroCare before changing your PIN." };
+  }
+
+  const pinHash = await hashPin(pinValue, user.id);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { pinHash },
+  });
+  await issuePrivacyUnlock(user.id);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  return { success: true };
+}
+
+/**
+ * Verify the PIN against the server-side bcrypt hash and, on success,
+ * issue the signed unlock cookie.
+ *
+ * Only WRONG attempts are counted (per user, in the database): a legitimate
+ * re-lock on a new tab or after switching apps never trips the limit. After
+ * PIN_MAX_FAILED_ATTEMPTS consecutive failures the account is blocked for
+ * PIN_LOCKOUT_MS. The counter clears on the next successful unlock.
+ */
+export async function verifyPrivacyPin(pin: string): Promise<PrivacyPinResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "You must be signed in." };
+  }
+  const pinValue = String(pin ?? "");
+
+  if (!user.pinHash) {
+    return { success: false, error: "No PIN is set on this account." };
+  }
+
+  if (user.pinLockedUntil && user.pinLockedUntil.getTime() > Date.now()) {
+    return {
+      success: false,
+      error: "Too many attempts — try again in a moment.",
+      retryAfter: Math.max(
+        1,
+        Math.ceil((user.pinLockedUntil.getTime() - Date.now()) / 1000)
+      ),
+    };
+  }
+
+  const valid = await verifyPinHash(pinValue, user.id, user.pinHash);
+  if (!valid) {
+    const attempts = user.pinFailedAttempts + 1;
+    const locked = attempts >= PIN_MAX_FAILED_ATTEMPTS;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        pinFailedAttempts: locked ? 0 : attempts,
+        pinLockedUntil: locked ? new Date(Date.now() + PIN_LOCKOUT_MS) : null,
+      },
+    });
+    return {
+      success: false,
+      error: locked
+        ? "Too many attempts — try again in a moment."
+        : "Incorrect PIN. Please try again.",
+      retryAfter: locked ? PIN_LOCKOUT_MS / 1000 : undefined,
+    };
+  }
+
+  // Successful unlock clears any accumulated failures / lockout.
+  if (user.pinFailedAttempts !== 0 || user.pinLockedUntil) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { pinFailedAttempts: 0, pinLockedUntil: null },
+    });
+  }
+
+  await issuePrivacyUnlock(user.id);
+  revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  return { success: true };
+}
+
+/**
+ * Disable the lock entirely. Only allowed while the current lock is already
+ * open (a valid unlock cookie) — someone holding a bare session cookie cannot
+ * silently remove the PIN.
+ */
+export async function removePrivacyPin(): Promise<PrivacyPinResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "You must be signed in." };
+  }
+  if (await isActionLocked(user)) {
+    return { success: false, error: "Unlock FibroCare before disabling the PIN." };
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { pinHash: null },
+  });
+  await revokePrivacyUnlock();
+
+  revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  return { success: true };
+}
+
+/**
+ * Unlock after an OS-level biometric verification. The platform
+ * authenticator (Touch ID / Windows Hello / Face ID) already confirmed the
+ * human; this action only records that fact server-side with the same
+ * signed cookie, capped so it cannot be hammered.
+ */
+export async function biometricUnlock(): Promise<PrivacyPinResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "You must be signed in." };
+  }
+  if (!user.pinHash) {
+    return { success: false, error: "No PIN is set on this account." };
+  }
+
+  const clientIp = await getClientIp();
+  const [{ ok: ipOk }, { ok: userOk }] = await Promise.all([
+    checkRateLimitDistributed(`privacy-pin-bio-ip:${clientIp}`, 20, 5 * 60 * 1000),
+    checkRateLimitDistributed(`privacy-pin-bio:${user.id}`, 20, 5 * 60 * 1000),
+  ]);
+  if (!ipOk || !userOk) {
+    return { success: false, error: "Too many unlock attempts — try again in a moment." };
+  }
+
+  await issuePrivacyUnlock(user.id);
+  revalidatePath("/dashboard");
+  revalidatePath("/profile");
+  return { success: true };
 }
 
 export async function updateUserName(newName: string) {
@@ -211,6 +453,9 @@ export async function updateUserName(newName: string) {
     const user = await getSessionUser();
     if (!user) {
       return { success: false, error: "You must be signed in." };
+    }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to update your profile." };
     }
 
     // Bound free-text input before it reaches the database (XSS-safe at
@@ -249,6 +494,9 @@ export async function savePainLog(
     const user = await getSessionUser();
     if (!user) {
       return { success: false, error: "You must be signed in." };
+    }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to save your log." };
     }
 
     const finalPainLevel = Number.isInteger(painLevel)
@@ -309,6 +557,9 @@ export async function updateUserProfile(name: string, email: string) {
     if (!user) {
       return { success: false, error: "You must be signed in." };
     }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to update your profile." };
+    }
 
     const safeName = String(name ?? "").trim();
     const safeEmail = String(email ?? "").trim().toLowerCase();
@@ -344,6 +595,9 @@ export async function updateHydration(amount: number) {
     if (!user) {
       return { success: false, error: "You must be signed in." };
     }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to track hydration." };
+    }
 
     // Validate the increment: integers only, bounded per call, and the
     // counter can never go below zero (the UI only sends ±1).
@@ -354,7 +608,10 @@ export async function updateHydration(amount: number) {
       where: { id: user.id },
       data: {
         hydrationCount: next
-      }
+      },
+      // Explicit projection: the full row (incl. passwordHash) is never
+      // serialized back to the client.
+      select: { id: true, hydrationCount: true },
     });
 
     revalidatePath("/dashboard");
@@ -369,6 +626,7 @@ export async function getWeeklyPainTrend() {
   try {
     const user = await getSessionUser();
     if (!user) return [];
+    if (await isActionLocked(user)) return [];
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
@@ -408,6 +666,7 @@ export async function getAllHealthLogs() {
   try {
     const user = await getSessionUser();
     if (!user) return [];
+    if (await isActionLocked(user)) return [];
 
     const logs = await prisma.painLog.findMany({
       where: { userId: user.id },
@@ -432,6 +691,9 @@ export async function deletePainLog(id: string) {
     if (!log || log.userId !== user.id) {
       return { success: false, error: "Log entry not found." };
     }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to delete logs." };
+    }
 
     await prisma.painLog.delete({
       where: { id },
@@ -449,6 +711,7 @@ export async function getLatestLogs() {
   try {
     const user = await getSessionUser();
     if (!user) return [];
+    if (await isActionLocked(user)) return [];
 
     const logs = await prisma.painLog.findMany({
       where: { userId: user.id },
@@ -469,6 +732,7 @@ export async function getDashboardInsights() {
   try {
     const user = await getSessionUser();
     if (!user) return [];
+    if (await isActionLocked(user)) return [];
 
     const insights = await analyzeHealthPatterns(user.id, 30);
     return insights;
@@ -482,6 +746,7 @@ export async function getReportData() {
   try {
     const user = await getSessionUser();
     if (!user) return null;
+    if (await isActionLocked(user)) return null;
 
     const [logs, insights, topSymptoms] = await Promise.all([
       prisma.painLog.findMany({
@@ -517,6 +782,7 @@ export async function getSymptomsForDate(date: string) {
   try {
     const user = await getSessionUser();
     if (!user) return [];
+    if (await isActionLocked(user)) return [];
 
     const entries = await prisma.symptomLog.findMany({
       where: { userId: user.id, date },
@@ -533,6 +799,9 @@ export async function toggleSymptom(symptom: string, date: string, active: boole
     const user = await getSessionUser();
     if (!user) {
       return { success: false, error: "You must be signed in." };
+    }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to update symptoms." };
     }
 
     // Free-text input bound before it reaches the database.
@@ -611,6 +880,9 @@ export async function generateMedicalSummary(): Promise<
     if (!user) {
       return { success: false, error: "You must be signed in." };
     }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to build your summary." };
+    }
 
     evictSummaryCache();
     const cacheKey = `medical-summary:${user.id}`;
@@ -667,6 +939,7 @@ export async function getStreak() {
   try {
     const user = await getSessionUser();
     if (!user) return 0;
+    if (await isActionLocked(user)) return 0;
 
     const logs = await prisma.painLog.findMany({
       where: { userId: user.id },

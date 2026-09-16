@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { unlockPrivatePage } from "./helpers/privacy";
 
 /**
  * LIVE AI chat verification — real provider, no mocks.
@@ -22,25 +23,7 @@ async function openCompanion(
   page: import("@playwright/test").Page,
   target = "/dashboard"
 ) {
-  // PrivacyLock stores only a SHA-256 digest in localStorage. Seed the same
-  // known test PIN ("1234") in each isolated context, then unlock through
-  // the real keypad because every new context intentionally starts locked.
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      "fibrocare-privacy-pin",
-      "208afe2b4d6e78c8377d28a9ef6d8f3905268c53e19ff9f8c99a6b00d73fd1b2"
-    );
-  });
-  await page.goto(target, { waitUntil: "domcontentloaded" });
-
-  const lockDialog = page.getByRole("dialog", {
-    name: "Enter your PIN to unlock FibroCare",
-  });
-  await expect(lockDialog).toBeVisible({ timeout: 20_000 });
-  for (const digit of ["1", "2", "3", "4"]) {
-    await lockDialog.getByRole("button", { name: `Digit ${digit}` }).click();
-  }
-  await expect(lockDialog).toHaveCount(0, { timeout: 10_000 });
+  await unlockPrivatePage(page, target);
 
   await page.getByRole("button", { name: "Open AI Care Companion" }).click();
   const dialog = page.getByRole("dialog");

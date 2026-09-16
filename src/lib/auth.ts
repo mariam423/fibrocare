@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimitDistributed } from "@/lib/ai/ratelimit";
+import { getClientIp } from "@/lib/security/clientIp";
 
 /**
  * Attempt cap for the credentials provider.
@@ -109,6 +110,19 @@ export const authOptions: NextAuthOptions = {
           console.warn(
             `[auth] login attempts exhausted for an account · window=${LOGIN_WINDOW_MS / 60000}m`
           );
+          return null;
+        }
+
+        // Per-IP budget on top of the per-account cap: an attacker spraying
+        // many different accounts from one address is bounded even though
+        // each individual account stays under its own threshold.
+        const clientIp = await getClientIp();
+        const { ok: ipBudgetOk } = await checkRateLimitDistributed(
+          `login-ip:${clientIp}`,
+          LOGIN_MAX_ATTEMPTS * 3,
+          LOGIN_WINDOW_MS
+        );
+        if (!ipBudgetOk) {
           return null;
         }
 

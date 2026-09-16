@@ -24,6 +24,11 @@ model User {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @default(now()) @updatedAt
   passwordHash         String?
+  pinHash              String?
+  /// Consecutive wrong-PIN attempts since the last successful unlock.
+  pinFailedAttempts    Int                   @default(0)
+  /// When set and in the future, PIN entry is temporarily blocked.
+  pinLockedUntil       DateTime?
   logs                 PainLog[]
   resetTokens          PasswordResetToken[]
   sessions             Session[]

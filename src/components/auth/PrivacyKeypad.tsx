@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   LockIcon,
@@ -11,6 +10,12 @@ import {
 } from "@hugeicons/core-free-icons";
 import { usePrivacy } from "./PrivacyLock";
 import { useLanguage } from "@/context/LanguageContext";
+import { biometricUnlock } from "@/app/actions";
+import {
+  hasBiometricCredential,
+  isBiometricSupported,
+  unlockWithBiometric,
+} from "@/lib/biometrics";
 
 const PIN_LENGTH = 4;
 
@@ -110,7 +115,29 @@ export function PrivacyKeypad() {
   const { t } = useLanguage();
   const [digits, setDigits] = useState("");
   const [error, setError] = useState(false);
+  const [bioAvailable, setBioAvailable] = useState(false);
+  const [bioBusy, setBioBusy] = useState(false);
   const announceRef = useRef<HTMLParagraphElement>(null);
+
+  // Only offer biometrics when the platform authenticator really is
+  // available (and a credential has been registered) — never in headless
+  // browsers, where this button used to just toast "success" without any
+  // actual check.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const supported = await isBiometricSupported();
+        if (cancelled) return;
+        setBioAvailable(supported && hasBiometricCredential());
+      } catch {
+        if (!cancelled) setBioAvailable(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const press = (value: string) => {
     setError(false);
@@ -141,9 +168,39 @@ export function PrivacyKeypad() {
     router.push("/forgot-password");
   };
 
-  const handleBiometrics = () => {
-    toast.success("Biometric authentication successful");
-    unlock();
+  const handleBiometrics = async () => {
+    if (bioBusy) return;
+    setBioBusy(true);
+    try {
+      // Real OS-level verification (Touch ID / Windows Hello / Face ID).
+      const authenticated = await unlockWithBiometric();
+      if (!authenticated) {
+        setError(true);
+        if (announceRef.current) {
+          announceRef.current.textContent = t("privacy.biometricFailed");
+        }
+        return;
+      }
+      // The browser just proved the human; record the unlock server-side
+      // (rate-limited) so the cookie is issued with the same ceremony as
+      // a PIN entry.
+      const result = await biometricUnlock();
+      if (result.success) {
+        unlock();
+      } else {
+        setError(true);
+        if (announceRef.current) {
+          announceRef.current.textContent = result.error;
+        }
+      }
+    } catch {
+      setError(true);
+      if (announceRef.current) {
+        announceRef.current.textContent = t("privacy.biometricFailed");
+      }
+    } finally {
+      setBioBusy(false);
+    }
   };
 
   useEffect(() => {
@@ -273,11 +330,14 @@ export function PrivacyKeypad() {
         >
           {t("privacy.forgotPin")}
         </button>
-        <span className="h-1 w-1 rounded-full bg-border" />
-        <button
-          type="button"
-          onClick={handleBiometrics}
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-150 underline-offset-2 hover:underline cursor-pointer"
+        {bioAvailable && (
+          <>
+            <span className="h-1 w-1 rounded-full bg-border" />
+            <button
+              type="button"
+              onClick={handleBiometrics}
+              disabled={bioBusy}
+              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-150 underline-offset-2 hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
@@ -292,6 +352,8 @@ export function PrivacyKeypad() {
           </svg>
           {t("privacy.useBiometrics")}
         </button>
+          </>
+        )}
       </motion.div>
     </motion.div>
   );

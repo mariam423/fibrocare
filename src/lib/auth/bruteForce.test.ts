@@ -87,11 +87,18 @@ describe("credentials authorize: brute-force gate", () => {
     vi.restoreAllMocks();
   });
 
-  it("consumes a limiter slot keyed by the lowercased email", async () => {
+  it("consumes a limiter slot keyed by the lowercased email, then a per-IP slot", async () => {
     await authorize({ email: "  VICTIM@Example.COM ", password: "pw" });
 
     expect(mockedLimiter).toHaveBeenCalledWith(
       `login:${email}`,
+      expect.any(Number),
+      expect.any(Number)
+    );
+    // Outside a request scope (unit tests) getClientIp() degrades to
+    // "unknown" — the per-IP budget still keyed deterministically.
+    expect(mockedLimiter).toHaveBeenLastCalledWith(
+      "login-ip:unknown",
       expect.any(Number),
       expect.any(Number)
     );
@@ -121,11 +128,12 @@ describe("credentials authorize: brute-force gate", () => {
 
   it("exhausts the budget after the configured attempt cap", async () => {
     // Drive 10 attempts through the gate, then the 11th must be locked out.
+    // Each attempt consumes TWO slots now: `login:<email>` then `login-ip:<ip>`.
     mockedCompare.mockResolvedValue(false); // wrong password — still consumes a slot
     for (let i = 0; i < 10; i++) {
       await authorize({ email, password: "wrong" });
     }
-    expect(mockedLimiter).toHaveBeenCalledTimes(10);
+    expect(mockedLimiter).toHaveBeenCalledTimes(20);
 
     mockedLimiter.mockResolvedValue({
       ok: false,

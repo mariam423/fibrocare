@@ -131,11 +131,19 @@ export async function requestPasswordReset(
     console.log(`[auth] Password reset requested for ${email}`);
   }
 
-  // In non-production the link is returned so the flow can be tested
-  // end-to-end without an email provider. Production must send it by email.
-  return process.env.NODE_ENV === "production"
-    ? { success: true }
-    : { success: true, resetLink };
+  // The reset link is returned to the client ONLY when the flow is
+  // explicitly in no-email dev mode: non-production AND SHOW_RESET_LINK
+  // opted in (default on for dev convenience, off whenever the var is
+  // set to "false"/"0"). Production NEVER returns the link — it must be
+  // delivered by email. The explicit flag keeps a preview/RC deployment
+  // (NODE_ENV=production with no mail provider) from exposing bearer
+  // reset tokens to anyone who can open the forgot-password page.
+  const devLinkEnabled =
+    process.env.NODE_ENV !== "production" &&
+    !/^(false|0)$/i.test((process.env.SHOW_RESET_LINK ?? "").trim());
+  return devLinkEnabled
+    ? { success: true, resetLink }
+    : { success: true };
 }
 
 export async function resetPassword(

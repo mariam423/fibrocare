@@ -26,7 +26,7 @@ import {
   doctorResponseDraftSchema,
   symptomStructureSchema,
 } from "@/lib/ai/doctor-schemas";
-import { sanitizeUserText } from "@/lib/security/sanitizer";
+import { sanitizeUserText, sanitizeUrl } from "@/lib/security/sanitizer";
 import {
   symptomIntakeSchema,
   symptomSubmissionSchema,
@@ -156,6 +156,15 @@ export async function createDoctorPost(rawInput: DoctorPostInput & { mediaUrls?:
       return { success: false as const, error: "Content must be at least 20 characters." };
     }
 
+    // Media URLs are rendered as <img src> in the feed — only absolute
+    // http(s) URLs survive `sanitizeUrl`, so `javascript:`/`data:` payloads
+    // can never be persisted and later injected into the DOM.
+    const mediaUrls = (Array.isArray(rawInput.mediaUrls) ? rawInput.mediaUrls : [])
+      .filter((url): url is string => typeof url === "string")
+      .map((url) => sanitizeUrl(url))
+      .filter((url): url is string => Boolean(url))
+      .slice(0, 6);
+
     const post = await prisma.doctorPost.create({
       data: {
         title,
@@ -164,7 +173,7 @@ export async function createDoctorPost(rawInput: DoctorPostInput & { mediaUrls?:
         kind: parsed.data.kind,
         authorId: auth.user.id,
         verifiedStatus: "pending",
-        mediaUrls: rawInput.mediaUrls ?? [],
+        mediaUrls,
       },
     });
 

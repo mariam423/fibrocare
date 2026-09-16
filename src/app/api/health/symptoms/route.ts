@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SymptomLogSchema } from "@/lib/validations/health";
+import { sanitizeUserText } from "@/lib/security/sanitizer";
 import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
@@ -15,11 +16,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = SymptomLogSchema.parse(body);
 
+    // Sanitize the user-visible symptom label (same layer as pain-log
+    // symptoms) and clamp to the schema ceiling after cleaning.
+    const symptom = sanitizeUserText(validatedData.symptom, { maxLength: 120 });
+    if (symptom.length < 3) {
+      return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+    }
+
     const symptomLog = await prisma.symptomLog.upsert({
       where: {
         userId_symptom_date: {
           userId: session.user.id,
-          symptom: validatedData.symptom,
+          symptom,
           date: validatedData.date,
         },
       },
@@ -30,7 +38,7 @@ export async function POST(req: NextRequest) {
       },
       create: {
         userId: session.user.id,
-        symptom: validatedData.symptom,
+        symptom,
         date: validatedData.date,
         severity: validatedData.severity,
         category: validatedData.category,

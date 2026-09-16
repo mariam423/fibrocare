@@ -7,7 +7,7 @@ import {
   DOCTOR_POST_KINDS,
   type DoctorPostKind,
 } from "@/lib/validations/doctorPosts";
-import { sanitizeUserText, looksMalicious } from "@/lib/security/sanitizer";
+import { sanitizeUserText, sanitizeUrl, looksMalicious } from "@/lib/security/sanitizer";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
@@ -36,20 +36,49 @@ export const dynamic = "force-dynamic";
  *    session-derived author id.
  */
 
+/**
+ * Explicit cross-origin allowlist for the Origin CSRF check.
+ *
+ * The `host`-match fallback below already covers same-origin browser
+ * requests (including Vercel's production/preview domains, where Origin
+ * host === request host), so this Set is only for deployments where a
+ * custom domain fronts the app but the Origin header differs from the
+ * request host (proxies that rewrite Host). Configure via:
+ *  - NEXTAUTH_URL   — the canonical auth origin (also used by NextAuth)
+ *  - APP_ORIGIN    — an extra allowed origin, e.g. a redirect target domain
+ *  - NEXT_PUBLIC_SITE_URL — the public site origin (metadata + OG URLs)
+ *
+ * Empty entries are skipped so a half-configured env never allowlists an
+ * empty-string origin.
+ */
 const ALLOWED_ORIGINS = new Set(
-  (process.env.NEXTAUTH_URL ? [process.env.NEXTAUTH_URL] : []).concat(
-    process.env.APP_ORIGIN ? [process.env.APP_ORIGIN] : []
-  )
+  [process.env.NEXTAUTH_URL, process.env.APP_ORIGIN, process.env.NEXT_PUBLIC_SITE_URL]
+    .filter((o): o is string => Boolean(o && o.trim()))
+    .map((o) => {
+      try {
+        // Normalize to scheme+host so trailing slashes/paths never cause
+        // a false rejection (and never let a path smuggle an origin).
+        const u = new URL(o.trim());
+        return `${u.protocol}//${u.host}`;
+      } catch {
+        return "";
+      }
+    })
+    .filter(Boolean)
 );
 
 function sameOrigin(request: Request): boolean {
   const origin = request.headers.get("origin");
   // No Origin header → not a browser form/fetch cross-site request.
   if (!origin) return true;
-  if (ALLOWED_ORIGINS.size > 0 && ALLOWED_ORIGINS.has(origin)) return true;
   try {
+    // Normalize the request origin to scheme+host (matches the allowlist
+    // format) — paths on the Origin header must never win a match.
+    const u = new URL(origin);
+    const normalized = `${u.protocol}//${u.host}`;
+    if (ALLOWED_ORIGINS.has(normalized)) return true;
     const host = request.headers.get("host");
-    return Boolean(host) && new URL(origin).host === host;
+    return Boolean(host) && u.host === host;
   } catch {
     return false;
   }
@@ -171,6 +200,18 @@ export async function POST(request: Request) {
     return Response.json({ error: "Post rejected." }, { status: 400 });
   }
 
+  // Media URLs are rendered as <img src> in the feed — only absolute
+  // http(s) URLs survive `sanitizeUrl`, so `javascript:`/`data:` payloads
+  // can never be persisted and later injected into the DOM.
+  const rawMediaUrls = Array.isArray((body as { mediaUrls?: unknown }).mediaUrls)
+    ? ((body as { mediaUrls: unknown[] }).mediaUrls)
+    : [];
+  const mediaUrls = rawMediaUrls
+    .filter((url): url is string => typeof url === "string")
+    .map((url) => sanitizeUrl(url))
+    .filter((url): url is string => Boolean(url))
+    .slice(0, 6);
+
   const post = await prisma.doctorPost.create({
     data: {
       title,
@@ -179,6 +220,7 @@ export async function POST(request: Request) {
       kind: parsed.data.kind,
       authorId: session.user.id,
       verifiedStatus: "pending",
+      mediaUrls,
     },
   });
 

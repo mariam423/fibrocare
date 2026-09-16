@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CycleLogSchema } from "@/lib/validations/health";
+import { sanitizeUserText } from "@/lib/security/sanitizer";
 import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
@@ -15,6 +16,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = CycleLogSchema.parse(body);
 
+    // Same sanitization layer every other persisted free-text path uses:
+    // strips HTML/script/URL-scheme payloads and bounds length (defense in
+    // depth on top of the Zod cap — React escaping handles render-time XSS,
+    // this keeps stored content clean for exports/AI context).
+    const notes = validatedData.notes
+      ? sanitizeUserText(validatedData.notes, { maxLength: 2000, collapseWhitespace: false })
+      : undefined;
+
     const cycle = await prisma.menstrualCycle.create({
       data: {
         userId: session.user.id,
@@ -22,7 +31,7 @@ export async function POST(req: NextRequest) {
         endDate: validatedData.endDate,
         phase: validatedData.phase,
         overallSeverity: validatedData.overallSeverity,
-        notes: validatedData.notes,
+        notes,
       },
     });
 

@@ -121,6 +121,7 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 ### 🧪 Quality & Testing
 - **Comprehensive Test Suites** — 993 Vitest unit tests across 106 files, plus Playwright end-to-end tests covering auth flows, API routes, and UI interactions.
 - **Accessibility Auditing** — automated a11y CSS guards in CI, reduced-motion support, and contrast-sensitive design modes.
+- **Automated Security Enforcement** — secret-pattern scan + `npm audit` gate on every PR and push, a scheduled weekly audit run, and Dependabot update PRs; see the full cadence in [`docs/SECURITY-2026-09.md → Ongoing enforcement`](./docs/SECURITY-2026-09.md#ongoing-enforcement).
 
 ---
 

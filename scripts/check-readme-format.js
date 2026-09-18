@@ -75,11 +75,38 @@ while ((m = linkRe.exec(md)) !== null) {
 }
 
 /* ── 3. Local link targets exist ───────────────────────────────────────── */
+// Links may carry a #fragment (e.g. ./docs/X.md#section): only the path
+// part is checked against disk, and — when the target is a local markdown
+// file with its own heading anchors — the fragment is validated against
+// that file's github-slugger slugs. Cross-file anchor links are the
+// classic silent breakage: the path exists, the fragment doesn't.
 const mdLinkRe = /\[[^\]]+\]\((?!#|http)([^)]+)\)/g;
 while ((m = mdLinkRe.exec(md)) !== null) {
-  const p = decodeURIComponent(m[1].split(" ")[0]);
+  const raw = m[1].split(" ")[0];
+  const hashIdx = raw.indexOf("#");
+  const p = decodeURIComponent(hashIdx === -1 ? raw : raw.slice(0, hashIdx));
   if (!fs.existsSync(p)) {
     issues.push(`LINK missing on disk: "${m[1]}"`);
+    continue;
+  }
+  if (hashIdx === -1 || !/\.mdx?$/i.test(p)) {
+    okCount++;
+    continue;
+  }
+  const frag = decodeURIComponent(raw.slice(hashIdx + 1));
+  const target = fs.readFileSync(p, "utf8");
+  const targetSlugger = new GithubSlugger();
+  const targetFragments = new Set();
+  const targetHeadingRe = /^(#{1,6})\s+(.+?)\s*#*$/gm;
+  const th = {};
+  while ((th.m = targetHeadingRe.exec(target)) !== null) {
+    const slug = targetSlugger.slug(
+      th.m[2].replace(/`([^`]*)`/g, "$1").replace(/[*_~]/g, "")
+    );
+    targetFragments.add(slug);
+  }
+  if (!targetFragments.has(frag)) {
+    issues.push(`ANCHOR cross-file broken: "${raw}" (no heading in ${p} generates #${frag})`);
   } else {
     okCount++;
   }

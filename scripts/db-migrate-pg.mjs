@@ -77,15 +77,18 @@ function loadEnvFile(path) {
 loadEnvFile(resolve(ROOT, ".env.production"));
 
 const required = ["DATABASE_URL", "DIRECT_URL"];
-for (const k of required) {
-  if (process.env[k] === undefined || process.env[k] === "") {
+for (const k of required) {    if (process.env[k] === undefined || process.env[k] === "") {
     // Dependabot branches deliberately run without repository secrets:
-    // GitHub withholds them on dependabot/* PRs. A bump build must still
-    // prove the app compiles, so degrade to a no-op instead of failing —
-    // `next build` itself never opens a database connection.
+    // GitHub withholds them on dependabot/* PRs (the values arrive as
+    // empty strings), so a bump build must still prove the app compiles
+    // — degrade to a no-op instead of failing. `next build` itself never
+    // opens a database connection; only this migrate step does.
+    // GITHUB_HEAD_REF is the sole signal: NEXT_PHASE is NOT yet set when
+    // the build script's migrate pre-step runs (it's exported by
+    // `next build` itself, which starts after this exits).
     const isDependabotBuild =
       process.env.GITHUB_HEAD_REF?.startsWith("dependabot/") ?? false;
-    if (isDependabotBuild && process.env.NEXT_PHASE === "phase-production-build") {
+    if (isDependabotBuild) {
       console.log(
         `[db-migrate-pg] ${k} not available on a Dependabot branch — skipping migrations (no DB access by design).`
       );

@@ -68,11 +68,14 @@ jobs:
       # Minimal footprint: install only github-slugger instead of the full
       # dependency tree (~30s job vs a multi-minute install). The version is
       # read from devDependencies in package.json, so CI and local runs of
-      # the checker can't drift apart.
+      # the checker can't drift apart. NOTE: no --omit=dev here — slugger IS
+      # a devDependency, and an --omit=dev install refuses to place it in
+      # node_modules even when named explicitly (the structural check then
+      # dies with "Cannot find module 'github-slugger'").
       - name: Install github-slugger (version pinned by package.json)
         run: |
           VERSION=$(node -p "require('./package.json').devDependencies['github-slugger']")
-          npm install --no-save --omit=dev "github-slugger@$VERSION"
+          npm install --no-save "github-slugger@$VERSION"
 
       - name: Structural check (anchors, paths, HTML, tables)
         run: |

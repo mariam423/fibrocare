@@ -142,16 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: validate
-    # The deploy step requires the SWA deployment token. Until
-    # AZURE_STATIC_WEB_APPS_API_TOKEN exists as a repository secret (create
-    # the Static Web App in the Azure portal → Manage deployment token →
-    # add the secret), this job would always fail with "deployment_token
-    # was not provided". Skipping keeps the CI signal clean: the validate
-    # gate above is what proves every commit, and the job self-heals to a
-    # real deploy the moment the token secret is added.
-    if: >-
-      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
-      secrets.AZURE_STATIC_WEB_APPS_API_TOKEN != ''
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     steps:
       - uses: actions/checkout@v7
 
@@ -160,10 +151,29 @@ jobs:
           node-version: 22
           cache: npm
 
-      # Same reasoning as the gate: the SWA CLI's `npm install` triggers the
-      # Prisma postinstall, which needs DATABASE_URL present in the workspace.
-      # Postgres (L-1) requires DIRECT_URL too, so both come from secrets.
+      # The deploy action requires the SWA deployment token. Until
+      # AZURE_STATIC_WEB_APPS_API_TOKEN exists as a repository secret (create
+      # the Static Web App in the Azure portal → Manage deployment token →
+      # add the secret), the whole job would always fail with
+      # "deployment_token was not provided". The secrets context is not
+      # available in job-level `if:` (that made the whole workflow a startup
+      # failure), so the check lives in this first step and no-ops the job
+      # when the token is absent. The job self-heals to a real deploy the
+      # moment the secret is added.
+      - name: Guard — SWA deployment token configured?
+        id: token
+        env:
+          AZURE_STATIC_WEB_APPS_API_TOKEN: "${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}"
+        run: |
+          if [ -z "$AZURE_STATIC_WEB_APPS_API_TOKEN" ]; then
+            echo "::notice::Build & Deploy skipped — AZURE_STATIC_WEB_APPS_API_TOKEN is not configured. Create the Static Web App in the Azure portal, copy its deployment token, and add it as a repository secret to enable deploys."
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create .env for Azure build
+        if: steps.token.outputs.has_token == 'true'
         run: |
           echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
           echo "DIRECT_URL=\"${{ secrets.DIRECT_URL }}\"" >> .env
@@ -172,6 +182,7 @@ jobs:
 
       - name: Build And Deploy
         id: builddeploy
+        if: steps.token.outputs.has_token == 'true'
         uses: Azure/static-web-apps-deploy@v1
         with:
           # One token per SWA environment, created in the Azure portal

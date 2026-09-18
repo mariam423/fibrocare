@@ -18,12 +18,24 @@ name: security-check
 # Runs on every push to main (not path-filtered): a leaked secret or a
 # vulnerable dependency matters the moment it lands, and both layers are
 # fast enough (<1 min) that filtering paths would save almost nothing.
+#
+# ALSO runs on a weekly schedule. The audit resolves dependencies from
+# the declared ranges at run time, so a CVE published upstream after a
+# commit is merged still surfaces here — the weekly run is what catches
+# "the code didn't change, the world did" regressions. Monday 06:07 UTC
+# was chosen off the busy hour: scheduled runs are dropped during GitHub
+# load peaks, and top-of-the-hour slots are the busiest (an odd minute
+# avoids the cron-everything-at-:00 pile-up).
 
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # Every Monday 06:07 UTC — catches CVEs published since the last
+    # PR/push run without depending on anyone committing that week.
+    - cron: "7 6 * * 1"
 
 permissions:
   contents: read

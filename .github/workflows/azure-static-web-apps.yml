@@ -45,15 +45,32 @@ jobs:
       # The schema is Postgres (Phase L-1) and declares directUrl, so the
       # SQLite file:./dev.db placeholder no longer works here — migrations
       # must run against the managed database via the repository secrets.
+      #
+      # Dependabot PRs intentionally get NO repository secrets (GitHub
+      # withholds them on dependabot/* branches to protect maintainers),
+      # so a hard "missing" here means every dependency-bump PR fails with
+      # a misleading error. On those branches the database-dependent steps
+      # below are skipped and the gate runs a build that doesn't touch the
+      # DB — enough to prove a version bump doesn't break compilation,
+      # while the full gate (tests + migrate + build) still runs on main
+      # and on normal PR branches.
       - name: Check required secrets are configured
+        id: secrets
         run: |
           missing=""
           for s in DATABASE_URL DIRECT_URL NEXTAUTH_SECRET; do
             if [ -z "$(printenv "$s")" ]; then missing="$missing $s"; fi
           done
           if [ -n "$missing" ]; then
-            echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions (see DEPLOY.md §2-3)."
-            exit 1
+            if [[ "$GITHUB_HEAD_REF" == dependabot/* ]]; then
+              echo "::warning::Skipping the DB-backed gate: repository secrets are not exposed on Dependabot branches (missing:$missing). A dependency-bump build runs without them; the full gate still guards main."
+              echo "has_secrets=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions (see DEPLOY.md §2-3)."
+              exit 1
+            fi
+          else
+            echo "has_secrets=true" >> "$GITHUB_OUTPUT"
           fi
         env:
           DATABASE_URL: "${{ secrets.DATABASE_URL }}"
@@ -63,12 +80,20 @@ jobs:
       # .env is gitignored and the Prisma schema reads DATABASE_URL via
       # env(), so CI materializes its own .env BEFORE `npm install` — the
       # @prisma/client postinstall generates the client from the schema and
-      # would fail without the variable.
+      # would fail without the variable. On Dependabot branches the client
+      # still generates from the schema with an empty-string URL (no
+      # connection attempt happens during generation).
       - name: Create .env for CI
         run: |
-          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
-          echo "DIRECT_URL=\"${{ secrets.DIRECT_URL }}\"" >> .env
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          if [ "${{ steps.secrets.outputs.has_secrets }}" != "true" ]; then
+            echo 'DATABASE_URL=""' > .env
+            echo 'DIRECT_URL=""' >> .env
+            echo 'NEXTAUTH_SECRET=ci-placeholder-secret-dependabot-branch' >> .env
+          else
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+            echo "DIRECT_URL=\"${{ secrets.DIRECT_URL }}\"" >> .env
+            echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          fi
           echo 'NEXTAUTH_URL=http://localhost:3000' >> .env
 
       # No package-lock.json is committed, so `npm install` (not `npm ci`).
@@ -76,6 +101,9 @@ jobs:
         run: npm install
 
       - name: Generate Prisma client + apply migrations
+        # migrate deploy is skipped on Dependabot branches: it would hit
+        # the managed database, and no credentials are available there.
+        if: steps.secrets.outputs.has_secrets == 'true'
         run: |
           npx prisma generate
           npx prisma migrate deploy
@@ -83,12 +111,23 @@ jobs:
           DATABASE_URL: "${{ secrets.DATABASE_URL }}"
           DIRECT_URL: "${{ secrets.DIRECT_URL }}"
 
+      - name: Generate Prisma client (no DB on Dependabot branches)
+        if: steps.secrets.outputs.has_secrets != 'true'
+        run: npx prisma generate
+
       - name: Run unit tests
         run: npm test
 
       - name: Production build
         run: npm run build
         env:
+          # db-migrate-pg.mjs (run inside `npm run build`) reads the
+          # connection string from process env — it does NOT load the .env
+          # file — so these must be exported here explicitly. On Dependabot
+          # branches the values stay empty strings; db-migrate-pg.mjs skips
+          # its migrate step when no URL is provided (has_secrets=false).
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
           # Server-side keys are read only in server routes/libs and never
           # reach the client bundle; referenced from GitHub Secrets so the
           # value stays out of the repository and the build logs.

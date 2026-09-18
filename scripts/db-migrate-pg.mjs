@@ -78,7 +78,19 @@ loadEnvFile(resolve(ROOT, ".env.production"));
 
 const required = ["DATABASE_URL", "DIRECT_URL"];
 for (const k of required) {
-  if (!process.env[k]) {
+  if (process.env[k] === undefined || process.env[k] === "") {
+    // Dependabot branches deliberately run without repository secrets:
+    // GitHub withholds them on dependabot/* PRs. A bump build must still
+    // prove the app compiles, so degrade to a no-op instead of failing —
+    // `next build` itself never opens a database connection.
+    const isDependabotBuild =
+      process.env.GITHUB_HEAD_REF?.startsWith("dependabot/") ?? false;
+    if (isDependabotBuild && process.env.NEXT_PHASE === "phase-production-build") {
+      console.log(
+        `[db-migrate-pg] ${k} not available on a Dependabot branch — skipping migrations (no DB access by design).`
+      );
+      process.exit(0);
+    }
     console.error(`[db-migrate-pg] Missing required env var: ${k}`);
     process.exit(1);
   }

@@ -180,8 +180,29 @@ Recorded for the next pass — none are exploitable today:
 
 ## Ongoing enforcement
 
-`npm run check:security` (`scripts/check-security.mjs`) now runs in CI
-as `.github/workflows/security-check.yml` on every PR and push to main:
+The audit's fixes are one-time; the enforcement below is what keeps
+them from regressing. Everything runs without manual setup — no extra
+secrets, no external services.
+
+### The weekly cadence (all times UTC)
+
+| When | What | Why it exists |
+|------|------|---------------|
+| Every PR + every push to `main` | `security-check` workflow — secret scan + `npm audit` gate | Catches a leaked secret or vulnerable dependency **the moment it lands** |
+| Monday 06:07 | `security-check` scheduled run | The audit resolves dependencies from declared ranges **at run time**, so a CVE published upstream after a merge still fails the gate — the schedule closes the "quiet week" gap where nothing triggers a run on its own |
+| Monday 07:30 | Dependabot npm review PRs | Turns detected drift/vulnerabilities into the actual bumps as reviewable PRs |
+| Monday 07:45 | Dependabot `github-actions` review PRs | Same discipline for the CI action pins |
+
+The layers are deliberately complementary: **the audit detects, the
+CI gate blocks, Dependabot proposes the fix**. A newly published CVE
+follows one path: it appears in Monday's audit run → CI fails with the
+vulnerability named → a Dependabot PR with the fix is already waiting
+in the same inbox.
+
+### The security-check workflow
+
+`npm run check:security` (`scripts/check-security.mjs`) runs in CI as
+`.github/workflows/security-check.yml`:
 
 - **Layer 1** — secret-pattern scan over every tracked text file
   (provider API keys, cloud credentials, private key blocks, Postgres
@@ -189,10 +210,30 @@ as `.github/workflows/security-check.yml` on every PR and push to main:
   inline `// security: ok <reason>` or placeholder values stay visible
   in the log.
 - **Layer 2** — `npm audit` gate failing at/above the configured
-  severity (default high).
+  severity (default high). Resolves the dependency tree from the
+  declared ranges per run, so it audits what CI would install today,
+  not what it installed last month.
 
 Re-run locally anytime; the scan exits non-zero on findings so it can
 gate any pipeline.
+
+### Dependabot (`.github/dependabot.yml`)
+
+Two ecosystems, both on Monday mornings:
+
+- **npm** (~52 dependencies) — routine patch/minor drift is **grouped
+  into one PR per week** so review stays small and predictable; major
+  bumps stay individual PRs for focused breaking-change review;
+  security-update PRs are independent of the group by design
+  (`applies-to: version-updates`) so a fix never waits behind a batch.
+- **github-actions** — keeps the workflow action pins
+  (checkout, setup-node, …) current under the same review discipline.
+
+First-run note: expect an initial batch of up to 10 open PRs (the
+cap) as Dependabot proposes every outdated dependency at once; the
+weekly cadence keeps it bounded after that. Every Dependabot PR runs
+through `security-check` and `build-verify` like any other change, so
+a bump is merged only when the full gate is green.
 
 ---
 

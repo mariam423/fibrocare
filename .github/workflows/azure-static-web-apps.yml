@@ -142,7 +142,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: validate
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    # The deploy step requires the SWA deployment token. Until
+    # AZURE_STATIC_WEB_APPS_API_TOKEN exists as a repository secret (create
+    # the Static Web App in the Azure portal → Manage deployment token →
+    # add the secret), this job would always fail with "deployment_token
+    # was not provided". Skipping keeps the CI signal clean: the validate
+    # gate above is what proves every commit, and the job self-heals to a
+    # real deploy the moment the token secret is added.
+    if: >-
+      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
+      secrets.AZURE_STATIC_WEB_APPS_API_TOKEN != ''
     steps:
       - uses: actions/checkout@v7
 

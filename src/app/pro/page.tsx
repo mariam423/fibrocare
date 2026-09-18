@@ -61,7 +61,7 @@ export default function ProLandingPage() {
   return (
     <RouteTransition>
       <GlobalNavHeader />
-      <main className="mx-auto max-w-4xl px-4 py-10 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-16">
+      <main className="mx-auto max-w-4xl px-4 pb-32 sm:pb-40 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-16">
         {/* Hero */}
         <ScrollReveal>
           <div className="text-center space-y-4">

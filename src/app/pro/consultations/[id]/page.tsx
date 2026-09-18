@@ -105,7 +105,7 @@ export default function ConsultationDetailPage() {
   return (
     <RouteTransition>
       <GlobalNavHeader />
-      <main className="container mx-auto max-w-3xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6">
+      <main className="container mx-auto max-w-3xl px-4 pb-32 sm:pb-40 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6">
         <ScrollReveal>
           <div className="flex items-center gap-3">
             <Button

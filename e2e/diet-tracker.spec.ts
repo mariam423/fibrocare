@@ -77,11 +77,13 @@ test.describe("Diet & Flare Trigger Tracker", () => {
 
     await typeFoodAndExpectWarning(page, "sugar");
 
-    // Save the meal; the card appears with the stored warning badge.
+    // Save the meal. First invocation cold-compiles app/diet/actions.ts on
+    // this dev box (10-40s), so wait for the server action to resolve — the
+    // button flips back from "Saving…" to an enabled "Save meal" — before
+    // asserting the persisted card.
     await page.getByRole("button", { name: "Save meal" }).click();
-    await expect(page.getByText(/Meals logged|Logged meals/, { exact: false }).first()).toBeVisible({
-      timeout: 15_000,
-    });
+    await expect(page.getByRole("button", { name: "Save meal" })).toBeEnabled({ timeout: 60_000 });
+    await expect(page.getByText("Logged meals", { exact: false }).first()).toBeVisible();
     // The saved card echoes the flagged food and shows the warning snapshot.
     const savedCard = page.locator('div[class*="rounded-xl"]', { hasText: /sugar/i }).last();
     await expect(savedCard).toBeVisible();

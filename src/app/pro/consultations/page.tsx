@@ -75,7 +75,7 @@ export default function ProConsultationsPage() {
   return (
     <RouteTransition>
       <GlobalNavHeader />
-      <main className="container mx-auto max-w-5xl px-4 py-8 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6 sm:space-y-8 sm:py-12 sm:pt-[calc(env(safe-area-inset-top)+2rem)]">
+      <main className="container mx-auto max-w-5xl px-4 pb-32 sm:pb-40 pt-[calc(env(safe-area-inset-top)+1.5rem)] space-y-6 sm:space-y-8 sm:pt-[calc(env(safe-area-inset-top)+2rem)]">
         <ScrollReveal>
           <div className="text-center space-y-3">
             <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl shadow-emerald-950/15 ring-1 ring-emerald-500/10">

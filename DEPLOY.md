@@ -25,16 +25,32 @@ For the **public-facing project documentation**, see [`README.md`](./README.md).
 
 These are the **non-negotiable** values. Without them, the app refuses to serve or degrades to the in-process fallback.
 
+### 2.1 GitHub Actions secrets (CI)
+
+The `azure-static-web-apps.yml` workflow reads the same values from
+**GitHub Secrets** (Settings → Secrets and variables → Actions). Verify
+what is configured at any time with `gh secret list`.
+
+| Secret | Used by | Notes |
+|--------|---------|-------|
+| `DATABASE_URL` / `DIRECT_URL` | gate (`npm run build` → `db-migrate-pg.mjs`), Prisma migrate, Azure build | Same Neon strings as production; the build step needs them **exported as step `env`** — the script does not load `.env` files |
+| `NEXTAUTH_SECRET` | gate, Azure runtime app settings | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Azure runtime app settings | `https://<your-domain>` |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Build & Deploy job | Optional until you actually deploy: without it the deploy job **skips itself with a notice** and CI stays green. Create a Static Web App in the Azure portal → Manage deployment token → paste here |
+| `HEALTH_DATA_ENCRYPTION_KEY`, `GEMINI_API_KEY`, `OPENWEATHER_API_KEY`, `ADMIN_METRICS_TOKEN`, `UPSTASH_*`, `PRISMA_ACCELERATE_URL` | Azure runtime app settings | Optional; unset keys degrade gracefully |
+
+**Dependabot PRs get no repository secrets.** GitHub withholds them on
+`dependabot/*` branches by design, so the workflow detects that case and
+runs a reduced gate instead (compile + unit tests, no migrations) with a
+`::warning` in the log — it will never fail with "Missing repository
+secrets" on a dependency-bump PR. If a PR run still fails that way, the
+branch predates the fix: comment `@dependabot rebase` on the PR to
+rebase it onto the current workflow.
+
 ```bash
-# ── Database (required) ────────────────────────────────────────────
-# Managed Postgres. The Prisma client uses `DATABASE_URL` for all
-# queries; `DIRECT_URL` is only used by Prisma's CLI for migrations
-# and introspection. They are the same connection string unless you
-# have a separate migration user.
+# Production values (see §2 below for full generation instructions)
 DATABASE_URL="postgresql://app:secret@db.example.com:5432/fibrocare?sslmode=require"
 DIRECT_URL="postgresql://app:secret@db.example.com:5432/fibrocare?sslmode=require"
-
-# ── NextAuth (required) ────────────────────────────────────────────
 NEXTAUTH_SECRET="$(openssl rand -base64 32)"  # NEVER commit this
 NEXTAUTH_URL="https://your-domain.example.com"
 

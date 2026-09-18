@@ -83,7 +83,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.186.0",
     "@vitest/coverage-v8": "^5.0.1",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.3.3",
     "github-slugger": "^2.0.0",
     "jsdom": "^30.0.1",

@@ -1,0 +1,65 @@
+# Dependabot — dependency bumps as reviewable PRs.
+#
+# Complements the weekly security-check run (see
+# .github/workflows/security-check.yml): the audit detects known CVEs and
+# fails CI, while Dependabot proposes the actual version bumps as PRs so
+# fixing them is a review, not a research project.
+#
+#   - npm:    ~52 production + dev dependencies. Grouped so routine patch/
+#             minor drift arrives as ONE reviewable PR per ecosystem, while
+#             security updates and production dependencies stay separate —
+#             a security fix must never wait behind a batch, and production
+#             bumps get their own focused diff.
+#   - github-actions: the workflow action pins (checkout, setup-node, …)
+#             are also bump PRs, keeping CI machinery current with the same
+#             review discipline.
+#
+# Schedule: Monday mornings (right after the 06:07 UTC audit run), so the
+# week starts with "here's what drifted + here's what's vulnerable" in one
+# inbox. Open PR limit caps the flood on the first run, when Dependabot
+# proposes every outdated dependency at once.
+
+version: 2
+
+updates:
+  # Production + dev dependencies from package.json / package-lock.json.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:30"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    groups:
+      # Routine drift (patch + minor, non-security) ships as one PR per
+      # week so the review stays small and predictable.
+      routine-minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "patch"
+          - "minor"
+    # Major bumps stay individual PRs (breaking-change review), and the
+    # default security-updates PRs are independent of the group above by
+    # design: `applies-to: version-updates` means security PRs never get
+    # batched or delayed by the group's review state.
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # Keep the CI action pins current (actions/checkout, setup-node, …).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:45"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - "dependencies"
+      - "github-actions"

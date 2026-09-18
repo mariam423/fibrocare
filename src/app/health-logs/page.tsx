@@ -227,7 +227,9 @@ export default function HealthLogsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <GlobalNavHeader />
 
-      <main className="pb-16 pt-[calc(env(safe-area-inset-top)+5rem)] px-4 sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:px-8 max-w-5xl mx-auto space-y-8">
+      {/* pb-32 sm:pb-40 keeps the last log card clear of the floating
+          bottom chrome (SOS FAB + PWA install prompt). */}
+      <main className="pb-32 sm:pb-40 pt-[calc(env(safe-area-inset-top)+5rem)] px-4 sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:px-8 max-w-5xl mx-auto space-y-8">
         {/* Page header */}
         <ScrollReveal as="section" className="space-y-2">
           <div className="flex items-center gap-3">

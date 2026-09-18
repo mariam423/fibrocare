@@ -34,6 +34,9 @@ const PROTECTED_PREFIXES = [
   "/reports",
   "/profile",
   "/toolkit",
+  "/clinical",
+  "/diet",
+  "/fog-shield",
   "/pro",
 ];
 

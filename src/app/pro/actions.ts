@@ -310,6 +310,17 @@ export async function aiPublishingAssistant(rawInput: { notes: string }) {
     const auth = await requireDoctor();
     if (!auth.ok) return { success: false as const, error: auth.error };
 
+    // This action triggers a live LLM call — bind it like the other
+    // one-shot AI features (10 req / 60 s per user) so a script hammering
+    // the action directly cannot run up provider spend.
+    const { ok: withinLimit } = await checkFeatureRateLimit(auth.user.id);
+    if (!withinLimit) {
+      return {
+        success: false as const,
+        error: "Give the AI a moment — try again shortly.",
+      };
+    }
+
     // Zod validation + prompt-injection sanitization: `sanitizeForPrompt`
     // (inside the prompt builder) strips instruction-override payloads;
     // the schema caps length first so oversized notes fail fast.
@@ -510,6 +521,16 @@ export async function generateClinicalSummary(consultationId: string) {
       return { success: false as const, error: "Only doctors can access clinical summaries." };
     }
 
+    // This action triggers a live LLM call — bind it like the other
+    // one-shot AI features (10 req / 60 s per user).
+    const { ok: withinLimit } = await checkFeatureRateLimit(auth.userId);
+    if (!withinLimit) {
+      return {
+        success: false as const,
+        error: "Give the AI a moment — try again shortly.",
+      };
+    }
+
     const consultation = await prisma.consultation.findUnique({
       where: { id: consultationId },
       include: { patient: { select: { id: true, name: true } } },
@@ -640,6 +661,16 @@ export async function generateDoctorResponseDraft(
     if (!auth.ok) return { success: false as const, error: auth.error };
     if (!auth.isDoctor) {
       return { success: false as const, error: "Only doctors can use the response draft feature." };
+    }
+
+    // This action triggers a live LLM call — bind it like the other
+    // one-shot AI features (10 req / 60 s per user).
+    const { ok: withinLimit } = await checkFeatureRateLimit(auth.userId);
+    if (!withinLimit) {
+      return {
+        success: false as const,
+        error: "Give the AI a moment — try again shortly.",
+      };
     }
 
     const recentMessages = await prisma.consultationMessage.findMany({

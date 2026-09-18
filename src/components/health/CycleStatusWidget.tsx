@@ -93,7 +93,7 @@ export function CycleStatusWidget() {
             {phaseNames[data.phase] || data.phase}
           </CardTitle>
           <div className="text-base font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
-            Day {data.currentDay}
+            {t("health.currentDay")} {data.currentDay}
           </div>
         </div>
       </CardHeader>
@@ -103,7 +103,7 @@ export function CycleStatusWidget() {
           <div
             className="absolute h-full bg-teal-400/40 dark:bg-teal-500/30 border-x border-teal-500/50"
             style={{
-              left: `${flareStart}%`,
+              insetInlineStart: `${flareStart}%`,
               width: `${flareEnd - flareStart}%`
             }}
             title={t("health.flareWindow")}
@@ -111,7 +111,7 @@ export function CycleStatusWidget() {
           {/* Current Day Marker */}
           <div
             className="absolute h-full w-1 bg-purple-600 dark:bg-purple-400 transition-all duration-500"
-            style={{ left: `${progress}%` }}
+            style={{ insetInlineStart: `${progress}%` }}
           />
         </div>
         <div className="flex justify-between items-center text-base text-purple-600/80 dark:text-purple-400/70">

@@ -144,7 +144,11 @@ describe("POST /api/pro/posts/[id]/comments — auth & validation", () => {
 
   it("returns 400 for invalid JSON", async () => {
     const res = await POST(
-      "{not json" as unknown as Request,
+      new Request("http://localhost/api/pro/posts/post-1/comments", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{not json",
+      }),
       routeCtx("post-1")
     );
     expect(res.status).toBe(400);

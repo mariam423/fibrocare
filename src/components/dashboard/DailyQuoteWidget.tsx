@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { QuotesIcon } from "@hugeicons/core-free-icons";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,7 +25,7 @@ const DAILY_QUOTE_KEYS: TranslationKey[] = [
 
 export function DailyQuoteWidget() {
   const { t } = useLanguage();
-  const dayIndex = Math.floor(Date.now() / 86_400_000);
+  const [dayIndex] = useState(() => Math.floor(Date.now() / 86_400_000));
   const quoteKey = DAILY_QUOTE_KEYS[dayIndex % DAILY_QUOTE_KEYS.length];
 
   return (

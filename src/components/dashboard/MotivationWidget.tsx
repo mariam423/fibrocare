@@ -411,7 +411,10 @@ const DATA_MAP: Record<MotivationKind, MotivationItem[]> = {
 export function MotivationWidget() {
   const { locale } = useLanguage();
   const [rotationCount, setRotationCount] = useState(0);
-  const [showArabic, setShowArabic] = useState(locale === "ar");
+  // Derive display language directly from locale; a manual override lets the
+  // user toggle without a setState-in-effect sync loop.
+  const [arabicOverride, setArabicOverride] = useState<boolean | null>(null);
+  const showArabic = arabicOverride ?? (locale === "ar");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(
     () =>
@@ -437,13 +440,6 @@ export function MotivationWidget() {
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Sync toggle to locale changes
-  useEffect(() => {
-    if (showArabic !== (locale === "ar")) {
-      setShowArabic(locale === "ar");
-    }
-  }, [locale, showArabic]);
-
   // ── Auto-rotate every 20 seconds ──
   useEffect(() => {
     const timer = window.setInterval(
@@ -452,6 +448,23 @@ export function MotivationWidget() {
     );
     return () => window.clearInterval(timer);
   }, []);
+
+  const showNotification = useCallback(
+    (title: string, body: string) => {
+      if (
+        typeof Notification === "undefined" ||
+        Notification.permission !== "granted"
+      )
+        return;
+      // eslint-disable-next-line no-new
+      new Notification(title, {
+        body,
+        icon: "/favicon.ico",
+        tag: "fibrocare-motivation",
+      });
+    },
+    []
+  );
 
   // ── Browser Notification scheduling ──
   useEffect(() => {
@@ -476,23 +489,6 @@ export function MotivationWidget() {
       }
     };
   }, [notificationsEnabled, hasNotificationPermission, locale]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const showNotification = useCallback(
-    (title: string, body: string) => {
-      if (
-        typeof Notification === "undefined" ||
-        Notification.permission !== "granted"
-      )
-        return;
-      // eslint-disable-next-line no-new
-      new Notification(title, {
-        body,
-        icon: "/favicon.ico",
-        tag: "fibrocare-motivation",
-      });
-    },
-    []
-  );
 
   const next = useCallback(
     () => setRotationCount((v) => v + 1),
@@ -620,7 +616,7 @@ export function MotivationWidget() {
           >
             <button
               type="button"
-              onClick={() => setShowArabic(false)}
+              onClick={() => setArabicOverride(false)}
               aria-pressed={!showArabic}
               className={cn(
                 "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
@@ -633,7 +629,7 @@ export function MotivationWidget() {
             </button>
             <button
               type="button"
-              onClick={() => setShowArabic(true)}
+              onClick={() => setArabicOverride(true)}
               aria-pressed={showArabic}
               className={cn(
                 "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",

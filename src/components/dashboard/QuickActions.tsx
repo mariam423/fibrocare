@@ -9,6 +9,7 @@ import {
   BookOpen01Icon,
   Chatting01Icon,
   ChevronRightIcon,
+  BrainIcon,
 } from "@hugeicons/core-free-icons";
 import { DepthCard } from "@/components/ui/DepthCard";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
@@ -60,13 +61,20 @@ const ACTIONS: QuickAction[] = [
     icon: Chatting01Icon,
     hoverBorder: "group-hover:border-teal-300 dark:group-hover:border-teal-700",
   },
+  {
+    href: "/fog-shield",
+    titleKey: "quickActions.fog.title",
+    descriptionKey: "quickActions.fog.description",
+    icon: BrainIcon,
+    hoverBorder: "group-hover:border-teal-300 dark:group-hover:border-teal-700",
+  },
 ];
 
 export function QuickActions() {
   const { t } = useLanguage();
   return (
     <section aria-label={t("quickActions.ariaLabel")}>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {ACTIONS.map((action, index) => (
           <li key={action.href} className="h-full">
             <DepthCard tilt={4} delay={index * 0.06} className="h-full">

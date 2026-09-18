@@ -357,15 +357,29 @@ function initField(canvas: HTMLCanvasElement, THREE: ThreeModule): () => void {
     io?.disconnect();
     document.removeEventListener("visibilitychange", onVisibility);
     scene.traverse((obj) => {
-      const mesh = obj as unknown as {
+      const instance = obj as unknown as {
         geometry?: Disposable;
         material?: Disposable | Disposable[];
       };
-      if (mesh.geometry) mesh.geometry.dispose();
-      if (Array.isArray(mesh.material)) mesh.material.forEach((m) => m.dispose());
-      else mesh.material?.dispose();
+      instance.geometry?.dispose();
+      const materials = Array.isArray(instance.material)
+        ? instance.material
+        : instance.material
+          ? [instance.material]
+          : [];
+      for (const material of materials) {
+        // Sprites/SpriteMaterials carry a glow `map` texture that is NOT
+        // released by `dispose()` — drop it explicitly so rapid SPA
+        // remounts do not accumulate GPU textures.
+        const texture = (material as unknown as { map?: Disposable }).map;
+        texture?.dispose();
+        material.dispose();
+      }
     });
     renderer.dispose();
+    // Release the raw WebGL context; `dispose()` alone can leave the
+    // context resident and leak VRAM across remounts.
+    renderer.forceContextLoss?.();
   };
 }
 
@@ -382,11 +396,18 @@ export function CalmResonance3D({ className }: { className?: string }) {
     if (!motion || !webgl || !canvas) return;
     let dispose: (() => void) | undefined;
     let cancelled = false;
-    void import("three").then((THREE) => {
-      if (cancelled || !canvas.isConnected) return;
-      dispose = initField(canvas, THREE);
-      setLive(true);
-    });
+    void import("three")
+      .then((THREE) => {
+        if (cancelled || !canvas.isConnected) return;
+        // Context creation can fail even after the probe succeeds (e.g. a
+        // worker-restricted or memory-starved browser) — keep the SVG
+        // fallback mounted instead of surfacing a rejected promise.
+        dispose = initField(canvas, THREE);
+        setLive(true);
+      })
+      .catch(() => {
+        // Fallback stays mounted; failure is invisible to the user.
+      });
     return () => {
       cancelled = true;
       dispose?.();

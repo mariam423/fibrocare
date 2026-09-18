@@ -53,6 +53,12 @@ import { CycleStatusWidget } from "@/components/health/CycleStatusWidget";
 import { SymptomMapWidget } from "@/components/health/SymptomMapWidget";
 import { FlareForecastWidget } from "@/components/health/FlareForecastCard";
 import { CareRecommendationCard } from "@/components/health/CareRecommendationCard";
+import { MenstrualLogForm } from "@/components/health/MenstrualLogForm";
+import { CycleDashboard } from "@/components/health/CycleDashboard";
+import { ClinicalReportCard } from "@/components/health/ClinicalReportCard";
+import { SpoonBudgetCalculator } from "@/components/health/SpoonBudgetCalculator";
+import { SpoonCheckInCard } from "@/components/health/SpoonCheckInCard";
+import { CaregiverSyncCard } from "@/components/health/CaregiverSyncCard";
 import { DoctorContentFeed } from "@/components/pro/DoctorContentFeed";
 import { PatientAssistant } from "@/components/pro/PatientAssistant";
 import { useHealth } from "@/context/HealthContext";
@@ -245,7 +251,10 @@ export default function Home() {
     <RouteTransition>
     <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground transition-colors duration-500">
       <GlobalNavHeader />
-      <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-12 pt-[calc(env(safe-area-inset-top)+5rem)] pb-28 sm:pt-[calc(env(safe-area-inset-top)+6rem)] sm:pb-32 lg:pt-32 space-y-8 lg:space-y-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* pb-32 sm:pb-40 keeps the last dashboard card clear of the
+            floating bottom chrome (SOS FAB + AI companion launcher + PWA
+            install prompt) at every viewport height. */}
+      <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-12 pt-[calc(env(safe-area-inset-top)+5rem)] pb-32 sm:pb-40 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:pt-32 space-y-8 lg:space-y-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {/* Welcome Section */}
         <motion.div ref={welcomeRef} style={{ y: welcomeYSpring, opacity: welcomeOpacity }}>
         <ScrollReveal as="section" className="space-y-1">
@@ -807,6 +816,18 @@ export default function Home() {
             <CareRecommendationCard />
             <SymptomMapWidget />
             <FlareForecastWidget />
+          </div>
+
+          {/* Menstrual Health Suite */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full pt-2">
+            <MenstrualLogForm />
+            <CycleDashboard />
+            <SpoonCheckInCard />
+            <SpoonBudgetCalculator />
+            <ClinicalReportCard />
+            <div className="lg:col-span-2">
+              <CaregiverSyncCard />
+            </div>
           </div>
         </ScrollReveal>
       </main>

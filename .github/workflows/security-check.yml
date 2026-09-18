@@ -1,0 +1,56 @@
+name: security-check
+
+# Automated security gate with two independent layers, run on every PR
+# and on pushes to main:
+#
+#   1. Secret-pattern scan (scripts/check-security.mjs layer 1) — greps
+#      every git-tracked text file for credential-shaped strings
+#      (OpenAI/Anthropic/Gemini keys, AWS/GCP/Azure credentials, private
+#      key blocks, Postgres URLs with embedded passwords, generic
+#      secret-assignment patterns). Lines can carry a
+#      `// security: ok <reason>` marker (or a placeholder value) to be
+#      reported-but-allowed — suppressions stay visible in the log.
+#
+#   2. Dependency audit (layer 2) — `npm audit --json` fails the job when
+#      any known CVE is at or above the severity threshold (default:
+#      high; tighten with --audit-level=moderate in package.json).
+#
+# Runs on every push to main (not path-filtered): a leaked secret or a
+# vulnerable dependency matters the moment it lands, and both layers are
+# fast enough (<1 min) that filtering paths would save almost nothing.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-check:
+    name: Secrets + dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # npm audit needs a lockfile. None is committed (see build-verify.yml),
+      # so materialize one from the declared dependency ranges — `npm
+      # audit --package-lock-only` resolves and audits the exact tree CI
+      # would install, without installing node_modules.
+      - name: Build lockfile for audit
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Security gate (secret scan + npm audit)
+        run: node scripts/check-security.mjs

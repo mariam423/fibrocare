@@ -142,7 +142,10 @@ describe("ConsultationsHubPage layout", () => {
 
   it("shows the open thread with its subject, doctor, and last message", async () => {
     await renderHub();
-    expect(screen.getByText("Flare management")).toBeInTheDocument();
+    // findBy* — the thread list renders only after the mocked action's
+    // promise resolves and the state update flushes, so it may not be
+    // mounted yet when `renderHub` returns.
+    expect(await screen.findByText("Flare management")).toBeInTheDocument();
     expect(screen.getByText(/consultation.doctorLabel · Dr. Hana/)).toBeInTheDocument();
     expect(screen.getByText(/Please keep tracking morning stiffness/)).toBeInTheDocument();
   });
@@ -304,7 +307,9 @@ describe("ConsultationsHubPage AI symptom structuring", () => {
 describe("ConsultationsHubPage secure messaging", () => {
   it("sends the composer draft through the validated action", async () => {
     await renderHub();
-    const composer = screen.getByRole("textbox", {
+    // findBy* — the thread list renders after the mocked action resolves,
+    // so the composer may not be mounted yet on slow workers.
+    const composer = await screen.findByRole("textbox", {
       name: "consultation.typeMessage — Flare management",
     });
     fireEvent.change(composer, { target: { value: "Morning flare eased today." } });
@@ -332,7 +337,9 @@ describe("ConsultationsHubPage secure messaging", () => {
     });
     await renderHub();
     fireEvent.change(
-      screen.getByRole("textbox", { name: "consultation.typeMessage — Flare management" }),
+      await screen.findByRole("textbox", {
+        name: "consultation.typeMessage — Flare management",
+      }),
       { target: { value: "Hello doctor" } }
     );
     fireEvent.click(screen.getByRole("button", { name: "consultation.send" }));

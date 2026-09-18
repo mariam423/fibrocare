@@ -7,8 +7,10 @@ import {
   verifyStripeSignature,
 } from "./webhook";
 
-const STRIPE_SECRET = "whsec_stripe_test_secret";
-const LS_SECRET = "whsec_lemon_test_secret";
+// Test fixtures, not real credentials — explicitly marked for the
+// security scanner (scripts/check-security.mjs).
+const STRIPE_SECRET = "whsec_stripe_test_secret"; // security: ok test fixture
+const LS_SECRET = "whsec_lemon_test_secret"; // security: ok test fixture
 
 function signStripe(rawBody: string, secret = STRIPE_SECRET, offsetSeconds = 0) {
   const timestamp = Math.floor(Date.now() / 1000) + offsetSeconds;

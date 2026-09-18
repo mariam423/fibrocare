@@ -77,8 +77,11 @@ function sameOrigin(request: Request): boolean {
     const u = new URL(origin);
     const normalized = `${u.protocol}//${u.host}`;
     if (ALLOWED_ORIGINS.has(normalized)) return true;
-    const host = request.headers.get("host");
-    return Boolean(host) && u.host === host;
+    // Real browsers always send a Host header, but programmatic clients
+    // (and Node's Request used in tests) may not — the request URL's host
+    // is the canonical destination and matches Origin for same-origin sends.
+    const host = request.headers.get("host") ?? new URL(request.url).host;
+    return u.host === host;
   } catch {
     return false;
   }

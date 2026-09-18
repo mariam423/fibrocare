@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { SocialPostCard } from "./SocialPostCard";
 import { FeedFilters } from "./FeedFilters";
+import {
+  AdvancedFeedFilters,
+  applyAdvancedFilters,
+  type FeedSort,
+} from "./AdvancedFeedFilters";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface Post {
@@ -25,6 +30,11 @@ export function DoctorSocialFeed() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filter, setFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+
+  // Advanced filter state (client-side layer on top of the kind filter).
+  const [query, setQuery] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [sort, setSort] = useState<FeedSort>("newest");
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
@@ -93,6 +103,18 @@ export function DoctorSocialFeed() {
     }
   };
 
+  const toggleTopic = useCallback((topic: string) => {
+    setSelectedTopics((prev) =>
+      prev.includes(topic) ? prev.filter((tp) => tp !== topic) : [...prev, topic]
+    );
+  }, []);
+
+  /** Client-side search / topic / sort pass over the fetched posts. */
+  const visiblePosts = useMemo(
+    () => applyAdvancedFilters(posts, query, selectedTopics, sort),
+    [posts, query, selectedTopics, sort]
+  );
+
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -126,16 +148,51 @@ export function DoctorSocialFeed() {
         <FeedFilters activeFilter={filter} onFilterChange={setFilter} />
       </div>
 
-      <div className="space-y-5">
-        {posts.map((post, i) => (
-          <ScrollReveal key={post.id} delay={Math.min(i * 0.05, 0.3)}>
-            <SocialPostCard
-              post={post}
-              onLike={handleLike}
-            />
-          </ScrollReveal>
-        ))}
+      {/* Advanced search / topics / sort — pure client-side pass. */}
+      <div className="mb-5">
+        <AdvancedFeedFilters
+          posts={posts}
+          query={query}
+          onQueryChange={setQuery}
+          selectedTopics={selectedTopics}
+          onToggleTopic={toggleTopic}
+          sort={sort}
+          onSortChange={setSort}
+          visibleCount={visiblePosts.length}
+        />
       </div>
+
+      {visiblePosts.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border/70 bg-card/40 px-4 py-12 text-center backdrop-blur-sm">
+          <p className="text-sm font-medium text-foreground">
+            {t("doctor.feed.noResults")}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t("doctor.feed.noResultsHint")}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setSelectedTopics([]);
+            }}
+            className="mt-4 rounded-full border border-emerald-500/40 px-4 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-500/10 dark:text-emerald-300"
+          >
+            {t("doctor.feed.clearAll")}
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {visiblePosts.map((post, i) => (
+            <ScrollReveal key={post.id} delay={Math.min(i * 0.05, 0.3)}>
+              <SocialPostCard
+                post={post}
+                onLike={handleLike}
+              />
+            </ScrollReveal>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

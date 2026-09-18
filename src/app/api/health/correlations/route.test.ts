@@ -32,9 +32,9 @@ function mockDb({ cycles = [], symptoms = [], painLogs = [] }: {
   symptoms?: unknown[];
   painLogs?: unknown[];
 }) {
-  vi.mocked(prisma.menstrualCycle.findMany).mockResolvedValue(cycles as any);
-  vi.mocked(prisma.symptomLog.findMany).mockResolvedValue(symptoms as any);
-  vi.mocked(prisma.painLog.findMany).mockResolvedValue(painLogs as any);
+  vi.mocked(prisma.menstrualCycle.findMany).mockResolvedValue(cycles as never);
+  vi.mocked(prisma.symptomLog.findMany).mockResolvedValue(symptoms as never);
+  vi.mocked(prisma.painLog.findMany).mockResolvedValue(painLogs as never);
 }
 
 describe("GET /api/health/correlations", () => {
@@ -47,7 +47,7 @@ describe("GET /api/health/correlations", () => {
   it("returns null cycle and empty recommendations for a fresh user", async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: "u1" },
-    } as any);
+    } as never);
     mockDb({});
 
     const res = await GET(req);
@@ -63,7 +63,7 @@ describe("GET /api/health/correlations", () => {
   it("derives the cycle view when a cycle exists", async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: "u1" },
-    } as any);
+    } as never);
     mockDb({
       cycles: [
         {
@@ -88,7 +88,7 @@ describe("GET /api/health/correlations", () => {
   it("surfaces insight-engine recommendations once enough pain logs exist", async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: "u1" },
-    } as any);
+    } as never);
     const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
     mockDb({
       painLogs: Array.from({ length: 6 }, (_, i) => ({

@@ -6,6 +6,7 @@ export type TranslationKey =
   | "meta.ogTitle"
   | "meta.ogDescription"
   | "meta.ogImageAlt"
+  | "meta.ogFeaturesImageAlt"
   | "nav.dashboard"
   | "nav.healthLogs"
   | "nav.resources"
@@ -63,6 +64,7 @@ export type TranslationKey =
   | "common.loading"
   | "common.readMore"
   | "common.back"
+  | "common.signInRequired"
   | "resources.title"
   | "resources.subtitle"
   | "resources.search"
@@ -426,64 +428,6 @@ export type TranslationKey =
   | "cycleTracker.insight.follicular"
   | "cycleTracker.insight.ovulatory"
   | "cycleTracker.insight.luteal"
-  | "cycleTracker.title"
-  | "cycleTracker.subtitle"
-  | "cycleTracker.logCta"
-  | "cycleTracker.insightLabel"
-  | "cycleTracker.insightShort"
-  | "cycleTracker.symptomChip.ache"
-  | "cycleTracker.symptomChip.sleep"
-  | "cycleTracker.symptomChip.fog"
-  | "cycleTracker.symptomChip.fatigue"
-  | "cycleTracker.disclaimer"
-  | "cycleTracker.symptom.menstrual"
-  | "cycleTracker.symptom.follicular"
-  | "cycleTracker.symptom.ovulatory"
-  | "cycleTracker.symptom.luteal"
-  | "cycleTracker.symptom.window"
-  | "cycleTracker.insight.menstrual"
-  | "cycleTracker.insight.follicular"
-  | "cycleTracker.insight.ovulatory"
-  | "cycleTracker.insight.luteal"
-  | "cycleTracker.insight.window"
-  | "cycleTracker.title"
-  | "cycleTracker.subtitle"
-  | "cycleTracker.logCta"
-  | "cycleTracker.insightLabel"
-  | "cycleTracker.insightShort"
-  | "cycleTracker.symptomChip.ache"
-  | "cycleTracker.symptomChip.sleep"
-  | "cycleTracker.symptomChip.fog"
-  | "cycleTracker.symptomChip.fatigue"
-  | "cycleTracker.disclaimer"
-  | "cycleTracker.symptom.menstrual"
-  | "cycleTracker.symptom.follicular"
-  | "cycleTracker.symptom.ovulatory"
-  | "cycleTracker.symptom.luteal"
-  | "cycleTracker.symptom.window"
-  | "cycleTracker.insight.menstrual"
-  | "cycleTracker.insight.follicular"
-  | "cycleTracker.insight.ovulatory"
-  | "cycleTracker.insight.luteal"
-  | "cycleTracker.title"
-  | "cycleTracker.subtitle"
-  | "cycleTracker.logCta"
-  | "cycleTracker.insightLabel"
-  | "cycleTracker.insightShort"
-  | "cycleTracker.symptomChip.ache"
-  | "cycleTracker.symptomChip.sleep"
-  | "cycleTracker.symptomChip.fog"
-  | "cycleTracker.symptomChip.fatigue"
-  | "cycleTracker.disclaimer"
-  | "cycleTracker.symptom.menstrual"
-  | "cycleTracker.symptom.follicular"
-  | "cycleTracker.symptom.ovulatory"
-  | "cycleTracker.symptom.luteal"
-  | "cycleTracker.symptom.window"
-  | "cycleTracker.insight.menstrual"
-  | "cycleTracker.insight.follicular"
-  | "cycleTracker.insight.ovulatory"
-  | "cycleTracker.insight.luteal"
   | "cycleTracker.insight.window"
   | "diagnosis.check.title"
   | "diagnosis.check.subtitle"
@@ -807,6 +751,99 @@ export type TranslationKey =
   | "health.area.widespread"
   | "health.area.joints"
   | "health.area.other"
+  | "health.menstrualLog.title"
+  | "health.menstrualLog.flow.title"
+  | "health.menstrualLog.flow.spotting"
+  | "health.menstrualLog.flow.light"
+  | "health.menstrualLog.flow.medium"
+  | "health.menstrualLog.flow.heavy"
+  | "health.menstrualLog.flow.hasClots"
+  | "health.menstrualLog.flow.color"
+  | "health.menstrualLog.somatic.title"
+  | "health.menstrualLog.somatic.cramps"
+  | "health.menstrualLog.somatic.headache"
+  | "health.menstrualLog.somatic.breastTenderness"
+  | "health.menstrualLog.somatic.bloating"
+  | "health.menstrualLog.gi.title"
+  | "health.menstrualLog.gi.diarrhea"
+  | "health.menstrualLog.gi.constipation"
+  | "health.menstrualLog.gi.acne"
+  | "health.menstrualLog.fertility.title"
+  | "health.menstrualLog.fertility.cervicalMucus"
+  | "health.menstrualLog.fertility.opk"
+  | "health.menstrualLog.mood.title"
+  | "health.menstrualLog.mood.tearfulness"
+  | "health.menstrualLog.mood.anxiety"
+  | "health.menstrualLog.mood.volatility"
+  | "health.menstrualLog.mucus.dry"
+  | "health.menstrualLog.mucus.sticky"
+  | "health.menstrualLog.mucus.creamy"
+  | "health.menstrualLog.mucus.watery"
+  | "health.menstrualLog.mucus.eggWhite"
+  | "health.menstrualLog.opk.negative"
+  | "health.menstrualLog.opk.positive"
+  | "health.menstrualLog.opk.notUsed"
+  | "health.menstrualLog.sensory.none"
+  | "health.menstrualLog.sensory.mild"
+  | "health.menstrualLog.sensory.moderate"
+  | "health.menstrualLog.sensory.severe"
+  | "health.menstrualLog.notesLabel"
+  | "health.menstrualLog.energy.title"
+  | "health.menstrualLog.libido.title"
+  | "health.menstrualLog.sensory.title"
+  | "health.menstrualLog.sensory.light"
+  | "health.menstrualLog.sensory.sound"
+  | "health.menstrualLog.saveCta"
+  | "health.menstrualLog.savedOk"
+  | "health.menstrualLog.saveError"
+  | "health.menstrualLog.noActiveCycle"
+  | "health.menstrualLog.createCycleFirst"
+  | "health.overlap.title"
+  | "health.overlap.hormonal"
+  | "health.overlap.physical"
+  | "health.overlap.noData"
+  | "health.carePlan.title"
+  | "health.carePlan.diet"
+  | "health.carePlan.supplements"
+  | "health.carePlan.pacing"
+  | "health.carePlan.currentPhase"
+  | "health.carePlan.diet.menstrual"
+  | "health.carePlan.diet.follicular"
+  | "health.carePlan.diet.ovulatory"
+  | "health.carePlan.diet.luteal"
+  | "health.carePlan.supplements.menstrual"
+  | "health.carePlan.supplements.follicular"
+  | "health.carePlan.supplements.ovulatory"
+  | "health.carePlan.supplements.luteal"
+  | "health.carePlan.pacing.menstrual"
+  | "health.carePlan.pacing.follicular"
+  | "health.carePlan.pacing.ovulatory"
+  | "health.carePlan.pacing.luteal"
+  | "health.spoonCalc.title"
+  | "health.spoonCalc.subtitle"
+  | "health.spoonCalc.budget"
+  | "health.spoonCalc.sleepQuality"
+  | "health.spoonCalc.cycleAdjust"
+  | "health.spoonCalc.available"
+  | "health.clinicalReport.title"
+  | "health.clinicalReport.subtitle"
+  | "health.clinicalReport.generate"
+  | "health.clinicalReport.generating"
+  | "health.clinicalReport.periodRange"
+  | "health.clinicalReport.peakPain"
+  | "health.clinicalReport.avgEnergy"
+  | "health.clinicalReport.avgMood"
+  | "health.clinicalReport.symptomSummary"
+  | "health.clinicalReport.printCta"
+  | "health.clinicalReport.emptyState"
+  | "health.caregiver.title"
+  | "health.caregiver.subtitle"
+  | "health.caregiver.enable"
+  | "health.caregiver.disable"
+  | "health.caregiver.shareToken"
+  | "health.caregiver.copied"
+  | "health.caregiver.disclaimer"
+  | "health.caregiver.viewOnly"
   | "dashboard.insights.title"
   | "dashboard.insights.subtitle"
   | "dashboard.insights.empty"
@@ -1754,6 +1791,19 @@ export type TranslationKey =
   | "doctor.feed.comment"
   | "doctor.feed.share"
   | "doctor.filter.all"
+  | "doctor.feed.searchPlaceholder"
+  | "doctor.feed.searchLabel"
+  | "doctor.feed.clearSearch"
+  | "doctor.feed.topicsLabel"
+  | "doctor.feed.sortLabel"
+  | "doctor.feed.sort.newest"
+  | "doctor.feed.sort.popular"
+  | "doctor.feed.resultsCount"
+  | "doctor.feed.noResults"
+  | "doctor.feed.noResultsHint"
+  | "doctor.feed.activeFilters"
+  | "doctor.feed.clearAll"
+  | "doctor.feed.filtersToggle"
   | "doctor.postMedia"
   | "doctor.postContentStatus"
   | "doctor.postAiToggle"
@@ -1864,7 +1914,656 @@ export type TranslationKey =
   | "doctorReport.copyToClipboard"
   | "doctorReport.copied"
   | "doctorReport.printReport"
-  | "doctorReport.disclaimer";
+  | "doctorReport.disclaimer"
+  | "nav.diet"
+  | "diet.title"
+  | "diet.subtitle"
+  | "diet.energy.exhausted"
+  | "diet.energy.low"
+  | "diet.energy.moderate"
+  | "diet.energy.good"
+  | "diet.energy.full"
+  | "diet.logger.title"
+  | "diet.logger.subtitle"
+  | "diet.logger.date"
+  | "diet.logger.time"
+  | "diet.logger.mealType"
+  | "diet.logger.mealType.breakfast"
+  | "diet.logger.mealType.lunch"
+  | "diet.logger.mealType.dinner"
+  | "diet.logger.mealType.snack"
+  | "diet.logger.foods"
+  | "diet.logger.foodsPlaceholder"
+  | "diet.logger.amount"
+  | "diet.logger.amountPlaceholder"
+  | "diet.logger.addFood"
+  | "diet.logger.energyBefore"
+  | "diet.logger.energyBefore.hint"
+  | "diet.logger.notes"
+  | "diet.logger.notesPlaceholder"
+  | "diet.logger.save"
+  | "diet.logger.saving"
+  | "diet.logger.saved"
+  | "diet.logger.delete"
+  | "diet.logger.noMeals"
+  | "diet.logger.mealsLabel"
+  | "diet.warn.known.gluten"
+  | "diet.warn.known.dairy"
+  | "diet.warn.known.sugar"
+  | "diet.warn.known.fried"
+  | "diet.warn.known.processed"
+  | "diet.warn.known.alcohol"
+  | "diet.warn.known.caffeine"
+  | "diet.warn.personal"
+  | "diet.warnings.none"
+  | "diet.warnings.some"
+  | "diet.warnings.swap"
+  | "diet.warnings.reason"
+  | "diet.swap.gluten.swap"
+  | "diet.swap.gluten.reason"
+  | "diet.swap.dairy.swap"
+  | "diet.swap.dairy.reason"
+  | "diet.swap.sugar.swap"
+  | "diet.swap.sugar.reason"
+  | "diet.swap.fried.swap"
+  | "diet.swap.fried.reason"
+  | "diet.swap.processed.swap"
+  | "diet.swap.processed.reason"
+  | "diet.swap.alcohol.swap"
+  | "diet.swap.alcohol.reason"
+  | "diet.swap.caffeine.swap"
+  | "diet.swap.caffeine.reason"
+  | "diet.timing.veryLow.title"
+  | "diet.timing.veryLow.reason"
+  | "diet.timing.low.title"
+  | "diet.timing.low.reason"
+  | "diet.timing.moderate.title"
+  | "diet.timing.moderate.reason"
+  | "diet.timing.good.title"
+  | "diet.timing.good.reason"
+  | "diet.timing.full.title"
+  | "diet.timing.full.reason"
+  | "diet.triggers.title"
+  | "diet.triggers.subtitle"
+  | "diet.triggers.name"
+  | "diet.triggers.severity"
+  | "diet.triggers.severity.hint"
+  | "diet.triggers.severity.level1"
+  | "diet.triggers.severity.level2"
+  | "diet.triggers.severity.level3"
+  | "diet.triggers.severity.level4"
+  | "diet.triggers.severity.level5"
+  | "diet.triggers.reactionNote"
+  | "diet.triggers.reactionNotePlaceholder"
+  | "diet.triggers.namePlaceholder"
+  | "diet.triggers.add"
+  | "diet.triggers.adding"
+  | "diet.triggers.empty"
+  | "diet.triggers.remove"
+  | "diet.triggers.removed"
+  | "diet.correlation.title"
+  | "diet.correlation.subtitle"
+  | "diet.correlation.disclaimer"
+  | "diet.correlation.empty"
+  | "diet.correlation.baseline"
+  | "diet.correlation.baseline.hint"
+  | "diet.correlation.food"
+  | "diet.correlation.with"
+  | "diet.correlation.without"
+  | "diet.correlation.lift"
+  | "diet.correlation.outOf"
+  | "diet.correlation.evenings"
+  | "diet.correlation.risk.high"
+  | "diet.correlation.risk.moderate"
+  | "diet.correlation.risk.watch"
+  | "diet.correlation.risk.high.hint"
+  | "diet.correlation.risk.moderate.hint"
+  | "diet.correlation.risk.watch.hint"
+  | "diet.correlation.timing.title"
+  | "diet.correlation.timing.highFlare"
+  | "diet.correlation.timing.lowFlare"
+  | "diet.correlation.timing.later"
+  | "diet.correlation.timing.nodata"
+
+  | "fog.title"
+  | "fog.hero.kicker"
+  | "fog.hero.subtitle"
+  | "fog.hero.statEpisodes"
+  | "fog.hero.statAvg"
+  | "fog.hero.statRecent"
+  | "fog.hero.statNone"
+  | "fog.hero.clearGuide"
+  | "fog.hero.fogGuide"
+  | "fog.hero.privacy"
+  | "fog.hero.privacyDetail"
+  | "fog.trigger.lowSleep"
+  | "fog.trigger.stress"
+  | "fog.trigger.screen"
+  | "fog.trigger.noise"
+  | "fog.trigger.lowFood"
+  | "fog.trigger.menstrual"
+  | "fog.trigger.multitasking"
+  | "fog.trigger.overwhelm"
+  | "fog.trigger.weather"
+  | "fog.trigger.medication"
+  | "fog.trigger.overdid"
+  | "fog.trigger.other"
+  | "fog.breath.title"
+  | "fog.breath.subtitle"
+  | "fog.breath.pattern478"
+  | "fog.breath.patternBox"
+  | "fog.breath.start"
+  | "fog.breath.pause"
+  | "fog.breath.reset"
+  | "fog.breath.cycles"
+  | "fog.breath.sessionComplete"
+  | "fog.breath.seconds"
+  | "fog.breath.inhale"
+  | "fog.breath.hold"
+  | "fog.breath.exhale"
+  | "fog.dump.title"
+  | "fog.dump.subtitle"
+  | "fog.dump.where"
+  | "fog.dump.chars"
+  | "fog.dump.intensity"
+  | "fog.dump.triggers"
+  | "fog.dump.save"
+  | "fog.dump.saving"
+  | "fog.dump.saved"
+  | "fog.dump.clear"
+  | "fog.dump.needsOne"
+  | "fog.dump.recent"
+  | "fog.dump.noTriggers"
+  | "fog.microtask.title"
+  | "fog.microtask.subtitle"
+  | "fog.microtask.prompt"
+  | "fog.microtask.placeholder"
+  | "fog.microtask.breakdown"
+  | "fog.microtask.step"
+  | "fog.microtask.saveToggle"
+  | "fog.microtask.saved"
+  | "fog.microtask.allDone"
+  | "fog.microtask.newTask"
+  | "fog.microtask.theTask"
+  | "fog.microtask.assist1"
+  | "fog.microtask.assist2"
+  | "fog.microtask.assist3"
+  | "fog.save.locked"
+  | "fog.save.invalid"
+  | "fog.save.failed"
+  | "fog.sos.title"
+  | "fog.sos.subtitle"
+  | "fog.sos.step1"
+  | "fog.sos.step1desc"
+  | "fog.sos.step2"
+  | "fog.sos.step2desc"
+  | "fog.sos.step3"
+  | "fog.sos.step3desc"
+  | "fog.sos.step4"
+  | "fog.sos.step4desc"
+  | "fog.sos.steady"
+  | "fog.sos.callClinic"
+  | "fog.sos.callTrusted"
+  | "fog.sos.emergency"
+  | "fog.sos.steadier"
+  | "quickActions.fog.title"
+  | "quickActions.fog.description"
+  | "toolkit.fogCard.title"
+  | "toolkit.fogCard.subtitle"
+  | "toolkit.fogCard.open"
+
+  | "clinical.acr.title"
+  | "clinical.acr.subtitle"
+  | "clinical.acr.ss.level.0"
+  | "clinical.acr.ss.level.1"
+  | "clinical.acr.ss.level.2"
+  | "clinical.acr.ss.level.3"
+  | "clinical.acr.wpi.title"
+  | "clinical.acr.wpi.subtitle"
+  | "clinical.acr.wpi.count"
+  | "clinical.acr.ss.title"
+  | "clinical.acr.ss.hint"
+  | "clinical.acr.ss.fatigue"
+  | "clinical.acr.ss.unrefreshed"
+  | "clinical.acr.ss.cognitive"
+  | "clinical.acr.somatic.title"
+  | "clinical.acr.somatic.subtitle"
+  | "clinical.acr.somatic.bandHint"
+  | "clinical.acr.duration.title"
+  | "clinical.acr.duration.label"
+  | "clinical.acr.evaluate"
+  | "clinical.acr.result.criteriaMet"
+  | "clinical.acr.result.criteriaNotMet"
+  | "clinical.acr.result.interpretation"
+  | "clinical.acr.result.wpi"
+  | "clinical.acr.result.ss"
+  | "clinical.acr.result.generalized"
+  | "clinical.acr.result.scoreRule"
+  | "clinical.acr.result.duration"
+  | "clinical.acr.result.met"
+  | "clinical.acr.result.notMet"
+  | "clinical.acr.summaryTitle"
+  | "clinical.acr.summary.wpi"
+  | "clinical.acr.summary.ss"
+  | "clinical.acr.summary.generalized"
+  | "clinical.acr.summary.scoreRule"
+  | "clinical.acr.summary.duration"
+  | "clinical.acr.summary.criteria"
+  | "clinical.acr.savedToProfile"
+  | "clinical.acr.signInHint"
+  | "clinical.acr.saveToProfile"
+  | "clinical.acr.savedToProfileHint"
+  | "clinical.acr.signInHintBody"
+  | "clinical.acr.shareError"
+  | "clinical.acr.disclaimer"
+
+  | "clinical.lab.title"
+  | "clinical.lab.subtitle"
+  | "clinical.lab.latestNone"
+  | "clinical.lab.test"
+  | "clinical.lab.date"
+  | "clinical.lab.value"
+  | "clinical.lab.valueRequired"
+  | "clinical.lab.hint"
+  | "clinical.lab.reference"
+  | "clinical.lab.note"
+  | "clinical.lab.notePlaceholder"
+  | "clinical.lab.add"
+  | "clinical.lab.history"
+  | "clinical.lab.empty"
+  | "clinical.lab.delete"
+  | "clinical.lab.disclaimer"
+  | "clinical.lab.verdict.low"
+  | "clinical.lab.verdict.inRange"
+  | "clinical.lab.verdict.high"
+  | "clinical.lab.tsh.label"
+  | "clinical.lab.tsh.hint"
+  | "clinical.lab.ft4.label"
+  | "clinical.lab.ft4.hint"
+  | "clinical.lab.vitaminD.label"
+  | "clinical.lab.vitaminD.hint"
+  | "clinical.lab.esr.label"
+  | "clinical.lab.esr.hint"
+  | "clinical.lab.crp.label"
+  | "clinical.lab.crp.hint"
+
+  | "clinical.meds.title"
+  | "clinical.meds.subtitle"
+  | "clinical.meds.due"
+  | "clinical.meds.dueEmpty"
+  | "clinical.meds.taken"
+  | "clinical.meds.markTaken"
+  | "clinical.meds.adherence"
+  | "clinical.meds.mySchedule"
+  | "clinical.meds.empty"
+  | "clinical.meds.remove"
+  | "clinical.meds.addTitle"
+  | "clinical.meds.add"
+  | "clinical.meds.addAria"
+  | "clinical.meds.disclaimer"
+  | "clinical.meds.frequency.once"
+  | "clinical.meds.frequency.twice"
+  | "clinical.meds.frequency.threeTimes"
+  | "clinical.meds.frequency.asNeeded"
+
+  | "clinical.somatic.headache"
+  | "clinical.somatic.lowerAbdomenPain"
+  | "clinical.somatic.depression"
+  | "clinical.somatic.constipation"
+  | "clinical.somatic.diarrhea"
+  | "clinical.somatic.nausea"
+  | "clinical.somatic.dizziness"
+  | "clinical.somatic.tingling"
+  | "clinical.somatic.irritableBowel"
+  | "clinical.somatic.tinnitus"
+  | "clinical.somatic.blurredVision"
+  | "clinical.somatic.chestPain"
+  | "clinical.somatic.dryMouth"
+  | "clinical.somatic.mouthUlcers"
+  | "clinical.somatic.skinSensitivity"
+  | "clinical.somatic.anxiety"
+  | "clinical.somatic.restlessLegs"
+  | "clinical.somatic.coldIntolerance"
+
+  | "clinical.trigger.title"
+  | "clinical.trigger.subtitle"
+  | "clinical.trigger.date"
+  | "clinical.trigger.severity"
+  | "clinical.trigger.severityHint"
+  | "clinical.trigger.factors"
+  | "clinical.trigger.note"
+  | "clinical.trigger.notePlaceholder"
+  | "clinical.trigger.addEntry"
+  | "clinical.trigger.added"
+  | "clinical.trigger.insights"
+  | "clinical.trigger.frequencyLabel"
+  | "clinical.trigger.avgSeverity"
+  | "clinical.trigger.history"
+  | "clinical.trigger.empty"
+  | "clinical.trigger.delete"
+  | "clinical.trigger.group.weather"
+  | "clinical.trigger.group.stress"
+  | "clinical.trigger.group.sleep"
+  | "clinical.trigger.group.diet"
+  | "clinical.trigger.group.activity"
+  | "clinical.trigger.group.other"
+  | "clinical.trigger.weatherPressure"
+  | "clinical.trigger.cold"
+  | "clinical.trigger.heat"
+  | "clinical.trigger.stress"
+  | "clinical.trigger.poorSleep"
+  | "clinical.trigger.overexertion"
+  | "clinical.trigger.dietary"
+  | "clinical.trigger.sittingTooLong"
+  | "clinical.trigger.hormonal"
+  | "clinical.trigger.illness"
+
+  | "clinical.wpi.shoulderL"
+  | "clinical.wpi.shoulderR"
+  | "clinical.wpi.upperArmL"
+  | "clinical.wpi.upperArmR"
+  | "clinical.wpi.lowerArmL"
+  | "clinical.wpi.lowerArmR"
+  | "clinical.wpi.hipL"
+  | "clinical.wpi.hipR"
+  | "clinical.wpi.upperLegL"
+  | "clinical.wpi.upperLegR"
+  | "clinical.wpi.lowerLegL"
+  | "clinical.wpi.lowerLegR"
+  | "clinical.wpi.jawL"
+  | "clinical.wpi.jawR"
+  | "clinical.wpi.chest"
+  | "clinical.wpi.abdomen"
+  | "clinical.wpi.neck"
+  | "clinical.wpi.upperBack"
+  | "clinical.wpi.lowerBack"
+  | "toolkit.clinicalTitle"
+  | "toolkit.clinicalSubtitle"
+
+
+  | "sos.fab"
+  | "sos.dismissFab"
+  | "sos.modal.title"
+  | "sos.modal.subtitle"
+  | "sos.close"
+  | "sos.breath.title"
+  | "sos.breath.hint"
+  | "sos.breath.done"
+  | "sos.message.title"
+  | "sos.message.body"
+  | "sos.message.share"
+  | "sos.message.copy"
+  | "sos.guide.title"
+  | "sos.guide.sit"
+  | "sos.guide.head"
+  | "sos.guide.sip"
+  | "sos.guide.call"
+  | "sos.emergencyCall"
+  | "sos.privacyNote"
+  | "spoon.checkin.title"
+  | "spoon.checkin.subtitle"
+  | "spoon.checkin.question"
+  | "spoon.checkin.guide.ask"
+  | "spoon.checkin.guide.spend"
+  | "spoon.checkin.guide.rest"
+  | "spoon.checkin.mode.spend"
+  | "spoon.checkin.mode.rest"
+  | "spoon.checkin.savedNote"
+  | "spoon.checkin.saving"
+  | "spoon.checkin.week"
+  | "spoon.checkin.signInRequired"
+  | "spoon.checkin.locked"
+  | "spoon.checkin.invalid"
+  | "spoon.checkin.failed"
+  | "pantry.title"
+  | "pantry.subtitle"
+  | "pantry.haveQuestion"
+  | "pantry.loading"
+  | "pantry.noMatch"
+  | "pantry.bestMatch"
+  | "pantry.minutes"
+  | "pantry.disclaimer"
+  | "pantry.ing.oats"
+  | "pantry.ing.oliveOil"
+  | "pantry.ing.fattyFish"
+  | "pantry.ing.leafyGreens"
+  | "pantry.ing.berries"
+  | "pantry.ing.nuts"
+  | "pantry.ing.yogurt"
+  | "pantry.ing.turmeric"
+  | "pantry.ing.ginger"
+  | "pantry.ing.eggs"
+  | "pantry.ing.bananas"
+  | "pantry.ing.wholeGrainBread"
+  | "pantry.meal.oatBerryBowl"
+  | "pantry.meal.oatBerryBowl.how"
+  | "pantry.meal.turmericYogurtBowl"
+  | "pantry.meal.turmericYogurtBowl.how"
+  | "pantry.meal.toastAvocadoSpinach"
+  | "pantry.meal.toastAvocadoSpinach.how"
+  | "pantry.meal.sardineToast"
+  | "pantry.meal.sardineToast.how"
+  | "pantry.meal.gingerBananaSmoothie"
+  | "pantry.meal.gingerBananaSmoothie.how"
+  | "pantry.meal.eggGreenScramble"
+  | "pantry.meal.eggGreenScramble.how"
+  | "family.title"
+  | "family.subtitle"
+  | "family.shareTitle"
+  | "family.copy"
+  | "family.copied"
+  | "family.copyFailed"
+  | "family.share"
+  | "family.privacyNote"
+  | "family.card.flare.title"
+  | "family.card.flare.body"
+  | "family.card.fog.title"
+  | "family.card.fog.body"
+  | "family.card.crash.title"
+  | "family.card.crash.body"
+  | "movement.title"
+  | "movement.off"
+  | "movement.minutes"
+  | "movement.popup.title"
+  | "movement.done"
+  | "movement.snooze"
+  | "movement.dismiss"
+  | "movement.stretch.neck"
+  | "movement.stretch.shoulders"
+  | "movement.stretch.wrists"
+  | "movement.stretch.hips"
+  | "movement.stretch.calves"
+  | "support.title"
+  | "support.subtitle"
+  | "summary.title"
+  | "summary.subtitle"
+  | "summary.loading"
+  | "summary.unavailable"
+  | "summary.heading"
+  | "summary.line.period"
+  | "summary.line.avgPain"
+  | "summary.line.peakPain"
+  | "summary.line.flareDays"
+  | "summary.line.cycleDays"
+  | "summary.line.symptomAvg"
+  | "summary.line.adherence"
+  | "summary.line.meds"
+  | "summary.line.medsNone"
+  | "summary.generated"
+  | "summary.print"
+  | "summary.none"
+
+  | "nav.clinical"
+  | "clinical.hub.title"
+  | "clinical.hub.subtitle"
+  | "clinical.hub.trackersTitle"
+  | "clinical.hub.trackersSubtitle"
+  | "clinical.hub.lifestyleTitle"
+  | "clinical.hub.lifestyleSubtitle"
+  | "clinical.hub.reportTitle"
+  | "clinical.hub.reportSubtitle"
+
+  | "clinical.exercise.title"
+  | "clinical.exercise.subtitle"
+  | "clinical.exercise.filter.all"
+  | "clinical.exercise.intensity.gentle"
+  | "clinical.exercise.intensity.light"
+  | "clinical.exercise.intensity.moderate"
+  | "clinical.exercise.minutes"
+  | "clinical.exercise.stepsLabel"
+  | "clinical.exercise.clearance"
+  | "clinical.exercise.tipsTitle"
+  | "clinical.exercise.tip.1"
+  | "clinical.exercise.tip.2"
+  | "clinical.exercise.tip.3"
+  | "clinical.exercise.tip.4"
+  | "clinical.exercise.walking.title"
+  | "clinical.exercise.walking.details"
+  | "clinical.exercise.walking.steps"
+  | "clinical.exercise.water.title"
+  | "clinical.exercise.water.details"
+  | "clinical.exercise.water.steps"
+  | "clinical.exercise.taiChi.title"
+  | "clinical.exercise.taiChi.details"
+  | "clinical.exercise.taiChi.steps"
+  | "clinical.exercise.yoga.title"
+  | "clinical.exercise.yoga.details"
+  | "clinical.exercise.yoga.steps"
+  | "clinical.exercise.stretching.title"
+  | "clinical.exercise.stretching.details"
+  | "clinical.exercise.stretching.steps"
+  | "clinical.exercise.strength.title"
+  | "clinical.exercise.strength.details"
+  | "clinical.exercise.strength.steps"
+  | "clinical.exercise.cycling.title"
+  | "clinical.exercise.cycling.details"
+  | "clinical.exercise.cycling.steps"
+  | "clinical.exercise.seatedBand.title"
+  | "clinical.exercise.seatedBand.details"
+  | "clinical.exercise.seatedBand.steps"
+
+  | "clinical.sleep.title"
+  | "clinical.sleep.subtitle"
+  | "clinical.sleep.checklistTitle"
+  | "clinical.sleep.score"
+  | "clinical.sleep.reading.strong"
+  | "clinical.sleep.reading.building"
+  | "clinical.sleep.reading.starting"
+  | "clinical.sleep.hint.strong"
+  | "clinical.sleep.hint.building"
+  | "clinical.sleep.hint.starting"
+  | "clinical.sleep.disclaimer"
+  | "clinical.sleep.consistentSchedule.title"
+  | "clinical.sleep.consistentSchedule.body"
+  | "clinical.sleep.darkCoolRoom.title"
+  | "clinical.sleep.darkCoolRoom.body"
+  | "clinical.sleep.screenWindDown.title"
+  | "clinical.sleep.screenWindDown.body"
+  | "clinical.sleep.caffeineCutoff.title"
+  | "clinical.sleep.caffeineCutoff.body"
+  | "clinical.sleep.eveningRoutine.title"
+  | "clinical.sleep.eveningRoutine.body"
+  | "clinical.sleep.preSleepRelaxation.title"
+  | "clinical.sleep.preSleepRelaxation.body"
+  | "clinical.sleep.gentleDaylight.title"
+  | "clinical.sleep.gentleDaylight.body"
+  | "clinical.sleep.painComfortPrep.title"
+  | "clinical.sleep.painComfortPrep.body"
+
+  | "clinical.coping.title"
+  | "clinical.coping.subtitle"
+  | "clinical.coping.pacing.title"
+  | "clinical.coping.pacing.body"
+  | "clinical.coping.pacing.action"
+  | "clinical.coping.breathing.title"
+  | "clinical.coping.breathing.body"
+  | "clinical.coping.breathing.action"
+  | "clinical.coping.grounding.title"
+  | "clinical.coping.grounding.body"
+  | "clinical.coping.grounding.action"
+  | "clinical.coping.heatComfort.title"
+  | "clinical.coping.heatComfort.body"
+  | "clinical.coping.heatComfort.action"
+  | "clinical.coping.sensoryShutdown.title"
+  | "clinical.coping.sensoryShutdown.body"
+  | "clinical.coping.sensoryShutdown.action"
+  | "clinical.coping.support.title"
+  | "clinical.coping.support.body"
+  | "clinical.coping.support.action"
+  | "clinical.coping.breath.title"
+  | "clinical.coping.breath.subtitle"
+  | "clinical.coping.breath.start"
+  | "clinical.coping.breath.pause"
+  | "clinical.coping.breath.reset"
+  | "clinical.coping.breath.inhale"
+  | "clinical.coping.breath.hold"
+  | "clinical.coping.breath.exhale"
+  | "clinical.coping.breath.cycleCount"
+  | "clinical.coping.breath.aria"
+  | "clinical.coping.disclaimer"
+
+  | "clinical.report.title"
+  | "clinical.report.subtitle"
+  | "clinical.report.period.week"
+  | "clinical.report.period.month"
+  | "clinical.report.stat.avgPain"
+  | "clinical.report.stat.peakPain"
+  | "clinical.report.stat.flareDays"
+  | "clinical.report.stat.adherence"
+  | "clinical.report.trigger.title"
+  | "clinical.report.trigger.none"
+  | "clinical.report.trigger.top"
+  | "clinical.report.lab.title"
+  | "clinical.report.lab.none"
+  | "clinical.report.meds.title"
+  | "clinical.report.meds.none"
+  | "clinical.report.acr.title"
+  | "clinical.report.acr.met"
+  | "clinical.report.acr.notMet"
+  | "clinical.report.acr.none"
+  | "clinical.report.cycle.title"
+  | "clinical.report.cycle.none"
+  | "clinical.report.empty"
+  | "clinical.report.copy"
+  | "clinical.report.copied"
+  | "clinical.report.shareHint"
+
+  | "caregiver.badge"
+  | "caregiver.title"
+  | "caregiver.readOnly"
+  | "caregiver.level.high"
+  | "caregiver.level.moderate"
+  | "caregiver.level.low"
+  | "caregiver.daysToPeriod"
+  | "caregiver.cyclePhase"
+  | "caregiver.unknown"
+  | "caregiver.insight"
+  | "caregiver.linkInactive"
+
+  | "doctor.filter.searchLabel"
+  | "doctor.filter.searchPlaceholder"
+  | "doctor.filter.topic"
+  | "doctor.filter.topicAll"
+  | "doctor.filter.topics.pain"
+  | "doctor.filter.topics.sleep"
+  | "doctor.filter.topics.fatigue"
+  | "doctor.filter.topics.medication"
+  | "doctor.filter.topics.nutrition"
+  | "doctor.filter.topics.mentalHealth"
+  | "doctor.filter.topics.research"
+  | "doctor.filter.topics.lifestyle"
+  | "doctor.filter.specialization"
+  | "doctor.filter.specAll"
+  | "doctor.filter.spec.rheumatology"
+  | "doctor.filter.spec.neurology"
+  | "doctor.filter.spec.painMedicine"
+  | "doctor.filter.spec.physiatry"
+  | "doctor.filter.spec.physiotherapy"
+  | "doctor.filter.spec.psychology"
+  | "doctor.filter.spec.generalMedicine"
+  | "doctor.filter.clear"
+  | "doctor.filter.showing"
+  | "doctor.filter.noResults";
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -1923,6 +2622,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "common.loading": "Loading...",
     "common.readMore": "Read More",
     "common.back": "Back",
+    "common.signInRequired": "You must be signed in.",
     "auth.login.title": "Welcome back",
     "auth.login.description": "Sign in to continue your check-ins, trends, and gentle support.",
     "resources.title": "Care Resources",
@@ -2590,6 +3290,99 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.area.widespread": "Widespread",
     "health.area.joints": "Joints",
     "health.area.other": "Other",
+    "health.menstrualLog.title": "Daily Cycle Log",
+    "health.menstrualLog.flow.title": "Flow Intensity",
+    "health.menstrualLog.flow.spotting": "Spotting",
+    "health.menstrualLog.flow.light": "Light",
+    "health.menstrualLog.flow.medium": "Medium",
+    "health.menstrualLog.flow.heavy": "Heavy",
+    "health.menstrualLog.flow.hasClots": "Blood Clots",
+    "health.menstrualLog.flow.color": "Flow Color",
+    "health.menstrualLog.somatic.title": "Fibro-Somatic Symptoms",
+    "health.menstrualLog.somatic.cramps": "Cramps Severity",
+    "health.menstrualLog.somatic.headache": "Headache Severity",
+    "health.menstrualLog.somatic.breastTenderness": "Breast Tenderness",
+    "health.menstrualLog.somatic.bloating": "Bloating",
+    "health.menstrualLog.gi.title": "Digestive & Inflammation",
+    "health.menstrualLog.gi.diarrhea": "Diarrhea",
+    "health.menstrualLog.gi.constipation": "Constipation",
+    "health.menstrualLog.gi.acne": "Hormonal Acne",
+    "health.menstrualLog.fertility.title": "Ovulation & Fertility Signs",
+    "health.menstrualLog.fertility.cervicalMucus": "Cervical Mucus",
+    "health.menstrualLog.fertility.opk": "OPK Result",
+    "health.menstrualLog.mood.title": "Mood & Emotional Sharpness",
+    "health.menstrualLog.mood.tearfulness": "Tearfulness",
+    "health.menstrualLog.mood.anxiety": "Anxiety Level",
+    "health.menstrualLog.mood.volatility": "Mood Volatility",
+    "health.menstrualLog.mucus.dry": "Dry",
+    "health.menstrualLog.mucus.sticky": "Sticky",
+    "health.menstrualLog.mucus.creamy": "Creamy",
+    "health.menstrualLog.mucus.watery": "Watery",
+    "health.menstrualLog.mucus.eggWhite": "Egg-white",
+    "health.menstrualLog.opk.negative": "Negative",
+    "health.menstrualLog.opk.positive": "Positive",
+    "health.menstrualLog.opk.notUsed": "Not used",
+    "health.menstrualLog.sensory.none": "None",
+    "health.menstrualLog.sensory.mild": "Mild",
+    "health.menstrualLog.sensory.moderate": "Moderate",
+    "health.menstrualLog.sensory.severe": "Severe",
+    "health.menstrualLog.notesLabel": "Notes",
+    "health.menstrualLog.energy.title": "Daily Bio-Energy",
+    "health.menstrualLog.libido.title": "Libido & Vitality",
+    "health.menstrualLog.sensory.title": "Sensory Overload",
+    "health.menstrualLog.sensory.light": "Light Sensitivity",
+    "health.menstrualLog.sensory.sound": "Sound Sensitivity",
+    "health.menstrualLog.saveCta": "Save daily log",
+    "health.menstrualLog.savedOk": "Daily log saved — your correlation map just got sharper.",
+    "health.menstrualLog.saveError": "Could not save the daily log. Please try again.",
+    "health.menstrualLog.noActiveCycle": "No active cycle yet",
+    "health.menstrualLog.createCycleFirst": "Create a cycle first — the daily log links to your current cycle phase.",
+    "health.overlap.title": "Fibro-Hormonal Overlap Score",
+    "health.overlap.hormonal": "Hormonal amplification",
+    "health.overlap.physical": "Physical exertion",
+    "health.overlap.noData": "Log a few days to reveal your hormonal flare split.",
+    "health.carePlan.title": "Phase-Based Care Plan",
+    "health.carePlan.diet": "Diet",
+    "health.carePlan.supplements": "Supplements",
+    "health.carePlan.pacing": "Pacing",
+    "health.carePlan.currentPhase": "Current phase",
+    "health.carePlan.diet.menstrual": "Prioritize iron-rich foods and warm, easily-digested meals; gentle soups reduce cramping load.",
+    "health.carePlan.diet.follicular": "Energy rises — favor lean proteins, fermented foods and fresh vegetables to support hormone clearance.",
+    "health.carePlan.diet.ovulatory": "Hydrate well, keep fiber high, and reduce simple sugars around the surge to steady mood.",
+    "health.carePlan.diet.luteal": "Increase magnesium, complex carbs and leafy greens; lower salt and caffeine to soften PMS symptoms.",
+    "health.carePlan.supplements.menstrual": "Vitamin D3 + magnesium glycinate may ease menstrual cramps — confirm the dose with your clinician.",
+    "health.carePlan.supplements.follicular": "Vitamin B-complex supports estrogen metabolism; consider an iron check if flow is heavy.",
+    "health.carePlan.supplements.ovulatory": "Omega-3s help quiet inflammatory peaks; keep zinc as a short luteal-support option.",
+    "health.carePlan.supplements.luteal": "Magnesium + vitamin B6 are the classic luteal team for PMS mood and bloating.",
+    "health.carePlan.pacing.menstrual": "Treat the first two days as a minimum rest baseline — split tasks and defer heavy exertion.",
+    "health.carePlan.pacing.follicular": "This is your strongest bandwidth — schedule demanding work and exercise now.",
+    "health.carePlan.pacing.ovulatory": "Great peak brain day — protect it with a mid-day micro-break and early bedtime.",
+    "health.carePlan.pacing.luteal": "Shrink your to-do list, add 10-minute rests, and keep movement gentle (walks, stretching).",
+    "health.spoonCalc.title": "Spoon Theory Energy Calculator",
+    "health.spoonCalc.subtitle": "Budget your daily spoons from sleep quality and cycle phase.",
+    "health.spoonCalc.budget": "Budgeted spoons",
+    "health.spoonCalc.sleepQuality": "Last night's sleep quality",
+    "health.spoonCalc.cycleAdjust": "Cycle phase adjustment",
+    "health.spoonCalc.available": "available today",
+    "health.clinicalReport.title": "Clinical Report",
+    "health.clinicalReport.subtitle": "Doctor-ready correlation summary of your cycle vs symptoms.",
+    "health.clinicalReport.generate": "Generate report",
+    "health.clinicalReport.generating": "Generating…",
+    "health.clinicalReport.periodRange": "Cycles analyzed",
+    "health.clinicalReport.peakPain": "Peak pain level",
+    "health.clinicalReport.avgEnergy": "Avg energy (1-10)",
+    "health.clinicalReport.avgMood": "Avg mood score",
+    "health.clinicalReport.symptomSummary": "Top symptom correlations",
+    "health.clinicalReport.printCta": "Print / Save as PDF",
+    "health.clinicalReport.emptyState": "Not enough data yet — log your cycle and symptoms for a readable report.",
+    "health.caregiver.title": "Caregiver / Partner Sync",
+    "health.caregiver.subtitle": "Share a read-only flare-prediction link with people who care for you.",
+    "health.caregiver.enable": "Enable secure share",
+    "health.caregiver.disable": "Disable share",
+    "health.caregiver.shareToken": "Share link",
+    "health.caregiver.copied": "Link copied to clipboard.",
+    "health.caregiver.disclaimer": "Your diary entries, scores and notes stay private — only the next flare forecast is visible to the viewer.",
+    "health.caregiver.viewOnly": "Read-only for the viewer",
     "dashboard.weekly.subtitle": "Your pain levels over the last 7 days.",
     "dashboard.weekly.avgPain": "Avg pain",
     "dashboard.weekly.daysLogged": "Days logged",
@@ -3495,6 +4288,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "meta.ogDescription":
       "Daily check-ins that turn invisible symptoms into clear patterns, calmer days, and reports your care team can actually use.",
     "meta.ogImageAlt": "FibroCare - Your pain is real. Your pace is yours.",
+    "meta.ogFeaturesImageAlt":
+      "FibroCare - Screenshots of the SOS crisis button, Fog Shield, and the Clinical Hub, in Arabic and English.",
     "doctor.title": "Doctor Hub",
     "doctor.subtitle": "Publish verified health insights for patients",
     "doctor.newPost": "New Article",
@@ -3565,6 +4360,19 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.feed.comment": "Comment",
     "doctor.feed.share": "Share",
     "doctor.filter.all": "All",
+    "doctor.feed.searchPlaceholder": "Search titles, topics, authors…",
+    "doctor.feed.searchLabel": "Search the feed",
+    "doctor.feed.clearSearch": "Clear search",
+    "doctor.feed.topicsLabel": "Topics",
+    "doctor.feed.sortLabel": "Sort",
+    "doctor.feed.sort.newest": "Newest",
+    "doctor.feed.sort.popular": "Most liked",
+    "doctor.feed.resultsCount": "Showing {count} of {total} posts",
+    "doctor.feed.noResults": "No posts match your filters",
+    "doctor.feed.noResultsHint": "Try a different keyword or remove a topic filter.",
+    "doctor.feed.activeFilters": "Active filters",
+    "doctor.feed.clearAll": "Clear all",
+    "doctor.feed.filtersToggle": "Search & filters",
     "doctor.postMedia": "Media URL",
     "doctor.postContentStatus": "Status update",
     "doctor.postAiToggle": "AI assist — structure my notes",
@@ -3676,6 +4484,653 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctorReport.copied": "Copied!",
     "doctorReport.printReport": "Print Report",
     "doctorReport.disclaimer": "This report was generated by the patient using FibroCare and is not a medical diagnosis. Please review with your healthcare provider.",
+    "nav.diet": "Diet & Triggers",
+    "diet.title": "Dietary Trigger Tracker",
+    "diet.subtitle": "Log your meals, keep your personal trigger list, and see how evening eating links to your next-morning symptoms.",
+    "diet.energy.exhausted": "Exhausted",
+    "diet.energy.low": "Low energy",
+    "diet.energy.moderate": "Moderate",
+    "diet.energy.good": "Good",
+    "diet.energy.full": "Full energy",
+    "diet.logger.title": "Log a Meal",
+    "diet.logger.subtitle": "Real-time flare warnings as you type your foods.",
+    "diet.logger.date": "Date",
+    "diet.logger.time": "Time",
+    "diet.logger.mealType": "Meal type",
+    "diet.logger.mealType.breakfast": "Breakfast",
+    "diet.logger.mealType.lunch": "Lunch",
+    "diet.logger.mealType.dinner": "Dinner",
+    "diet.logger.mealType.snack": "Snack",
+    "diet.logger.foods": "Foods eaten",
+    "diet.logger.foodsPlaceholder": "e.g. Grilled salmon, steamed broccoli",
+    "diet.logger.amount": "Amount",
+    "diet.logger.amountPlaceholder": "e.g. 1 bowl, 150 g",
+    "diet.logger.addFood": "Add food",
+    "diet.logger.energyBefore": "Energy before this meal",
+    "diet.logger.energyBefore.hint": "0 = exhausted · 4 = full energy",
+    "diet.logger.notes": "Notes",
+    "diet.logger.notesPlaceholder": "How did you feel after this meal?",
+    "diet.logger.save": "Save meal",
+    "diet.logger.saving": "Saving…",
+    "diet.logger.saved": "Meal saved",
+    "diet.logger.delete": "Delete",
+    "diet.logger.noMeals": "No meals logged for this date yet.",
+    "diet.logger.mealsLabel": "Logged meals",
+    "diet.warn.known.gluten": "Gluten (wheat, bread, pasta)",
+    "diet.warn.known.dairy": "Dairy (milk, cheese, yogurt)",
+    "diet.warn.known.sugar": "Refined sugar & sweets",
+    "diet.warn.known.fried": "Fried foods",
+    "diet.warn.known.processed": "Processed & fast foods",
+    "diet.warn.known.alcohol": "Alcohol",
+    "diet.warn.known.caffeine": "Caffeine",
+    "diet.warn.personal": "You listed this as a personal trigger",
+    "diet.warnings.none": "No known triggers detected — nice choice.",
+    "diet.warnings.some": "Possible trigger(s) in this meal",
+    "diet.warnings.swap": "Swap idea",
+    "diet.warnings.reason": "Why",
+    "diet.swap.gluten.swap": "Swap for gluten-free oats or rice",
+    "diet.swap.gluten.reason": "Gluten can drive fatigue and joint stiffness in sensitive people.",
+    "diet.swap.dairy.swap": "Swap for oat or almond milk",
+    "diet.swap.dairy.reason": "Dairy is a common fibromyalgia food sensitivity.",
+    "diet.swap.sugar.swap": "Swap refined sugar for dates or berries",
+    "diet.swap.sugar.reason": "Sugar spikes can amplify afternoon crashes.",
+    "diet.swap.fried.swap": "Choose baked or air-fried options",
+    "diet.swap.fried.reason": "Fried foods add inflammatory fats that may worsen pain.",
+    "diet.swap.processed.swap": "Choose a whole-food alternative",
+    "diet.swap.processed.reason": "Ultra-processed foods often hide pro-inflammatory additives.",
+    "diet.swap.alcohol.swap": "Swap for sparkling water with lime",
+    "diet.swap.alcohol.reason": "Alcohol can disrupt deep sleep, fueling next-day fatigue.",
+    "diet.swap.caffeine.swap": "Swap for herbal or decaf tea",
+    "diet.swap.caffeine.reason": "Late caffeine can delay sleep and worsen fibro fog.",
+    "diet.timing.veryLow.title": "Eat small & early tonight",
+    "diet.timing.veryLow.reason": "Very low energy — a light dinner before 19:00 supports better recovery.",
+    "diet.timing.low.title": "Aim for an earlier dinner",
+    "diet.timing.low.reason": "Try finishing dinner before 20:00 to protect your sleep window.",
+    "diet.timing.moderate.title": "Keep a steady evening meal",
+    "diet.timing.moderate.reason": "A balanced dinner with protein and vegetables supports stable energy.",
+    "diet.timing.good.title": "You're in a good window",
+    "diet.timing.good.reason": "Keep your usual balanced dinner and stay hydrated.",
+    "diet.timing.full.title": "Full energy — keep it nourishing",
+    "diet.timing.full.reason": "Great energy today — a nutrient-rich dinner sustains tomorrow.",
+    "diet.triggers.title": "My Trigger Foods",
+    "diet.triggers.subtitle": "Foods that tend to bring on your flare-ups — we'll flag them whenever they appear in a meal.",
+    "diet.triggers.name": "Food name",
+    "diet.triggers.severity": "Severity",
+    "diet.triggers.severity.hint": "1 = mild · 5 = severe reaction",
+    "diet.triggers.severity.level1": "Mild",
+    "diet.triggers.severity.level2": "Mild–moderate",
+    "diet.triggers.severity.level3": "Moderate",
+    "diet.triggers.severity.level4": "Strong",
+    "diet.triggers.severity.level5": "Severe",
+    "diet.triggers.reactionNote": "How does it affect you?",
+    "diet.triggers.reactionNotePlaceholder": "e.g. Next-day fatigue, joint pain",
+  "diet.triggers.namePlaceholder": "e.g. Garlic, citrus, red wine",
+    "diet.triggers.add": "Add to my list",
+    "diet.triggers.adding": "Adding…",
+    "diet.triggers.empty": "No personal triggers yet — add foods you've noticed set you back.",
+    "diet.triggers.remove": "Remove",
+    "diet.triggers.removed": "Trigger removed",
+    "diet.correlation.title": "Next-Day Flare Correlation",
+    "diet.correlation.subtitle": "Evening meals vs. your next-morning symptoms — a pattern hint, not a diagnosis.",
+    "diet.correlation.disclaimer": "Correlation only — not a medical diagnosis.",
+    "diet.correlation.empty": "Log a few evening meals (with pain or symptom logs the next day) and this panel will find patterns.",
+    "diet.correlation.baseline": "Baseline next-day score",
+    "diet.correlation.baseline.hint": "Average symptom score after any evening meal",
+    "diet.correlation.food": "Food",
+    "diet.correlation.with": "Score after eating it",
+    "diet.correlation.without": "Score without it",
+    "diet.correlation.lift": "Lift",
+    "diet.correlation.outOf": "out of 10",
+    "diet.correlation.evenings": "Evenings",
+    "diet.correlation.risk.high": "High suspicion",
+    "diet.correlation.risk.moderate": "Moderate suspicion",
+    "diet.correlation.risk.watch": "Watch",
+    "diet.correlation.risk.high.hint": "Strongly linked with your next-morning symptoms in your logs.",
+    "diet.correlation.risk.moderate.hint": "May be linked — worth testing consciously.",
+    "diet.correlation.risk.watch.hint": "Too few samples or no clear signal yet.",
+    "diet.correlation.timing.title": "Dinner timing",
+    "diet.correlation.timing.highFlare": "Avg. dinner hour on flare mornings",
+    "diet.correlation.timing.lowFlare": "Avg. dinner hour on calm mornings",
+    "diet.correlation.timing.later": "Later dinners tend to track with next-morning flare-ups. Try eating before {hour}:00 to protect your sleep.",
+    "diet.correlation.timing.nodata": "Not enough data yet.",
+
+    "clinical.acr.title": "ACR Assessment",
+    "clinical.acr.subtitle": "A self-check against the ACR 2010/2016 criteria — a screening aid, not a diagnosis.",
+    "clinical.acr.ss.level.0": "No symptoms",
+    "clinical.acr.ss.level.1": "Mild",
+    "clinical.acr.ss.level.2": "Moderate",
+    "clinical.acr.ss.level.3": "Severe",
+    "clinical.acr.wpi.title": "Widespread Pain Index (WPI)",
+    "clinical.acr.wpi.subtitle": "Tap every area that was painful in the last 7 days.",
+    "clinical.acr.wpi.count": "{count} of 19 areas selected",
+    "clinical.acr.ss.title": "Symptom Severity (SS) score",
+    "clinical.acr.ss.hint": "Rate each dimension over the past week.",
+    "clinical.acr.ss.fatigue": "Fatigue",
+    "clinical.acr.ss.unrefreshed": "Waking unrefreshed",
+    "clinical.acr.ss.cognitive": "Cognitive symptoms",
+    "clinical.acr.somatic.title": "Somatic symptom checklist",
+    "clinical.acr.somatic.subtitle": "Tick symptoms you have experienced recently.",
+    "clinical.acr.somatic.bandHint": "{count} selected → severity band: {band}",
+    "clinical.acr.duration.title": "Duration",
+    "clinical.acr.duration.label": "Symptoms have been present at a similar level for at least 3 months.",
+    "clinical.acr.evaluate": "Evaluate",
+    "clinical.acr.result.criteriaMet": "Criteria met",
+    "clinical.acr.result.criteriaNotMet": "Criteria not fully met",
+    "clinical.acr.result.interpretation": "This reflects your answers to the ACR screening questions — not a medical diagnosis.",
+    "clinical.acr.result.wpi": "WPI",
+    "clinical.acr.result.ss": "SS",
+    "clinical.acr.result.generalized": "Generalized",
+    "clinical.acr.result.scoreRule": "Score rule",
+    "clinical.acr.result.duration": "Duration ≥ 3 months",
+    "clinical.acr.result.met": "Met",
+    "clinical.acr.result.notMet": "Not met",
+    "clinical.acr.summaryTitle": "Summary for your doctor",
+    "clinical.acr.summary.wpi": "painful areas out of 19",
+    "clinical.acr.summary.ss": "Symptom Severity",
+    "clinical.acr.summary.generalized": "Generalized regions",
+    "clinical.acr.summary.scoreRule": "Score rule",
+    "clinical.acr.summary.duration": "Duration",
+    "clinical.acr.summary.criteria": "ACR criteria",
+    "clinical.acr.savedToProfile": "Saved to profile",
+    "clinical.acr.signInHint": "Sign in to save",
+    "clinical.acr.saveToProfile": "Save to profile",
+    "clinical.acr.savedToProfileHint": "Saved to your profile. You can share it with your doctor.",
+    "clinical.acr.signInHintBody": "By saving, you can share this snapshot with your doctor. Please sign in first.",
+    "clinical.acr.shareError": "Something went wrong while saving. Please try again.",
+    "clinical.acr.disclaimer": "Screening aid only — it is not a diagnosis. Discuss the results with a qualified clinician.",
+
+    "clinical.somatic.headache": "Headache",
+    "clinical.somatic.lowerAbdomenPain": "Pain or cramps in the lower abdomen",
+    "clinical.somatic.depression": "Depression",
+    "clinical.somatic.constipation": "Constipation",
+    "clinical.somatic.diarrhea": "Diarrhea",
+    "clinical.somatic.nausea": "Nausea",
+    "clinical.somatic.dizziness": "Dizziness",
+    "clinical.somatic.tingling": "Tingling / numbness",
+    "clinical.somatic.irritableBowel": "Irritable bowel syndrome",
+    "clinical.somatic.tinnitus": "Tinnitus",
+    "clinical.somatic.blurredVision": "Blurred vision",
+    "clinical.somatic.chestPain": "Chest pain",
+    "clinical.somatic.dryMouth": "Dry mouth",
+    "clinical.somatic.mouthUlcers": "Mouth ulcers",
+    "clinical.somatic.skinSensitivity": "Skin sensitivity",
+    "clinical.somatic.anxiety": "Anxiety",
+    "clinical.somatic.restlessLegs": "Restless legs",
+    "clinical.somatic.coldIntolerance": "Cold intolerance",
+
+    "clinical.wpi.shoulderL": "Shoulder — left",
+    "clinical.wpi.shoulderR": "Shoulder — right",
+    "clinical.wpi.upperArmL": "Upper arm — left",
+    "clinical.wpi.upperArmR": "Upper arm — right",
+    "clinical.wpi.lowerArmL": "Lower arm — left",
+    "clinical.wpi.lowerArmR": "Lower arm — right",
+    "clinical.wpi.hipL": "Hip — left",
+    "clinical.wpi.hipR": "Hip — right",
+    "clinical.wpi.upperLegL": "Upper leg — left",
+    "clinical.wpi.upperLegR": "Upper leg — right",
+    "clinical.wpi.lowerLegL": "Lower leg — left",
+    "clinical.wpi.lowerLegR": "Lower leg — right",
+    "clinical.wpi.jawL": "Jaw — left",
+    "clinical.wpi.jawR": "Jaw — right",
+    "clinical.wpi.chest": "Chest",
+    "clinical.wpi.abdomen": "Abdomen",
+    "clinical.wpi.neck": "Neck",
+    "clinical.wpi.upperBack": "Upper back",
+    "clinical.wpi.lowerBack": "Lower back",
+
+    "clinical.meds.title": "Medications & Supplements",
+    "clinical.meds.subtitle": "Track your doses and daily adherence — informational, not treatment advice.",
+    "clinical.meds.due": "Due now",
+    "clinical.meds.dueEmpty": "Nothing due right now. Keep a regular rhythm.",
+    "clinical.meds.taken": "Taken ✓",
+    "clinical.meds.markTaken": "Mark taken",
+    "clinical.meds.adherence": "7-day adherence",
+    "clinical.meds.mySchedule": "My schedule",
+    "clinical.meds.empty": "Your schedule is empty. Add common medications and supplements below.",
+    "clinical.meds.remove": "Remove {name}",
+    "clinical.meds.addTitle": "Add from the common list",
+    "clinical.meds.add": "Add",
+    "clinical.meds.addAria": "Add {name} to my schedule",
+    "clinical.meds.disclaimer": "Informational only — never stop, start or change medication without your prescriber.",
+    "clinical.meds.frequency.once": "Once daily",
+    "clinical.meds.frequency.twice": "Twice daily",
+    "clinical.meds.frequency.threeTimes": "Three times daily",
+    "clinical.meds.frequency.asNeeded": "As needed",
+
+    "clinical.trigger.title": "Flare Triggers Log",
+    "clinical.trigger.subtitle": "Learn which factors tend to accompany your strongest flares.",
+    "clinical.trigger.date": "Date",
+    "clinical.trigger.severity": "Severity",
+    "clinical.trigger.severityHint": "0 = no flare · 10 = worst flare you have felt",
+    "clinical.trigger.factors": "Suspect factors",
+    "clinical.trigger.note": "Note",
+    "clinical.trigger.notePlaceholder": "What was going on? Weather, stress, activities…",
+    "clinical.trigger.addEntry": "Add entry",
+    "clinical.trigger.added": "Added ✓",
+    "clinical.trigger.insights": "Your patterns so far",
+    "clinical.trigger.frequencyLabel": "{count} logged",
+    "clinical.trigger.avgSeverity": "avg {avg}/10",
+    "clinical.trigger.history": "History",
+    "clinical.trigger.empty": "No entries yet. Log your first flare to start spotting patterns.",
+    "clinical.trigger.delete": "Delete entry",
+    "clinical.trigger.group.weather": "Weather",
+    "clinical.trigger.group.stress": "Stress & emotions",
+    "clinical.trigger.group.sleep": "Sleep",
+    "clinical.trigger.group.diet": "Diet",
+    "clinical.trigger.group.activity": "Activity",
+    "clinical.trigger.group.other": "Other",
+    "clinical.trigger.weatherPressure": "Pressure / weather change",
+    "clinical.trigger.cold": "Cold",
+    "clinical.trigger.heat": "Heat",
+    "clinical.trigger.stress": "Stress",
+    "clinical.trigger.poorSleep": "Poor sleep",
+    "clinical.trigger.overexertion": "Overexertion",
+    "clinical.trigger.dietary": "Diet (e.g. sugar, alcohol)",
+    "clinical.trigger.sittingTooLong": "Sitting too long",
+    "clinical.trigger.hormonal": "Hormonal changes",
+    "clinical.trigger.illness": "Illness / infection",
+
+    "clinical.lab.title": "Lab Results & Biomarkers",
+    "clinical.lab.subtitle": "Track the classic 'rule out overlap' bloodwork: thyroid, vitamin D, ESR and CRP.",
+    "clinical.lab.latestNone": "No results yet",
+    "clinical.lab.test": "Test",
+    "clinical.lab.date": "Date",
+    "clinical.lab.value": "Value",
+    "clinical.lab.valueRequired": "Enter a numeric value to add a result.",
+    "clinical.lab.hint": "Hint: {hint}",
+    "clinical.lab.reference": "Reference range: {low}–{high} {unit}",
+    "clinical.lab.note": "Note (optional)",
+    "clinical.lab.notePlaceholder": "Lab, fasting status, symptoms around the draw…",
+    "clinical.lab.add": "Add result",
+    "clinical.lab.history": "History",
+    "clinical.lab.empty": "No results logged yet. Add your latest bloodwork above.",
+    "clinical.lab.delete": "Delete result",
+    "clinical.lab.disclaimer": "Informational only — always review results with your clinician.",
+    "clinical.lab.verdict.low": "Low",
+    "clinical.lab.verdict.inRange": "In range",
+    "clinical.lab.verdict.high": "High",
+    "clinical.lab.tsh.label": "TSH",
+    "clinical.lab.tsh.hint": "Standard thyroid screening value.",
+    "clinical.lab.ft4.label": "Free T4",
+    "clinical.lab.ft4.hint": "Free thyroxine.",
+    "clinical.lab.vitaminD.label": "Vitamin D",
+    "clinical.lab.vitaminD.hint": "25-Hydroxyvitamin D.",
+    "clinical.lab.esr.label": "ESR",
+    "clinical.lab.esr.hint": "Erythrocyte sedimentation rate.",
+    "clinical.lab.crp.label": "CRP",
+    "clinical.lab.crp.hint": "C-reactive protein.",
+
+    "toolkit.clinicalTitle": "Clinical Centre",
+    "toolkit.clinicalSubtitle": "Self-assessments and trackers that help you prepare for appointments and rule out overlapping conditions.",
+
+    "fog.title": "Fog Shield",
+    "fog.hero.kicker": "Cognitive emergency toolkit",
+    "fog.hero.subtitle": "When brain fog rolls in, this page helps you ride it out: settle your breath, dump the static, shrink one task, or run the SOS protocol.",
+    "fog.hero.fogGuide": "Use any tool below — the fog lifts as you settle.",
+    "fog.hero.clearGuide": "You're clear. Come back any time the static returns.",
+    "fog.hero.statEpisodes": "Episodes logged",
+    "fog.hero.statAvg": "Average intensity",
+    "fog.hero.statRecent": "Recent trend",
+    "fog.hero.statNone": "No data yet",
+    "fog.hero.privacy": "Private by design —",
+    "fog.hero.privacyDetail": "brain dumps are encrypted at rest and readable only by you.",
+    "fog.sos.title": "Fog SOS",
+    "fog.sos.subtitle": "This is scary, not just hard. Work the four steps in order.",
+    "fog.sos.step1": "Sit or lie down somewhere safe",
+    "fog.sos.step1desc": "Stop what you're doing. You don't have to finish anything right now.",
+    "fog.sos.step2": "Sip water slowly",
+    "fog.sos.step2desc": "Dehydration amplifies fog and dizziness more than anything else.",
+    "fog.sos.step3": "Look at one fixed point and breathe",
+    "fog.sos.step3desc": "Hold your gaze on something still until the room stops spinning.",
+    "fog.sos.step4": "Tell one trusted person",
+    "fog.sos.step4desc": "One short message is enough: \"Fog episode, I'm resting, I'm safe.\"",
+    "fog.sos.callClinic": "Call my clinic",
+    "fog.sos.callTrusted": "Call my person",
+    "fog.sos.steady": "I'm steadier now",
+    "fog.sos.steadier": "Glad it's easing. The steps stay here whenever you need them.",
+    "fog.sos.emergency": "If you have chest pain, faint, or can't speak or move — call emergency services immediately.",
+    "fog.breath.title": "Breath reset",
+    "fog.breath.subtitle": "Long exhales tell your nervous system the emergency is over.",
+    "fog.breath.start": "Start",
+    "fog.breath.pause": "Pause",
+    "fog.breath.reset": "Reset",
+    "fog.breath.seconds": "seconds",
+    "fog.breath.cycles": "cycles",
+    "fog.breath.sessionComplete": "Session complete — nice work.",
+    "fog.breath.inhale": "Breathe in",
+    "fog.breath.hold": "Hold",
+    "fog.breath.exhale": "Breathe out",
+    "fog.breath.pattern478": "4-7-8 calming",
+    "fog.breath.patternBox": "Box breathing",
+    "fog.dump.title": "Brain dump",
+    "fog.dump.subtitle": "Empty the swirling thoughts onto the page. They don't have to make sense.",
+    "fog.dump.intensity": "Fog intensity",
+    "fog.dump.triggers": "What might be feeding it",
+    "fog.dump.where": "Where your head is right now",
+    "fog.dump.noTriggers": "Nothing selected",
+    "fog.dump.save": "Save this dump",
+    "fog.dump.saving": "Saving…",
+    "fog.dump.saved": "Dumped. It's out of your head and locked away.",
+    "fog.dump.clear": "Clear",
+    "fog.dump.chars": "characters",
+    "fog.dump.needsOne": "Write a thought or pick at least one trigger first.",
+    "fog.dump.recent": "Recent dumps",
+    "fog.save.locked": "Unlock FibroCare to save your fog log.",
+    "fog.save.invalid": "Please complete the fog log correctly.",
+    "fog.save.failed": "Failed to save your fog log. Please try again.",
+    "fog.microtask.title": "Micro-task shrinker",
+    "fog.microtask.subtitle": "One task that feels too big right now — three steps small enough to survive.",
+    "fog.microtask.prompt": "What feels too big right now?",
+    "fog.microtask.placeholder": "e.g. answer the insurance email…",
+    "fog.microtask.breakdown": "Shrink it to 3 steps",
+    "fog.microtask.newTask": "Shrink another task",
+    "fog.microtask.allDone": "All three done — that was the whole task.",
+    "fog.microtask.step": "Step",
+    "fog.microtask.theTask": "this task",
+    "fog.microtask.assist1": "Open whatever \"{task}\" needs — just open it.",
+    "fog.microtask.assist2": "Do the smallest visible piece for one minute.",
+    "fog.microtask.assist3": "Stop and let it rest — started is done for now.",
+    "fog.microtask.saveToggle": "Log this session",
+    "fog.microtask.saved": "Saved to your fog log.",
+    "fog.trigger.lowSleep": "Poor sleep",
+    "fog.trigger.stress": "Stress",
+    "fog.trigger.screen": "Long screen time",
+    "fog.trigger.noise": "Noise / crowds",
+    "fog.trigger.lowFood": "Haven't eaten",
+    "fog.trigger.medication": "Missed medication",
+    "fog.trigger.menstrual": "Hormonal phase",
+    "fog.trigger.weather": "Weather change",
+    "fog.trigger.overdid": "Overdid activity",
+    "fog.trigger.overwhelm": "Too much at once",
+    "fog.trigger.multitasking": "Multitasking",
+    "fog.trigger.other": "Something else",
+    "quickActions.fog.title": "Fog Shield",
+    "quickActions.fog.description": "Grounding tools for brain-fog episodes",
+    "toolkit.fogCard.title": "Fog Shield",
+    "toolkit.fogCard.subtitle": "Breathe out the fog, dump the static, split one hard task — right here.",
+    "toolkit.fogCard.open": "Open Fog Shield",
+    "sos.fab": "Open SOS crisis help",
+    "sos.dismissFab": "Hide crisis help button",
+    "sos.modal.title": "SOS — Flare support",
+    "sos.modal.subtitle": "You are not alone. One step at a time.",
+    "sos.close": "Close",
+    "sos.breath.title": "Slow breathing countdown",
+    "sos.breath.hint": "Follow the phase label. Long exhales calm the nervous system.",
+    "sos.breath.done": "Well done — your breathing has slowed.",
+    "sos.message.title": "Tell someone what's happening",
+    "sos.message.body": "I am experiencing an unexpected fibromyalgia flare right now. I may need help with daily tasks or company. No need to panic — I am resting and following my flare plan.",
+    "sos.message.share": "Share",
+    "sos.message.copy": "Copy",
+    "sos.guide.title": "Dizzy or disoriented? Do this now",
+    "sos.guide.sit": "Sit or lie down immediately — do not push through.",
+    "sos.guide.head": "Move slowly. Turning your head fast worsens dizziness.",
+    "sos.guide.sip": "Sip water and have a small salty snack if available.",
+    "sos.guide.call": "If it lasts over 30 minutes or worsens — call someone.",
+    "sos.emergencyCall": "Call emergency",
+    "sos.privacyNote": "Nothing here is sent to FibroCare servers — sharing happens on your device only.",
+    "spoon.checkin.title": "Daily energy check-in",
+    "spoon.checkin.subtitle": "Spoon Theory — budget your energy like money.",
+    "spoon.checkin.question": "How many energy spoons do you have today?",
+    "spoon.checkin.guide.ask": "Pick today's number — it shapes the rest of the app around your energy.",
+    "spoon.checkin.guide.spend": "Enough for what matters. Choose one or two big things and let the rest wait.",
+    "spoon.checkin.guide.rest": "Rest is the task today. Everything else can wait — this is not failure.",
+    "spoon.checkin.mode.spend": "Energy Saving Mode: off",
+    "spoon.checkin.mode.rest": "Energy Saving Mode: ON",
+    "spoon.checkin.savedNote": "Saved to your energy log for today.",
+    "spoon.checkin.saving": "Saving…",
+    "spoon.checkin.week": "Last 7 days",
+    "spoon.checkin.signInRequired": "You must be signed in.",
+    "spoon.checkin.locked": "Unlock FibroCare to save your energy check-in.",
+    "spoon.checkin.invalid": "Spoons must be between 1 and 10.",
+    "spoon.checkin.failed": "Could not save your energy check-in.",
+    "pantry.title": "Pantry meal helper",
+    "pantry.subtitle": "One-click anti-inflammatory meals for low-energy days — 5 minutes, no decisions.",
+    "pantry.haveQuestion": "What's in your kitchen right now?",
+    "pantry.loading": "Loading your pantry…",
+    "pantry.noMatch": "Tick a few ingredients above and quick meals will appear here.",
+    "pantry.bestMatch": "Best match — start here",
+    "pantry.minutes": "{count} min",
+    "pantry.disclaimer": "General food ideas, not medical or dietary advice — follow your clinician's plan.",
+    "pantry.ing.oats": "Oats",
+    "pantry.ing.oliveOil": "Olive oil",
+    "pantry.ing.fattyFish": "Canned fish",
+    "pantry.ing.leafyGreens": "Leafy greens",
+    "pantry.ing.berries": "Berries",
+    "pantry.ing.nuts": "Nuts / seeds",
+    "pantry.ing.yogurt": "Yogurt",
+    "pantry.ing.turmeric": "Turmeric",
+    "pantry.ing.ginger": "Ginger",
+    "pantry.ing.eggs": "Eggs",
+    "pantry.ing.bananas": "Bananas",
+    "pantry.ing.wholeGrainBread": "Whole-grain bread",
+    "pantry.meal.oatBerryBowl": "Warm oat & berry bowl",
+    "pantry.meal.oatBerryBowl.how": "Soak oats in hot water or milk 2 min, top with berries and a handful of nuts. Slow carbs + antioxidants calm morning stiffness.",
+    "pantry.meal.turmericYogurtBowl": "Golden yogurt bowl",
+    "pantry.meal.turmericYogurtBowl.how": "Stir a pinch of turmeric and a squeeze of honey into yogurt, top with berries. Quick anti-inflammatory protein hit.",
+    "pantry.meal.toastAvocadoSpinach": "Green toast",
+    "pantry.meal.toastAvocadoSpinach.how": "Toast bread, pile on greens with a thread of olive oil and a pinch of salt. Magnesium-rich greens ease muscle tension.",
+    "pantry.meal.sardineToast": "Sardine toast",
+    "pantry.meal.sardineToast.how": "Mash canned sardines onto toast, crown with greens. Omega-3s are the most evidence-backed anti-inflammatory fat.",
+    "pantry.meal.gingerBananaSmoothie": "Ginger-banana smoothie",
+    "pantry.meal.gingerBananaSmoothie.how": "Blend banana, yogurt, a thumb of ginger and water/milk. Ginger soothes nausea that rides along with flares.",
+    "pantry.meal.eggGreenScramble": "Two-minute green eggs",
+    "pantry.meal.eggGreenScramble.how": "Scramble eggs in olive oil, wilt greens in at the end. Protein + greens without standing long at the stove.",
+    "family.title": "Family support cards",
+    "family.subtitle": "Pre-written explainers for the people around you — say it once, not ten times.",
+    "family.shareTitle": "A note from me (FibroCare)",
+    "family.copy": "Copy",
+    "family.copied": "Copied!",
+    "family.copyFailed": "Copy failed — select the text and copy manually.",
+    "family.share": "Share",
+    "family.privacyNote": "Cards copy/share from your device only — FibroCare servers never see them.",
+    "family.card.flare.title": "🔥 I'm having a flare",
+    "family.card.flare.body": "My fibromyalgia is flaring right now: pain and exhaustion spiked, and it's not something I can push through. I'll be resting — I'd love soup, a ride, or a quiet check-in message. No need to visit or call repeatedly. It passes; it just needs time.",
+    "family.card.fog.title": "🌫 I'm having a brain-fog episode",
+    "family.card.fog.body": "My thinking is cloudy right now (fibro fog): words slip, focus drifts, decisions feel huge. It's temporary and it's not me being careless. Simple, short messages help; please don't quiz me or add tasks right now. I'll be back when it clears.",
+    "family.card.crash.title": "🔋 I'm out of energy today",
+    "family.card.crash.body": "I've used up today's energy and my body demands full rest. Canceling plans isn't giving up — it's how I protect tomorrow. Please handle anything urgent for me, and let's reschedule when I'm recharged.",
+    "movement.title": "Movement reminders",
+    "movement.off": "Off",
+    "movement.minutes": "{count} min",
+    "movement.popup.title": "Time for a tiny stretch",
+    "movement.done": "Done — nice",
+    "movement.snooze": "Snooze 10 min",
+    "movement.dismiss": "Dismiss reminder",
+    "movement.stretch.neck": "Slowly roll your right ear toward your right shoulder; count 4 breaths. Switch sides.",
+    "movement.stretch.shoulders": "Roll both shoulders back in slow circles — 5 rounds, exhaling on each drop.",
+    "movement.stretch.wrists": "Arms out: circle your wrists 5 times each way, then spread and close your fingers.",
+    "movement.stretch.hips": "Standing or seated: shift weight side to side gently, 6 slow shifts.",
+    "movement.stretch.calves": "Rise to tiptoes and lower slowly, 6 times — wake up circulation without strain.",
+    "support.title": "Daily-life support",
+    "support.subtitle": "Explainers for the people around you, and gentle nudges to keep your muscles kind.",
+    "summary.title": "Doctor-ready summary",
+    "summary.subtitle": "One clean page for your next appointment — no more relying on memory through the fog.",
+    "summary.loading": "Preparing your summary…",
+    "summary.unavailable": "Your summary appears here once you're signed in and unlocked.",
+    "summary.heading": "Fibromyalgia self-tracking summary — {name}",
+    "summary.line.period": "Tracked {count} days with symptoms over the last {days} days.",
+    "summary.line.avgPain": "Average pain {value}/10",
+    "summary.line.peakPain": "peak {value}/10",
+    "summary.line.flareDays": "{count} flare days (pain ≥ 7/10)",
+    "summary.line.cycleDays": "{count} menstrual log days in the period",
+    "summary.line.symptomAvg": "Average symptom severity {value}/10",
+    "summary.line.adherence": "Symptoms logged on {count} of the last 30 days",
+    "summary.line.meds": "Current medications/supplements: {meds}",
+    "summary.line.medsNone": "No medication list saved yet — add it in the Clinical Centre before your visit.",
+    "summary.generated": "Generated {date} · self-reported data from FibroCare",
+    "summary.print": "Print / save as PDF",
+    "summary.none": "n/a",
+    "nav.clinical": "Clinical Hub",
+    "clinical.hub.title": "Clinical Hub",
+    "clinical.hub.subtitle": "Assessments, trackers, therapeutic guidance and a doctor-ready report — everything clinical in one place.",
+    "clinical.hub.trackersTitle": "Assessments & Trackers",
+    "clinical.hub.trackersSubtitle": "Structured self-assessments and daily logs that build your appointment kit.",
+    "clinical.hub.lifestyleTitle": "Therapeutic & Lifestyle",
+    "clinical.hub.lifestyleSubtitle": "Evidence-aligned guidance you can act on today: movement, sleep and flare coping.",
+    "clinical.hub.reportTitle": "Weekly / Monthly Report",
+    "clinical.hub.reportSubtitle": "Aggregates your logs, trackers and cycle context into a copy-ready summary for your doctor.",
+
+    "clinical.exercise.title": "Low-Impact Exercise Library",
+    "clinical.exercise.subtitle": "Gentle, graded movement guides. Start low, go slow, and pace every session.",
+    "clinical.exercise.filter.all": "All levels",
+    "clinical.exercise.intensity.gentle": "Gentle",
+    "clinical.exercise.intensity.light": "Light",
+    "clinical.exercise.intensity.moderate": "Moderate",
+    "clinical.exercise.minutes": "{count} min",
+    "clinical.exercise.stepsLabel": "How to do it",
+    "clinical.exercise.clearance": "Check with your clinician before starting",
+    "clinical.exercise.tipsTitle": "Pacing principles",
+    "clinical.exercise.tip.1": "Start at half of what you think you can do, then build by ~10% a week.",
+    "clinical.exercise.tip.2": "Stop while you still have energy — pushing to exhaustion costs days.",
+    "clinical.exercise.tip.3": "A short flare after a new activity is common; a multi-day crash means doing less.",
+    "clinical.exercise.tip.4": "Gentle daily movement beats occasional intense sessions.",
+    "clinical.exercise.walking.title": "Gentle Walking",
+    "clinical.exercise.walking.details": "The most accessible aerobic base — flat routes, comfortable shoes, and a pace where you can still talk.",
+    "clinical.exercise.walking.steps": "1. Pick a flat, shaded loop near home.\n2. Walk 3–5 minutes, then rest or turn back.\n3. Add 1–2 minutes only on days you feel steady.\n4. Track how you feel the next morning before extending.",
+    "clinical.exercise.water.title": "Warm Water Exercise",
+    "clinical.exercise.water.details": "Buoyancy unloads painful joints while gentle resistance builds strength — the best-tolerated exercise in fibromyalgia studies.",
+    "clinical.exercise.water.steps": "1. Choose a warm pool (32–34°C when possible).\n2. Walk the shallow end width-wise for 5 minutes.\n3. Add slow leg swings and shoulder circles.\n4. Stop before you feel cold or tired.",
+    "clinical.exercise.taiChi.title": "Tai Chi",
+    "clinical.exercise.taiChi.details": "Slow, flowing patterns that train balance and calm breathing; strong trial evidence for fibromyalgia symptom relief.",
+    "clinical.exercise.taiChi.steps": "1. Begin with the opening warm-up form only.\n2. Follow a beginner video or class at half speed.\n3. Keep knees soft — never locked.\n4. Practice 10–20 minutes, 2–3 times a week.",
+    "clinical.exercise.yoga.title": "Gentle Yoga",
+    "clinical.exercise.yoga.details": "Restorative poses with props and long holds; emphasize breath and comfort over depth of stretch.",
+    "clinical.exercise.yoga.steps": "1. Use a chair or wall for support in every standing pose.\n2. Hold poses 30–60 seconds without straining.\n3. Favor restorative poses: child's pose, legs-up-the-wall.\n4. Skip hot yoga and fast vinyasa flows.",
+    "clinical.exercise.stretching.title": "Daily Stretching",
+    "clinical.exercise.stretching.details": "A 10-minute full-body routine keeps morning stiffness manageable — the single most-reported relief habit.",
+    "clinical.exercise.stretching.steps": "1. Stretch after a warm shower when muscles are warm.\n2. Hold each stretch 20–30 seconds; never bounce.\n3. Breathe slowly and exhale into the stretch.\n4. Cover neck, shoulders, back, hips and calves.",
+    "clinical.exercise.strength.title": "Light Strength Work",
+    "clinical.exercise.strength.details": "Light resistance protects muscle and bone. Only start once daily activity feels manageable, ideally with a physiotherapist.",
+    "clinical.exercise.strength.steps": "1. Begin with resistance bands or 0.5–1 kg weights.\n2. 8–12 slow repetitions per exercise, one set.\n3. Rest 48h between strength sessions.\n4. Reduce weight if pain rises the next day.",
+    "clinical.exercise.cycling.title": "Stationary Cycling",
+    "clinical.exercise.cycling.details": "Weather-independent aerobic work with no impact — the seat carries your weight, not your joints.",
+    "clinical.exercise.cycling.steps": "1. Set a comfortable seat height (slight knee bend).\n2. Start with 5 minutes, no resistance.\n3. Add 1–2 minutes per session, resistance last.\n4. Keep cadence slow and steady.",
+    "clinical.exercise.seatedBand.title": "Seated Band Routine",
+    "clinical.exercise.seatedBand.details": "A full upper-body session from a chair — for flare days, low-energy days, or office breaks.",
+    "clinical.exercise.seatedBand.steps": "1. Sit tall with feet flat, band looped around both hands.\n2. Row: pull the band to your chest, elbows back.\n3. Press: extend both arms forward at chest height.\n4. 8–10 slow reps of each, rest as needed.",
+
+    "clinical.sleep.title": "Sleep Hygiene Guidance",
+    "clinical.sleep.subtitle": "Non-restorative sleep amplifies pain and fibro fog. These habits target the factors that matter most.",
+    "clinical.sleep.checklistTitle": "Tonight's checklist",
+    "clinical.sleep.score": "{count} of 8 habits",
+    "clinical.sleep.reading.strong": "Strong routine",
+    "clinical.sleep.reading.building": "Building up",
+    "clinical.sleep.reading.starting": "Just starting",
+    "clinical.sleep.hint.strong": "Keep it going — consistency is what protects your sleep.",
+    "clinical.sleep.hint.building": "Pick one more habit and repeat it nightly for a week.",
+    "clinical.sleep.hint.starting": "Start with a consistent wake time — it anchors everything else.",
+    "clinical.sleep.disclaimer": "If insomnia persists despite good sleep habits, discuss it with your clinician — treatable conditions like restless legs or sleep apnea are common in fibromyalgia.",
+    "clinical.sleep.consistentSchedule.title": "Consistent schedule",
+    "clinical.sleep.consistentSchedule.body": "Same wake-up time every day — even after a bad night and on weekends.",
+    "clinical.sleep.darkCoolRoom.title": "Dark, cool room",
+    "clinical.sleep.darkCoolRoom.body": "Blackout the room and keep it slightly cool; night-time heat worsens fibro pain.",
+    "clinical.sleep.screenWindDown.title": "Screen wind-down",
+    "clinical.sleep.screenWindDown.body": "Park screens 60–90 minutes before bed; dim lights and switch to something calm.",
+    "clinical.sleep.caffeineCutoff.title": "Caffeine cut-off",
+    "clinical.sleep.caffeineCutoff.body": "No caffeine after early afternoon — it lingers 8+ hours and fragments deep sleep.",
+    "clinical.sleep.eveningRoutine.title": "Evening routine",
+    "clinical.sleep.eveningRoutine.body": "A fixed 20–30 minute wind-down — warm shower, light stretch, herbal tea — signals sleep to your body.",
+    "clinical.sleep.preSleepRelaxation.title": "Relaxation in bed",
+    "clinical.sleep.preSleepRelaxation.body": "Slow breathing or a body scan while lying down; if awake after ~20 minutes, get up and reset.",
+    "clinical.sleep.gentleDaylight.title": "Morning daylight",
+    "clinical.sleep.gentleDaylight.body": "10–20 minutes of outdoor light early in the day strengthens your sleep–wake rhythm.",
+    "clinical.sleep.painComfortPrep.title": "Pain comfort prep",
+    "clinical.sleep.painComfortPrep.body": "Set up support pillows, heat pad and comfort meds before bed so pain doesn't sabotage the night.",
+
+    "clinical.coping.title": "Flare-up Management & Coping Toolkit",
+    "clinical.coping.subtitle": "For flare moments: strategies you can start right now, plus a guided breathing exercise.",
+    "clinical.coping.pacing.title": "Pacing & rest",
+    "clinical.coping.pacing.body": "Down-shift activity instead of stopping completely; alternate 15–20 minutes of gentle effort with real rest.",
+    "clinical.coping.pacing.action": "Try this: set a timer for 15 minutes of rest before your next task.",
+    "clinical.coping.breathing.title": "Slow breathing",
+    "clinical.coping.breathing.body": "Long, slow exhales calm the nervous system and take the edge off pain spikes.",
+    "clinical.coping.breathing.action": "Try this: start the guided 4-7-8 exercise below.",
+    "clinical.coping.grounding.title": "5-4-3-2-1 Grounding",
+    "clinical.coping.grounding.body": "Anchor in the present when a flare brings panic: name 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste.",
+    "clinical.coping.grounding.action": "Try this: go slowly — one sense at a time is enough.",
+    "clinical.coping.heatComfort.title": "Gentle heat",
+    "clinical.coping.heatComfort.body": "A warm pack, heated blanket or warm bath relaxes guarded muscles and eases deep aching.",
+    "clinical.coping.heatComfort.action": "Try this: 15–20 minutes of warmth on the most painful area.",
+    "clinical.coping.sensoryShutdown.title": "Sensory shutdown",
+    "clinical.coping.sensoryShutdown.body": "During sensory overload, dim lights, silence notifications and retreat somewhere quiet for a few minutes.",
+    "clinical.coping.sensoryShutdown.action": "Try this: headphones + dim room + slow breaths, 10 minutes.",
+    "clinical.coping.support.title": "Reach out",
+    "clinical.coping.support.body": "Tell one person how you feel — a partner, friend or the caregiver share link. Support lowers flare distress.",
+    "clinical.coping.support.action": "Try this: send one short message — no explaining required.",
+    "clinical.coping.breath.title": "Guided 4-7-8 breathing",
+    "clinical.coping.breath.subtitle": "Inhale 4s · hold 7s · exhale 8s. Four cycles is a good first goal.",
+    "clinical.coping.breath.start": "Start",
+    "clinical.coping.breath.pause": "Pause",
+    "clinical.coping.breath.reset": "Reset",
+    "clinical.coping.breath.inhale": "Inhale",
+    "clinical.coping.breath.hold": "Hold",
+    "clinical.coping.breath.exhale": "Exhale",
+    "clinical.coping.breath.cycleCount": "Cycles: {count}",
+    "clinical.coping.breath.aria": "Guided breathing timer",
+    "clinical.coping.disclaimer": "If a flare feels different from your usual pattern — new weakness, chest pain, one-sided symptoms — seek medical care promptly.",
+
+    "clinical.report.title": "Weekly / Monthly Report",
+    "clinical.report.subtitle": "A doctor-ready summary of your logs, triggers, labs and cycle context for the chosen period.",
+    "clinical.report.period.week": "This week",
+    "clinical.report.period.month": "This month",
+    "clinical.report.stat.avgPain": "Average pain",
+    "clinical.report.stat.peakPain": "Peak pain",
+    "clinical.report.stat.flareDays": "Flare days (≥7/10)",
+    "clinical.report.stat.adherence": "Logging adherence",
+    "clinical.report.trigger.title": "Flare triggers in this period",
+    "clinical.report.trigger.none": "No flare triggers logged in this period.",
+    "clinical.report.trigger.top": "Top trigger: {factor} (avg {avg}/10 across {count} flares)",
+    "clinical.report.lab.title": "Lab highlights",
+    "clinical.report.lab.none": "No lab results in this period.",
+    "clinical.report.meds.title": "Scheduled medications",
+    "clinical.report.meds.none": "No scheduled medications configured.",
+    "clinical.report.acr.title": "ACR 2010/2016 screening",
+    "clinical.report.acr.met": "Criteria met (WPI {wpi}/19 · SS {ss}/12)",
+    "clinical.report.acr.notMet": "Criteria not met (WPI {wpi}/19 · SS {ss}/12)",
+    "clinical.report.acr.none": "No ACR assessment saved yet.",
+    "clinical.report.cycle.title": "Cycle context",
+    "clinical.report.cycle.none": "No cycle data in this period.",
+    "clinical.report.empty": "No symptom logs in this period yet — keep logging to build the report.",
+    "clinical.report.copy": "Copy for my doctor",
+    "clinical.report.copied": "Copied ✓",
+    "clinical.report.shareHint": "Paste into a message or print it for the appointment.",
+
+    "caregiver.badge": "Caregiver view",
+    "caregiver.title": "Flare forecast for {name}",
+    "caregiver.readOnly": "Shared read-only — no diary or score data is shown here.",
+    "caregiver.level.high": "Elevated",
+    "caregiver.level.moderate": "Moderate",
+    "caregiver.level.low": "Calm",
+    "caregiver.daysToPeriod": "Days to next period",
+    "caregiver.cyclePhase": "Cycle phase",
+    "caregiver.unknown": "Unknown",
+    "caregiver.insight": "Plan gentle support around the elevated window: keep rest cues close, meals warm and steady, and outings short. This link shares only today's forecast — it updates automatically.",
+    "caregiver.linkInactive": "This share link is not active.",
+
+    "doctor.filter.searchLabel": "Search the feed",
+    "doctor.filter.searchPlaceholder": "Search title, body or author…",
+    "doctor.filter.topic": "Topic",
+    "doctor.filter.topicAll": "All topics",
+    "doctor.filter.topics.pain": "Pain & flares",
+    "doctor.filter.topics.sleep": "Sleep",
+    "doctor.filter.topics.fatigue": "Fatigue & energy",
+    "doctor.filter.topics.medication": "Medication",
+    "doctor.filter.topics.nutrition": "Nutrition",
+    "doctor.filter.topics.mentalHealth": "Mental health",
+    "doctor.filter.topics.research": "Research",
+    "doctor.filter.topics.lifestyle": "Lifestyle",
+    "doctor.filter.specialization": "Specialization",
+    "doctor.filter.specAll": "All specializations",
+    "doctor.filter.spec.rheumatology": "Rheumatology",
+    "doctor.filter.spec.neurology": "Neurology",
+    "doctor.filter.spec.painMedicine": "Pain medicine",
+    "doctor.filter.spec.physiatry": "Physical medicine",
+    "doctor.filter.spec.physiotherapy": "Physiotherapy",
+    "doctor.filter.spec.psychology": "Psychology",
+    "doctor.filter.spec.generalMedicine": "General medicine",
+    "doctor.filter.clear": "Clear filters",
+    "doctor.filter.showing": "{shown} of {total} posts",
+    "doctor.filter.noResults": "No posts match these filters. Try clearing them.",
   },
   ar: {
     "nav.dashboard": "اللوحة الرئيسية",
@@ -3733,6 +5188,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "common.loading": "جاري التحميل...",
     "common.readMore": "اقرأ المزيد",
     "common.back": "رجوع",
+    "common.signInRequired": "يجب تسجيل الدخول أولاً.",
     "auth.login.title": "مرحباً بك مجدداً",
     "auth.login.description": "سجل دخولك لمتابعة سجلاتك، وتوجهاتك، ودعمنا اللطيف.",
     "resources.title": "موارد الرعاية",
@@ -4400,6 +5856,99 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "health.area.widespread": "منتشر",
     "health.area.joints": "المفاصل",
     "health.area.other": "أخرى",
+    "health.menstrualLog.title": "السجل اليومي للدورة",
+    "health.menstrualLog.flow.title": "شدة النزيف",
+    "health.menstrualLog.flow.spotting": "تنقيط",
+    "health.menstrualLog.flow.light": "خفيف",
+    "health.menstrualLog.flow.medium": "متوسط",
+    "health.menstrualLog.flow.heavy": "غزير",
+    "health.menstrualLog.flow.hasClots": "تخثرات دموية",
+    "health.menstrualLog.flow.color": "لون النزيف",
+    "health.menstrualLog.somatic.title": "أعراض الألم العضلي الليفي",
+    "health.menstrualLog.somatic.cramps": "شدة التشنجات",
+    "health.menstrualLog.somatic.headache": "شدة الصداع",
+    "health.menstrualLog.somatic.breastTenderness": "حساسية الثدي",
+    "health.menstrualLog.somatic.bloating": "الانتفاخ",
+    "health.menstrualLog.gi.title": "الهضم والالتهاب",
+    "health.menstrualLog.gi.diarrhea": "إسهال",
+    "health.menstrualLog.gi.constipation": "إمساك",
+    "health.menstrualLog.gi.acne": "حب الشباب الهرموني",
+    "health.menstrualLog.fertility.title": "علامات الإباضة والخصوبة",
+    "health.menstrualLog.fertility.cervicalMucus": "مخاط عنق الرحم",
+    "health.menstrualLog.fertility.opk": "نتيجة اختبار الإباضة",
+    "health.menstrualLog.mood.title": "المزاج والحدة العاطفية",
+    "health.menstrualLog.mood.tearfulness": "ميل للبكاء",
+    "health.menstrualLog.mood.anxiety": "مستوى القلق",
+    "health.menstrualLog.mood.volatility": "تقلب المزاج",
+    "health.menstrualLog.mucus.dry": "جاف",
+    "health.menstrualLog.mucus.sticky": "لزج",
+    "health.menstrualLog.mucus.creamy": "قشدي",
+    "health.menstrualLog.mucus.watery": "مائي",
+    "health.menstrualLog.mucus.eggWhite": "بياض البيض",
+    "health.menstrualLog.opk.negative": "سلبي",
+    "health.menstrualLog.opk.positive": "إيجابي",
+    "health.menstrualLog.opk.notUsed": "غير مستخدم",
+    "health.menstrualLog.sensory.none": "لا شيء",
+    "health.menstrualLog.sensory.mild": "خفيف",
+    "health.menstrualLog.sensory.moderate": "متوسط",
+    "health.menstrualLog.sensory.severe": "شديد",
+    "health.menstrualLog.notesLabel": "ملاحظات",
+    "health.menstrualLog.energy.title": "الطاقة الحيوية اليومية",
+    "health.menstrualLog.libido.title": "الرغبة والحيوية",
+    "health.menstrualLog.sensory.title": "الحساسية الحسية",
+    "health.menstrualLog.sensory.light": "حساسية الضوء",
+    "health.menstrualLog.sensory.sound": "حساسية الصوت",
+    "health.menstrualLog.saveCta": "حفظ السجل اليومي",
+    "health.menstrualLog.savedOk": "تم حفظ السجل اليومي — خريطة الارتباطات أصبحت أكثر دقة.",
+    "health.menstrualLog.saveError": "تعذر حفظ السجل اليومي. يرجى المحاولة مرة أخرى.",
+    "health.menstrualLog.noActiveCycle": "لا توجد دورة نشطة بعد",
+    "health.menstrualLog.createCycleFirst": "أنشئ دورة أولاً — يرتبط السجل اليومي بطور الدورة الحالي.",
+    "health.overlap.title": "درجة التداخل الليفي-الهرموني",
+    "health.overlap.hormonal": "التضخيم الهرموني",
+    "health.overlap.physical": "المجهود البدني",
+    "health.overlap.noData": "سجّل بضعة أيام لتظهر نسبة تفاقم الأعراض الهرمونية.",
+    "health.carePlan.title": "خطة العناية حسب الطور",
+    "health.carePlan.diet": "النظام الغذائي",
+    "health.carePlan.supplements": "المكملات",
+    "health.carePlan.pacing": "إيقاع النشاط",
+    "health.carePlan.currentPhase": "الطور الحالي",
+    "health.carePlan.diet.menstrual": "ركزي على الأطعمة الغنية بالحديد والوجبات الدافئة سهلة الهضم؛ الحساء الخفيف يخفف التشنجات.",
+    "health.carePlan.diet.follicular": "الطاقة ترتفع — اختاري البروتينات الخفيفة والأطعمة المخمرة والخضروات الطازجة لدعم تصفية الهرمونات.",
+    "health.carePlan.diet.ovulatory": "اشربي الماء بكثرة، حافظي على الألياف العالية، وقللي السكريات البسيطة حول الذروة لتثبيت المزاج.",
+    "health.carePlan.diet.luteal": "زيدي المغنيسيوم والكربوهيدرات المعقدة والخضروات الورقية؛ خففي الملح والكافيين لتخفيف أعراض ما قبل الحيض.",
+    "health.carePlan.supplements.menstrual": "قد يساعد فيتامين د3 مع مغنيسيوم الغلايسين في تخفيف تقلصات الحيض — أكدي الجرعة مع طبيبك.",
+    "health.carePlan.supplements.follicular": "فيتامين ب المركب يدعم أيض الإستروجين؛ فكري في فحص الحديد إذا كان النزيف غزيرًا.",
+    "health.carePlan.supplements.ovulatory": "أوميغا-3 تساعد في تهدئة قمم الالتهاب؛ احتفظي بالزنك كخيار داعم قصير في الطور الأصفري.",
+    "health.carePlan.supplements.luteal": "المغنيسيوم مع فيتامين ب6 هما الثنائي الكلاسيكي للطوارف المزاجية والانتفاخ قبل الحيض.",
+    "health.carePlan.pacing.menstrual": "عاملي أول يومين كخط أساس صارم للراحة — قسمي المهام وأجلي المجهود الشاق.",
+    "health.carePlan.pacing.follicular": "هذه أقوى مساحة طاقة لديك — خططي للأعمال الصعبة والتمارين الآن.",
+    "health.carePlan.pacing.ovulatory": "يوم رائع لذروة التركيز — احميه باستراحة قصيرة في منتصف النهار ونوم مبكر.",
+    "health.carePlan.pacing.luteal": "قلصي قائمة مهامك، أضيفي فترات راحة 10 دقائق، واجعل الحركة لطيفة (مشي، إطالة).",
+    "health.spoonCalc.title": "حاسبة طاقة النظرية الملعقية",
+    "health.spoonCalc.subtitle": "وزّع ملاعق طاقتك اليومية بناءً على النوم وطور الدورة.",
+    "health.spoonCalc.budget": "الملاعق المخصصة",
+    "health.spoonCalc.sleepQuality": "جودة نوم الليلة الماضية",
+    "health.spoonCalc.cycleAdjust": "تعديل طور الدورة",
+    "health.spoonCalc.available": "متاحة اليوم",
+    "health.clinicalReport.title": "التقرير السريري",
+    "health.clinicalReport.subtitle": "ملخص جاهز للطبيب يوضح الارتباط بين الدورة والأعراض.",
+    "health.clinicalReport.generate": "إنشاء التقرير",
+    "health.clinicalReport.generating": "جاري الإنشاء…",
+    "health.clinicalReport.periodRange": "الدورات المحللة",
+    "health.clinicalReport.peakPain": "ذروة مستوى الألم",
+    "health.clinicalReport.avgEnergy": "متوسط الطاقة (1-10)",
+    "health.clinicalReport.avgMood": "متوسط درجة المزاج",
+    "health.clinicalReport.symptomSummary": "أهم ارتباطات الأعراض",
+    "health.clinicalReport.printCta": "طباعة / حفظ PDF",
+    "health.clinicalReport.emptyState": "البيانات غير كافية بعد — سجّل دورتك وأعراضك لقراءة تقرير واضح.",
+    "health.caregiver.title": "مزامنة مقدم الرعاية / الشريك",
+    "health.caregiver.subtitle": "شارك رابط توقعات النوبات للقراءة فقط مع من يرعاك.",
+    "health.caregiver.enable": "تفعيل المشاركة الآمنة",
+    "health.caregiver.disable": "تعطيل المشاركة",
+    "health.caregiver.shareToken": "رابط المشاركة",
+    "health.caregiver.copied": "تم نسخ الرابط إلى الحافظة.",
+    "health.caregiver.disclaimer": "تظل يومياتك ودرجاتك وملاحظاتك خاصة — فقط توقعات النوبة القادمة تظهر للمشاهد.",
+    "health.caregiver.viewOnly": "للقراءة فقط للمشاهد",
     "dashboard.weekly.subtitle": "مستويات ألمك خلال آخر 7 أيام.",
     "dashboard.weekly.avgPain": "متوسط الألم",
     "dashboard.weekly.daysLogged": "أيام مسجلة",
@@ -5307,6 +6856,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "meta.ogDescription":
       "تسجيلات يومية تحوّل الأعراض الخفية إلى أنماط واضحة، وأيام أكثر هدوءًا، وتقارير يفيد بها فريق رعايتك فعلًا.",
     "meta.ogImageAlt": "فيبروكير - ألمُك حقيقي. وإيقاعُك ملكُك.",
+    "meta.ogFeaturesImageAlt":
+      "فيبروكير - لقطات من زر النجدة ودرع الضباب والمركز الإكلينيكي، بالعربية والإنجليزية.",
     "doctor.title": "مركز الأطباء",
     "doctor.subtitle": "نشر رؤى صحية موثقة للمرضى",
     "doctor.newPost": "مقال جديد",
@@ -5377,6 +6928,19 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctor.feed.comment": "تعليق",
     "doctor.feed.share": "مشاركة",
     "doctor.filter.all": "الكل",
+    "doctor.feed.searchPlaceholder": "ابحث في العناوين والموضوعات والأطباء…",
+    "doctor.feed.searchLabel": "البحث في المنشورات",
+    "doctor.feed.clearSearch": "مسح البحث",
+    "doctor.feed.topicsLabel": "الموضوعات",
+    "doctor.feed.sortLabel": "الترتيب",
+    "doctor.feed.sort.newest": "الأحدث",
+    "doctor.feed.sort.popular": "الأكثر إعجابًا",
+    "doctor.feed.resultsCount": "عرض {count} من {total} منشورًا",
+    "doctor.feed.noResults": "لا توجد منشورات مطابقة للفلاتر",
+    "doctor.feed.noResultsHint": "جرّب كلمة بحث مختلفة أو أزل فلتر موضوع.",
+    "doctor.feed.activeFilters": "الفلاتر النشطة",
+    "doctor.feed.clearAll": "مسح الكل",
+    "doctor.feed.filtersToggle": "البحث والفلاتر",
     "doctor.postMedia": "رابط الوسائط",
     "doctor.postContentStatus": "التحديث",
     "doctor.postAiToggle": "مساعد الذكاء الاصطناعي — هيكلة ملاحظاتي",
@@ -5488,5 +7052,653 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "doctorReport.copied": "تم النسخ!",
     "doctorReport.printReport": "طباعة التقرير",
     "doctorReport.disclaimer": "تم إنشاء هذا التقرير بواسطة المريض باستخدام فيبروكير وهو ليس تشخيصًا طبيًا. يرجى مراجعته مع مقدم الرعاية الصحية.",
+    "nav.diet": "النظام الغذائي والمهيجات",
+    "diet.title": "متتبع مهيجات النظام الغذائي",
+    "diet.subtitle": "سجّل وجباتك، واحتفظ بقائمة مهيجاتك الشخصية، واكتشف كيف ترتبط وجبات المساء بأعراض الصباح التالي.",
+    "diet.energy.exhausted": "منهك",
+    "diet.energy.low": "طاقة منخفضة",
+    "diet.energy.moderate": "معتدل",
+    "diet.energy.good": "جيد",
+    "diet.energy.full": "طاقة كاملة",
+    "diet.logger.title": "تسجيل وجبة",
+    "diet.logger.subtitle": "تحذيرات فورية من المهيجات أثناء إدخال الأطعمة.",
+    "diet.logger.date": "التاريخ",
+    "diet.logger.time": "الوقت",
+    "diet.logger.mealType": "نوع الوجبة",
+    "diet.logger.mealType.breakfast": "فطور",
+    "diet.logger.mealType.lunch": "غداء",
+    "diet.logger.mealType.dinner": "عشاء",
+    "diet.logger.mealType.snack": "وجبة خفيفة",
+    "diet.logger.foods": "الأطعمة المتناولة",
+    "diet.logger.foodsPlaceholder": "مثال: سمك السلمون المشوي، بروكلي مطهو على البخار",
+    "diet.logger.amount": "الكمية",
+    "diet.logger.amountPlaceholder": "مثال: وعاء واحد، 150 غرام",
+    "diet.logger.addFood": "إضافة طعام",
+    "diet.logger.energyBefore": "مستوى الطاقة قبل هذه الوجبة",
+    "diet.logger.energyBefore.hint": "0 = منهك · 4 = طاقة كاملة",
+    "diet.logger.notes": "ملاحظات",
+    "diet.logger.notesPlaceholder": "كيف شعرت بعد هذه الوجبة؟",
+    "diet.logger.save": "حفظ الوجبة",
+    "diet.logger.saving": "جارٍ الحفظ…",
+    "diet.logger.saved": "تم حفظ الوجبة",
+    "diet.logger.delete": "حذف",
+    "diet.logger.noMeals": "لا توجد وجبات مسجلة لهذا التاريخ بعد.",
+    "diet.logger.mealsLabel": "الوجبات المسجلة",
+    "diet.warn.known.gluten": "الغلوتين (القمح، الخبز، المعكرونة)",
+    "diet.warn.known.dairy": "الألبان (حليب، جبن، زبادي)",
+    "diet.warn.known.sugar": "السكر المكرر والحلويات",
+    "diet.warn.known.fried": "الأطعمة المقلية",
+    "diet.warn.known.processed": "الأطعمة المصنعة والوجبات السريعة",
+    "diet.warn.known.alcohol": "الكحول",
+    "diet.warn.known.caffeine": "الكافيين",
+    "diet.warn.personal": "أدرجت هذا الطعام كمهيج شخصي لك",
+    "diet.warnings.none": "لم تُرصد مهيجات معروفة — اختيار رائع.",
+    "diet.warnings.some": "مهيجات محتملة في هذه الوجبة",
+    "diet.warnings.swap": "فكرة بديلة",
+    "diet.warnings.reason": "السبب",
+    "diet.swap.gluten.swap": "استبدله بالشوفان أو الأرز الخالي من الغلوتين",
+    "diet.swap.gluten.reason": "قد يسبب الغلوتين التعب وتيبس المفاصل لدى الأشخاص الحساسين.",
+    "diet.swap.dairy.swap": "استبدله بحليب الشوفان أو اللوز",
+    "diet.swap.dairy.reason": "الألبان حساسية غذائية شائعة لدى مرضى الفيبروميالغيا.",
+    "diet.swap.sugar.swap": "استبدل السكر المكرر بالتمر أو التوت",
+    "diet.swap.sugar.reason": "ارتفاع السكر قد يزيد من انهيار الطاقة في منتصف اليوم.",
+    "diet.swap.fried.swap": "اختر خيارات مشوية أو مقلية بالهواء",
+    "diet.swap.fried.reason": "تحتوي الأطعمة المقلية على دهون التهابية قد تزيد الألم.",
+    "diet.swap.processed.swap": "اختر بديلاً من الأطعمة الكاملة",
+    "diet.swap.processed.reason": "غالبًا ما تحتوي الأطعمة فائقة المعالجة على إضافات مسببة للالتهاب.",
+    "diet.swap.alcohol.swap": "استبدله بماء فوار مع ليمون",
+    "diet.swap.alcohol.reason": "قد يخل الكحول بالنوم العميق ويزيد التعب في اليوم التالي.",
+    "diet.swap.caffeine.swap": "استبدله بشاي أعشاب أو منزوع الكافيين",
+    "diet.swap.caffeine.reason": "الكافيين المتأخر قد يؤخر النوم ويزيد ضبابية الدماغ.",
+    "diet.timing.veryLow.title": "تناول عشاءً خفيفًا ومبكرًا الليلة",
+    "diet.timing.veryLow.reason": "طاقة منخفضة جدًا — عشاء خفيف قبل 19:00 يدعم التعافي بشكل أفضل.",
+    "diet.timing.low.title": "ابدأ بعشاء أبكر",
+    "diet.timing.low.reason": "جرّب إنهاء العشاء قبل 20:00 لحماية نافذة نومك.",
+    "diet.timing.moderate.title": "حافظ على وجبة عشاء متوازنة",
+    "diet.timing.moderate.reason": "عشاء متوازن مع البروتين والخضروات يدعم استقرار الطاقة.",
+    "diet.timing.good.title": "أنت في نافذة جيدة",
+    "diet.timing.good.reason": "حافظ على عشاءك المتوازن المعتاد واشرب كمية كافية من الماء.",
+    "diet.timing.full.title": "طاقة كاملة — حافظ على التغذية الجيدة",
+    "diet.timing.full.reason": "طاقة رائعة اليوم — عشاء غني بالعناصر الغذائية يدعم غدك.",
+    "diet.triggers.title": "قائمتي الشخصية للمهيجات",
+    "diet.triggers.subtitle": "الأطعمة التي غالبًا ما تؤدي إلى نوباتك — سننبهك إليها كلما ظهرت في أي وجبة.",
+    "diet.triggers.name": "اسم الطعام",
+    "diet.triggers.severity": "الشدة",
+    "diet.triggers.severity.hint": "1 = خفيف · 5 = رد فعل شديد",
+    "diet.triggers.severity.level1": "خفيف",
+    "diet.triggers.severity.level2": "خفيف إلى متوسط",
+    "diet.triggers.severity.level3": "متوسط",
+    "diet.triggers.severity.level4": "قوي",
+    "diet.triggers.severity.level5": "شديد",
+    "diet.triggers.reactionNote": "كيف يؤثر عليك؟",
+    "diet.triggers.reactionNotePlaceholder": "مثال: تعب في اليوم التالي، آلام في المفاصل",
+    "diet.triggers.namePlaceholder": "مثال: ثوم، حمضيات، نبيذ أحمر",
+    "diet.triggers.add": "إضافة إلى قائمتي",
+    "diet.triggers.adding": "جارٍ الإضافة…",
+    "diet.triggers.empty": "لا توجد مهيجات شخصية بعد — أضف الأطعمة التي لاحظت أنها تعيقك.",
+    "diet.triggers.remove": "إزالة",
+    "diet.triggers.removed": "تمت إزالة المهيج",
+    "diet.correlation.title": "ارتباط نوبة اليوم التالي",
+    "diet.correlation.subtitle": "وجبات المساء مقارنة بأعراض الصباح التالي — إشارة نمطية، وليست تشخيصًا.",
+    "diet.correlation.disclaimer": "ارتباط فقط — وليس تشخيصًا طبيًا.",
+    "diet.correlation.empty": "سجّل بضع وجبات مسائية (مع سجلات ألم أو أعراض في اليوم التالي) وسيعثر هذا القسم على الأنماط.",
+    "diet.correlation.baseline": "درجة اليوم التالي الأساسية",
+    "diet.correlation.baseline.hint": "متوسط درجة الأعراض بعد أي وجبة مسائية",
+    "diet.correlation.food": "الطعام",
+    "diet.correlation.with": "الدرجة بعد تناوله",
+    "diet.correlation.without": "الدرجة بدونه",
+    "diet.correlation.lift": "الرفع",
+    "diet.correlation.outOf": "من 10",
+    "diet.correlation.evenings": "الأمسيات",
+    "diet.correlation.risk.high": "اشتباه مرتفع",
+    "diet.correlation.risk.moderate": "اشتباه متوسط",
+    "diet.correlation.risk.watch": "متابعة",
+    "diet.correlation.risk.high.hint": "مرتبط بقوة بأعراض صباحك التالي في سجلاتك.",
+    "diet.correlation.risk.moderate.hint": "قد يكون مرتبطًا — يستحق تجربة واعية.",
+    "diet.correlation.risk.watch.hint": "عينات قليلة جدًا أو لا توجد إشارة واضحة بعد.",
+    "diet.correlation.timing.title": "توقيت العشاء",
+    "diet.correlation.timing.highFlare": "متوسط ساعة العشاء في صباحات النوبات",
+    "diet.correlation.timing.lowFlare": "متوسط ساعة العشاء في الصباحات الهادئة",
+    "diet.correlation.timing.later": "تميل العشاءات المتأخرة إلى الارتباط بنوبات الصباح التالي. حاول تناول الطعام قبل {hour}:00 لحماية نومك.",
+    "diet.correlation.timing.nodata": "لا توجد بيانات كافية بعد.",
+
+    "fog.title": "درع الضباب",
+    "fog.hero.kicker": "حالة الطقس الإدراكي",
+    "fog.hero.subtitle": "مكان آمن وخاص لاجتياز نوبة ضباب الدماغ — خفّفها بالتنفس، أو أفرغ الأفكار المشوشة، أو قسّم مهمة صعبة إلى خطوات، أو فعّل بروتوكول SOS. وأي أداة تستخدمها، يتلاشى الضباب أمام عينيك.",
+    "fog.hero.statEpisodes": "النوبات المسجلة",
+    "fog.hero.statAvg": "متوسط الضباب",
+    "fog.hero.statRecent": "الضباب مؤخرًا",
+    "fog.hero.statNone": "—",
+    "fog.hero.clearGuide": "الصفاء قريب. لقد عدت إلى مكانك.",
+    "fog.hero.fogGuide": "اختر أداة بالأسفل. كل أداة تبدد جزءًا من الضباب.",
+    "fog.hero.privacy": "يحافظ درع الضباب على خصوصية تدويناتك:",
+    "fog.hero.privacyDetail": "نص التفريغ يُشفَّر قبل تخزينه، ولا يُعرض عليك مرة أخرى.",
+    "fog.trigger.lowSleep": "قلة النوم",
+    "fog.trigger.stress": "التوتر",
+    "fog.trigger.screen": "استخدام الشاشات لفترة طويلة",
+    "fog.trigger.noise": "الضوضاء",
+    "fog.trigger.lowFood": "تفويت الوجبات",
+    "fog.trigger.menstrual": "الدورة الشهرية",
+    "fog.trigger.multitasking": "المهام المتعددة",
+    "fog.trigger.overwhelm": "الإرهاق الذهني",
+    "fog.trigger.weather": "الطقس / الضغط الجوي",
+    "fog.trigger.medication": "تفويت الدواء",
+    "fog.trigger.overdid": "المبالغة في النشاط",
+    "fog.trigger.other": "سبب آخر",
+    "fog.breath.title": "إعادة ضبط التنفس 4-7-8",
+    "fog.breath.subtitle": "أبطئ الدوامة. يهدأ الضباب عندما يهدأ النفس.",
+    "fog.breath.pattern478": "4-7-8",
+    "fog.breath.patternBox": "المربع",
+    "fog.breath.start": "ابدأ التنفس",
+    "fog.breath.pause": "إيقاف مؤقت",
+    "fog.breath.reset": "إعادة",
+    "fog.breath.cycles": "دورات",
+    "fog.breath.sessionComplete": "هدأ النفس — بدأ الصفاء يعود.",
+    "fog.breath.seconds": "ث",
+    "fog.breath.inhale": "شهيق",
+    "fog.breath.hold": "احبس",
+    "fog.breath.exhale": "زفير",
+    "fog.dump.title": "تفريغ الذهن",
+    "fog.dump.subtitle": "أفرغ الأفكار المشوشة على الورق. يمكنها البقاء هنا — أو ألا تبقى أبدًا.",
+    "fog.dump.where": "ماذا يدور في رأسك؟ كل فكرة، وقلق، ومهمة ناقصة، وصوت، وألم.",
+    "fog.dump.chars": "حرفًا",
+    "fog.dump.intensity": "شدة الضباب",
+    "fog.dump.triggers": "ما الذي يغذّي الضباب غالبًا؟",
+    "fog.dump.save": "احفظ في سجل الضباب",
+    "fog.dump.saving": "جارٍ الحفظ…",
+    "fog.dump.saved": "تم التفريغ — خرج من رأسك.",
+    "fog.dump.clear": "مسح",
+    "fog.dump.needsOne": "أضف فكرة، أو حدد مهيجًا واحدًا على الأقل.",
+    "fog.dump.recent": "الضباب الأخير",
+    "fog.dump.noTriggers": "لم تُحدد أي مهيجات",
+    "fog.save.locked": "افتح قفل FibroCare لحفظ سجل الضباب.",
+    "fog.save.invalid": "يرجى إكمال سجل الضباب بشكل صحيح.",
+    "fog.save.failed": "تعذر حفظ سجل الضباب. حاول مرة أخرى.",
+    "fog.microtask.title": "تقسيم المهمة الدقيقة",
+    "fog.microtask.subtitle": "مهمة واحدة مرهقة → ثلاث خطوات صغيرة. الخطوات الصغيرة لا يتأثر بها الضباب.",
+    "fog.microtask.prompt": "ما المهمة التي تبدو كبيرة جدًا الآن؟",
+    "fog.microtask.placeholder": "مثال: التحضير لموعد الغد",
+    "fog.microtask.breakdown": "قسّمها",
+    "fog.microtask.step": "خطوة",
+    "fog.microtask.saveToggle": "سجّل هذا في سجل الضباب",
+    "fog.microtask.saved": "تم التسجيل — خفّ الضباب.",
+    "fog.microtask.allDone": "اكتملت كل الخطوات. أصبحت المهمة قابلة للتحرك.",
+    "fog.microtask.newTask": "مهمة جديدة",
+    "fog.microtask.theTask": "تلك المهمة",
+    "fog.microtask.assist1": "خذ نفسًا 4-7-8 واحدًا قبل لمس «{task}».",
+    "fog.microtask.assist2": "افتح أول دقيقة منها فقط — القراءة وحدها تكفي.",
+    "fog.microtask.assist3": "أنجز جزءًا صغيرًا واحدًا ثم توقف. الإنجاز يُحتسب.",
+    "fog.sos.title": "بروتوكول SOS",
+    "fog.sos.subtitle": "حين يكون الضباب مخيفًا، لا مجرد صعب. خطوات قصيرة وواضحة وإنسانية.",
+    "fog.sos.step1": "سمِّه بصوت مسموع",
+    "fog.sos.step1desc": "«أنا آمن، وهذا الضباب مؤقت.» سمِّ ثلاثة أشياء تراها.",
+    "fog.sos.step2": "ماء بارد",
+    "fog.sos.step2desc": "ضع ماءً باردًا على معصميك ووجهك. الحرارة تخترق الضباب بسرعة.",
+    "fog.sos.step3": "خذ نفسًا واحدًا",
+    "fog.sos.step3desc": "نفس واحد 4-7-8 — لا خمسة. واحد يكفي للبدء.",
+    "fog.sos.step4": "تحرّك نحو شخص",
+    "fog.sos.step4desc": "تتقلص الأماكن الصاخبة عندما يسمعك أحد. اتصل بإنسان واحد.",
+    "fog.sos.steady": "أشعر بثبات أكبر الآن",
+    "fog.sos.callClinic": "اتصل بعيادتك",
+    "fog.sos.callTrusted": "اتصل بشخص تثق به",
+    "fog.sos.emergency": "إذا شعرت بعدم الأمان، أو لاحظت تغيرًا مفاجئًا في الأعراض، فاتصل برقم الطوارئ الآن.",
+    "fog.sos.steadier": "ارتفع الضباب بما يكفي — لقد عدت إلى مكانك.",
+    "quickActions.fog.title": "درع الضباب",
+    "quickActions.fog.description": "أدوات تأريض لنوبات ضباب الدماغ",
+    "toolkit.fogCard.title": "درع الضباب",
+    "toolkit.fogCard.subtitle": "نفّس الضباب، وأفرغ الأفكار، وقسّم مهمة صعبة — هنا مباشرة.",
+    "toolkit.fogCard.open": "افتح درع الضباب",
+
+    "clinical.acr.title": "تقييم ACR",
+    "clinical.acr.subtitle": "فحص ذاتي وفق معايير ACR 2010/2016 — أداة مساعدة للفحص، وليست تشخيصًا.",
+    "clinical.acr.ss.level.0": "لا توجد أعراض",
+    "clinical.acr.ss.level.1": "خفيفة",
+    "clinical.acr.ss.level.2": "متوسطة",
+    "clinical.acr.ss.level.3": "شديدة",
+    "clinical.acr.wpi.title": "مؤشر الألم المنتشر (WPI)",
+    "clinical.acr.wpi.subtitle": "اضغط على كل منطقة شعرت بألم فيها خلال آخر 7 أيام.",
+    "clinical.acr.wpi.count": "تم اختيار {count} من 19 منطقة",
+    "clinical.acr.ss.title": "درجة شدة الأعراض (SS)",
+    "clinical.acr.ss.hint": "قيّم كل بُعد خلال الأسبوع الماضي.",
+    "clinical.acr.ss.fatigue": "الإرهاق",
+    "clinical.acr.ss.unrefreshed": "الاستيقاظ دون انتعاش",
+    "clinical.acr.ss.cognitive": "الأعراض الإدراكية",
+    "clinical.acr.somatic.title": "قائمة الأعراض الجسدية",
+    "clinical.acr.somatic.subtitle": "حدّد الأعراض التي عانيت منها مؤخرًا.",
+    "clinical.acr.somatic.bandHint": "تم اختيار {count} ← مستوى الشدة: {band}",
+    "clinical.acr.duration.title": "المدة",
+    "clinical.acr.duration.label": "استمرت الأعراض بمستوى مماثل لمدة 3 أشهر على الأقل.",
+    "clinical.acr.evaluate": "احسب التقييم",
+    "clinical.acr.result.criteriaMet": "المعايير محققة",
+    "clinical.acr.result.criteriaNotMet": "المعايير غير محققة بالكامل",
+    "clinical.acr.result.interpretation": "يعكس ذلك إجاباتك على أسئلة فحص ACR — وليس تشخيصًا طبيًا.",
+    "clinical.acr.result.wpi": "WPI",
+    "clinical.acr.result.ss": "SS",
+    "clinical.acr.result.generalized": "الانتشار",
+    "clinical.acr.result.scoreRule": "قاعدة الدرجة",
+    "clinical.acr.result.duration": "المدة ≥ 3 أشهر",
+    "clinical.acr.result.met": "محقق",
+    "clinical.acr.result.notMet": "غير محقق",
+    "clinical.acr.summaryTitle": "ملخص لطبيبك",
+    "clinical.acr.summary.wpi": "مناطق مؤلمة من أصل 19",
+    "clinical.acr.summary.ss": "شدة الأعراض",
+    "clinical.acr.summary.generalized": "المناطق المنتشرة",
+    "clinical.acr.summary.scoreRule": "قاعدة الدرجة",
+    "clinical.acr.summary.duration": "المدة",
+    "clinical.acr.summary.criteria": "معايير ACR",
+    "clinical.acr.savedToProfile": "تم الحفظ في ملفك",
+    "clinical.acr.signInHint": "سجّل الدخول للحفظ",
+    "clinical.acr.saveToProfile": "حفظ في ملفي",
+    "clinical.acr.savedToProfileHint": "تم الحفظ في ملفك. يمكنك مشاركته مع طبيبك.",
+    "clinical.acr.signInHintBody": "بالحفظ يمكنك مشاركة هذه اللقطة مع طبيبك. يرجى تسجيل الدخول أولًا.",
+    "clinical.acr.shareError": "حدث خطأ أثناء الحفظ. حاول مرة أخرى.",
+    "clinical.acr.disclaimer": "أداة فحص مساعدة فقط — وليست تشخيصًا. ناقش النتائج مع طبيب مختص.",
+
+    "clinical.somatic.headache": "صداع",
+    "clinical.somatic.lowerAbdomenPain": "ألم أو تقلصات في أسفل البطن",
+    "clinical.somatic.depression": "اكتئاب",
+    "clinical.somatic.constipation": "إمساك",
+    "clinical.somatic.diarrhea": "إسهال",
+    "clinical.somatic.nausea": "غثيان",
+    "clinical.somatic.dizziness": "دوار",
+    "clinical.somatic.tingling": "تنميل / خدر",
+    "clinical.somatic.irritableBowel": "متلازمة القولون العصبي",
+    "clinical.somatic.tinnitus": "طنين الأذن",
+    "clinical.somatic.blurredVision": "تشوش الرؤية",
+    "clinical.somatic.chestPain": "ألم في الصدر",
+    "clinical.somatic.dryMouth": "جفاف الفم",
+    "clinical.somatic.mouthUlcers": "تقرحات الفم",
+    "clinical.somatic.skinSensitivity": "حساسية الجلد",
+    "clinical.somatic.anxiety": "قلق",
+    "clinical.somatic.restlessLegs": "تململ الساقين",
+    "clinical.somatic.coldIntolerance": "عدم تحمل البرد",
+
+    "clinical.wpi.shoulderL": "الكتف — الأيسر",
+    "clinical.wpi.shoulderR": "الكتف — الأيمن",
+    "clinical.wpi.upperArmL": "الذراع العلوي — الأيسر",
+    "clinical.wpi.upperArmR": "الذراع العلوي — الأيمن",
+    "clinical.wpi.lowerArmL": "الذراع السفلي — الأيسر",
+    "clinical.wpi.lowerArmR": "الذراع السفلي — الأيمن",
+    "clinical.wpi.hipL": "الورك — الأيسر",
+    "clinical.wpi.hipR": "الورك — الأيمن",
+    "clinical.wpi.upperLegL": "الفخذ — الأيسر",
+    "clinical.wpi.upperLegR": "الفخذ — الأيمن",
+    "clinical.wpi.lowerLegL": "الساق — اليسرى",
+    "clinical.wpi.lowerLegR": "الساق — اليمنى",
+    "clinical.wpi.jawL": "الفك — الأيسر",
+    "clinical.wpi.jawR": "الفك — الأيمن",
+    "clinical.wpi.chest": "الصدر",
+    "clinical.wpi.abdomen": "البطن",
+    "clinical.wpi.neck": "الرقبة",
+    "clinical.wpi.upperBack": "الظهر العلوي",
+    "clinical.wpi.lowerBack": "الظهر السفلي",
+
+    "clinical.meds.title": "الأدوية والمكملات",
+    "clinical.meds.subtitle": "تتبع جرعاتك والتزامك اليومي — معلومات إرشادية، وليست نصيحة علاجية.",
+    "clinical.meds.due": "مستحق الآن",
+    "clinical.meds.dueEmpty": "لا شيء مستحق الآن. حافظ على إيقاع منتظم.",
+    "clinical.meds.taken": "تم تناوله ✓",
+    "clinical.meds.markTaken": "تحديد كمتناول",
+    "clinical.meds.adherence": "الالتزام خلال 7 أيام",
+    "clinical.meds.mySchedule": "جدولي",
+    "clinical.meds.empty": "جدولك فارغ. أضف أدوية ومكملات شائعة أدناه.",
+    "clinical.meds.remove": "إزالة {name}",
+    "clinical.meds.addTitle": "أضف من القائمة الشائعة",
+    "clinical.meds.add": "إضافة",
+    "clinical.meds.addAria": "إضافة {name} إلى جدولي",
+    "clinical.meds.disclaimer": "معلومات إرشادية فقط — لا توقف أو تبدأ أو تغيّر أي دواء دون استشارة الطبيب.",
+    "clinical.meds.frequency.once": "مرة يوميًا",
+    "clinical.meds.frequency.twice": "مرتين يوميًا",
+    "clinical.meds.frequency.threeTimes": "ثلاث مرات يوميًا",
+    "clinical.meds.frequency.asNeeded": "عند الحاجة",
+
+    "clinical.trigger.title": "سجل محفزات النوبات",
+    "clinical.trigger.subtitle": "اكتشف العوامل التي ترتبط عادةً بأقوى نوباتك.",
+    "clinical.trigger.date": "التاريخ",
+    "clinical.trigger.severity": "الشدة",
+    "clinical.trigger.severityHint": "0 = لا نوبة · 10 = أسوأ نوبة شعرت بها",
+    "clinical.trigger.factors": "العوامل المشتبه بها",
+    "clinical.trigger.note": "ملاحظة",
+    "clinical.trigger.notePlaceholder": "ماذا حدث؟ طقس، ضغط، أنشطة…",
+    "clinical.trigger.addEntry": "إضافة تسجيل",
+    "clinical.trigger.added": "تمت الإضافة ✓",
+    "clinical.trigger.insights": "أنماطك حتى الآن",
+    "clinical.trigger.frequencyLabel": "{count} تسجيل",
+    "clinical.trigger.avgSeverity": "متوسط {avg}/10",
+    "clinical.trigger.history": "السجل",
+    "clinical.trigger.empty": "لا توجد تسجيلات بعد. سجّل أول نوبة لتكتشف الأنماط.",
+    "clinical.trigger.delete": "حذف التسجيل",
+    "clinical.trigger.group.weather": "الطقس",
+    "clinical.trigger.group.stress": "الضغط والمشاعر",
+    "clinical.trigger.group.sleep": "النوم",
+    "clinical.trigger.group.diet": "النظام الغذائي",
+    "clinical.trigger.group.activity": "النشاط",
+    "clinical.trigger.group.other": "أخرى",
+    "clinical.trigger.weatherPressure": "تغير الضغط / الطقس",
+    "clinical.trigger.cold": "البرد",
+    "clinical.trigger.heat": "الحرارة",
+    "clinical.trigger.stress": "الضغط النفسي",
+    "clinical.trigger.poorSleep": "نوم سيئ",
+    "clinical.trigger.overexertion": "إجهاد زائد",
+    "clinical.trigger.dietary": "النظام الغذائي (مثل: السكر والكحول)",
+    "clinical.trigger.sittingTooLong": "الجلوس الطويل",
+    "clinical.trigger.hormonal": "التغيرات الهرمونية",
+    "clinical.trigger.illness": "مرض / عدوى",
+
+    "clinical.lab.title": "نتائج المختبر والمؤشرات الحيوية",
+    "clinical.lab.subtitle": "تتبع الفحوصات الكلاسيكية لاستبعاد الحالات المتداخلة: الغدة الدرقية وفيتامين د وESR وCRP.",
+    "clinical.lab.latestNone": "لا نتائج بعد",
+    "clinical.lab.test": "الفحص",
+    "clinical.lab.date": "التاريخ",
+    "clinical.lab.value": "القيمة",
+    "clinical.lab.valueRequired": "أدخل قيمة رقمية لإضافة النتيجة.",
+    "clinical.lab.hint": "تلميح: {hint}",
+    "clinical.lab.reference": "النطاق المرجعي: {low}–{high} {unit}",
+    "clinical.lab.note": "ملاحظة (اختياري)",
+    "clinical.lab.notePlaceholder": "المختبر، حالة الصيام، الأعراض وقت السحب…",
+    "clinical.lab.add": "إضافة نتيجة",
+    "clinical.lab.history": "السجل",
+    "clinical.lab.empty": "لا توجد نتائج مسجلة بعد. أضف أحدث تحاليلك أعلاه.",
+    "clinical.lab.delete": "حذف النتيجة",
+    "clinical.lab.disclaimer": "معلومات إرشادية فقط — راجع النتائج دائمًا مع طبيبك.",
+    "clinical.lab.verdict.low": "منخفض",
+    "clinical.lab.verdict.inRange": "ضمن النطاق",
+    "clinical.lab.verdict.high": "مرتفع",
+    "clinical.lab.tsh.label": "TSH",
+    "clinical.lab.tsh.hint": "قيمة فحص الغدة الدرقية الأساسية.",
+    "clinical.lab.ft4.label": "T4 الحر",
+    "clinical.lab.ft4.hint": "هرمون الثيروكسين الحر.",
+    "clinical.lab.vitaminD.label": "فيتامين د",
+    "clinical.lab.vitaminD.hint": "25-هيدروكسي فيتامين د.",
+    "clinical.lab.esr.label": "ESR",
+    "clinical.lab.esr.hint": "سرعة ترسب الدم.",
+    "clinical.lab.crp.label": "CRP",
+    "clinical.lab.crp.hint": "البروتين المتفاعل C.",
+
+    "toolkit.clinicalTitle": "المركز السريري",
+    "toolkit.clinicalSubtitle": "تقييمات ذاتية ومتتبعات تساعدك على التحضير للمواعيد واستبعاد الحالات المتداخلة.",
+
+    "sos.fab": "افتح مساعدة الأزمة",
+    "sos.dismissFab": "إخفاء زر المساعدة",
+    "sos.modal.title": "نجدة — دعم النوبة",
+    "sos.modal.subtitle": "أنت لست وحدك. خطوة واحدة في كل مرة.",
+    "sos.close": "إغلاق",
+    "sos.breath.title": "عدّاد التنفس البطيء",
+    "sos.breath.hint": "اتبع اسم المرحلة. الزفير الطويل يهدئ الجهاز العصبي.",
+    "sos.breath.done": "أحسنت — تنفّسك أصبح أهدأ.",
+    "sos.message.title": "أخبر شخصاً بما يحدث",
+    "sos.message.body": "أعاني الآن من نوبة تليف عضلي غير متوقعة. قد أحتاج مساعدة في المهام اليومية أو مجاملة. لا داعي للذعر — أستريح وأتبع خطة النوبة الخاصة بي.",
+    "sos.message.share": "مشاركة",
+    "sos.message.copy": "نسخ",
+    "sos.guide.title": "دوخة أو تشتت؟ افعل هذا الآن",
+    "sos.guide.sit": "اجلس أو استلقِ فوراً — لا تكمل رغم كل شيء.",
+    "sos.guide.head": "تحرّك ببطء. تحريك الرأس بسرعة يزيد الدوخة.",
+    "sos.guide.sip": "اشرب الماء وتناول وجبة خفيفة مالحة إن توفرت.",
+    "sos.guide.call": "إذا استمرت أكثر من 30 دقيقة أو ساءت — اتصل بشخص ما.",
+    "sos.emergencyCall": "اتصل بالإسعاف",
+    "sos.privacyNote": "لا شيء هنا يُرسل إلى خوادم FibroCare — المشاركة تحدث على جهازك فقط.",
+    "spoon.checkin.title": "تسجيل الطاقة اليومي",
+    "spoon.checkin.subtitle": "نظرية الملاعق — وزّع طاقتك كالمال.",
+    "spoon.checkin.question": "كم ملعقة طاقة لديك اليوم؟",
+    "spoon.checkin.guide.ask": "اختر رقم اليوم — سيشكّل بقية التطبيق حول طاقتك.",
+    "spoon.checkin.guide.spend": "طاقة تكفي لما يهم. اختر شيئاً أو شيئين كبيرين وأجّل الباقي.",
+    "spoon.checkin.guide.rest": "الراحة هي المهمة اليوم. كل شيء آخر يمكن انتظاره — هذا ليس فشلاً.",
+    "spoon.checkin.mode.spend": "وضع توفير الطاقة: مغلق",
+    "spoon.checkin.mode.rest": "وضع توفير الطاقة: مفعّل",
+    "spoon.checkin.savedNote": "حُفظ في سجل طاقتك لليوم.",
+    "spoon.checkin.saving": "جارٍ الحفظ…",
+    "spoon.checkin.week": "آخر 7 أيام",
+    "spoon.checkin.signInRequired": "يجب تسجيل الدخول أولاً.",
+    "spoon.checkin.locked": "افتح قفل FibroCare لحفظ فحص الطاقة اليومي.",
+    "spoon.checkin.invalid": "يجب أن تكون الملاعق بين 1 و 10.",
+    "spoon.checkin.failed": "تعذر حفظ فحص الطاقة اليومي.",
+    "pantry.title": "مساعد وجبات المؤن",
+    "pantry.subtitle": "وجبات مضادة للالتهاب بنقرة واحدة لأيام الطاقة المنخفضة — 5 دقائق بلا قرارات.",
+    "pantry.haveQuestion": "ما الموجود في مطبخك الآن؟",
+    "pantry.loading": "جارٍ تحميل مؤنتك…",
+    "pantry.noMatch": "اختر بعض المكونات أعلاه وستظهر الوجبات السريعة هنا.",
+    "pantry.bestMatch": "أفضل تطابق — ابدأ هنا",
+    "pantry.minutes": "{count} دقيقة",
+    "pantry.disclaimer": "أفكار غذائية عامة وليست نصيحة طبية — اتبع خطة طبيبك.",
+    "pantry.ing.oats": "شوفان",
+    "pantry.ing.oliveOil": "زيت زيتون",
+    "pantry.ing.fattyFish": "أسماك معلبة",
+    "pantry.ing.leafyGreens": "خضار ورقية",
+    "pantry.ing.berries": "توت",
+    "pantry.ing.nuts": "مكسرات / بذور",
+    "pantry.ing.yogurt": "زبادي",
+    "pantry.ing.turmeric": "كركم",
+    "pantry.ing.ginger": "زنجبيل",
+    "pantry.ing.eggs": "بيض",
+    "pantry.ing.bananas": "موز",
+    "pantry.ing.wholeGrainBread": "خبز أسمر",
+    "pantry.meal.oatBerryBowl": "وعاء شوفان بالتوت",
+    "pantry.meal.oatBerryBowl.how": "انقع الشوفان في ماء أو حليب ساخن دقيقتين، أضف التوت وقليلًا من المكسرات. الكربوهيدرات البطيئة ومضادات الأكسدة تهدئ تيبّس الصباح.",
+    "pantry.meal.turmericYogurtBowl": "وعاء الزبادي الذهبي",
+    "pantry.meal.turmericYogurtBowl.how": "اخلط رشة كركم وقليلًا من العسل في الزبادي وأضف التوت. جرعة بروتين مضادة للالتهاب سريعة.",
+    "pantry.meal.toastAvocadoSpinach": "توست أخضر",
+    "pantry.meal.toastAvocadoSpinach.how": "حمّص الخبز وضع فوقه الخضار الورقية بخيط زيت زيتون ورشة ملح. المغنيسيوم في الخضار يخفف توتر العضلات.",
+    "pantry.meal.sardineToast": "توست السردين",
+    "pantry.meal.sardineToast.how": "اهرس السردين المعلب على التوست وضعه فوقه الخضار. أوميغا-3 أكثر الدهون المدعومة بالأدلة ضد الالتهاب.",
+    "pantry.meal.gingerBananaSmoothie": "سموذي الزنجبيل والموز",
+    "pantry.meal.gingerBananaSmoothie.how": "اخلط الموز والزبادي ولبّ الزنجبيل مع الماء أو الحليب. الزنجبيل يهدئ الغثيان المصاحب للنوبات.",
+    "pantry.meal.eggGreenScramble": "بيض أخضر بدقيقتين",
+    "pantry.meal.eggGreenScramble.how": "اخلط البيض في زيت الزيتون وأضف الخضار في النهاية. بروتين وخضار دون وقوف طويل في المطبخ.",
+    "family.title": "بطاقات دعم العائلة",
+    "family.subtitle": "شروح جاهزة لمن حولك — قلها مرة واحدة لا عشر مرات.",
+    "family.shareTitle": "رسالة مني (FibroCare)",
+    "family.copy": "نسخ",
+    "family.copied": "تم النسخ!",
+    "family.copyFailed": "فشل النسخ — حدد النص وانسخه يدوياً.",
+    "family.share": "مشاركة",
+    "family.privacyNote": "النسخ والمشاركة من جهازك فقط — خوادم FibroCare لا تراها أبداً.",
+    "family.card.flare.title": "🔥 لديّ نوبة الآن",
+    "family.card.flare.body": "تليفي العضلات مشتعل الآن: الألم والإرهاق قفا يرتفعان، وهذا ليس شيئاً يمكنني تجاهله. سأستريح — تسعدني شوربة أو توصيلة أو رسالة اطمئنان هادئة. لا داعي للزيارة أو المكالمات المتكررة. ستنتهي؛ تحتاج وقتاً فقط.",
+    "family.card.fog.title": "🌫 نوبة ضباب دماغي",
+    "family.card.fog.body": "تفكيري مشوش الآن (ضباب التليف): الكلمات تفلت، التركيز يتشتت، والقرارات تبدو ضخمة. هذا مؤقت وليس تفاهة مني. الرسائل القصيرة والبسيطة تساعد؛ لا تختبرني ولا تضف مهام الآن. سأعود حين يصفو.",
+    "family.card.crash.title": "🔋 نفدت طاقتي اليوم",
+    "family.card.crash.body": "استهلكت طاقة اليوم وجسدي يطلب راحة كاملة. إلغاء الخطط ليس استسلاماً — إنه حماية للغد. أرجو تدارك أي شيء عاجل بدلاً عني، ولنؤجل اللقاء حين تتعاش طاقتي.",
+    "movement.title": "تذكيرات الحركة",
+    "movement.off": "مغلق",
+    "movement.minutes": "{count} دقيقة",
+    "movement.popup.title": "وقت تمرين صغير",
+    "movement.done": "تم — أحسنت",
+    "movement.snooze": "غفوة 10 دقائق",
+    "movement.dismiss": "تجاهل التذكير",
+    "movement.stretch.neck": "أدر أذنك اليمنى ببطء نحو كتفك الأيمن؛ عدّ 4 أنفاس. بدّل الجانب.",
+    "movement.stretch.shoulders": "دوّر كتفيك للخلف بدوائر بطيئة — 5 لفات مع زفير في كل نزولة.",
+    "movement.stretch.wrists": "مدّ ذراعيك: دوّر معصميك 5 مرات لكل اتجاه، ثم انشر أصابعك وأغمضها.",
+    "movement.stretch.hips": "وقوفاً أو جلوساً: انقل وزنك من جانب لآخر بلطف، 6 مرات بطيئة.",
+    "movement.stretch.calves": "انتصب على أطراف أصابعك وانزل ببطء، 6 مرات — أيقظ الدورة الدموية دون إجهاد.",
+    "support.title": "دعم الحياة اليومية",
+    "support.subtitle": "شروح لمن حولك، وتذكيرات لطيفة تبقي عضلاتك رحيمة بك.",
+    "summary.title": "ملخص جاهز للطبيب",
+    "summary.subtitle": "صفحة واحدة نظيفة لموعدك القادم — لا مزيد من الاعتماد على الذاكرة أثناء الضباب.",
+    "summary.loading": "جارٍ تجهيز ملخصك…",
+    "summary.unavailable": "سيظهر ملخصك هنا عند تسجيل الدخول وفتح القفل.",
+    "summary.heading": "ملخص التتبع الذاتي للتليف العضلي — {name}",
+    "summary.line.period": "تم تتبع الأعراض في {count} يوماً من آخر {days} يوماً.",
+    "summary.line.avgPain": "متوسط الألم {value}/10",
+    "summary.line.peakPain": "الذروة {value}/10",
+    "summary.line.flareDays": "{count} يوماً من النوبات (ألم ≥ 7/10)",
+    "summary.line.cycleDays": "{count} يوماً لسجلات الدورة في الفترة",
+    "summary.line.symptomAvg": "متوسط شدة الأعراض {value}/10",
+    "summary.line.adherence": "تم تسجيل الأعراض في {count} يوماً من آخر 30 يوماً",
+    "summary.line.meds": "الأدوية/المكملات الحالية: {meds}",
+    "summary.line.medsNone": "لا قائمة أدوية محفوظة بعد — أضفها في المركز السريري قبل زيارتك.",
+    "summary.generated": "أُنشئ في {date} · بيانات ذاتية من FibroCare",
+    "summary.print": "طباعة / حفظ PDF",
+    "summary.none": "غير متاح",
+    "nav.clinical": "المركز السريري",
+    "clinical.hub.title": "المركز السريري",
+    "clinical.hub.subtitle": "تقييمات ومتتبعات وإرشادات علاجية وتقرير جاهز للطبيب — كل ما هو سريري في مكان واحد.",
+    "clinical.hub.trackersTitle": "التقييمات والمتتبعات",
+    "clinical.hub.trackersSubtitle": "تقييمات ذاتية منظمة وسجلات يومية تبني حقيبة موعدك الطبي.",
+    "clinical.hub.lifestyleTitle": "العلاجي ونمط الحياة",
+    "clinical.hub.lifestyleSubtitle": "إرشادات مبنية على الأدلة يمكنك تطبيقها اليوم: الحركة والنوم والتعامل مع النوبات.",
+    "clinical.hub.reportTitle": "التقرير الأسبوعي / الشهري",
+    "clinical.hub.reportSubtitle": "يجمع سجلاتك ومتتبعاتك وسياق الدورة في ملخص جاهز للنسخ لمشاركته مع طبيبك.",
+
+    "clinical.exercise.title": "مكتبة التمارين منخفضة التأثير",
+    "clinical.exercise.subtitle": "أدلة حركة لطيفة ومتدرجة. ابدأ بخفة وتقدم ببطء، ونظّم جهدك في كل جلسة.",
+    "clinical.exercise.filter.all": "كل المستويات",
+    "clinical.exercise.intensity.gentle": "لطيف",
+    "clinical.exercise.intensity.light": "خفيف",
+    "clinical.exercise.intensity.moderate": "متوسط",
+    "clinical.exercise.minutes": "{count} دقيقة",
+    "clinical.exercise.stepsLabel": "كيفية الأداء",
+    "clinical.exercise.clearance": "استشر طبيبك قبل البدء",
+    "clinical.exercise.tipsTitle": "مبادئ تنظيم الجهد",
+    "clinical.exercise.tip.1": "ابدأ بنصف ما تعتقد أنه بإمكانك، ثم زد نحو 10% أسبوعيًا.",
+    "clinical.exercise.tip.2": "توقف وأنت لا تزال لديك طاقة — الدفع حتى الإنهاك يكلفك أيامًا.",
+    "clinical.exercise.tip.3": "نوبة قصيرة بعد نشاط جديد أمر شائع؛ أما الانهيار لأيام فيعني تقليل الجهد.",
+    "clinical.exercise.tip.4": "الحركة اللطيفة اليومية أفضل من الجلسات الشديدة المتقطعة.",
+    "clinical.exercise.walking.title": "المشي اللطيف",
+    "clinical.exercise.walking.details": "القاعدة الهوائية الأيسر: مسارات مستوية وأحذية مريحة وسرعة تتيح لك الكلام أثناء المشي.",
+    "clinical.exercise.walking.steps": "1. اختر حلقة مستوية وظليلة قرب منزلك.\n2. امشِ 3–5 دقائق ثم استرح أو ارجع.\n3. أضف 1–2 دقيقة فقط في الأيام التي تشعر فيها باستقرار.\n4. راقب شعورك صباح اليوم التالي قبل الإطالة.",
+    "clinical.exercise.water.title": "تمارين الماء الدافئ",
+    "clinical.exercise.water.details": "الطفو يخفف الحمل عن المفاصل المؤلمة بينما توفر المقاومة اللطيفة قوة — أفضل التمارين تحملاً في دراسات الليفوميالجيا.",
+    "clinical.exercise.water.steps": "1. اختر مسبحًا دافئًا (32–34°م إن أمكن).\n2. امشِ في الحافة الضحلة لمدة 5 دقائق.\n3. أضف تأرجح الساقين ودوائر الكتفين ببطء.\n4. توقف قبل أن تشعر بالبرد أو التعب.",
+    "clinical.exercise.taiChi.title": "التاي تشي",
+    "clinical.exercise.taiChi.details": "حركات بطيئة متدفقة تدرب التوازن وتلين التنفس؛ أدلة تجريبية قوية على تخفيف أعراض الليفوميالجيا.",
+    "clinical.exercise.taiChi.steps": "1. ابدأ بحركة الإحماء الافتتاحية فقط.\n2. اتبع فيديو مبتدئ أو صفًا بنصف السرعة.\n3. أبقِ الركبتين مرنتين — لا مقفلتين أبدًا.\n4. تدرّب 10–20 دقيقة، 2–3 مرات أسبوعيًا.",
+    "clinical.exercise.yoga.title": "اليوغا اللطيفة",
+    "clinical.exercise.yoga.details": "وضعيات استعادية مع وسائل دعم ومسكات طويلة؛ ركّز على التنفس والراحة لا على عمق التمدد.",
+    "clinical.exercise.yoga.steps": "1. استخدم كرسيًا أو حائطًا للدعم في كل وضعية وقوف.\n2. امسك الوضعية 30–60 ثانية دون إجهاد.\n3. فضّل الوضعيات الاستعادية: وضعية الطفل، الرجلان على الحائط.\n4. تجنب اليوغا الساخنة والتدفقات السريعة.",
+    "clinical.exercise.stretching.title": "التمدد اليومي",
+    "clinical.exercise.stretching.details": "روتين 10 دقائق لكل الجسم يبقي تيبّس الصباح محتملًا — أكثر عادة تخفيفٍ شيوعًا بين المرضى.",
+    "clinical.exercise.stretching.steps": "1. تمدد بعد دش دافئ عندما تكون العضلات دافئة.\n2. امسك كل تمدد 20–30 ثانية؛ لا ترتد أبدًا.\n3. تنفس ببطء وأخرج النفس داخل التمدد.\n4. غطِّ الرقبة والكتفين والظهر والوركين والسمانة.",
+    "clinical.exercise.strength.title": "تمارين قوة خفيفة",
+    "clinical.exercise.strength.details": "المقاومة الخفيفة تحمي العضلات والعظام. ابدأ فقط عندما تصبح أنشطتك اليومية مُدارَة، ويفضل مع أخصائي علاج طبيعي.",
+    "clinical.exercise.strength.steps": "1. ابدأ بأحزمة المقاومة أو أوزان 0.5–1 كغ.\n2. 8–12 تكرارًا بطيئًا لكل تمرين، مجموعة واحدة.\n3. استرح 48 ساعة بين جلسات القوة.\n4. قلل الوزن إذا زاد الألم في اليوم التالي.",
+    "clinical.exercise.cycling.title": "الدراجة الثابتة",
+    "clinical.exercise.cycling.details": "جهد هوائي مستقل عن الطقس وبدون ارتطام — المقعد يحمل وزنك لا مفاصلك.",
+    "clinical.exercise.cycling.steps": "1. اضبط ارتفاع المقعد مريحًا (انثناء بسيط في الركبة).\n2. ابدأ بـ5 دقائق دون مقاومة.\n3. أضف 1–2 دقيقة لكل جلسة، والمقاومة أخيرًا.\n4. حافظ على إيقاع بطيء وثابت.",
+    "clinical.exercise.seatedBand.title": "روتين الحزام جالسًا",
+    "clinical.exercise.seatedBand.details": "جلسة كاملة للجزء العلوي من على الكرسي — لأيام النوبات وأيام الطاقة المنخفضة وفترات الراحة في العمل.",
+    "clinical.exercise.seatedBand.steps": "1. اجلس معتدلًا والقدمان مستويتين، والحزام ملوف حول اليدين.\n2. السحب: اسحب الحزام نحو صدرك والمرفقان للخلف.\n3. الدفع: مِد الذراعين أمامك على مستوى الصدر.\n4. 8–10 تكرارات بطيئة لكل حركة مع راحة عند الحاجة.",
+
+    "clinical.sleep.title": "إرشادات نظافة النوم",
+    "clinical.sleep.subtitle": "النوم غير المجدّ يضخّم الألم وضباب الليفو. هذه العادات تستهدف العوامل الأهم فعليًا.",
+    "clinical.sleep.checklistTitle": "قائمة الليلة",
+    "clinical.sleep.score": "{count} من 8 عادات",
+    "clinical.sleep.reading.strong": "روتين قوي",
+    "clinical.sleep.reading.building": "قيد البناء",
+    "clinical.sleep.reading.starting": "بداية فقط",
+    "clinical.sleep.hint.strong": "واصل — الاستمرارية هي ما يحمي نومك.",
+    "clinical.sleep.hint.building": "اختر عادة إضافية وكررها كل ليلة لأسبوع.",
+    "clinical.sleep.hint.starting": "ابدأ بموعد استيقاظ ثابت — فهو يضبط كل ما عداها.",
+    "clinical.sleep.disclaimer": "إذا استمر الأرق رغم النوم الجيد، ناقش الأمر مع طبيبك — حالات قابلة للعلاج مثل متلازمة تململ الساقين وانقطاع النفس النومي شائعة مع الليفوميالجيا.",
+    "clinical.sleep.consistentSchedule.title": "مواعيد ثابتة",
+    "clinical.sleep.consistentSchedule.body": "موعد استيقاظ واحد كل يوم — حتى بعد ليلة سيئة وفي عطلات نهاية الأسبوع.",
+    "clinical.sleep.darkCoolRoom.title": "غرفة مظلمة وباردة",
+    "clinical.sleep.darkCoolRoom.body": "أمعم الغرفة وأبقها باردة قليلًا؛ حرارة الليل تزيد ألم الليفو.",
+    "clinical.sleep.screenWindDown.title": "تهدئة الشاشات",
+    "clinical.sleep.screenWindDown.body": "اترك الشاشات قبل النوم بـ60–90 دقيقة؛ خفّف الإضاءة وانتقل إلى شيء هادئ.",
+    "clinical.sleep.caffeineCutoff.title": "حد الكافيين",
+    "clinical.sleep.caffeineCutoff.body": "لا كافيين بعد بعد الظهر — يبقى في الجسم أكثر من 8 ساعات ويفسد النوم العميق.",
+    "clinical.sleep.eveningRoutine.title": "روتين المساء",
+    "clinical.sleep.eveningRoutine.body": "تهدئة ثابتة 20–30 دقيقة — دش دافئ، تمدد خفيف، شاي أعشاب — تُعلن للجسم اقتراب النوم.",
+    "clinical.sleep.preSleepRelaxation.title": "استرخاء في السرير",
+    "clinical.sleep.preSleepRelaxation.body": "تنفس بطيء أو مسح للجسم أثناء الاستلقاء؛ إذا بقيت مستيقظًا نحو 20 دقيقة فانهض وأعد الضبط.",
+    "clinical.sleep.gentleDaylight.title": "ضوء الصباح",
+    "clinical.sleep.gentleDaylight.body": "10–20 دقيقة من ضوء النهار مبكرًا تقوي إيقاع النوم واليقظة لديك.",
+    "clinical.sleep.painComfortPrep.title": "تجهيز راحة الألم",
+    "clinical.sleep.painComfortPrep.body": "جهّز وسائد الدعم وسادة التدفئة ومسكناتك قبل النوم حتى لا يخرب الألم ليلك.",
+
+    "clinical.coping.title": "أدوات إدارة النوبات والتعافي",
+    "clinical.coping.subtitle": "لحظات النوبة: استراتيجيات تبدأ بها فورًا، مع تمرين تنفس موجّه.",
+    "clinical.coping.pacing.title": "تنظيم الجهد والراحة",
+    "clinical.coping.pacing.body": "خفّف النشاط بدل إيقافه تمامًا؛ بدّل بين 15–20 دقيقة جهد لطيف وراحة حقيقية.",
+    "clinical.coping.pacing.action": "جرّب: اضبط مؤقتًا لـ15 دقيقة راحة قبل مهمتك التالية.",
+    "clinical.coping.breathing.title": "التنفس البطيء",
+    "clinical.coping.breathing.body": "الزفير الطويل البطيء يهدئ الجهاز العصبي ويخفف حدّة ارتفاعات الألم.",
+    "clinical.coping.breathing.action": "جرّب: ابدأ تمرين 4-7-8 الموجّه أدناه.",
+    "clinical.coping.grounding.title": "التهدئة 5-4-3-2-1",
+    "clinical.coping.grounding.body": "رتّب نفسك في الحاضر حين تجلب النوبة ذعرًا: سمِّ 5 أشياء تراها، و4 تشعر بها باللمس، و3 تسمعها، و2 تشمها، و1 تتذوقه.",
+    "clinical.coping.grounding.action": "جرّب: ببطء — حاسة واحدة في المرة تكفي.",
+    "clinical.coping.heatComfort.title": "الدفء اللطيف",
+    "clinical.coping.heatComfort.body": "كمادة دافئة أو بطانية تدفئة أو حمام دافئ يريح العضلات المتوترة ويخفف الألم العميق.",
+    "clinical.coping.heatComfort.action": "جرّب: 15–20 دقيقة دفء على المنطقة الأكثر ألمًا.",
+    "clinical.coping.sensoryShutdown.title": "إغلاق حسي",
+    "clinical.coping.sensoryShutdown.body": "في لحظات الحمل الحسي الزائد، أخفف الإضاءة وأسكت التنبيهات واعتزل مكانًا هادئًا دقائق.",
+    "clinical.coping.sensoryShutdown.action": "جرّب: سماعات + غرفة معتمة + أنفاس بطيئة، 10 دقائق.",
+    "clinical.coping.support.title": "اطلب الدعم",
+    "clinical.coping.support.body": "أخبر شخصًا واحدًا بشعورك — شريكك أو صديقًا أو عبر رابط المشاركة للمقدّم على الرعاية. الدعم يخفف ضيق النوبة.",
+    "clinical.coping.support.action": "جرّب: أرسل رسالة قصيرة واحدة — دون شرح مطوّل.",
+    "clinical.coping.breath.title": "تنفس 4-7-8 الموجّه",
+    "clinical.coping.breath.subtitle": "شهيق 4 ثوانٍ · حبس 7 ثوانٍ · زفير 8 ثوانٍ. أربع دورات هدف أول جيد.",
+    "clinical.coping.breath.start": "ابدأ",
+    "clinical.coping.breath.pause": "إيقاف مؤقت",
+    "clinical.coping.breath.reset": "إعادة",
+    "clinical.coping.breath.inhale": "شهيق",
+    "clinical.coping.breath.hold": "حبس",
+    "clinical.coping.breath.exhale": "زفير",
+    "clinical.coping.breath.cycleCount": "الدورات: {count}",
+    "clinical.coping.breath.aria": "مؤقت التنفس الموجّه",
+    "clinical.coping.disclaimer": "إذا بدت النوبة مختلفة عن نمطك المعتاد — ضعف جديد أو ألم صدر أو أعراض بجانب واحد — اطلب الرعاية الطبية فورًا.",
+
+    "clinical.report.title": "التقرير الأسبوعي / الشهري",
+    "clinical.report.subtitle": "ملخص جاهز للطبيب لسجلاتك ومحفزاتك وتحاليلك وسياق الدورة للفترة المختارة.",
+    "clinical.report.period.week": "هذا الأسبوع",
+    "clinical.report.period.month": "هذا الشهر",
+    "clinical.report.stat.avgPain": "متوسط الألم",
+    "clinical.report.stat.peakPain": "أقصى ألم",
+    "clinical.report.stat.flareDays": "أيام النوبة (≥7/10)",
+    "clinical.report.stat.adherence": "الالتزام بالتسجيل",
+    "clinical.report.trigger.title": "محفزات النوبة في هذه الفترة",
+    "clinical.report.trigger.none": "لا محفزات نوبة مسجلة في هذه الفترة.",
+    "clinical.report.trigger.top": "أبرز محفز: {factor} (متوسط {avg}/10 عبر {count} نوبة)",
+    "clinical.report.lab.title": "أبرز نتائج المختبر",
+    "clinical.report.lab.none": "لا نتائج مختبر في هذه الفترة.",
+    "clinical.report.meds.title": "الأدوية المجدولة",
+    "clinical.report.meds.none": "لا أدوية مجدولة بعد.",
+    "clinical.report.acr.title": "فرز ACR 2010/2016",
+    "clinical.report.acr.met": "المعايير مستوفاة (WPI {wpi}/19 · SS {ss}/12)",
+    "clinical.report.acr.notMet": "المعايير غير مستوفاة (WPI {wpi}/19 · SS {ss}/12)",
+    "clinical.report.acr.none": "لا يوجد تقييم ACR محفوظ بعد.",
+    "clinical.report.cycle.title": "سياق الدورة",
+    "clinical.report.cycle.none": "لا بيانات دورة في هذه الفترة.",
+    "clinical.report.empty": "لا سجلات أعراض في هذه الفترة بعد — واصل التسجيل لبناء التقرير.",
+    "clinical.report.copy": "نسخ للطبيب",
+    "clinical.report.copied": "تم النسخ ✓",
+    "clinical.report.shareHint": "الصقه في رسالة أو اطبعه للموعد.",
+
+    "caregiver.badge": "عرض مقدم الرعاية",
+    "caregiver.title": "توقع النوبة لـ {name}",
+    "caregiver.readOnly": "مشاركة للاطلاع فقط — لا تظهر هنا أي يوميات أو درجات أو بيانات.",
+    "caregiver.level.high": "مرتفع",
+    "caregiver.level.moderate": "متوسط",
+    "caregiver.level.low": "هادئ",
+    "caregiver.daysToPeriod": "أيام حتى الدورة القادمة",
+    "caregiver.cyclePhase": "طور الدورة",
+    "caregiver.unknown": "غير معروف",
+    "caregiver.insight": "خطط لدعم لطيف حول النافذة المرتفعة: حافظ على تذكيرات الراحة قريبة، والوجبات دافئة وثابتة، والنزهات قصيرة. يشارك هذا الرابط توقع اليوم فقط — ويتحدث تلقائيًا.",
+    "caregiver.linkInactive": "رابط المشاركة هذا غير نشط.",
+
+    "doctor.filter.searchLabel": "ابحث في الملف",
+    "doctor.filter.searchPlaceholder": "ابحث في العنوان أو النص أو اسم الكاتب…",
+    "doctor.filter.topic": "الموضوع",
+    "doctor.filter.topicAll": "كل المواضيع",
+    "doctor.filter.topics.pain": "الألم والنوبات",
+    "doctor.filter.topics.sleep": "النوم",
+    "doctor.filter.topics.fatigue": "التعب والطاقة",
+    "doctor.filter.topics.medication": "الأدوية",
+    "doctor.filter.topics.nutrition": "التغذية",
+    "doctor.filter.topics.mentalHealth": "الصحة النفسية",
+    "doctor.filter.topics.research": "بحث علمي",
+    "doctor.filter.topics.lifestyle": "نمط الحياة",
+    "doctor.filter.specialization": "التخصص",
+    "doctor.filter.specAll": "كل التخصصات",
+    "doctor.filter.spec.rheumatology": "الأمراض الروماتيزمية",
+    "doctor.filter.spec.neurology": "الأعصاب",
+    "doctor.filter.spec.painMedicine": "طب الألم",
+    "doctor.filter.spec.physiatry": "الطب الطبيعي والتأهيل",
+    "doctor.filter.spec.physiotherapy": "العلاج الطبيعي",
+    "doctor.filter.spec.psychology": "علم النفس",
+    "doctor.filter.spec.generalMedicine": "الطب العام",
+    "doctor.filter.clear": "مسح الفلاتر",
+    "doctor.filter.showing": "{shown} من {total} منشورًا",
+    "doctor.filter.noResults": "لا منشورات تطابق هذه الفلاتر. جرّب مسحها.",
   },
 };

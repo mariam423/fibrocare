@@ -4,9 +4,29 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { sanitizeUserText } from "@/lib/security/sanitizer";
 
+export const dynamic = "force-dynamic";
+
 const commentSchema = z.object({
   content: z.string().trim().min(1).max(1000),
 });
+
+/**
+ * CSRF gate — same contract as the posts route: browsers always send an
+ * Origin header on cross-site fetch/form POSTs, so any mismatching Origin
+ * is rejected. Same-origin requests (and non-browser clients, which send
+ * no Origin) pass. Defense-in-depth on top of the SameSite=Lax session
+ * cookie, matching the POST handler in `../route.ts`.
+ */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return true;
+  try {
+    const host = request.headers.get("host") ?? new URL(request.url).host;
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(
   request: Request,
@@ -58,6 +78,10 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!sameOrigin(request)) {
+    return Response.json({ error: "Cross-origin request rejected." }, { status: 403 });
+  }
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });

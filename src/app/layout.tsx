@@ -17,6 +17,7 @@ import { SessionProvider } from "@/components/auth/SessionProvider";
 import { AmbientAurora } from "@/components/ui/AmbientAurora";
 import ThemeManager from "@/components/ThemeManager";
 import { PwaPrompt } from "@/components/pwa/PwaPrompt";
+import { SosButton } from "@/components/sos/SosButton";
 
 const readexPro = Readex_Pro({
   variable: "--font-readex",
@@ -31,16 +32,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   const ogImageEn = {
-    url: `${baseUrl}/og?lang=en`,
+    url: `${baseUrl}/og?lang=en&variant=features`,
     width: 1200,
     height: 630,
-    alt: translations.en["meta.ogImageAlt"],
+    alt: translations.en["meta.ogFeaturesImageAlt"],
   };
   const ogImageAr = {
-    url: `${baseUrl}/og?lang=ar`,
+    url: `${baseUrl}/og?lang=ar&variant=features`,
     width: 1200,
     height: 630,
-    alt: translations.ar["meta.ogImageAlt"],
+    alt: translations.ar["meta.ogFeaturesImageAlt"],
   };
 
   return {
@@ -193,6 +194,9 @@ export default async function RootLayout({
                 </SessionProvider>
               </PrivacyProvider>
               <Toaster richColors position="bottom-right" />
+              {/* Always-available crisis entry point — client-only rendering
+                  lives inside the component (hidden pre-hydration). */}
+              <SosButton />
             </NotificationProvider>
           </LanguageProvider>
         </HealthProvider>

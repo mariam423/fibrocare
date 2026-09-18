@@ -49,7 +49,8 @@ jobs:
 
     env:
       # Read by scripts/run-e2e-env.mjs when it writes .env for CI.
-      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_e2e
+      # Throwaway service-container credential — not a real secret.
+      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_e2e # security: ok throwaway CI container
       NEXTAUTH_URL: http://localhost:3000
 
     steps:

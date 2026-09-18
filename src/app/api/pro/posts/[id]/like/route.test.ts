@@ -25,6 +25,7 @@ vi.mock("@/lib/prisma", () => ({
     articleReaction: {
       findUnique: vi.fn(),
       delete: vi.fn(),
+      deleteMany: vi.fn(),
       create: vi.fn(),
     },
   },
@@ -84,8 +85,8 @@ describe("POST /api/pro/posts/[id]/like", () => {
     const body = await res.json();
     expect(body.liked).toBe(false);
     expect(mockedCreate).not.toHaveBeenCalled();
-    expect(prisma.articleReaction.delete).toHaveBeenCalledWith({
-      where: { id: "r-existing" },
+    expect(prisma.articleReaction.deleteMany).toHaveBeenCalledWith({
+      where: { userId: "u1", postId: "post-1", kind: "like" },
     });
   });
 });

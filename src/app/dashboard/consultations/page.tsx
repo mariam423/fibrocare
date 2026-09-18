@@ -240,9 +240,11 @@ export default function ConsultationsHubPage() {
   return (
     <RouteTransition>
       <GlobalNavHeader />
+      {/* pb-32 sm:pb-40 keeps the last consultation card clear of the
+          floating bottom chrome (SOS FAB + PWA install prompt). */}
       <main
         dir={dir}
-        className="container mx-auto max-w-6xl px-4 pb-16 pt-[calc(env(safe-area-inset-top)+1.5rem)] sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+2rem)]"
+        className="container mx-auto max-w-6xl px-4 pb-32 sm:pb-40 pt-[calc(env(safe-area-inset-top)+1.5rem)] sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+2rem)]"
       >
         {/* Hero ---------------------------------------------------------- */}
         <ScrollReveal>

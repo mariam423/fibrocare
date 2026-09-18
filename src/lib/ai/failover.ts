@@ -5,7 +5,6 @@ import {
   type GenerateTextOnEndCallback,
   type LanguageModel,
   type ModelMessage,
-  type StreamTextOnErrorCallback,
   type TimeoutConfiguration,
   type ToolSet,
 } from "ai";
@@ -17,9 +16,10 @@ import { getFailoverOrder, getModel, recordAiFailure, recordAiSuccess, type AiPr
  * 502/503/504 are also typical transient provider issues.
  */
 function isTransientError(error: unknown): boolean {
-  const err = error as any;
-  if (err?.status === 429) return true;
-  if (err?.status >= 502 && err?.status <= 504) return true;
+  const err = error as { status?: number; message?: string } | null;
+  const status = err?.status;
+  if (status === 429) return true;
+  if (status !== undefined && status >= 502 && status <= 504) return true;
 
   // Check for common AI SDK error messages that indicate rate limits
   const msg = err?.message?.toLowerCase() ?? "";
@@ -148,7 +148,7 @@ interface GenerateObjectResult<T> {
   usage: { inputTokens: number; outputTokens: number };
 }
 
-export async function generateObjectWithFailover<T = any>(
+export async function generateObjectWithFailover<T = unknown>(
   options: Record<string, unknown> & { schema: unknown }
 ): Promise<GenerateObjectResult<T>> {
   const order = getFailoverOrder();

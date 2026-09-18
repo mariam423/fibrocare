@@ -80,7 +80,7 @@ export function PwaPrompt() {
       <div
         role="status"
         aria-live="polite"
-        className="fixed bottom-24 end-4 z-[60] w-[calc(100vw-2rem)] max-w-sm pointer-events-none print:hidden"
+className="fixed bottom-[max(6.5rem,calc(env(safe-area-inset-bottom)+6rem))] start-4 z-[60] w-[calc(100vw-2rem)] max-w-sm pointer-events-none print:hidden"
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-lg pointer-events-auto">
           <span
@@ -97,8 +97,16 @@ export function PwaPrompt() {
 
   if (!installEvent) return null;
 
+  // Anchored at max(6.5rem, env + 6rem) on the START side so the banner
+  // never stacks over the bottom-END floating cluster (SOS FAB + AI
+  // companion launcher: bottom ~1.25rem + 3.5rem tall, i.e. up to
+  // env+4.75rem) — it parks on the opposite corner instead, above the
+  // MovementReminder band (start, env+1.25rem ≲ 4.25rem tall), including
+  // iOS safe-area insets. z-[60] keeps the banner above page content
+  // (z < 50) but below the AI companion panel and toasts, which rank
+  // z-[70]/z-[100] as dismissible overlays.
   return (
-    <div className="fixed bottom-24 end-4 z-[60] w-[calc(100vw-2rem)] max-w-sm pointer-events-none print:hidden">
+    <div className="fixed bottom-[max(6.5rem,calc(env(safe-area-inset-bottom)+6rem))] start-4 z-[60] w-[calc(100vw-2rem)] max-w-sm pointer-events-none print:hidden">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-lg pointer-events-auto">
         <span className="min-w-0 flex-1 text-foreground">
           Add <strong>FibroCare</strong> to your home screen for quick access.

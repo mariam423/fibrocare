@@ -10,7 +10,7 @@
  * it is a complementary inline variant for the check-in flow.
  */
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -140,14 +140,10 @@ function getMealEmoji(type: MealType): string {
 export function PostMealFatigueSection() {
   const { t } = useLanguage();
 
-  const [entries, setEntries] = useState<MealFatigueEntry[]>([]);
+  const [entries, setEntries] = useState<MealFatigueEntry[]>(() => loadEntries());
   const [selectedMeal, setSelectedMeal] = useState<MealType>("lunch");
   const [selectedFatigue, setSelectedFatigue] = useState<FatigueLevel>(0);
   const [justSaved, setJustSaved] = useState(false);
-
-  useEffect(() => {
-    setEntries(loadEntries());
-  }, []);
 
   const logFatigue = useCallback(() => {
     const entry: MealFatigueEntry = {

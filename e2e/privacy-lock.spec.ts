@@ -92,10 +92,10 @@ test.describe("PIN lock screen", () => {
         .getByRole("button", { name: `Digit ${digit}` })
         .click();
     }
-    await expect(
-      page.getByRole("dialog").getByRole("alert"),
-      { timeout: LOCK_DIALOG_TIMEOUT_MS }
-    ).toHaveText("Incorrect PIN. Try again.");
+    await expect(page.getByRole("dialog").getByRole("alert"))
+      .toHaveText("Incorrect PIN. Try again.", {
+        timeout: LOCK_DIALOG_TIMEOUT_MS,
+      });
     await expect(title).toBeVisible({ timeout: 10_000 });
 
     // Headless Chromium has no platform authenticator and no registered

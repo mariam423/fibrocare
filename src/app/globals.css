@@ -93,40 +93,43 @@
 }
 
 .dark {
-  /* Standard · Dark — Deep Teal/Emerald Obsidian
-     Near-black teal base with translucent glass cards; off-white
-     text with a cool emerald cast (never pure white) to prevent
-     eye strain; hairline white borders, refined sage accents. */
-  --background: #060D0C;
-  --foreground: #E8F0EB;
-  --card: #0E1817;
-  --card-foreground: #E8F0EB;
-  --popover: #101B19;
-  --popover-foreground: #E8F0EB;
+  /* Standard · Dark — Soft Slate / Sage
+     Calm misty-slate base (#0B101B — matches the app's theme-color and
+     dark scenery) with gently lifted slate cards that separate
+     harmoniously, soft off-white text (never pure white), hairline
+     slate borders and refined sage accents. No near-black and no teal
+     cast: restful, low-glare dark that reads like the app bars it
+     lives alongside. */
+  --background: #0B101B;
+  --foreground: #E5EAF2;
+  --card: #121A2A;
+  --card-foreground: #E5EAF2;
+  --popover: #141D2E;
+  --popover-foreground: #E5EAF2;
   --primary: #8FBF9B;
   --primary-foreground: #0C1F12;
-  --secondary: #16201E;
-  --secondary-foreground: #DCEBE0;
-  --muted: #131E1C;
-  --muted-foreground: #A5B8AC;
-  --accent: #16231F;
-  --accent-foreground: #D4E8D6;
+  --secondary: #1A2437;
+  --secondary-foreground: #DCE4EF;
+  --muted: #1A2437;
+  --muted-foreground: #97A3B6;
+  --accent: #1E2A3E;
+  --accent-foreground: #DCE4EF;
   --destructive: #E06B5E;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: rgba(255, 255, 255, 0.11);
+  --border: rgba(148, 163, 184, 0.16);
+  --input: rgba(148, 163, 184, 0.22);
   --ring: #9CC6A4;
   --chart-1: #8FBF9B;
-  --chart-2: #7FB5A5;
+  --chart-2: #A79ACF;
   --chart-3: #C9AE7C;
   --chart-4: #D19A87;
-  --chart-5: #97A09A;
-  --sidebar: #0C1513;
-  --sidebar-foreground: #E8F0EB;
+  --chart-5: #7E8CA0;
+  --sidebar: #0E1522;
+  --sidebar-foreground: #E5EAF2;
   --sidebar-primary: #8FBF9B;
   --sidebar-primary-foreground: #0C1F12;
-  --sidebar-accent: #16231F;
-  --sidebar-accent-foreground: #D4E8D6;
-  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-accent: #1E2A3E;
+  --sidebar-accent-foreground: #DCE4EF;
+  --sidebar-border: rgba(148, 163, 184, 0.16);
   --sidebar-ring: #9CC6A4;
 }
 
@@ -579,18 +582,19 @@ html.motion-reduce .animate-on-scroll.animate {
   pointer-events: none;
 }
 
-/* Dark mode: deep teal/emerald obsidian gradient with a lighter dot-matrix */
+/* Dark mode: soft slate wash with a whisper of lavender-blue + sage so
+   the surface keeps depth without the former near-black teal cast. */
 .dark .ambient {
   background-color: var(--background);
   background-image: radial-gradient(
       140% 120% at 12% 0%,
-      rgba(13, 44, 44, 0.55) 0%,
-      rgba(7, 18, 22, 0) 46%
+      rgba(132, 160, 188, 0.1) 0%,
+      rgba(132, 160, 188, 0) 46%
     ),
     radial-gradient(
       120% 110% at 88% 100%,
-      rgba(6, 42, 36, 0.5) 0%,
-      rgba(7, 18, 22, 0) 52%
+      rgba(134, 172, 140, 0.07) 0%,
+      rgba(134, 172, 140, 0) 52%
     );
 }
 
@@ -811,13 +815,13 @@ html.motion-reduce .animate-on-scroll.animate {
 }
 
 .dark .surface-crisp.hover-lift:hover {
-  border-color: rgba(52, 211, 153, 0.28);
+  border-color: rgba(134, 172, 140, 0.28);
   box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.24),
     0 10px 30px rgba(0, 0, 0, 0.32),
     0 24px 60px rgba(0, 0, 0, 0.42),
-    0 0 24px rgba(16, 185, 129, 0.16);
+    0 0 24px rgba(134, 172, 140, 0.16);
 }
 
 /* --- Uniform glassmorphism icon badge -------------------------
@@ -1471,7 +1475,7 @@ html.motion-reduce .hero-scenery-mist {
   }
   50% {
     transform: scale(1.015);
-    filter: brightness(1.04) drop-shadow(0 0 18px rgba(16, 185, 129, 0.18));
+    filter: brightness(1.04) drop-shadow(0 0 18px rgba(134, 172, 140, 0.18));
   }
 }
 

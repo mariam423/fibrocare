@@ -1,0 +1,83 @@
+name: docs-format
+
+# README/FEATURES render hygiene: catches broken image paths, heading
+# anchors, unbalanced HTML, and mis-piped tables before they reach the
+# rendered GitHub page. Two layers:
+#
+#   1. Local structural check (fast, deterministic, no network):
+#      scripts/check-readme-format.js — validates that every image/link
+#      target exists, every in-page anchor matches github-slugger output
+#      (GitHub's own slug algorithm), and HTML tags/tables are balanced.
+#
+#   2. Authoritative render check: scripts/render-readme-github.js sends
+#      README.md to GitHub's own markdown API (GFM mode) and inspects the
+#      HTML GitHub would actually render — badge URLs, relative image
+#      targets, heading anchors, table/GIF presence.
+#
+# Runs on every pull request and on docs edits pushed to main, so a
+# renamed screenshot or a retitled heading can't silently break the docs.
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "FEATURES.md"
+      - "public/images/**"
+      - "assets/**"
+      - "scripts/check-readme-format.js"
+      - "scripts/render-readme-github.js"
+      - ".github/workflows/docs-format.yml"
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "FEATURES.md"
+      - "public/images/**"
+      - "assets/**"
+      - "scripts/check-readme-format.js"
+      - "scripts/render-readme-github.js"
+      - ".github/workflows/docs-format.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-format-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-format:
+    name: Docs render check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      # Lifts the /markdown rate limit from 60/h per IP to 5,000/h per
+      # token (the built-in GITHUB_TOKEN is automatically scoped to the
+      # repo — no secret setup required).
+      GITHUB_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Minimal footprint: install only github-slugger instead of the full
+      # dependency tree (~30s job vs a multi-minute install). The version is
+      # read from devDependencies in package.json, so CI and local runs of
+      # the checker can't drift apart.
+      - name: Install github-slugger (version pinned by package.json)
+        run: |
+          VERSION=$(node -p "require('./package.json').devDependencies['github-slugger']")
+          npm install --no-save --omit=dev "github-slugger@$VERSION"
+
+      - name: Structural check (anchors, paths, HTML, tables)
+        run: |
+          node scripts/check-readme-format.js README.md
+          node scripts/check-readme-format.js FEATURES.md
+
+      - name: GitHub-render check (official markdown API)
+        run: node scripts/render-readme-github.js

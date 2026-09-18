@@ -18,6 +18,7 @@ import {
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { getReportData } from "@/app/actions";
+import { MedicalSummaryCard } from "@/components/reports/MedicalSummaryCard";
 import type { Insight } from "@/lib/insightEngine";
 import type { ClinicalBrief } from "@/lib/ai/clinical-brief/types";
 import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
@@ -165,7 +166,9 @@ export default function ReportsPage() {
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
       <GlobalNavHeader />
 
-      <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-[calc(env(safe-area-inset-top)+5rem)] pb-8 lg:pb-10 space-y-8 max-w-4xl">
+      {/* pb-32 sm:pb-40 keeps the last report section clear of the
+          floating bottom chrome (SOS FAB + PWA install prompt). */}
+      <main className="container mx-auto px-5 sm:px-8 lg:px-10 pt-[calc(env(safe-area-inset-top)+5rem)] pb-32 sm:pb-40 space-y-8 max-w-4xl">
         <ScrollReveal as="section" className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t("reports.pageTitle")}</h1>
           <p className="text-lg text-muted-foreground">
@@ -391,6 +394,11 @@ export default function ReportsPage() {
                 </DepthCard>
               </ScrollReveal>
             )}
+
+            {/* Doctor-ready one-pager (print/PDF) */}
+            <ScrollReveal delay={0.28}>
+              <MedicalSummaryCard />
+            </ScrollReveal>
 
             {/* Download */}
             <ScrollReveal delay={0.3}>

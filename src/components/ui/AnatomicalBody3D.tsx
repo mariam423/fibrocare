@@ -148,14 +148,17 @@ export function AnatomicalBody3D({
     selected: EMPTY_SET,
     hovered: null,
   });
-  dataRef.current = {
-    severity,
-    highlight,
-    backView,
-    hotspots: hotspots ?? [],
-    selected: selected ?? EMPTY_SET,
-    hovered,
-  };
+  // Written after every commit — never during render (render must stay pure).
+  React.useEffect(() => {
+    dataRef.current = {
+      severity,
+      highlight,
+      backView,
+      hotspots: hotspots ?? [],
+      selected: selected ?? EMPTY_SET,
+      hovered,
+    };
+  });
 
   const setHover = React.useCallback(
     (id: string | null) => {
@@ -170,11 +173,15 @@ export function AnatomicalBody3D({
   React.useEffect(() => {
     if (!motionEnabled || !isWebGLAvailable()) return;
     let cancelled = false;
-    import("three").then((three) => {
-      if (cancelled) return;
-      threeRef.current = three;
-      setMode("gl");
-    });
+    import("three")
+      .then((three) => {
+        if (cancelled) return;
+        threeRef.current = three;
+        setMode("gl");
+      })
+      .catch(() => {
+        // Stay on the SVG rendition; a dynamic-import failure is invisible.
+      });
     return () => {
       cancelled = true;
       threeRef.current = null;
@@ -189,11 +196,26 @@ export function AnatomicalBody3D({
     const canvas = canvasRef.current;
     const root = rootRef.current;
     if (!THREE || !canvas || !root) return;
-    const viewer = buildViewer(THREE, canvas, root, buttonRefs, dataRef, autoRotate);
-    viewerRef.current = viewer;
+    let viewer: Viewer | null = null;
+    let disposed = false;
+    // Defer the builder out of the synchronous effect body: the react-hooks
+    // compiler forbids the synchronous setState fallback that a throw would
+    // otherwise need.
+    void Promise.resolve().then(() => {
+      if (disposed) return;
+      try {
+        viewer = buildViewer(THREE, canvas, root, buttonRefs, dataRef, autoRotate);
+        viewerRef.current = viewer;
+      } catch {
+        // Context creation can fail even after the probe succeeded; fall back
+        // to the SVG rendition without crashing the card.
+        setMode("svg");
+      }
+    });
     return () => {
-      viewer.dispose();
+      disposed = true;
       viewerRef.current = null;
+      viewer?.dispose();
     };
   }, [mode, autoRotate]);
 
@@ -736,6 +758,9 @@ function buildViewer(
     });
     glowTex.dispose();
     renderer.dispose();
+    // Release the raw WebGL context; `dispose()` alone can leave the
+    // context resident and leak VRAM across remounts.
+    renderer.forceContextLoss?.();
   }
 
   return { syncAll, setBack, dispose };

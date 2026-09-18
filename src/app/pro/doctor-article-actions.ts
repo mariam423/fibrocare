@@ -371,7 +371,7 @@ async function generateOne(
   // never show an empty state because the upstream LLM is unhappy.
   try {
     const prompt = buildArticlePrompt(topic, signature, language);
-    const result = await generateObjectWithFailover({
+    const result = await generateObjectWithFailover<GeneratedArticle>({
       schema: generatedArticleSchema,
       prompt,
       temperature: 0.4,

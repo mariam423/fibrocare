@@ -29,6 +29,9 @@ model User {
   pinFailedAttempts    Int                   @default(0)
   /// When set and in the future, PIN entry is temporarily blocked.
   pinLockedUntil       DateTime?
+  /// Latest ACR 2010/2016 self-assessment snapshot (JSON) for clinician
+  /// sharing — populated by the Clinical Centre's AcrAssessment module.
+  clinicalDataJson      String?
   logs                 PainLog[]
   resetTokens          PasswordResetToken[]
   sessions             Session[]
@@ -41,6 +44,16 @@ model User {
   sentMessages         ConsultationMessage[]
   subscriptions        Subscription[]
   cycles               MenstrualCycle[]
+  menstrualLogs        MenstrualLog[]
+  /// Caregiver/partner secure sync: when enabled, a signed token allows
+  /// a read-only view of non-sensitive flare predictions.
+  caregiverShareEnabled Boolean             @default(false)
+  caregiverShareToken   String?             @unique
+  mealLogs             MealLog[]
+  triggerFoods         TriggerFood[]
+  fibroFogLogs         FibroFogLog[]
+  /// Daily spoon (energy) budget check-ins for the Spoon Theory widget.
+  spoonLogs            SpoonLog[]
 
   // Indexes added in the perf migration:
   //  - `role` is filtered for "all doctors" / "all pro users" admin queries.
@@ -241,6 +254,34 @@ enum CyclePhase {
   LUTEAL
 }
 
+enum FlowIntensity {
+  SPOTTING
+  LIGHT
+  MEDIUM
+  HEAVY
+}
+
+enum CervicalMucus {
+  DRY
+  STICKY
+  CREAMY
+  WATERY
+  EGG_WHITE
+}
+
+enum OpkResult {
+  NEGATIVE
+  POSITIVE
+  NOT_USED
+}
+
+enum SensorySensitivity {
+  NONE
+  MILD
+  MODERATE
+  SEVERE
+}
+
 enum SymptomCategory {
   PHYSICAL
   COGNITIVE
@@ -256,16 +297,191 @@ enum PainArea {
 }
 
 model MenstrualCycle {
-  id              String     @id @default(cuid())
+  id              String           @id @default(cuid())
   userId          String
   startDate       DateTime
   endDate         DateTime?
   phase           CyclePhase
-  overallSeverity Int        @default(5)
+  overallSeverity Int              @default(5)
   notes           String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @default(now()) @updatedAt
-  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyLogs       MenstrualLog[]
 
   @@index([userId, startDate])
+}
+
+model MenstrualLog {
+  id                   String           @id @default(cuid())
+  userId               String
+  cycleId              String
+  logDate              DateTime         @default(now())
+
+  // ── Point 1: Core dates & editing ──
+  // logDate is the entry timestamp; the cycle's startDate/endDate provide
+  // cycle-level date management.  An optional `editedAt` tracks client-side
+  // corrections.
+
+  // ── Point 2: Flow intensity & clots ──
+  flowIntensity        FlowIntensity?
+  hasClots             Boolean          @default(false)
+  flowColor            String?
+
+  // ── Point 3: Fibro-somatic symptoms ──
+  crampsSeverity       Int              @default(0)
+  headacheSeverity     Int              @default(0)
+  breastTenderness     Int              @default(0)
+  bloatingSeverity     Int              @default(0)
+
+  // ── Point 4: Digestive & inflammatory ──
+  giDiarrhea           Boolean          @default(false)
+  giConstipation       Boolean          @default(false)
+  hormonalAcne         Boolean          @default(false)
+
+  // ── Point 5: Ovulation & fertility ──
+  cervicalMucus        CervicalMucus?
+  opkResult            OpkResult?
+
+  // ── Point 6: Mood swings & emotional sharpness ──
+  tearfulness          Int              @default(0)
+  anxietyLevel         Int              @default(0)
+  moodVolatility       Int              @default(0)
+
+  // ── Point 7: Daily bio-energy ──
+  energyLevel          Int              @default(5)
+
+  // ── Point 8: Neuro-hormonal libido ──
+  libidoLevel          Int              @default(5)
+
+  // ── Point 14: Sensory overload ──
+  lightSensitivity     SensorySensitivity @default(NONE)
+  soundSensitivity     SensorySensitivity @default(NONE)
+
+  notes                String?
+  editedAt             DateTime?
+
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @default(now()) @updatedAt
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cycle                MenstrualCycle   @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cycleId, logDate])
+  @@index([userId, logDate])
+  @@index([cycleId])
+}
+
+/// A single eating occasion (breakfast/lunch/dinner/snack) in the
+/// Fibro-Dietary & Personal Flare Trigger Tracker. `warningsJson` stores a
+/// snapshot of the trigger warnings shown when the meal was logged, so the
+/// log history keeps showing exactly what was flagged at the time even if
+/// the patient later edits their personal trigger list.
+model MealLog {
+  id           String     @id @default(cuid())
+  userId       String
+  /// UTC `YYYY-MM-DD` bucket key — the same convention as SymptomLog.date.
+  date         String
+  /// "breakfast" | "lunch" | "dinner" | "snack"
+  mealType     String
+  /// When the meal was actually eaten (drives evening/late-night windows).
+  eatenAt      DateTime
+  /// Pre-meal energy on the 0 (very low) – 4 (full) scale.
+  energyBefore Int        @default(2)
+  /// JSON snapshot of the trigger matches shown at log time.
+  warningsJson String     @default("[]")
+  /// Free-text notes — AES-256-GCM encrypted at rest.
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        MealItem[]
+
+  @@index([userId, date])
+  @@index([userId, eatenAt])
+}
+
+/// One food / ingredient inside a MealLog. Names stay as plain text so the
+/// warning and next-day correlation engines can match them deterministically.
+model MealItem {
+  id     String  @id @default(cuid())
+  mealId String
+  name   String
+  /// Optional serving note, e.g. "1 cup" or "small bowl".
+  amount String?
+  meal   MealLog @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@index([mealId])
+  @@index([name])
+}
+
+/// The patient's own personal flare-trigger list — foods they have noticed
+/// aggravate their fibromyalgia pain, fatigue, or brain fog (قائمتي
+/// الشخصية للمهيجات).
+model TriggerFood {
+  id           String   @id @default(cuid())
+  userId       String
+  /// Normalized to trimmed lowercase for case-insensitive per-user uniqueness.
+  name         String
+  /// 1 (mild) – 5 (severe) remembered reaction intensity.
+  severity     Int      @default(3)
+  /// Personal reaction note — AES-256-GCM encrypted at rest.
+  reactionNote String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId, severity])
+}
+
+/// One logged fibro-fog / cognitive-fatigue episode captured by the Fog
+/// Shield (src/app/fog-shield). A patient reaches for this when "brain fog"
+/// hits in real life — mid-task, out and about, or during a crash — and
+/// logs the episode + the coping tool they used, so progress and triggers
+/// become visible over time.
+///
+/// `triggers` stores a snapshot of the situational categories selected at
+/// log time (e.g. "LOW_SLEEP", "STRESS", "LONG_SCREEN_TIME", "NOISE",
+/// "LOW_FOOD", "MENSTRUAL"). `brainDumpText` is free text the patient used
+/// to offload racing/chaotic thoughts — AES-256-GCM encrypted at rest by the
+/// server action. `copingToolUsed` records which Fog Shield module they
+/// reached for (BREATH | DUMP | MICROTASK | SOS | NONE).
+model FibroFogLog {
+  id             String   @id @default(cuid())
+  userId         String
+  /// Self-reported fog intensity: 1 (mild haze) – 10 (overwhelmed).
+  intensity      Int      @default(5)
+  /// Situational trigger labels for this episode (snapshot at log time).
+  triggers       String[] @default([])
+  /// Free-form brain dump — encrypted at rest, never stored plaintext.
+  brainDumpText  String?
+  /// The grounding tool the user reached for during the episode.
+  copingToolUsed String   @default("NONE")
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// "What did my fog look like this week?" history reads.
+  @@index([userId, createdAt])
+}
+
+/// Daily spoon (energy) budget check-in for the Spoon Theory widget.
+/// One row per user per calendar day (unique on (userId, logDate)); the
+/// morning check-in upserts it. `startSpoons` is the user's subjective
+/// 1–10 capacity, `currentSpoons` drifts with rest/activity presets.
+model SpoonLog {
+  id            String   @id @default(cuid())
+  userId        String
+  /// Calendar day this check-in belongs to (ISO yyyy-mm-dd, UTC).
+  logDate       String
+  /// Subjective morning capacity, 1–10.
+  startSpoons   Int
+  /// Live balance as the day is spent/rested. Never below 0.
+  currentSpoons Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// One check-in per day — the morning prompt upserts.
+  @@unique([userId, logDate])
+  @@index([userId, logDate])
 }

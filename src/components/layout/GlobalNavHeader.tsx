@@ -61,6 +61,8 @@ const PAGE_TITLES: Record<string, TranslationKey> = {
   "/profile": "profile.pageTitle",
   "/health-logs": "logs.pageTitle",
   "/toolkit": "toolkit.title",
+  "/clinical": "nav.clinical",
+  "/fog-shield": "fog.title",
   "/reports": "reports.pageTitle",
   "/resources": "resources.title",
   "/resources/about": "about.title",
@@ -75,6 +77,7 @@ const PAGE_TITLES: Record<string, TranslationKey> = {
   "/pro/doctor": "nav.doctorHub",
   "/pro/consultations": "consultation.title",
   "/pro/consultations/new": "consultation.newConsultation",
+  "/diet": "nav.diet",
 };
 
 /** Collapse dynamic parameters to their parent section. */
@@ -86,6 +89,11 @@ function crumbKeyFor(pathname: string): string | null {
 
 const QUICK_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
   { href: "/dashboard", labelKey: "nav.dashboard" },
+  { href: "/health-logs", labelKey: "logs.pageTitle" },
+  { href: "/clinical", labelKey: "nav.clinical" },
+  { href: "/fog-shield", labelKey: "fog.title" },
+  { href: "/diet", labelKey: "nav.diet" },
+  { href: "/fog-shield", labelKey: "fog.title" },
   { href: "/pro/doctor", labelKey: "nav.doctorHub" },
   { href: "/dashboard/consultations", labelKey: "nav.consultations" },
   { href: "/profile", labelKey: "nav.profile" },

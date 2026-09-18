@@ -18,15 +18,15 @@
   --transition-speed: 0.3s;
 }
 
-/* Standard (dark) — Deep Teal/Emerald Obsidian */
+/* Standard (dark) — Soft Slate / Sage */
 .dark {
-  --bg-main: #060D0C;
-  --bg-card: #0E1817;
-  --text-main: #E8F0EB;
-  --text-muted: #A5B8AC;
+  --bg-main: #0B101B;
+  --bg-card: #121A2A;
+  --text-main: #E5EAF2;
+  --text-muted: #97A3B6;
   --accent-primary: #8FBF9B;
-  --accent-secondary: #7FB5A5;
-  --border-color: rgba(255, 255, 255, 0.09);
+  --accent-secondary: #A79ACF;
+  --border-color: rgba(148, 163, 184, 0.16);
   --ring-color: #9CC6A4;
 }
 

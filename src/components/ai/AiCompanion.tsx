@@ -270,8 +270,10 @@ export function AiCompanion() {
 
   return (
     <>
-      {/* Launcher */}
-      <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] end-5 z-[70] sm:bottom-6 sm:end-6">
+      {/* Launcher — end-20 / sm:end-24 parks it to the inline-start side of
+          the SOS FAB (bottom-end, z-50) so the two floating controls never
+          stack on top of each other in the corner. */}
+      <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] end-20 z-[70] sm:bottom-6 sm:end-24">
         <AnimatePresence>
           {!open && (
             <motion.button

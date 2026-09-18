@@ -42,9 +42,10 @@ jobs:
       # connection string from process env — it does not load .env —
       # so the job exports it directly. The same values are written
       # into .env by scripts/run-e2e-env.mjs for the Next runtime.
-      DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
-      DIRECT_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
-      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build
+      # Throwaway service-container credentials — not real secrets.
+      DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build # security: ok throwaway CI container
+      DIRECT_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build # security: ok throwaway CI container
+      CI_DATABASE_URL: postgresql://fibrocare:fibrocare@localhost:5432/fibrocare_build # security: ok throwaway CI container
       NEXTAUTH_URL: http://localhost:3000
 
     steps:

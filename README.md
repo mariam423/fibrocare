@@ -127,58 +127,9 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ## 📸 Screenshots
 
-Here is a quick look at the **FibroCare** interface:
+The full product walkthrough is the animated demo at the top of this README. Individual feature screenshots — English and Arabic — live in [`public/images/`](./public/images) and are intentionally not embedded inline to keep this page fast and readable.
 
-### Homepage / Loading
-![Loading Page](public/images/Loading%20page.png)
-
-### Health Tracking
-![Health Tracking](public/images/Health%20Tracking.png)
-
-### Weekly Progress & Analytics
-![Weekly Progress & Analytics](public/images/Weekly%20Progress%20&%20Analytics.png)
-
-### AI Clinical Insights
-![AI Clinical Insights](public/images/AI%20Clinical%20Insights.png)
-
-### Care Resources
-![Care Resources](public/images/Care%20Resources.png)
-
-### Toolkit
-![Toolkit](public/images/Toolkit.png)
-
-### Fog Shield — emergency fog support with 3D calm sphere
-![Fog Shield](public/images/fog-shield.png)
-
-### Clinical Hub — trackers, exercise library, and reports in one place
-![Clinical Hub](public/images/clinical-hub.png)
-
-### SOS Crisis Overlay — breathing countdown and emergency message
-![SOS Modal](public/images/sos-modal.png)
-
-### Diet Pantry Helper — 5-minute anti-inflammatory meal ideas
-![Diet Pantry](public/images/diet-pantry.png)
-
-### Medical Summary — print-ready doctor visit sheet
-![Medical Summary](public/images/medical-summary.png)
-
-### Doctor Hub
-![Doctor Hub](public/images/Doctor%20Hub.png)
-
-### Bilingual support — the same pages in Arabic (full RTL)
-> FibroCare is built for Arabic speakers first: every screen — including the crisis and clinical tools — renders natively in Arabic with proper right-to-left layout, not a translated afterthought. The server renders the chosen language from the start, so there's no flash of English before the Arabic appears.
-
-| | |
-|:---:|:---:|
-| ![Fog Shield — Arabic](public/images/fog-shield-ar.png) | ![Clinical Hub — Arabic](public/images/clinical-hub-ar.png) |
-| *درع الضباب — Fog Shield* | *المركز الإكلينيكي — Clinical Hub* |
-| ![SOS Modal — Arabic](public/images/sos-modal-ar.png) | ![Diet Pantry — Arabic](public/images/diet-pantry-ar.png) |
-| *نافذة SOS — SOS Modal* | *مساعد البانتري — Diet Pantry* |
-| ![Medical Summary — Arabic](public/images/medical-summary-ar.png) | |
-| *الملخص الطبي — Medical Summary* | |
-
-### Login
-![Login](public/images/Log%20in.jpeg)
+**Bilingual support** — the same pages in Arabic (full RTL): FibroCare is built for Arabic speakers first. Every screen — including the crisis and clinical tools — renders natively in Arabic with proper right-to-left layout, not a translated afterthought. The server renders the chosen language from the start, so there's no flash of English before the Arabic appears.
 
 > The walkthrough GIF at the top of this README is auto-generated. To
 > regenerate the demo GIF or capture the feature screenshots (requires

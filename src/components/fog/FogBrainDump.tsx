@@ -10,7 +10,7 @@
  * a calm gain to the Fog Shield hero sphere.
  */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   NotebookIcon,
@@ -54,6 +54,16 @@ function formatFogTime(iso: string | Date, locale: string) {
   }
 }
 
+/**
+ * Typing calm: while the patient actively writes, tiny fog-clearing gains
+ * drip out (one small burst per sustained typing second, capped so writing
+ * alone can never fully clear the fog — saving still gives the big lift).
+ */
+const TYPING_GAIN = 0.03;
+const TYPING_GAIN_COOLDOWN_MS = 1500;
+const TYPING_GAIN_MAX = 0.3;
+const TYPING_GAIN_MIN_CHARS = 10;
+
 export function FogBrainDump({ onSettled }: FogBrainDumpProps) {
   const { t, locale } = useLanguage();
   const [text, setText] = useState("");
@@ -63,6 +73,16 @@ export function FogBrainDump({ onSettled }: FogBrainDumpProps) {
   const [justSaved, setJustSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recent, setRecent] = useState<FogLogEntry[]>([]);
+  const [typingGain, setTypingGain] = useState<{ amount: number; at: number } | null>(null);
+  const lastGainAtRef = useRef(0);
+  const typingCalmRef = useRef(0);
+  const gainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (gainTimerRef.current) clearTimeout(gainTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -82,6 +102,24 @@ export function FogBrainDump({ onSettled }: FogBrainDumpProps) {
       if (prev.length >= FOG_TRIGGERS_MAX) return prev;
       return [...prev, id];
     });
+  };
+
+  /** Real-time calm: a small gain per sustained typing burst while writing. */
+  const handleType = (value: string) => {
+    setText(value.slice(0, DUMP_MAX));
+    const now = Date.now();
+    if (
+      value.trim().length >= TYPING_GAIN_MIN_CHARS &&
+      typingCalmRef.current < TYPING_GAIN_MAX &&
+      now - lastGainAtRef.current >= TYPING_GAIN_COOLDOWN_MS
+    ) {
+      lastGainAtRef.current = now;
+      typingCalmRef.current = Math.min(TYPING_GAIN_MAX, typingCalmRef.current + TYPING_GAIN);
+      onSettled(TYPING_GAIN);
+      setTypingGain({ amount: TYPING_GAIN, at: now });
+      if (gainTimerRef.current) clearTimeout(gainTimerRef.current);
+      gainTimerRef.current = setTimeout(() => setTypingGain(null), 1800);
+    }
   };
 
   const handleSave = useCallback(async () => {
@@ -136,16 +174,26 @@ export function FogBrainDump({ onSettled }: FogBrainDumpProps) {
       </CardHeader>
 
       <CardContent className="space-y-4 p-5 sm:p-6">
-        <label className="block">
+        <label className="relative block">
           <span className="text-sm text-muted-foreground">{t("fog.dump.where")}</span>
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value.slice(0, DUMP_MAX))}
+            onChange={(e) => handleType(e.target.value)}
             rows={5}
             spellCheck={false}
             className="mt-2 w-full resize-y rounded-xl border border-input bg-card/70 px-3 py-2.5 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
             aria-describedby="fog-dump-count"
           />
+          {/* Transient "the fog is lifting while you write" gain chip. */}
+          {typingGain && (
+            <span
+              key={typingGain.at}
+              className="absolute end-3 top-9 animate-pulse rounded-full bg-teal-500/15 px-2 py-0.5 text-[0.65rem] font-bold tabular-nums text-teal-700 dark:text-teal-300"
+              aria-hidden="true"
+            >
+              +{typingGain.amount.toFixed(2)}
+            </span>
+          )}
           <span id="fog-dump-count" className="mt-1 block text-end text-xs tabular-nums text-muted-foreground">
             {text.length}/{DUMP_MAX} {t("fog.dump.chars")}
           </span>

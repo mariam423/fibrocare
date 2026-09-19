@@ -93,7 +93,6 @@ const QUICK_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
   { href: "/clinical", labelKey: "nav.clinical" },
   { href: "/fog-shield", labelKey: "fog.title" },
   { href: "/diet", labelKey: "nav.diet" },
-  { href: "/fog-shield", labelKey: "fog.title" },
   { href: "/pro/doctor", labelKey: "nav.doctorHub" },
   { href: "/dashboard/consultations", labelKey: "nav.consultations" },
   { href: "/profile", labelKey: "nav.profile" },

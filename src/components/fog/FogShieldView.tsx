@@ -11,8 +11,16 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Shield01Icon, CloudIcon } from "@hugeicons/core-free-icons";
+import {
+  Shield01Icon,
+  CloudIcon,
+  WindPowerIcon,
+  NotebookIcon,
+  Task01Icon,
+  Alert02Icon,
+} from "@hugeicons/core-free-icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { DepthCard } from "@/components/ui/DepthCard";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -23,6 +31,14 @@ import { FogBrainDump } from "./FogBrainDump";
 import { FogMicroTask } from "./FogMicroTask";
 import { FogSosMode } from "./FogSosMode";
 import { getFogStats, type FogStats } from "@/app/fog-shield/actions";
+
+/** Quick-jump chips for the four grounding tools below the hero. */
+const TOOL_CHIPS = [
+  { anchor: "fog-breath", icon: WindPowerIcon, labelKey: "fog.breath.title" },
+  { anchor: "fog-dump", icon: NotebookIcon, labelKey: "fog.dump.title" },
+  { anchor: "fog-microtask", icon: Task01Icon, labelKey: "fog.microtask.title" },
+  { anchor: "fog-sos", icon: Alert02Icon, labelKey: "fog.sos.title" },
+] as const;
 
 export function FogShieldView() {
   const { t, locale } = useLanguage();
@@ -50,7 +66,25 @@ export function FogShieldView() {
       {/* ── Hero: the clearing sphere answers to every tool on the page. ── */}
       <ScrollReveal as="section" className="space-y-2">
         <DepthCard tilt={2}>
-          <Card className="overflow-hidden border border-teal-500/15 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md rounded-2xl shadow-xl">
+          <Card className="group relative overflow-hidden rounded-2xl border border-teal-500/15 shadow-xl">
+            {/* Glassmorphic banner image header. The gradient scrim keeps the
+                title legible over the artwork in both themes, and the low-opacity
+                image layer respects the a11y transparency washes. The localized
+                artwork swaps in Arabic via the -ar asset. */}
+            <div className="relative h-36 w-full overflow-hidden sm:h-48">
+              <Image
+                src={locale === "ar" ? "/images/fog-shield-ar.png" : "/images/fog-shield.png"}
+                alt={t("fog.hero.imageAlt")}
+                fill
+                sizes="(max-width: 640px) 100vw, 1024px"
+                priority
+                className="object-cover opacity-60 transition-opacity duration-500 group-hover:opacity-75 dark:opacity-40"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-white/70 dark:via-zinc-900/30 dark:to-zinc-900/80" />
+              {/* Hero glow: a soft teal bloom behind the card's top edge. */}
+              <div className="pointer-events-none absolute -top-24 start-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-teal-400/25 blur-3xl rtl:translate-x-1/2" />
+            </div>
+
             <CardContent className="grid grid-cols-1 items-center gap-4 p-5 sm:p-8 lg:grid-cols-[1fr_auto]">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-teal-700 dark:text-teal-300">
@@ -97,6 +131,20 @@ export function FogShieldView() {
           </Card>
         </DepthCard>
       </ScrollReveal>
+
+      {/* ── Tool icon chips: quick anchors into the four grounding tools. ── */}
+      <nav aria-label={t("fog.title")} className="flex flex-wrap items-center justify-center gap-2">
+        {TOOL_CHIPS.map((chip) => (
+          <a
+            key={chip.anchor}
+            href={`#${chip.anchor}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-teal-500/20 bg-white/60 px-3.5 py-1.5 text-xs font-semibold text-teal-700 shadow-sm backdrop-blur-sm transition-colors hover:bg-teal-500/10 dark:bg-zinc-900/50 dark:text-teal-300 dark:hover:bg-teal-500/15"
+          >
+            <HugeiconsIcon icon={chip.icon} className="h-4 w-4" aria-hidden="true" />
+            {t(chip.labelKey)}
+          </a>
+        ))}
+      </nav>
 
       {/* ── Grounding tools ── */}
       <section aria-label={t("fog.title")} className="grid grid-cols-1 gap-6 lg:grid-cols-2">

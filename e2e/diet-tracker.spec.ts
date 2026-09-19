@@ -77,17 +77,23 @@ test.describe("Diet & Flare Trigger Tracker", () => {
 
     await typeFoodAndExpectWarning(page, "sugar");
 
-    // Save the meal. First invocation cold-compiles app/diet/actions.ts on
-    // this dev box (10-40s), so wait for the server action to resolve — the
-    // button flips back from "Saving…" to an enabled "Save meal" — before
-    // asserting the persisted card.
+    // Save the meal. Wait directly for the persisted result: on success
+    // the form resets, which DISABLES the button while keeping the same
+    // "Save meal" label, so button-enabled polling races the reset on a
+    // warm server. The 60s timeout still absorbs the dev-server cold
+    // compile of app/diet/actions.ts (10-40s).
     await page.getByRole("button", { name: "Save meal" }).click();
-    await expect(page.getByRole("button", { name: "Save meal" })).toBeEnabled({ timeout: 60_000 });
-    await expect(page.getByText("Logged meals", { exact: false }).first()).toBeVisible();
-    // The saved card echoes the flagged food and shows the warning snapshot.
-    const savedCard = page.locator('div[class*="rounded-xl"]', { hasText: /sugar/i }).last();
-    await expect(savedCard).toBeVisible();
-    await expect(savedCard.getByText(/Possible trigger|محتمل/, { exact: false })).toBeVisible();
+    // Success resets the form, unmounting the LIVE warning banner
+    // ("Possible trigger(s) in this meal") — a deterministic signal that
+    // the server action resolved (the 60s timeout absorbs the dev-server
+    // cold compile of app/diet/actions.ts). Button-enabled polling can't
+    // be used here: the reset re-disables the button under the same label.
+    await expect(page.getByText(/Possible trigger/)).toHaveCount(0, { timeout: 60_000 });
+    // The reloaded meal list renders the stored warning snapshot
+    // (warningsJson) through TriggerWarnings compact mode — the category
+    // title "Refined sugar & sweets" can only come from the persisted
+    // snapshot, never from the (now cleared) live input.
+    await expect(page.getByText("Refined sugar & sweets").first()).toBeVisible({ timeout: 20_000 });
   });
 
   test("adds and removes a personal trigger", async ({ page }) => {
@@ -97,15 +103,18 @@ test.describe("Diet & Flare Trigger Tracker", () => {
     await nameInput.fill("Chocolate diary");
     await page.getByRole("button", { name: "Add to my list" }).click();
 
-    // The trigger appears with its severity pill.
-    await expect(page.getByText("Chocolate diary", { exact: true })).toBeVisible({ timeout: 15_000 });
+    // The trigger appears with its severity pill. The action persists the
+    // NORMALIZED (lowercased) name — the card's `capitalize` class makes it
+    // look titled in the UI, but the DOM text stays lowercase — so match
+    // case-insensitively.
+    await expect(page.getByText(/chocolate diary/i).first()).toBeVisible({ timeout: 15_000 });
 
     // Remove requires a confirming second click.
     const removeBtn = page.getByRole("button", { name: "Remove" }).first();
     await removeBtn.click();
     await removeBtn.click();
     await expect(page.getByText("Trigger removed").first()).toBeVisible();
-    await expect(page.getByText("Chocolate diary", { exact: true })).toHaveCount(0, { timeout: 10_000 });
+    await expect(page.getByText(/chocolate diary/i)).toHaveCount(0, { timeout: 10_000 });
   });
 
   test("Arabic RTL renders localized copy and mirrors layout", async ({ page }) => {
@@ -131,10 +140,12 @@ test.describe("Diet & Flare Trigger Tracker", () => {
     await expect(page.locator("html")).toHaveAttribute("lang", "ar");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
 
-    // Localized headings.
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("الغذاء", { timeout: 15_000 });
+    // Localized headings. (diet.title AR is "متتبع مهيجات النظام الغذائي"
+    // — assert the real translated string, not a substring of an older one.)
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("متتبع مهيجات النظام الغذائي", { timeout: 15_000 });
     await expect(page.getByText("تسجيل وجبة", { exact: false }).first()).toBeVisible();
-    await expect(page.getByText("الأطعمة المهيجة", { exact: false }).first()).toBeVisible();
+    // diet.triggers.title AR (real copy — not the older "الأطعمة المهيجة"):
+    await expect(page.getByText("قائمتي الشخصية للمهيجات", { exact: false }).first()).toBeVisible();
 
     // RTL mirroring: the brand sits on the inline-start (now right) edge.
     const header = page.locator("header").first();

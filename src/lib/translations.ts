@@ -865,6 +865,8 @@ export type TranslationKey =
   | "privacy.forgotPin"
   | "privacy.useBiometrics"
   | "privacy.biometricScanning"
+  | "privacy.biometricHint"
+  | "privacy.biometricUnlockAria"
   | "pricing.title"
   | "pricing.subtitle"
   | "pricing.free.name"
@@ -1944,6 +1946,7 @@ export type TranslationKey =
   | "diet.logger.save"
   | "diet.logger.saving"
   | "diet.logger.saved"
+  | "diet.logger.saveError"
   | "diet.logger.delete"
   | "diet.logger.noMeals"
   | "diet.logger.mealsLabel"
@@ -1998,6 +2001,7 @@ export type TranslationKey =
   | "diet.triggers.namePlaceholder"
   | "diet.triggers.add"
   | "diet.triggers.adding"
+  | "diet.triggers.addError"
   | "diet.triggers.empty"
   | "diet.triggers.remove"
   | "diet.triggers.removed"
@@ -2036,6 +2040,7 @@ export type TranslationKey =
   | "fog.hero.fogGuide"
   | "fog.hero.privacy"
   | "fog.hero.privacyDetail"
+  | "fog.hero.imageAlt"
   | "fog.trigger.lowSleep"
   | "fog.trigger.stress"
   | "fog.trigger.screen"
@@ -2061,6 +2066,8 @@ export type TranslationKey =
   | "fog.breath.inhale"
   | "fog.breath.hold"
   | "fog.breath.exhale"
+  | "fog.breath.calmFeed"
+  | "fog.breath.calmAria"
   | "fog.dump.title"
   | "fog.dump.subtitle"
   | "fog.dump.where"
@@ -2106,6 +2113,7 @@ export type TranslationKey =
   | "fog.sos.callTrusted"
   | "fog.sos.emergency"
   | "fog.sos.steadier"
+  | "fog.sos.markDone"
   | "quickActions.fog.title"
   | "quickActions.fog.description"
   | "toolkit.fogCard.title"
@@ -2394,6 +2402,7 @@ export type TranslationKey =
   | "summary.none"
 
   | "nav.clinical"
+  | "clinical.hub.bannerAlt"
   | "clinical.hub.title"
   | "clinical.hub.subtitle"
   | "clinical.hub.trackersTitle"
@@ -2402,6 +2411,9 @@ export type TranslationKey =
   | "clinical.hub.lifestyleSubtitle"
   | "clinical.hub.reportTitle"
   | "clinical.hub.reportSubtitle"
+  | "clinical.hub.card.trackersTitle"
+  | "clinical.hub.card.guidanceTitle"
+  | "clinical.hub.card.reportTitle"
 
   | "clinical.exercise.title"
   | "clinical.exercise.subtitle"
@@ -2527,6 +2539,8 @@ export type TranslationKey =
   | "clinical.report.copy"
   | "clinical.report.copied"
   | "clinical.report.shareHint"
+  | "clinical.report.print"
+  | "clinical.report.printAria"
 
   | "caregiver.badge"
   | "caregiver.title"
@@ -3409,6 +3423,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "Forgot PIN?",
     "privacy.useBiometrics": "Use Biometrics",
     "privacy.biometricScanning": "Waiting for biometric sensor…",
+    "privacy.biometricHint": "Or unlock with your fingerprint",
+    "privacy.biometricUnlockAria": "Unlock with biometrics",
     "pricing.title": "FibroCare plans",
     "pricing.subtitle": "Your logs and data are always free. Pro adds the deeper AI work on top.",
     "pricing.free.name": "Free",
@@ -4513,6 +4529,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "diet.logger.save": "Save meal",
     "diet.logger.saving": "Saving…",
     "diet.logger.saved": "Meal saved",
+    "diet.logger.saveError": "Save timed out. Check your connection and try again.",
     "diet.logger.delete": "Delete",
     "diet.logger.noMeals": "No meals logged for this date yet.",
     "diet.logger.mealsLabel": "Logged meals",
@@ -4567,6 +4584,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
   "diet.triggers.namePlaceholder": "e.g. Garlic, citrus, red wine",
     "diet.triggers.add": "Add to my list",
     "diet.triggers.adding": "Adding…",
+    "diet.triggers.addError": "Couldn't add the trigger. Check your connection and try again.",
     "diet.triggers.empty": "No personal triggers yet — add foods you've noticed set you back.",
     "diet.triggers.remove": "Remove",
     "diet.triggers.removed": "Trigger removed",
@@ -4774,6 +4792,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.hero.statNone": "No data yet",
     "fog.hero.privacy": "Private by design —",
     "fog.hero.privacyDetail": "brain dumps are encrypted at rest and readable only by you.",
+    "fog.hero.imageAlt": "Fog Shield — a calming visualization of the mind clearing",
     "fog.sos.title": "Fog SOS",
     "fog.sos.subtitle": "This is scary, not just hard. Work the four steps in order.",
     "fog.sos.step1": "Sit or lie down somewhere safe",
@@ -4788,6 +4807,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.sos.callTrusted": "Call my person",
     "fog.sos.steady": "I'm steadier now",
     "fog.sos.steadier": "Glad it's easing. The steps stay here whenever you need them.",
+    "fog.sos.markDone": "Mark this step as done",
     "fog.sos.emergency": "If you have chest pain, faint, or can't speak or move — call emergency services immediately.",
     "fog.breath.title": "Breath reset",
     "fog.breath.subtitle": "Long exhales tell your nervous system the emergency is over.",
@@ -4800,6 +4820,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.breath.inhale": "Breathe in",
     "fog.breath.hold": "Hold",
     "fog.breath.exhale": "Breathe out",
+    "fog.breath.calmFeed": "Calm feed",
+    "fog.breath.calmAria": "Calm progress toward a clear mind",
     "fog.breath.pattern478": "4-7-8 calming",
     "fog.breath.patternBox": "Box breathing",
     "fog.dump.title": "Brain dump",
@@ -4961,6 +4983,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "summary.print": "Print / save as PDF",
     "summary.none": "n/a",
     "nav.clinical": "Clinical Hub",
+    "clinical.hub.bannerAlt": "Clinical Hub — your assessments, trackers, and reports in one place",
     "clinical.hub.title": "Clinical Hub",
     "clinical.hub.subtitle": "Assessments, trackers, therapeutic guidance and a doctor-ready report — everything clinical in one place.",
     "clinical.hub.trackersTitle": "Assessments & Trackers",
@@ -4969,6 +4992,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "clinical.hub.lifestyleSubtitle": "Evidence-aligned guidance you can act on today: movement, sleep and flare coping.",
     "clinical.hub.reportTitle": "Weekly / Monthly Report",
     "clinical.hub.reportSubtitle": "Aggregates your logs, trackers and cycle context into a copy-ready summary for your doctor.",
+    "clinical.hub.card.trackersTitle": "Assessments & Trackers",
+    "clinical.hub.card.guidanceTitle": "Therapeutic Guidance",
+    "clinical.hub.card.reportTitle": "Doctor-Ready Report",
 
     "clinical.exercise.title": "Low-Impact Exercise Library",
     "clinical.exercise.subtitle": "Gentle, graded movement guides. Start low, go slow, and pace every session.",
@@ -5094,6 +5120,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "clinical.report.copy": "Copy for my doctor",
     "clinical.report.copied": "Copied ✓",
     "clinical.report.shareHint": "Paste into a message or print it for the appointment.",
+    "clinical.report.print": "Print / PDF",
+    "clinical.report.printAria": "Print this report or save it as a PDF",
 
     "caregiver.badge": "Caregiver view",
     "caregiver.title": "Flare forecast for {name}",
@@ -5975,6 +6003,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "privacy.forgotPin": "نسيت رمز PIN؟",
     "privacy.useBiometrics": "استخدام البصمة",
     "privacy.biometricScanning": "في انتظار مستشعر البصمة…",
+    "privacy.biometricHint": "أو افتح القفل ببصمتك",
+    "privacy.biometricUnlockAria": "فتح القفل بالبصمة",
     "pricing.title": "خطط فيبروكير",
     "pricing.subtitle": "سجلاتك وبياناتك مجانية دائمًا. Pro يضيف عمل الذكاء الاصطناعي الأعمق فوقها.",
     "pricing.free.name": "مجاني",
@@ -7081,6 +7111,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "diet.logger.save": "حفظ الوجبة",
     "diet.logger.saving": "جارٍ الحفظ…",
     "diet.logger.saved": "تم حفظ الوجبة",
+    "diet.logger.saveError": "انتهت مهلة الحفظ. تحقق من اتصالك وحاول مجددًا.",
     "diet.logger.delete": "حذف",
     "diet.logger.noMeals": "لا توجد وجبات مسجلة لهذا التاريخ بعد.",
     "diet.logger.mealsLabel": "الوجبات المسجلة",
@@ -7135,6 +7166,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "diet.triggers.namePlaceholder": "مثال: ثوم، حمضيات، نبيذ أحمر",
     "diet.triggers.add": "إضافة إلى قائمتي",
     "diet.triggers.adding": "جارٍ الإضافة…",
+    "diet.triggers.addError": "تعذّرت إضافة المحرّض. تحقق من اتصالك وحاول مجددًا.",
     "diet.triggers.empty": "لا توجد مهيجات شخصية بعد — أضف الأطعمة التي لاحظت أنها تعيقك.",
     "diet.triggers.remove": "إزالة",
     "diet.triggers.removed": "تمت إزالة المهيج",
@@ -7173,6 +7205,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.hero.fogGuide": "اختر أداة بالأسفل. كل أداة تبدد جزءًا من الضباب.",
     "fog.hero.privacy": "يحافظ درع الضباب على خصوصية تدويناتك:",
     "fog.hero.privacyDetail": "نص التفريغ يُشفَّر قبل تخزينه، ولا يُعرض عليك مرة أخرى.",
+    "fog.hero.imageAlt": "درع الضباب — تصوير بصري هادئ للذهن وهو يصفو",
     "fog.trigger.lowSleep": "قلة النوم",
     "fog.trigger.stress": "التوتر",
     "fog.trigger.screen": "استخدام الشاشات لفترة طويلة",
@@ -7198,6 +7231,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.breath.inhale": "شهيق",
     "fog.breath.hold": "احبس",
     "fog.breath.exhale": "زفير",
+    "fog.breath.calmFeed": "تغذية الهدوء",
+    "fog.breath.calmAria": "تقدم الهدوء نحو صفاء الذهن",
     "fog.dump.title": "تفريغ الذهن",
     "fog.dump.subtitle": "أفرغ الأفكار المشوشة على الورق. يمكنها البقاء هنا — أو ألا تبقى أبدًا.",
     "fog.dump.where": "ماذا يدور في رأسك؟ كل فكرة، وقلق، ومهمة ناقصة، وصوت، وألم.",
@@ -7243,6 +7278,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "fog.sos.callTrusted": "اتصل بشخص تثق به",
     "fog.sos.emergency": "إذا شعرت بعدم الأمان، أو لاحظت تغيرًا مفاجئًا في الأعراض، فاتصل برقم الطوارئ الآن.",
     "fog.sos.steadier": "ارتفع الضباب بما يكفي — لقد عدت إلى مكانك.",
+    "fog.sos.markDone": "حدِّد هذه الخطوة كمكتملة",
     "quickActions.fog.title": "درع الضباب",
     "quickActions.fog.description": "أدوات تأريض لنوبات ضباب الدماغ",
     "toolkit.fogCard.title": "درع الضباب",
@@ -7530,6 +7566,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "summary.print": "طباعة / حفظ PDF",
     "summary.none": "غير متاح",
     "nav.clinical": "المركز السريري",
+    "clinical.hub.bannerAlt": "المركز السريري — تقييماتك ومتتبعاتك وتقاريرك في مكان واحد",
     "clinical.hub.title": "المركز السريري",
     "clinical.hub.subtitle": "تقييمات ومتتبعات وإرشادات علاجية وتقرير جاهز للطبيب — كل ما هو سريري في مكان واحد.",
     "clinical.hub.trackersTitle": "التقييمات والمتتبعات",
@@ -7538,6 +7575,9 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "clinical.hub.lifestyleSubtitle": "إرشادات مبنية على الأدلة يمكنك تطبيقها اليوم: الحركة والنوم والتعامل مع النوبات.",
     "clinical.hub.reportTitle": "التقرير الأسبوعي / الشهري",
     "clinical.hub.reportSubtitle": "يجمع سجلاتك ومتتبعاتك وسياق الدورة في ملخص جاهز للنسخ لمشاركته مع طبيبك.",
+    "clinical.hub.card.trackersTitle": "التقييمات والمتتبعات",
+    "clinical.hub.card.guidanceTitle": "الإرشادات العلاجية",
+    "clinical.hub.card.reportTitle": "التقرير الجاهز للطبيب",
 
     "clinical.exercise.title": "مكتبة التمارين منخفضة التأثير",
     "clinical.exercise.subtitle": "أدلة حركة لطيفة ومتدرجة. ابدأ بخفة وتقدم ببطء، ونظّم جهدك في كل جلسة.",
@@ -7663,6 +7703,8 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     "clinical.report.copy": "نسخ للطبيب",
     "clinical.report.copied": "تم النسخ ✓",
     "clinical.report.shareHint": "الصقه في رسالة أو اطبعه للموعد.",
+    "clinical.report.print": "طباعة / PDF",
+    "clinical.report.printAria": "اطبع هذا التقرير أو احفظه كملف PDF",
 
     "caregiver.badge": "عرض مقدم الرعاية",
     "caregiver.title": "توقع النوبة لـ {name}",

@@ -86,13 +86,50 @@ const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "FibroCareE2E2026!";
 async function ensureSignedIn(browser, storageStatePath, baseUrl) {
   const context = await browser.newContext({ viewport: VIEWPORT });
   const page = await context.newPage();
+  const logs = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") logs.push(msg.text());
+  });
+  page.on("pageerror", (err) => logs.push(`pageerror: ${err.message}`));
   await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded", timeout: 60_000 }).catch(() => {});
-  await page.fill("#email", E2E_EMAIL).catch(() => {});
-  await page.fill("#password", E2E_PASSWORD).catch(() => {});
-  await page.click('button[type="submit"]').catch(() => {});
-  await page.waitForURL(/dashboard/, { timeout: 60_000 }).catch(() => {});
+  await page.waitForSelector("#email", { timeout: 30_000 }).catch(() => {});
+  try {
+    const result = await page.evaluate(
+      async ({ token, email, password, baseUrl }) => {
+        const csrfRes = await fetch(`${baseUrl}/api/auth/csrf`);
+        const { csrfToken } = await csrfRes.json();
+        const form = new URLSearchParams();
+        form.set("csrfToken", csrfToken || token);
+        form.set("email", email);
+        form.set("password", password);
+        form.set("callbackUrl", "/dashboard");
+        const res = await fetch(`${baseUrl}/api/auth/callback/credentials`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: form.toString(),
+          redirect: "manual",
+        });
+        const text = await res.text();
+        return { status: res.status, type: res.type, url: res.url, body: text.slice(0, 300) };
+      },
+      { token: "", email: E2E_EMAIL, password: E2E_PASSWORD, baseUrl }
+    );
+    console.log(`[verify] login API result=${JSON.stringify(result)}`);
+  } catch (err) {
+    console.log(`[verify] login API threw: ${err.message}`);
+  }
+  await page.waitForTimeout(3000);
   const url = page.url();
-  await context.storageState({ path: storageStatePath }).catch(() => {});
+  console.log(`[verify] url after login API = ${url}`);
+  console.log(`[verify] console errors (${logs.length}): ${logs.slice(0, 5).join(" | ")}`);
+  const cookies = await context.cookies();
+  const hasSession = cookies.some((c) => /session|token/i.test(c.name) && c.value.length > 10);
+  if (!url.startsWith(`${baseUrl}/login`) && hasSession) {
+    await context.storageState({ path: storageStatePath }).catch(() => {});
+    console.log("[verify] storage state saved (API login succeeded)");
+  } else {
+    console.log("[verify] API login did not set a session; keeping storageState unchanged");
+  }
   await context.close();
   return url;
 }

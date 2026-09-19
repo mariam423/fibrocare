@@ -22,6 +22,7 @@ import {
   Restaurant02Icon,
   SaladIcon,
   TimeSetting01Icon,
+  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 import { SegmentedFilter, type SegmentedFilterOption } from "@/components/ui/SegmentedFilter";
 import { useLanguage } from "@/context/LanguageContext";
@@ -30,7 +31,7 @@ import { deleteMealLog, getMealLogs, getTriggerFoods, saveMealLog } from "@/app/
 import { computeWarnings, suggestEatingTiming } from "@/lib/diet/triggerEngine";
 import type { MealLogEntry, MealType, TriggerFoodEntry } from "@/lib/types";
 import { TriggerWarnings, parseStoredWarnings, type WarningModel } from "@/components/diet/TriggerWarnings";
-import { cn } from "@/lib/utils";
+import { cn, withTimeout } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -76,6 +77,11 @@ function formatMealTime(value: Date | string): string {
   return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+/** Deadline for the save server action so a silent network hang can't leave
+ *  the button stuck at "Saving…" forever. */
+const SAVE_TIMEOUT_MS = 20_000;
+const RELOAD_TIMEOUT_MS = 15_000;
+
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
@@ -93,6 +99,7 @@ export function MealLogger() {
   const [meals, setMeals] = useState<MealLogEntry[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [hasSaveError, setHasSaveError] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -165,25 +172,32 @@ export function MealLogger() {
       .filter((f) => f.name.length > 0);
     if (items.length === 0) return;
 
+    setHasSaveError(false);
     setIsSaving(true);
     try {
-      const res = await saveMealLog({
-        date,
-        mealType,
-        eatenAt: time ? new Date(`${date}T${time}`) : undefined,
-        energyBefore,
-        notes: notes.trim() || undefined,
-        items,
-      });
-      if (res.success) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2200);
-        const reloaded = await getMealLogs(date);
-        if (reloaded.success) setMeals(reloaded.data?.meals ?? []);
-        resetForm();
+      const res = await withTimeout(
+        saveMealLog({
+          date,
+          mealType,
+          eatenAt: time ? new Date(`${date}T${time}`) : undefined,
+          energyBefore,
+          notes: notes.trim() || undefined,
+          items,
+        }),
+        SAVE_TIMEOUT_MS
+      );
+      if (!res.success) {
+        setHasSaveError(true);
+        return;
       }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2200);
+      const reloaded = await withTimeout(getMealLogs(date), RELOAD_TIMEOUT_MS).catch(() => null);
+      if (reloaded?.success) setMeals(reloaded.data?.meals ?? []);
+      resetForm();
     } catch (error) {
       console.error("Error saving meal:", error);
+      setHasSaveError(true);
     } finally {
       setIsSaving(false);
     }

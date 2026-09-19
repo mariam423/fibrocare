@@ -32,6 +32,7 @@ import {
   CheckmarkCircle02Icon,
   ClipboardListIcon,
   Copy01Icon,
+  PrinterIcon,
   FlameIcon,
   HealthIcon,
   Loading01Icon,
@@ -217,7 +218,7 @@ export function WeeklyMonthlyReport() {
   return (
     <section
       aria-label={t("clinical.report.title")}
-      className="w-full break-inside-avoid rounded-2xl border border-teal-500/20 bg-white/70 p-5 shadow-lg shadow-teal-950/10 backdrop-blur-xl dark:bg-slate-900/60"
+      className="w-full break-inside-avoid rounded-2xl border border-teal-500/20 bg-white/70 p-5 shadow-lg shadow-teal-950/10 backdrop-blur-xl dark:bg-slate-900/60 print:bg-white print:shadow-none print:backdrop-blur-none dark:print:bg-white"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
@@ -234,7 +235,7 @@ export function WeeklyMonthlyReport() {
 
         {/* Period toggle */}
         <div
-          className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-card/60 p-1"
+          className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-card/60 p-1 print:hidden"
           role="group"
           aria-label={t("clinical.report.title")}
         >
@@ -436,6 +437,16 @@ export function WeeklyMonthlyReport() {
                 {t("clinical.report.copy")}
               </p>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.print()}
+                  aria-label={t("clinical.report.printAria")}
+                  className="rounded-lg border-border transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <HugeiconsIcon icon={PrinterIcon} className="me-1 h-3.5 w-3.5" aria-hidden="true" />
+                  {t("clinical.report.print")}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

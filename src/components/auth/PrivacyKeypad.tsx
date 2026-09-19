@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  FingerPrintScanIcon,
   LockIcon,
   Shield01Icon,
 } from "@hugeicons/core-free-icons";
@@ -316,6 +317,42 @@ export function PrivacyKeypad() {
         </motion.button>
       </motion.div>
 
+      {/* Biometric unlock — fingerprint button under the numpad */}
+      {bioAvailable && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.4 }}
+          className="flex flex-col items-center gap-2.5"
+        >
+          <motion.button
+            type="button"
+            onClick={handleBiometrics}
+            disabled={bioBusy}
+            aria-label={t("privacy.biometricUnlockAria")}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: "spring", stiffness: 400, damping: 22 }}
+            className="relative h-16 w-16 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/25 dark:ring-emerald-400/25 shadow-[0_0_16px_rgba(52,211,153,0.15)] hover:bg-emerald-500/15 dark:hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <HugeiconsIcon
+              icon={FingerPrintScanIcon}
+              className={bioBusy ? "h-7 w-7 animate-pulse" : "h-7 w-7"}
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
+          </motion.button>
+          <p
+            className="text-[13px] text-muted-foreground font-medium"
+            role="status"
+          >
+            {bioBusy
+              ? t("privacy.biometricScanning")
+              : t("privacy.biometricHint")}
+          </p>
+        </motion.div>
+      )}
+
       {/* Action links */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -330,30 +367,6 @@ export function PrivacyKeypad() {
         >
           {t("privacy.forgotPin")}
         </button>
-        {bioAvailable && (
-          <>
-            <span className="h-1 w-1 rounded-full bg-border" />
-            <button
-              type="button"
-              onClick={handleBiometrics}
-              disabled={bioBusy}
-              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-150 underline-offset-2 hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-            <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-            <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-            <path d="M2 12a10 10 0 0 1 18-6" />
-            <path d="M2 16h.01" />
-            <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-            <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 0 .34-2" />
-            <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-            <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-          </svg>
-          {t("privacy.useBiometrics")}
-        </button>
-          </>
-        )}
       </motion.div>
     </motion.div>
   );

@@ -29,6 +29,9 @@ import type { TranslationKey } from "@/lib/translations";
 
 const TARGET_STEPS = 3;
 
+/** Calm gained the moment a big task is broken into micro-steps. */
+const SPLIT_GAIN = 0.15;
+
 interface FogMicroTaskProps {
   onSettled: (delta: number) => void;
 }
@@ -75,6 +78,9 @@ export function FogMicroTask({ onSettled }: FogMicroTaskProps) {
     setCleared(false);
     setSaved(false);
     setError(null);
+    // Merely breaking the mountain into pebbles already clears a little fog
+    // — starting is the hardest part, so it earns its own calm gain.
+    onSettled(SPLIT_GAIN);
   };
 
   const tick = async (index: number) => {

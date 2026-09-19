@@ -34,6 +34,7 @@ import { usePrivacy } from "@/components/auth/PrivacyLock";
 import { getCurrentUser, updateUserName, getStreak, getAllHealthLogs } from "../actions";
 import GlobalNavHeader from "@/components/layout/GlobalNavHeader";
 import { PrivacySecurityCard } from "@/components/settings/PrivacySecurityCard";
+import { BiometricSetup } from "@/components/auth/BiometricSetup";
 import { PricingModal } from "@/components/pricing/PricingModal";
 
 export default function ProfilePage() {
@@ -343,6 +344,7 @@ export default function ProfilePage() {
                 </Button>
               </div>
             ) : (
+              <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1 space-y-2">
                   <label
@@ -393,6 +395,12 @@ export default function ProfilePage() {
                   </Button>
                 </div>
               </div>
+
+              {/* Fingerprint enrollment — an alternative way to satisfy the
+                  lock, so it lives inside the enabled-lock branch (the
+                  unlock server action requires a PIN hash anyway). */}
+              <BiometricSetup />
+              </>
             )}
           </CardContent>
         </Card>

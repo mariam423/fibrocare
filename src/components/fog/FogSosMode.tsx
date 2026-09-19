@@ -20,10 +20,12 @@ import {
   TelephoneIcon,
   FirstAidKitIcon,
   CheckmarkCircle01Icon,
+  WindPowerIcon,
 } from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
+import { cn } from "@/lib/utils";
 
 interface FogSosModeProps {
   /** Large calm gain once the user feels steadier. */
@@ -36,13 +38,28 @@ interface FogSosModeProps {
 const STEPS = [
   { key: "step1", icon: MedicalMaskIcon },
   { key: "step2", icon: GlassWaterIcon },
-  { key: "step3", icon: MedicalMaskIcon },
+  { key: "step3", icon: WindPowerIcon },
   { key: "step4", icon: TelephoneIcon },
 ] as const;
 
+/** Calm gained per completed SOS step; the "steadier" tap still gives the big lift. */
+const STEP_GAIN = 0.15;
+
 export function FogSosMode({ onSettled, clinicPhone, trustedPhone }: FogSosModeProps) {
   const { t } = useLanguage();
+  const [doneSteps, setDoneSteps] = useState<Record<string, boolean>>({});
   const [steadier, setSteadier] = useState(false);
+
+  /** Tap a step's icon row to mark it done — each step clears a little fog. */
+  const handleStepDone = (key: string) => {
+    setDoneSteps((prev) => {
+      if (prev[key]) return prev;
+      onSettled(STEP_GAIN);
+      return { ...prev, [key]: true };
+    });
+  };
+
+  const doneCount = STEPS.filter((s) => doneSteps[s.key]).length;
 
   const handleSteadier = () => {
     setSteadier(true);
@@ -69,23 +86,58 @@ export function FogSosMode({ onSettled, clinicPhone, trustedPhone }: FogSosModeP
 
       <CardContent className="space-y-4 p-5 sm:p-6">
         <ol className="space-y-2">
-          {STEPS.map((step, i) => (
-            <li
-              key={step.key}
-              className="flex items-start gap-3 rounded-xl border border-border/60 bg-card/50 px-3 py-3 text-sm"
-            >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400" aria-hidden="true">
-                <HugeiconsIcon icon={step.icon} className="h-4 w-4" />
-              </span>
-              <span>
-                <span className="block font-semibold">
-                  {i + 1}. {t(`fog.sos.${step.key}`)}
-                </span>
-                <span className="text-muted-foreground">{t(`fog.sos.${step.key}desc`)}</span>
-              </span>
-            </li>
-          ))}
+          {STEPS.map((step, i) => {
+            const isDone = !!doneSteps[step.key];
+            return (
+              <li key={step.key}>
+                <button
+                  type="button"
+                  onClick={() => handleStepDone(step.key)}
+                  disabled={isDone || steadier}
+                  aria-label={`${t("fog.sos.markDone")}: ${t(`fog.sos.${step.key}`)}`}
+                  aria-pressed={isDone}
+                  className={cn(
+                    "flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-start text-sm transition-colors",
+                    isDone
+                      ? "border-teal-500/30 bg-teal-500/5"
+                      : "border-border/60 bg-card/50 hover:bg-muted"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors",
+                      isDone
+                        ? "bg-teal-500 text-white"
+                        : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                    )}
+                    aria-hidden="true"
+                  >
+                    <HugeiconsIcon
+                      icon={isDone ? CheckmarkCircle01Icon : step.icon}
+                      className="h-4 w-4"
+                    />
+                  </span>
+                  <span className="flex-1">
+                    <span
+                      className={cn(
+                        "block font-semibold",
+                        isDone && "text-muted-foreground line-through"
+                      )}
+                    >
+                      {i + 1}. {t(`fog.sos.${step.key}`)}
+                    </span>
+                    <span className="text-muted-foreground">{t(`fog.sos.${step.key}desc`)}</span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ol>
+
+        {/* Per-step progress, so the protocol reads as doable, not daunting. */}
+        <p className="text-center text-xs tabular-nums text-muted-foreground" aria-live="polite">
+          {doneCount}/{STEPS.length}
+        </p>
 
         {/* Contact affordances (real links only when a number is provided). */}
         {(clinicPhone || trustedPhone) && (

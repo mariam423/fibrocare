@@ -317,41 +317,42 @@ export function PrivacyKeypad() {
         </motion.button>
       </motion.div>
 
-      {/* Biometric unlock — fingerprint button under the numpad */}
-      {bioAvailable && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.4 }}
-          className="flex flex-col items-center gap-2.5"
+      {/* Biometric unlock — fingerprint button under the numpad, always part
+          of the layout so the lock matches the original design. It only
+          performs a real WebAuthn check when the platform has a registered
+          authenticator; otherwise it stays disabled instead of faking success. */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.4 }}
+        className="flex flex-col items-center gap-2.5"
+      >
+        <motion.button
+          type="button"
+          onClick={handleBiometrics}
+          disabled={!bioAvailable || bioBusy}
+          aria-label={t("privacy.biometricUnlockAria")}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+          className="relative h-16 w-16 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/25 dark:ring-emerald-400/25 shadow-[0_0_16px_rgba(52,211,153,0.15)] hover:bg-emerald-500/15 dark:hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <motion.button
-            type="button"
-            onClick={handleBiometrics}
-            disabled={bioBusy}
-            aria-label={t("privacy.biometricUnlockAria")}
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.94 }}
-            transition={{ type: "spring", stiffness: 400, damping: 22 }}
-            className="relative h-16 w-16 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/25 dark:ring-emerald-400/25 shadow-[0_0_16px_rgba(52,211,153,0.15)] hover:bg-emerald-500/15 dark:hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <HugeiconsIcon
-              icon={FingerPrintScanIcon}
-              className={bioBusy ? "h-7 w-7 animate-pulse" : "h-7 w-7"}
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-          </motion.button>
-          <p
-            className="text-[13px] text-muted-foreground font-medium"
-            role="status"
-          >
-            {bioBusy
-              ? t("privacy.biometricScanning")
-              : t("privacy.biometricHint")}
-          </p>
-        </motion.div>
-      )}
+          <HugeiconsIcon
+            icon={FingerPrintScanIcon}
+            className={bioBusy ? "h-7 w-7 animate-pulse" : "h-7 w-7"}
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+        </motion.button>
+        <p
+          className="text-[13px] text-muted-foreground font-medium"
+          role="status"
+        >
+          {bioBusy
+            ? t("privacy.biometricScanning")
+            : t("privacy.biometricHint")}
+        </p>
+      </motion.div>
 
       {/* Action links */}
       <motion.div

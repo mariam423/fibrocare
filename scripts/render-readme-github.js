@@ -7,7 +7,7 @@
  *   1. Every rendered <img> is either a camo-proxied badge with a
  *      well-formed URL, or a repo-relative path that exists on disk.
  *   2. Every in-page link fragment matches a heading anchor GitHub emitted.
- *   3. Structural sanity: tables render as <table>, hero GIF present,
+ *   3. Structural sanity: tables render as <table>,
  *      no raw HTML leaking as escaped text.
  *
  * NOTE: the REST /markdown API does NOT rewrite relative image paths (the
@@ -112,9 +112,6 @@ function validate(html) {
   if (!/<table[\s>]/.test(html)) {
     issues.push("TABLE: tech-stack table did not render as <table>");
   }
-  if (!/<img src="[^"]*fibrocare-repo-demo\.gif/.test(html)) {
-    issues.push("HERO GIF missing from rendered output");
-  }
   if (/&lt;div align/.test(html)) {
     issues.push("RAW HTML leak: <div> rendered as escaped text");
   }
@@ -123,7 +120,7 @@ function validate(html) {
   console.log(
     `GitHub-rendered README: ${imgs.length} <img> total → ${badges} badge(s) via camo, ${local} local; ` +
       `${anchorIds.size} heading anchors; ${checkedFrags}/${frags.length} in-page links verified; ` +
-      `table OK; GIF OK`
+      `table OK`
   );
   if (issues.length) {
     console.log(`\n${issues.length} ISSUE(S):`);

@@ -4,8 +4,8 @@
  * Clinical Hub — the unified clinical dashboard (Midnight Emerald edition).
  *
  * Page anatomy, in the order a patient actually uses it:
- *  1. Glass banner — the clinical-hub artwork behind a Midnight Emerald
- *     gradient scrim, title over the image (Arabic artwork when RTL).
+ *  1. Glass hero — the headings on a Midnight Emerald shell with the clinic
+ *     artwork shown cleanly in a framed, responsive card beside the text.
  *  2. Quick-nav — a responsive 3-card grid (trackers / guidance / report)
  *     that deep-links to the anchored sections below.
  *  3. Anchored sections — Assessments & Trackers (the appointment kit),
@@ -53,9 +53,7 @@ const HUB_CARDS = [
 }>;
 
 export default function ClinicalHubPage() {
-  const { t, locale } = useLanguage();
-  const bannerSrc =
-    locale === "ar" ? "/images/clinical-hub-ar.png" : "/images/clinical-hub.png";
+  const { t } = useLanguage();
 
   return (
     <RouteTransition>
@@ -68,30 +66,29 @@ export default function ClinicalHubPage() {
         {/* pb-32 sm:pb-40 keeps the last report card clear of the floating
           bottom chrome (SOS FAB + PWA install prompt). */}
         <main className="print:hidden mx-auto max-w-4xl px-4 lg:px-8 pt-[calc(env(safe-area-inset-top)+5rem)] pb-32 sm:pb-40 space-y-8">
-          {/* 1 — Midnight Emerald glass banner */}
+          {/* 1 — Midnight Emerald hero with the clinic artwork framed beside it */}
           <ScrollReveal as="section">
-            <div className="relative overflow-hidden rounded-2xl border border-emerald-500/15 shadow-xl">
-            {/* Banner artwork is meaningful (localized per-locale) — expose
-                it to AT instead of hiding it behind aria-hidden. */}
-              <div className="relative h-40 w-full sm:h-52">
-                <Image
-                  src={bannerSrc}
-                  alt={t("clinical.hub.bannerAlt")}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 896px"
-                  priority
-                  className="object-cover opacity-55 transition-opacity duration-500 hover:opacity-70 dark:opacity-40"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-950/20 to-emerald-950/70 dark:to-emerald-950/85" />
-                <div className="pointer-events-none absolute -top-20 start-1/2 h-44 w-44 -translate-x-1/2 rounded-full bg-emerald-400/20 blur-3xl rtl:translate-x-1/2" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-sm sm:text-4xl">
-                  {t("clinical.hub.title")}
-                </h1>
-                <p className="mt-1 max-w-2xl text-sm text-emerald-50/90 sm:text-base">
-                  {t("clinical.hub.subtitle")}
-                </p>
+            <div className="overflow-hidden rounded-2xl border border-emerald-500/15 bg-white/50 shadow-xl backdrop-blur-md dark:bg-zinc-900/40">
+              <div className="grid grid-cols-1 items-center gap-6 p-5 sm:p-8 lg:grid-cols-[1fr_minmax(0,380px)]">
+                <div className="space-y-3">
+                  <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+                    {t("clinical.hub.title")}
+                  </h1>
+                  <p className="max-w-prose text-sm text-muted-foreground sm:text-base">
+                    {t("clinical.hub.subtitle")}
+                  </p>
+                </div>
+                <figure className="rounded-2xl border border-emerald-500/15 bg-white/60 p-3 shadow-sm dark:bg-zinc-900/40">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl">
+                    <Image
+                      src="/images/clinic.png"
+                      alt={t("clinical.hub.bannerAlt")}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 420px"
+                      className="object-cover"
+                    />
+                  </div>
+                </figure>
               </div>
             </div>
           </ScrollReveal>

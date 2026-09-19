@@ -69,11 +69,10 @@ export function FogShieldView() {
           <Card className="group relative overflow-hidden rounded-2xl border border-teal-500/15 shadow-xl">
             {/* Glassmorphic banner image header. The gradient scrim keeps the
                 title legible over the artwork in both themes, and the low-opacity
-                image layer respects the a11y transparency washes. The localized
-                artwork swaps in Arabic via the -ar asset. */}
+                image layer respects the a11y transparency washes. */}
             <div className="relative h-36 w-full overflow-hidden sm:h-48">
               <Image
-                src={locale === "ar" ? "/images/fog-shield-ar.png" : "/images/fog-shield.png"}
+                src="/images/درع الضباب.jpg"
                 alt={t("fog.hero.imageAlt")}
                 fill
                 sizes="(max-width: 640px) 100vw, 1024px"

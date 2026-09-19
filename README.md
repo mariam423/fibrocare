@@ -10,20 +10,7 @@
 
 **Your calm companion for chronic pain management, symptom tracking, and psychological support.**
 
----
-
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white&style=for-the-badge)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white&style=for-the-badge)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-38bdf8?logo=tailwindcss&logoColor=white&style=for-the-badge)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-993%20passing-6ba539?logo=vitest&logoColor=white&style=for-the-badge)](#testing)
-[![PWA](https://img.shields.io/badge/PWA-Ready-8fbf9b?logo=pwa&logoColor=white&style=for-the-badge)](#progressive-web-app)
-
 </div>
-
-<p align="center">
-  <img src="./assets/fibrocare-repo-demo.gif" alt="FibroCare product walkthrough — landing page, resources library, and citation dialog" width="860" />
-</p>
 
 <p align="center">
   <strong>FibroCare</strong> — a calm, bilingual companion for living with fibromyalgia.<br />
@@ -127,21 +114,9 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ## 📸 Screenshots
 
-The full product walkthrough is the animated demo at the top of this README. Individual feature screenshots — English and Arabic — live in [`public/images/`](./public/images) and are intentionally not embedded inline to keep this page fast and readable.
+Feature screenshots — English and Arabic — live in [`public/images/`](./public/images) and are intentionally not embedded inline to keep this page fast and readable.
 
 **Bilingual support** — the same pages in Arabic (full RTL): FibroCare is built for Arabic speakers first. Every screen — including the crisis and clinical tools — renders natively in Arabic with proper right-to-left layout, not a translated afterthought. The server renders the chosen language from the start, so there's no flash of English before the Arabic appears.
-
-> The walkthrough GIF at the top of this README is auto-generated. To
-> regenerate the demo GIF or capture the feature screenshots (requires
-> Playwright + Chromium):
->
-> ```bash
-> npm run demo:all                  # capture frames + compose animated GIF
-> node scripts/capture-features.mjs # capture the feature screenshots above
-> ```
->
-> Output: `assets/fibrocare-repo-demo.gif` (README hero) and PNGs in
-> `public/images/`.
 
 ---
 

@@ -12,8 +12,9 @@
  *    plain Link when history is unknown (new tab / direct entry).
  *  - Breadcrumbs — Home › … › current page, reflecting the real route
  *    hierarchy (parameters render as their parent section).
- *  - Quick links — dashboard, doctor hub, consultations, profile; the
- *    overflow collapses into an accessible mobile menu.
+ *  - Quick links — all eight section links render inline on xl+ screens
+ *    (the only widths where 8 bilingual labels fit without colliding);
+ *    below xl the hamburger menu owns navigation instead.
  *  - Utilities — language toggle (with an accessible name) and theme
  *    toggle survive from AppHeader.
  *
@@ -175,7 +176,7 @@ export default function GlobalNavHeader() {
       />
       <div>
         <div className="pt-[env(safe-area-inset-top)]">
-          <div className="container mx-auto flex h-14 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="container mx-auto flex h-14 items-center justify-between gap-x-4 px-4 sm:px-6 lg:px-8 max-w-7xl">
             {/* Brand */}
             <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
@@ -194,18 +195,21 @@ export default function GlobalNavHeader() {
             </div>
 
             {/* Desktop quick links on section roots (deep pages show the
-                breadcrumb trail instead — both never render at once). */}
+                breadcrumb trail instead — both never render at once). Only
+                xl+ gets the inline strip: at md–lg eight bilingual labels
+                overflow the bar and collide with the action cluster, so
+                those widths use the hamburger menu below. */}
             {isTopLevel && (
               <nav
                 aria-label={t("nav.primaryNav")}
-                className="hidden md:flex items-center gap-1 text-sm font-medium text-slate-600 dark:text-slate-300"
+                className="hidden min-w-0 xl:flex items-center gap-1 text-sm font-medium text-slate-600 dark:text-slate-300"
               >
                 {QUICK_LINKS.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "inline-flex items-center rounded-lg px-3 py-2 transition-colors hover:text-slate-900 dark:hover:text-foreground hover:bg-muted",
+                      "inline-flex items-center whitespace-nowrap rounded-lg px-2 py-2 transition-colors hover:text-slate-900 dark:hover:text-foreground hover:bg-muted xl:px-2.5",
                       pathname === link.href &&
                         "bg-primary/10 text-primary font-semibold"
                     )}
@@ -221,7 +225,7 @@ export default function GlobalNavHeader() {
             {!isTopLevel && (
             <nav
               aria-label={t("nav.breadcrumb")}
-              className="hidden min-w-0 md:flex items-center gap-1 text-sm"
+              className="hidden min-w-0 xl:flex items-center gap-1 text-sm"
             >
               {!isDashboardRoot && (
                 <>
@@ -331,7 +335,7 @@ export default function GlobalNavHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-muted hover:bg-muted/80 md:hidden"
+                className="rounded-full bg-muted hover:bg-muted/80 xl:hidden"
                 aria-label={t("nav.mainMenu")}
                 aria-expanded={mobileOpen}
                 onClick={() => setMobileOpen((v) => !v)}
@@ -350,7 +354,7 @@ export default function GlobalNavHeader() {
       {/* Mobile quick links */}
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out md:hidden",
+          "grid transition-[grid-template-rows] duration-300 ease-out xl:hidden",
           mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >

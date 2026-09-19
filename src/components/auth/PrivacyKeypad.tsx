@@ -219,7 +219,7 @@ export function PrivacyKeypad() {
       initial={{ opacity: 0, y: 16, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center gap-7"
+      className="flex w-full flex-col items-center py-1"
       role="dialog"
       aria-modal="true"
       aria-label={t("privacy.unlockDialogAria")}
@@ -227,7 +227,7 @@ export function PrivacyKeypad() {
       <p ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Header with glowing lock badge */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-4">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -250,7 +250,7 @@ export function PrivacyKeypad() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="text-center space-y-1.5"
+          className="text-center space-y-2"
         >
           <h1 className="text-xl font-bold tracking-tight text-foreground">
             {t("privacy.lockedTitle")}
@@ -262,7 +262,9 @@ export function PrivacyKeypad() {
       </div>
 
       {/* PIN dots */}
-      <PinDots length={digits.length} error={error} />
+      <div className="mt-8">
+        <PinDots length={digits.length} error={error} />
+      </div>
 
       {/* Error message */}
       <AnimatePresence>
@@ -271,7 +273,7 @@ export function PrivacyKeypad() {
             initial={{ opacity: 0, y: -4, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -4, height: 0 }}
-            className="text-sm text-red-500 font-medium"
+            className="mt-4 text-sm text-red-500 font-medium"
             role="alert"
           >
             {t("privacy.incorrectPin")}
@@ -284,7 +286,7 @@ export function PrivacyKeypad() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="grid grid-cols-3 gap-3"
+        className="mt-7 grid grid-cols-3 gap-3"
       >
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((n) => (
           <KeypadButton
@@ -325,7 +327,7 @@ export function PrivacyKeypad() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.4 }}
-        className="flex flex-col items-center gap-2.5"
+        className="mt-9 flex flex-col items-center gap-2.5"
       >
         <motion.button
           type="button"
@@ -359,7 +361,7 @@ export function PrivacyKeypad() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.4 }}
-        className="flex items-center gap-6 mt-1 relative z-20 pointer-events-auto"
+        className="relative z-20 mt-6 flex items-center pointer-events-auto"
       >
         <button
           type="button"

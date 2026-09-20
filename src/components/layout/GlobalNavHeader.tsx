@@ -10,10 +10,14 @@
  *  - Brand — logo + wordmark (wordmark collapses to the mark on very
  *    narrow screens so it never collides with the action cluster).
  *  - Core links — every essential section (Dashboard, Clinical Hub, Diet &
- *    Triggers, Care Kit, Pro, Doctors, Profile) renders inline on xl+ when
- *    the route is a section root; the current page is marked with
- *    aria-current. The same links live in the responsive menu for smaller
- *    screens (below xl).
+ *    Triggers, Care Kit, Doctors, Profile) renders inline on xl+ when the
+ *    route is a section root; the current page is marked with aria-current.
+ *    The same links live in the responsive menu for smaller screens (below
+ *    xl).
+ *  - Pro action — Pro is deliberately kept out of the nav strip; it renders
+ *    as a highlighted pill against the action cluster (language, theme,
+ *    notifications) so it reads as a dedicated upgrade/Pro button rather
+ *    than one more link.
  *  - Breadcrumbs — on sub-pages the inline links step aside and a
  *    "Home › … › current page" trail takes the same slot, reflecting the
  *    real route hierarchy (dynamic parameters render as their parent
@@ -96,19 +100,21 @@ function crumbKeyFor(pathname: string): string | null {
   return null;
 }
 
-/** The essential sections every header menu exposes. The set stays short
- *  enough that the desktop strip and the responsive sheet remain clean on
- *  any locale — Pro and the doctor section deliberately use their handy
- *  short labels so the strip never crowds at narrower desktop widths. */
+/** The section links the header exposes. The set stays short enough that
+ *  the desktop strip and the responsive sheet remain clean on any locale —
+ *  Pro deliberately lives apart as a highlighted action button next to the
+ *  language/theme/notification cluster instead of sharing this strip. */
 const CORE_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
   { href: "/dashboard", labelKey: "nav.dashboard" },
   { href: "/clinical", labelKey: "nav.clinical" },
   { href: "/diet", labelKey: "nav.diet" },
   { href: "/toolkit", labelKey: "toolkit.title" },
-  { href: "/pro", labelKey: "pricing.pro.badge" },
   { href: "/pro/doctor", labelKey: "nav.doctorHub" },
   { href: "/profile", labelKey: "nav.profile" },
 ];
+
+/** The highlighted upgrade/Pro action rendered beside the action cluster. */
+const PRO_LINK = { href: "/pro", labelKey: "pricing.pro.badge" as const };
 
 /* ------------------------------------------------------------------ */
 /* Component                                                           */
@@ -343,6 +349,17 @@ export default function GlobalNavHeader() {
               </Button>
 
               <NotificationBell />
+
+              {/* Dedicated Pro / upgrade action — a solid accent pill that
+                  stands out from the muted utility controls beside it. */}
+              <Link
+                href={PRO_LINK.href}
+                aria-label={t(PRO_LINK.labelKey)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:outline-none dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-emerald-950"
+              >
+                <HugeiconsIcon icon={FlashIcon} className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{t(PRO_LINK.labelKey)}</span>
+              </Link>
 
               <Button
                 variant="ghost"

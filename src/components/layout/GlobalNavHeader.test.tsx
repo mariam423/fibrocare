@@ -24,18 +24,20 @@ import GlobalNavHeader from "./GlobalNavHeader";
  * The header structure under test:
  *  - Brand — logo + wordmark, linking to the dashboard (aria-label
  *    "nav.dashboard").
- *  - Core links — Dashboard, Clinical Hub, Diet & Triggers, Care Kit, Pro,
+ *  - Core links — Dashboard, Clinical Hub, Diet & Triggers, Care Kit,
  *    Doctors and Profile render on xl+ when the route is a section root
  *    (nav.primaryNav) and every one of them in the responsive sheet
  *    (nav.mainMenu); the current page is marked with aria-current in both
- *    surfaces.
+ *    surfaces. Pro stays out of the strip and renders as a dedicated
+ *    highlighted action beside the cluster instead.
  *  - Breadcrumbs — on sub-pages the desktop strip steps aside and a
  *    "Home › … › current page" trail (nav.breadcrumb) reflects the route
  *    hierarchy; dynamic parameters collapse to their parent section and
  *    the /dashboard crumb deduplicates against the home shortcut.
  *  - Actions — a history-aware back control with a parent fallback, the
  *    language toggle (name reflects the *target* locale), the theme
- *    toggle, the notification bell, and the hamburger menu (below lg).
+ *    toggle, the notification bell, the dedicated Pro action, and the
+ *    hamburger menu (below xl).
  *  - Direction — the header pins dir from the language context, so the
  *    brand/actions always sit at the correct inline ends and breadcrumb
  *    separators mirror for Arabic.
@@ -95,13 +97,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-/** The exact core set the component renders (mirrors CORE_LINKS). */
+/** The exact core set the component renders (mirrors CORE_LINKS). Pro
+ *  deliberately lives outside this strip as a dedicated action button, so
+ *  the CTA it points at is asserted separately. */
 const CORE_LINK_HREFS = [
   "/dashboard",
   "/clinical",
   "/diet",
   "/toolkit",
-  "/pro",
   "/pro/doctor",
   "/profile",
 ];
@@ -110,7 +113,6 @@ const CORE_LINK_LABELS = [
   "nav.clinical",
   "nav.diet",
   "toolkit.title",
-  "pricing.pro.badge",
   "nav.doctorHub",
   "nav.profile",
 ];
@@ -320,6 +322,26 @@ describe("GlobalNavHeader structure & a11y", () => {
     const links = Array.from(primary.querySelectorAll("a"));
     expect(links.map((a) => a.getAttribute("href"))).toEqual(CORE_LINK_HREFS);
     expect(links.map((a) => a.textContent)).toEqual(CORE_LINK_LABELS);
+
+    // Pro must not share this strip — it is a dedicated action button.
+    expect(primary.querySelector('a[href="/pro"]')).toBeNull();
+  });
+
+  it("renders the Pro upgrade as a dedicated highlighted action beside the cluster", () => {
+    currentPath = "/dashboard";
+    render(<GlobalNavHeader />);
+
+    // One Pro affordance with a distinct accessible name…
+    const pro = screen.getByRole("link", { name: "pricing.pro.badge" });
+    expect(pro).toHaveAttribute("href", "/pro");
+    expect(screen.getAllByRole("link", { name: "pricing.pro.badge" })).toHaveLength(1);
+    // …styled to stand out (solid accent) rather than read as a muted
+    // utility control…
+    expect(pro.className).toContain("bg-emerald-600");
+    expect(pro.className).toContain("font-bold");
+    // …and kept out of the section-link strip.
+    const primary = screen.getByRole("navigation", { name: "nav.primaryNav" });
+    expect(primary.querySelector('a[href="/pro"]')).toBeNull();
   });
 
   it("hides the desktop core links on sub-pages in favor of the breadcrumb trail", () => {

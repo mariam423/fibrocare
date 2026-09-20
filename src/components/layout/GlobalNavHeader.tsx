@@ -5,18 +5,19 @@
  *
  * One header serves the whole authenticated app (dashboard, resources and
  * its sub-pages, pro portal and its sub-routes, profile, logs, toolkit,
- * reports) so a user is never trapped without a return path:
+ * reports) so a user is never trapped without a return path. The section
+ * links themselves live on the Dashboard, so the header stays lightweight:
  *
- *  - Smart "Go Back" — router.back() when there is in-app history,
- *    falling back to a sensible parent (then /dashboard). Falls back to a
- *    plain Link when history is unknown (new tab / direct entry).
- *  - Breadcrumbs — Home › … › current page, reflecting the real route
- *    hierarchy (parameters render as their parent section).
- *  - Quick links — all eight section links render inline on xl+ screens
- *    (the only widths where 8 bilingual labels fit without colliding);
- *    below xl the hamburger menu owns navigation instead.
- *  - Utilities — language toggle (with an accessible name) and theme
- *    toggle survive from AppHeader.
+ *  - Brand — logo + wordmark (wordmark collapses to the mark on very
+ *    narrow screens so it never collides with the action cluster).
+ *  - Breadcrumbs — "Home › … › current page" reflecting the real route
+ *    hierarchy (dynamic parameters render as their parent section). The
+ *    trail renders inline on md+ with truncating middle links; the leaf is
+ *    the current, unlinked page.
+ *  - Actions — smart "Go back" (router.back() when there is in-app
+ *    history, otherwise a sensible parent), language toggle (with an
+ *    accessible name), theme toggle, the notification bell, and the
+ *    hamburger menu (md only) that hosts the Upgrade-Pro call to action.
  *
  * Design: the Midnight Emerald glass treatment (blur, hairline border,
  * soft shadow) with a 3D glass stack — a translucent top highlight over a
@@ -34,14 +35,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
-  ArrowRight01Icon,
   Cancel01Icon,
   FlashIcon,
   HeartIcon,
   LanguageCircleIcon,
   Menu01Icon,
   Moon02Icon,
-  ArrowUp01Icon,
   Sun02Icon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
@@ -88,17 +87,6 @@ function crumbKeyFor(pathname: string): string | null {
   return null;
 }
 
-const QUICK_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
-  { href: "/dashboard", labelKey: "nav.dashboard" },
-  { href: "/health-logs", labelKey: "logs.pageTitle" },
-  { href: "/clinical", labelKey: "nav.clinical" },
-  { href: "/fog-shield", labelKey: "fog.title" },
-  { href: "/diet", labelKey: "nav.diet" },
-  { href: "/pro/doctor", labelKey: "nav.doctorHub" },
-  { href: "/dashboard/consultations", labelKey: "nav.consultations" },
-  { href: "/profile", labelKey: "nav.profile" },
-];
-
 /* ------------------------------------------------------------------ */
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
@@ -139,6 +127,14 @@ export default function GlobalNavHeader() {
     return chain;
   }, [pathname, t]);
 
+  /** Home › … › current trail. /dashboard/* routes already begin with a
+   *  dashboard crumb, so the redundant entry is dropped — the home
+   *  shortcut renders once. */
+  const trail = useMemo<Crumb[]>(() => {
+    const home: Crumb = { href: "/dashboard", label: t("nav.dashboard") };
+    return [home, ...crumbs.filter((crumb) => crumb.href !== "/dashboard")];
+  }, [crumbs, t]);
+
   /** Sensible parent for history-less fallbacks (new tab / direct entry). */
   const fallbackHref = useMemo(() => {
     const leaf = crumbKeyFor(pathname) ?? pathname;
@@ -158,11 +154,6 @@ export default function GlobalNavHeader() {
 
   const canGoBackInApp = typeof window !== "undefined" && window.history.length > 1;
   const isDashboardRoot = pathname === "/dashboard";
-  /** Section roots get the desktop quick links; deep pages get breadcrumbs. */
-  const isTopLevel = useMemo(() => {
-    const segments = pathname.split("/").filter(Boolean);
-    return segments.length <= 1;
-  }, [pathname]);
 
   return (
     <header
@@ -176,93 +167,68 @@ export default function GlobalNavHeader() {
       />
       <div>
         <div className="pt-[env(safe-area-inset-top)]">
-          <div className="container mx-auto flex h-14 items-center justify-between gap-x-4 px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="container mx-auto flex h-14 items-center justify-between gap-x-3 px-3 sm:px-6 lg:px-8 max-w-7xl">
             {/* Brand */}
-            <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-                <HugeiconsIcon
-                  icon={HeartIcon}
-                  className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
-                  aria-hidden="true"
-                />
-              </div>
+            <div className="flex shrink-0 items-center gap-2.5">
               <Link
                 href="/dashboard"
-                className="text-xl font-semibold tracking-tight text-slate-900 dark:text-foreground whitespace-nowrap"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2.5"
+                aria-label={t("nav.dashboard")}
               >
-                FibroCare
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+                  <HugeiconsIcon
+                    icon={HeartIcon}
+                    className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <span className="hidden text-xl font-semibold tracking-tight whitespace-nowrap text-slate-900 dark:text-foreground min-[420px]:inline">
+                  FibroCare
+                </span>
               </Link>
             </div>
 
-            {/* Desktop quick links on section roots (deep pages show the
-                breadcrumb trail instead — both never render at once). Only
-                xl+ gets the inline strip: at md–lg eight bilingual labels
-                overflow the bar and collide with the action cluster, so
-                those widths use the hamburger menu below. */}
-            {isTopLevel && (
-              <nav
-                aria-label={t("nav.primaryNav")}
-                className="hidden min-w-0 xl:flex items-center gap-1 text-sm font-medium text-slate-600 dark:text-slate-300"
-              >
-                {QUICK_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "inline-flex items-center whitespace-nowrap rounded-lg px-2 py-2 transition-colors hover:text-slate-900 dark:hover:text-foreground hover:bg-muted xl:px-2.5",
-                      pathname === link.href &&
-                        "bg-primary/10 text-primary font-semibold"
-                    )}
-                    aria-current={pathname === link.href ? "page" : undefined}
-                  >
-                    {t(link.labelKey)}
-                  </Link>
-                ))}
-              </nav>
-            )}
-
             {/* Breadcrumbs (md+): Home › … › current */}
-            {!isTopLevel && (
-            <nav
-              aria-label={t("nav.breadcrumb")}
-              className="hidden min-w-0 xl:flex items-center gap-1 text-sm"
-            >
-              {!isDashboardRoot && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 font-medium text-slate-600 transition-colors hover:text-slate-900 hover:bg-muted dark:text-muted-foreground dark:hover:text-foreground"
-                  >
-                    <HugeiconsIcon icon={ArrowUp01Icon} className="h-3.5 w-3.5 rtl:rotate-90" aria-hidden="true" />
-                    {t("nav.dashboard")}
-                  </Link>
-                  <span aria-hidden="true" className="text-slate-400 dark:text-slate-600">
-                    {locale === "ar" ? "‹" : "/"}
-                  </span>
-                </>
-              )}
-              {crumbs.slice(0, -1).map((crumb) => (
-                <span key={crumb.href} className="flex min-w-0 items-center gap-1">
-                  <Link
-                    href={crumb.href}
-                    className="truncate rounded-lg px-2 py-1.5 font-medium text-slate-600 transition-colors hover:text-slate-900 hover:bg-muted dark:text-muted-foreground dark:hover:text-foreground"
-                  >
-                    {crumb.label}
-                  </Link>
-                  <span aria-hidden="true" className="shrink-0 text-slate-400 dark:text-slate-600">
-                    {locale === "ar" ? "‹" : "/"}
-                  </span>
-                </span>
-              ))}
-              {crumbs.length > 0 && (
-                <span
-                  aria-current="page"
-                  className="truncate rounded-lg bg-primary/10 px-2 py-1.5 font-semibold text-primary"
-                >
-                  {crumbs[crumbs.length - 1].label}
-                </span>
-              )}
-            </nav>
+            {!isDashboardRoot && (
+              <nav
+                aria-label={t("nav.breadcrumb")}
+                className="hidden min-w-0 flex-1 items-center whitespace-nowrap text-sm md:flex"
+              >
+                {trail.map((crumb, index) => {
+                  const isLast = index === trail.length - 1;
+                  return (
+                    <span
+                      key={crumb.href}
+                      className="flex min-w-0 items-center"
+                    >
+                      {index > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="shrink-0 px-1.5 text-slate-400 dark:text-slate-600"
+                        >
+                          {locale === "ar" ? "‹" : "/"}
+                        </span>
+                      )}
+                      {isLast ? (
+                        <span
+                          aria-current="page"
+                          className="truncate shrink-0 rounded-lg bg-primary/10 px-2 py-1.5 font-semibold text-primary max-w-[14rem]"
+                        >
+                          {crumb.label}
+                        </span>
+                      ) : (
+                        <Link
+                          href={crumb.href}
+                          className="truncate min-w-0 rounded-lg px-2 py-1.5 font-medium text-slate-600 transition-colors hover:bg-muted hover:text-slate-900 dark:text-muted-foreground dark:hover:text-foreground"
+                        >
+                          {crumb.label}
+                        </Link>
+                      )}
+                    </span>
+                  );
+                })}
+              </nav>
             )}
 
             {/* Actions */}
@@ -291,13 +257,8 @@ export default function GlobalNavHeader() {
                     className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-muted/80 hover:text-slate-900 dark:text-muted-foreground dark:hover:text-foreground"
                   >
                     <HugeiconsIcon
-                      icon={locale === "ar" ? ArrowRight01Icon : ArrowLeft01Icon}
-                      className="hidden h-4 w-4 rtl:block"
-                      aria-hidden="true"
-                    />
-                    <HugeiconsIcon
-                      icon={locale === "ar" ? ArrowLeft01Icon : ArrowRight01Icon}
-                      className="h-4 w-4 rtl:hidden"
+                      icon={ArrowLeft01Icon}
+                      className="h-4 w-4 rtl:scale-x-[-1]"
                       aria-hidden="true"
                     />
                     <span className="hidden sm:inline">{t("nav.goBack")}</span>
@@ -335,7 +296,7 @@ export default function GlobalNavHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-muted hover:bg-muted/80 xl:hidden"
+                className="rounded-full bg-muted hover:bg-muted/80 md:hidden"
                 aria-label={t("nav.mainMenu")}
                 aria-expanded={mobileOpen}
                 onClick={() => setMobileOpen((v) => !v)}
@@ -351,32 +312,19 @@ export default function GlobalNavHeader() {
         </div>
       </div>
 
-      {/* Mobile quick links */}
+      {/* Mobile quick link (md only) — the Dashboard owns the section
+          navigation, so the menu hosts the one goal-oriented CTA. */}
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out xl:hidden",
+          "grid transition-[grid-template-rows] duration-300 ease-out md:hidden",
           mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
         <div className="overflow-hidden">
           <nav
             aria-label={t("nav.mainMenu")}
-            className="flex flex-col gap-1 bg-white/95 px-6 pb-3 pt-2 backdrop-blur-xl dark:bg-background/95 sm:px-8"
+            className="flex flex-col gap-1 bg-white/95 px-3 pb-3 pt-2 backdrop-blur-xl dark:bg-background/95 sm:px-6"
           >
-            {QUICK_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                aria-current={pathname === link.href ? "page" : undefined}
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted",
-                  pathname === link.href && "bg-primary/10 font-semibold text-primary"
-                )}
-              >
-                {t(link.labelKey)}
-              </Link>
-            ))}
             <Link
               href="/pro"
               onClick={() => setMobileOpen(false)}

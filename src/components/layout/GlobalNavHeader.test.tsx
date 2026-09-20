@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import GlobalNavHeader from "./GlobalNavHeader";
 
 /**
@@ -20,6 +20,11 @@ import GlobalNavHeader from "./GlobalNavHeader";
  *    in-app history (smart back) versus a fresh entry (fallback link).
  *    The stub is applied INSIDE the test (not beforeEach) so each test's
  *    value is what the component actually reads at render time.
+ *
+ * The header no longer duplicates the Dashboard's section links — the
+ * breadcrumb trail (with a single, deduplicated home shortcut) and the
+ * action cluster (go back, language, theme, notifications, responsive
+ * menu) are the only navigation surfaces under test.
  */
 
 let currentPath = "/dashboard";
@@ -77,19 +82,26 @@ afterEach(() => {
 });
 
 describe("GlobalNavHeader breadcrumbs", () => {
-  it("on the dashboard root shows the primary nav instead of a breadcrumb trail", () => {
+  it("on the dashboard root hides the trail and keeps branding plus core actions", () => {
     currentPath = "/dashboard";
     render(<GlobalNavHeader />);
 
-    // Section roots swap the trail for the primary quick links…
+    // No trail on the home route…
     expect(
       screen.queryByRole("navigation", { name: "nav.breadcrumb" })
     ).toBeNull();
-    const primary = screen.getByRole("navigation", { name: "nav.primaryNav" });
-    // …and the dashboard link is still announced as the current page.
-    expect(primary.querySelector('[aria-current="page"]')).toHaveTextContent(
-      "nav.dashboard"
-    );
+    // …the brand links back to the dashboard…
+    const brand = screen.getByRole("link", { name: "nav.dashboard" });
+    expect(brand).toHaveAttribute("href", "/dashboard");
+    // …and the action cluster is intact.
+    expect(
+      screen.getByRole("button", { name: "nav.switchToArabic" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "header.themeDark" })
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("notification-bell")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "nav.mainMenu" })).toBeInTheDocument();
   });
 
   it("renders the home shortcut and chain for a two-level route", () => {
@@ -97,7 +109,7 @@ describe("GlobalNavHeader breadcrumbs", () => {
     render(<GlobalNavHeader />);
     const nav = screen.getByRole("navigation", { name: "nav.breadcrumb" });
 
-    // Home shortcut (icon + label) links back to the dashboard.
+    // Home shortcut links back to the dashboard.
     expect(nav.querySelector('a[href="/dashboard"]')).toHaveTextContent(
       "nav.dashboard"
     );
@@ -141,6 +153,33 @@ describe("GlobalNavHeader breadcrumbs", () => {
       "consultation.title"
     );
     expect(nav.innerHTML).not.toContain("abc-123");
+  });
+
+  it("does not duplicate the dashboard crumb on nested dashboard routes", () => {
+    currentPath = "/dashboard/consultations";
+    render(<GlobalNavHeader />);
+    const nav = screen.getByRole("navigation", { name: "nav.breadcrumb" });
+
+    // The home shortcut renders exactly once — the crumb chain drops its
+    // own /dashboard entry instead of repeating it as an intermediate link.
+    expect(nav.querySelectorAll('a[href="/dashboard"]')).toHaveLength(1);
+    expect(nav.querySelector('a[href="/dashboard"]')).not.toHaveAttribute(
+      "aria-current"
+    );
+    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent(
+      "consultationsHub.title"
+    );
+  });
+
+  it("keeps every trail level unique — no crumb renders twice", () => {
+    currentPath = "/dashboard/consultations";
+    render(<GlobalNavHeader />);
+    const nav = screen.getByRole("navigation", { name: "nav.breadcrumb" });
+
+    const hrefs = Array.from(nav.querySelectorAll("a")).map((a) =>
+      a.getAttribute("href")
+    );
+    expect(new Set(hrefs).size).toBe(hrefs.length);
   });
 
   it("labels the trail for assistive tech in both languages", () => {
@@ -224,26 +263,54 @@ describe("GlobalNavHeader smart back", () => {
   });
 });
 
-describe("GlobalNavHeader quick links & a11y", () => {
-  it("exposes quick links on desktop AND in the mobile menu, with the current page marked", () => {
+describe("GlobalNavHeader structure & a11y", () => {
+  it("renders the FibroCare brand linking to the dashboard", () => {
+    currentPath = "/dashboard";
+    render(<GlobalNavHeader />);
+
+    const brand = screen.getByRole("link", { name: "nav.dashboard" });
+    expect(brand).toHaveAttribute("href", "/dashboard");
+    expect(brand).toHaveTextContent("FibroCare");
+  });
+
+  it("exposes no redundant section links — navigation lives on the dashboard", () => {
     currentPath = "/profile";
     render(<GlobalNavHeader />);
 
-    // Every quick link renders twice — desktop nav (hidden md:flex) plus
-    // the collapsible mobile menu. getAllByRole covers both.
-    const profileLinks = screen.getAllByRole("link", { name: "nav.profile" });
-    expect(profileLinks.length).toBeGreaterThanOrEqual(2);
-    for (const link of profileLinks) {
-      expect(link).toHaveAttribute("href", "/profile");
-      expect(link).toHaveAttribute("aria-current", "page");
+    // The removed quick-link strip would have surfaced these labels; the
+    // cleaned header must not render any of them (the breadcrumb trail
+    // uses page titles, e.g. profile.pageTitle, not nav.* labels).
+    for (const label of [
+      "nav.profile",
+      "nav.consultations",
+      "nav.doctorHub",
+      "nav.clinical",
+      "nav.diet",
+      "nav.healthLogs",
+      "nav.toolkit",
+      "logs.pageTitle",
+      "fog.title",
+      "toolkit.title",
+      "reports.pageTitle",
+    ]) {
+      expect(screen.queryByRole("link", { name: label })).toBeNull();
     }
+  });
 
-    // Dashboard appears three times (breadcrumb home shortcut + one quick
-    // link per surface) — none may claim aria-current while /profile is
-    // active.
-    for (const dash of screen.getAllByRole("link", { name: "nav.dashboard" })) {
-      expect(dash).not.toHaveAttribute("aria-current");
-    }
+  it("marks the current page only at the breadcrumb leaf", () => {
+    currentPath = "/resources/diagnosis";
+    render(<GlobalNavHeader />);
+
+    const nav = screen.getByRole("navigation", { name: "nav.breadcrumb" });
+    const current = nav.querySelector('[aria-current="page"]');
+    expect(current).toHaveTextContent("diagnosis.title");
+    expect(current?.tagName).toBe("SPAN");
+    expect(nav.querySelector('a[href="/dashboard"]')).not.toHaveAttribute(
+      "aria-current"
+    );
+    expect(nav.querySelector('a[href="/resources"]')).not.toHaveAttribute(
+      "aria-current"
+    );
   });
 
   it("gives the language toggle an accessible name that reflects the target locale", () => {
@@ -254,10 +321,47 @@ describe("GlobalNavHeader quick links & a11y", () => {
     ).toBeInTheDocument();
   });
 
+  it("gives the theme toggle an accessible name that reflects the current theme", () => {
+    currentPath = "/dashboard";
+    render(<GlobalNavHeader />);
+    expect(
+      screen.getByRole("button", { name: "header.themeDark" })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the notification bell", () => {
+    currentPath = "/dashboard";
+    render(<GlobalNavHeader />);
+    expect(screen.getByTestId("notification-bell")).toBeInTheDocument();
+  });
+
   it("wires the mobile menu button with aria-expanded and a menu label", () => {
     currentPath = "/dashboard";
     render(<GlobalNavHeader />);
     const menu = screen.getByRole("button", { name: "nav.mainMenu" });
     expect(menu).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(menu);
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("hosts only the upgrade CTA in the mobile menu and closes it on navigation", () => {
+    currentPath = "/dashboard";
+    const { rerender } = render(<GlobalNavHeader />);
+
+    fireEvent.click(screen.getByRole("button", { name: "nav.mainMenu" }));
+    const upgrade = screen.getByRole("link", { name: "nav.upgradePro" });
+    expect(upgrade).toHaveAttribute("href", "/pro");
+
+    // The Dashboard owns section navigation, so the menu offers nothing
+    // redundant — just the goal-oriented CTA.
+    expect(screen.queryByRole("link", { name: "nav.profile" })).toBeNull();
+
+    // Navigating closes the sheet (setState-during-render pattern).
+    currentPath = "/profile";
+    rerender(<GlobalNavHeader />);
+    expect(
+      screen.getByRole("button", { name: "nav.mainMenu" })
+    ).toHaveAttribute("aria-expanded", "false");
   });
 });

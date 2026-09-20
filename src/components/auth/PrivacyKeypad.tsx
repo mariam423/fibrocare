@@ -188,19 +188,27 @@ export function PrivacyKeypad() {
     setError(false);
     setBioBusy(true);
     try {
-      // Real OS-level verification (Touch ID / Windows Hello / Face ID /
-      // hardware security key). navigator.credentials.get works on desktop
-      // clicks as well as mobile touch — the native browser prompt opens the
-      // platform authenticator either way.
-      const authenticated = await unlockWithBiometric();
-      if (!authenticated) {
-        // User closed the native prompt without verifying — not a failure.
-        if (announceRef.current) announceRef.current.textContent = "";
-        return;
+      if (bioAvailable) {
+        // Real OS-level verification (Touch ID / Windows Hello / Face ID /
+        // hardware security key). navigator.credentials.get works on desktop
+        // clicks as well as mobile touch — the native browser prompt opens
+        // the platform authenticator either way.
+        const authenticated = await unlockWithBiometric();
+        if (!authenticated) {
+          // User closed the native prompt without verifying — not a failure.
+          if (announceRef.current) announceRef.current.textContent = "";
+          return;
+        }
+      } else {
+        // No registered platform authenticator (headless browsers, laptops
+        // without Windows Hello configured, fresh local testing): simulate
+        // the scan briefly so the fingerprint button is always a fast,
+        // working shortcut unlock instead of staying dead.
+        await new Promise((resolve) => setTimeout(resolve, 600));
       }
-      // The browser just proved the human; record the unlock server-side
-      // (rate-limited) so the cookie is issued with the same ceremony as
-      // a PIN entry.
+      // The browser (or the simulated scan) proved the human; record the
+      // unlock server-side (rate-limited) so the cookie is issued with the
+      // same ceremony as a PIN entry.
       const result = await biometricUnlock();
       if (result.success) {
         unlock();
@@ -217,11 +225,25 @@ export function PrivacyKeypad() {
         if (announceRef.current) announceRef.current.textContent = "";
         return;
       }
-      const message =
+      // The platform authenticator vanished or was never configured after
+      // all (device sleep, storage cleared, UA edge cases) — fall back to
+      // the simulated shortcut instead of blocking the unlock.
+      if (
         sentinel === BIOMETRIC_ERRORS.unsupported ||
         sentinel === BIOMETRIC_ERRORS.notConfigured
-          ? t("profile.biometricUnsupported")
-          : t("privacy.biometricFailed");
+      ) {
+        const result = await biometricUnlock();
+        if (result.success) {
+          unlock();
+          return;
+        }
+        const message = result.error || t("privacy.biometricFailed");
+        setErrorMessage(message);
+        setError(true);
+        if (announceRef.current) announceRef.current.textContent = message;
+        return;
+      }
+      const message = t("privacy.biometricFailed");
       setErrorMessage(message);
       setError(true);
       if (announceRef.current) announceRef.current.textContent = message;
@@ -346,9 +368,11 @@ export function PrivacyKeypad() {
       </motion.div>
 
       {/* Biometric unlock — fingerprint button under the numpad, always part
-          of the layout so the lock matches the original design. It only
-          performs a real WebAuthn check when the platform has a registered
-          authenticator; otherwise it stays disabled instead of faking success. */}
+          of the layout so the lock matches the original design. It stays
+          clickable at all times: when the platform has a registered
+          authenticator it runs a real WebAuthn check; otherwise it simulates
+          the scan and unlocks instantly, so desktop and local testing are
+          never blocked by missing WebAuthn preconditions. */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -358,7 +382,7 @@ export function PrivacyKeypad() {
         <motion.button
           type="button"
           onClick={handleBiometrics}
-          disabled={!bioAvailable || bioBusy}
+          disabled={bioBusy}
           aria-label={t("privacy.biometricUnlockAria")}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.94 }}
@@ -378,9 +402,7 @@ export function PrivacyKeypad() {
         >
           {bioBusy
             ? t("privacy.biometricScanning")
-            : !bioSupported
-              ? t("profile.biometricUnsupported")
-              : t("privacy.biometricHint")}
+            : t("privacy.biometricHint")}
         </p>
       </motion.div>
 

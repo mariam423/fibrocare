@@ -11,8 +11,8 @@ import GlobalNavHeader from "./GlobalNavHeader";
  * every one of them is mocked:
  *
  *  - `useLanguage` returns the key itself for `t()` (deterministic labels
- *    that double as the breadcrumb assertions) and a settable locale so
- *    the toggle's accessible name can be flipped.
+ *    that double as the breadcrumb assertions), a settable locale, and a
+ *    dir derived from it so RTL/LTR behavior can be asserted.
  *  - `usePathname` is redirected to `currentPath`, letting each test
  *    render a different route.
  *  - `useRouter` hands out `routerMock`, capturing back()/push() calls.
@@ -21,14 +21,29 @@ import GlobalNavHeader from "./GlobalNavHeader";
  *    The stub is applied INSIDE the test (not beforeEach) so each test's
  *    value is what the component actually reads at render time.
  *
- * The header no longer duplicates the Dashboard's section links — the
- * breadcrumb trail (with a single, deduplicated home shortcut) and the
- * action cluster (go back, language, theme, notifications, responsive
- * menu) are the only navigation surfaces under test.
+ * The header structure under test:
+ *  - Brand — logo + wordmark, linking to the dashboard (aria-label
+ *    "nav.dashboard").
+ *  - Core links — Dashboard, Clinical Hub, Diet & Triggers and Profile
+ *    render on lg+ when the route is a section root (nav.primaryNav) and
+ *    every one of them in the responsive sheet (nav.mainMenu); the current
+ *    page is marked with aria-current in both surfaces.
+ *  - Breadcrumbs — on sub-pages the desktop strip steps aside and a
+ *    "Home › … › current page" trail (nav.breadcrumb) reflects the route
+ *    hierarchy; dynamic parameters collapse to their parent section and
+ *    the /dashboard crumb deduplicates against the home shortcut.
+ *  - Actions — a history-aware back control with a parent fallback, the
+ *    language toggle (name reflects the *target* locale), the theme
+ *    toggle, the notification bell, and the hamburger menu (below lg).
+ *  - Direction — the header pins dir from the language context, so the
+ *    brand/actions always sit at the correct inline ends and breadcrumb
+ *    separators mirror for Arabic.
  */
 
 let currentPath = "/dashboard";
 const routerMock = { back: vi.fn(), push: vi.fn() };
+
+const localeState = { value: "en" as "en" | "ar" };
 
 vi.mock("@/context/LanguageContext", () => ({
   useLanguage: () => ({
@@ -51,8 +66,6 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/components/notifications/NotificationBell", () => ({
   NotificationBell: () => <div data-testid="notification-bell" />,
 }));
-
-const localeState = { value: "en" as "en" | "ar" };
 
 function setHistory(length: number) {
   vi.stubGlobal("history", { length });
@@ -81,18 +94,29 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+/** The exact core set the component renders (mirrors CORE_LINKS). */
+const CORE_LINK_HREFS = ["/dashboard", "/clinical", "/diet", "/profile"];
+const CORE_LINK_LABELS = [
+  "nav.dashboard",
+  "nav.clinical",
+  "nav.diet",
+  "nav.profile",
+];
+
 describe("GlobalNavHeader breadcrumbs", () => {
   it("on the dashboard root hides the trail and keeps branding plus core actions", () => {
     currentPath = "/dashboard";
-    render(<GlobalNavHeader />);
+    const { container } = render(<GlobalNavHeader />);
 
     // No trail on the home route…
     expect(
       screen.queryByRole("navigation", { name: "nav.breadcrumb" })
     ).toBeNull();
-    // …the brand links back to the dashboard…
-    const brand = screen.getByRole("link", { name: "nav.dashboard" });
+    // …the branded wordmark wraps the dashboard link (the brand anchor is
+    // the only header link carrying an aria-label)…
+    const brand = container.querySelector('a[aria-label="nav.dashboard"]');
     expect(brand).toHaveAttribute("href", "/dashboard");
+    expect(brand).toHaveTextContent("FibroCare");
     // …and the action cluster is intact.
     expect(
       screen.getByRole("button", { name: "nav.switchToArabic" })
@@ -266,35 +290,69 @@ describe("GlobalNavHeader smart back", () => {
 describe("GlobalNavHeader structure & a11y", () => {
   it("renders the FibroCare brand linking to the dashboard", () => {
     currentPath = "/dashboard";
-    render(<GlobalNavHeader />);
+    const { container } = render(<GlobalNavHeader />);
 
-    const brand = screen.getByRole("link", { name: "nav.dashboard" });
+    // The brand anchor is the only link whose accessible name comes from
+    // an aria-label (the restored section links use their text content),
+    // so querying the container keeps this unambiguous with the nav live.
+    const brand = container.querySelector('a[aria-label="nav.dashboard"]');
     expect(brand).toHaveAttribute("href", "/dashboard");
     expect(brand).toHaveTextContent("FibroCare");
   });
 
-  it("exposes no redundant section links — navigation lives on the dashboard", () => {
+  it("restores the core section links on section roots", () => {
+    currentPath = "/dashboard";
+    render(<GlobalNavHeader />);
+    const primary = screen.getByRole("navigation", { name: "nav.primaryNav" });
+
+    const links = Array.from(primary.querySelectorAll("a"));
+    expect(links.map((a) => a.getAttribute("href"))).toEqual(CORE_LINK_HREFS);
+    expect(links.map((a) => a.textContent)).toEqual(CORE_LINK_LABELS);
+  });
+
+  it("hides the desktop core links on sub-pages in favor of the breadcrumb trail", () => {
+    currentPath = "/resources/diagnosis";
+    render(<GlobalNavHeader />);
+
+    // Sub-pages swap the desktop strip for the trail…
+    expect(
+      screen.queryByRole("navigation", { name: "nav.primaryNav" })
+    ).toBeNull();
+    expect(
+      screen.getByRole("navigation", { name: "nav.breadcrumb" })
+    ).toBeInTheDocument();
+    // …but the responsive sheet still offers the core links, so section
+    // navigation is never more than a tap away on any route.
+    const menu = screen.getByRole("navigation", { name: "nav.mainMenu" });
+    expect(menu.querySelector('a[href="/profile"]')).toBeInTheDocument();
+    expect(menu.querySelector('a[href="/clinical"]')).toBeInTheDocument();
+    expect(menu.querySelector('a[href="/diet"]')).toBeInTheDocument();
+  });
+
+  it("marks the current section root with aria-current in desktop and mobile", () => {
     currentPath = "/profile";
     render(<GlobalNavHeader />);
 
-    // The removed quick-link strip would have surfaced these labels; the
-    // cleaned header must not render any of them (the breadcrumb trail
-    // uses page titles, e.g. profile.pageTitle, not nav.* labels).
-    for (const label of [
-      "nav.profile",
-      "nav.consultations",
-      "nav.doctorHub",
-      "nav.clinical",
-      "nav.diet",
-      "nav.healthLogs",
-      "nav.toolkit",
-      "logs.pageTitle",
-      "fog.title",
-      "toolkit.title",
-      "reports.pageTitle",
-    ]) {
-      expect(screen.queryByRole("link", { name: label })).toBeNull();
-    }
+    const primary = screen.getByRole("navigation", { name: "nav.primaryNav" });
+    expect(primary.querySelector('a[href="/profile"]')).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+    expect(primary.querySelector('a[href="/dashboard"]')).not.toHaveAttribute(
+      "aria-current"
+    );
+    expect(primary.querySelector('a[href="/clinical"]')).not.toHaveAttribute(
+      "aria-current"
+    );
+
+    const menu = screen.getByRole("navigation", { name: "nav.mainMenu" });
+    expect(menu.querySelector('a[href="/profile"]')).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+    expect(menu.querySelector('a[href="/dashboard"]')).not.toHaveAttribute(
+      "aria-current"
+    );
   });
 
   it("marks the current page only at the breadcrumb leaf", () => {
@@ -313,11 +371,17 @@ describe("GlobalNavHeader structure & a11y", () => {
     );
   });
 
-  it("gives the language toggle an accessible name that reflects the target locale", () => {
+  it("names the language toggle after the target locale and flips it", () => {
     currentPath = "/dashboard";
-    render(<GlobalNavHeader />);
+    const { rerender } = render(<GlobalNavHeader />);
     expect(
       screen.getByRole("button", { name: "nav.switchToArabic" })
+    ).toBeInTheDocument();
+
+    localeState.value = "ar";
+    rerender(<GlobalNavHeader />);
+    expect(
+      screen.getByRole("button", { name: "nav.switchToEnglish" })
     ).toBeInTheDocument();
   });
 
@@ -345,23 +409,63 @@ describe("GlobalNavHeader structure & a11y", () => {
     expect(menu).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("hosts only the upgrade CTA in the mobile menu and closes it on navigation", () => {
+  it("hosts the core links plus the upgrade CTA in the mobile menu and closes it on navigation", () => {
     currentPath = "/dashboard";
     const { rerender } = render(<GlobalNavHeader />);
+    const toggle = screen.getByRole("button", { name: "nav.mainMenu" });
 
-    fireEvent.click(screen.getByRole("button", { name: "nav.mainMenu" }));
-    const upgrade = screen.getByRole("link", { name: "nav.upgradePro" });
-    expect(upgrade).toHaveAttribute("href", "/pro");
+    fireEvent.click(toggle);
+    const menuNav = screen.getByRole("navigation", { name: "nav.mainMenu" });
 
-    // The Dashboard owns section navigation, so the menu offers nothing
-    // redundant — just the goal-oriented CTA.
-    expect(screen.queryByRole("link", { name: "nav.profile" })).toBeNull();
+    // Same essential links as the desktop strip, plus the goal-oriented CTA.
+    expect(
+      Array.from(menuNav.querySelectorAll("a")).map((a) =>
+        a.getAttribute("href")
+      )
+    ).toEqual([...CORE_LINK_HREFS, "/pro"]);
+    expect(screen.getByRole("link", { name: "nav.upgradePro" })).toHaveAttribute(
+      "href",
+      "/pro"
+    );
 
-    // Navigating closes the sheet (setState-during-render pattern).
+    // Activating a core link closes the sheet.
+    fireEvent.click(menuNav.querySelector('a[href="/profile"]') as Element);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    // And so does navigating away (setState-during-render pattern).
+    fireEvent.click(toggle);
     currentPath = "/profile";
     rerender(<GlobalNavHeader />);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+describe("GlobalNavHeader RTL/LTR direction", () => {
+  it("pins the header dir from the language context", () => {
+    currentPath = "/dashboard";
+
+    const ltr = render(<GlobalNavHeader />);
+    expect(ltr.getByTestId("global-nav-header")).toHaveAttribute("dir", "ltr");
+    ltr.unmount();
+
+    localeState.value = "ar";
+    const rtl = render(<GlobalNavHeader />);
+    expect(rtl.getByTestId("global-nav-header")).toHaveAttribute("dir", "rtl");
+  });
+
+  it("mirrors the breadcrumb separator for Arabic", () => {
+    currentPath = "/resources/diagnosis";
+
+    const ltr = render(<GlobalNavHeader />);
     expect(
-      screen.getByRole("button", { name: "nav.mainMenu" })
-    ).toHaveAttribute("aria-expanded", "false");
+      screen.getByRole("navigation", { name: "nav.breadcrumb" }).textContent
+    ).toContain("/");
+    ltr.unmount();
+
+    localeState.value = "ar";
+    render(<GlobalNavHeader />);
+    expect(
+      screen.getByRole("navigation", { name: "nav.breadcrumb" }).textContent
+    ).toContain("‹");
   });
 });

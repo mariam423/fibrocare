@@ -5,28 +5,36 @@
  *
  * One header serves the whole authenticated app (dashboard, resources and
  * its sub-pages, pro portal and its sub-routes, profile, logs, toolkit,
- * reports) so a user is never trapped without a return path. The section
- * links themselves live on the Dashboard, so the header stays lightweight:
+ * reports) so a user is never trapped without a return path:
  *
  *  - Brand — logo + wordmark (wordmark collapses to the mark on very
  *    narrow screens so it never collides with the action cluster).
- *  - Breadcrumbs — "Home › … › current page" reflecting the real route
- *    hierarchy (dynamic parameters render as their parent section). The
- *    trail renders inline on md+ with truncating middle links; the leaf is
- *    the current, unlinked page.
+ *  - Core links — the essential sections (Dashboard, Clinical Hub, Diet &
+ *    Triggers, Profile) render inline on lg+ when the route is a section
+ *    root; the current page is marked with aria-current. The same links
+ *    live in the responsive menu for smaller screens.
+ *  - Breadcrumbs — on sub-pages the inline links step aside and a
+ *    "Home › … › current page" trail takes the same slot, reflecting the
+ *    real route hierarchy (dynamic parameters render as their parent
+ *    section). The trail truncates its middle links so it never overlaps
+ *    the brand or the action cluster.
  *  - Actions — smart "Go back" (router.back() when there is in-app
  *    history, otherwise a sensible parent), language toggle (with an
  *    accessible name), theme toggle, the notification bell, and the
- *    hamburger menu (md only) that hosts the Upgrade-Pro call to action.
+ *    hamburger menu (below lg) that hosts the core links plus the
+ *    Upgrade-Pro call to action.
+ *
+ * Direction: the header pins its own dir (ltr/rtl) straight from the
+ * language context, so the brand always sits at the inline start and the
+ * actions at the inline end — left/right in English, mirrored in Arabic —
+ * regardless of where the header is mounted. Everything inside uses
+ * logical properties and rtl: variants: the back arrow mirrors via
+ * rtl:scale-x-[-1]; breadcrumb separators use logical spacing.
  *
  * Design: the Midnight Emerald glass treatment (blur, hairline border,
  * soft shadow) with a 3D glass stack — a translucent top highlight over a
  * gradient surface and a hairline bottom edge so the bar reads as a raised
- * glass slab. The sticky offset plus per-page safe-area padding keep
- * content clear of the bar (verified by e2e/responsive.spec.ts).
- *
- * RTL: logical properties + rtl: variants only — the back arrow mirrors
- * via rtl:scale-x-[-1]; breadcrumb separators use logical spacing.
+ * glass slab.
  */
 
 import { useMemo, useState } from "react";
@@ -87,6 +95,15 @@ function crumbKeyFor(pathname: string): string | null {
   return null;
 }
 
+/** The essential sections every header menu exposes — kept short so the
+ *  desktop strip and the responsive sheet stay clean and uncluttered. */
+const CORE_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
+  { href: "/dashboard", labelKey: "nav.dashboard" },
+  { href: "/clinical", labelKey: "nav.clinical" },
+  { href: "/diet", labelKey: "nav.diet" },
+  { href: "/profile", labelKey: "nav.profile" },
+];
+
 /* ------------------------------------------------------------------ */
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
@@ -98,7 +115,7 @@ interface Crumb {
 
 export default function GlobalNavHeader() {
   const { isDark, toggleDark } = useHealth();
-  const { locale, setLocale, t } = useLanguage();
+  const { locale, setLocale, t, dir } = useLanguage();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -154,10 +171,17 @@ export default function GlobalNavHeader() {
 
   const canGoBackInApp = typeof window !== "undefined" && window.history.length > 1;
   const isDashboardRoot = pathname === "/dashboard";
+  /** Section roots get the desktop core links; sub-pages get the
+   *  breadcrumb trail instead — the two never render at once. */
+  const isTopLevel = useMemo(() => {
+    const segments = pathname.split("/").filter(Boolean);
+    return segments.length <= 1;
+  }, [pathname]);
 
   return (
     <header
       data-testid="global-nav-header"
+      dir={dir}
       className="sticky top-0 z-50 relative w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 dark:bg-slate-900/85 dark:border-emerald-500/10"
     >
       {/* 3D glass stack: top specular highlight over a translucent slab */}
@@ -168,13 +192,13 @@ export default function GlobalNavHeader() {
       <div>
         <div className="pt-[env(safe-area-inset-top)]">
           <div className="container mx-auto flex h-14 items-center justify-between gap-x-3 px-3 sm:px-6 lg:px-8 max-w-7xl">
-            {/* Brand */}
+            {/* Brand — sits at the inline start (left in LTR, right in RTL). */}
             <div className="flex shrink-0 items-center gap-2.5">
               <Link
                 href="/dashboard"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2.5"
                 aria-label={t("nav.dashboard")}
+                className="flex items-center gap-2.5"
               >
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
                   <HugeiconsIcon
@@ -189,49 +213,70 @@ export default function GlobalNavHeader() {
               </Link>
             </div>
 
-            {/* Breadcrumbs (md+): Home › … › current */}
-            {!isDashboardRoot && (
-              <nav
-                aria-label={t("nav.breadcrumb")}
-                className="hidden min-w-0 flex-1 items-center whitespace-nowrap text-sm md:flex"
-              >
-                {trail.map((crumb, index) => {
-                  const isLast = index === trail.length - 1;
-                  return (
-                    <span
-                      key={crumb.href}
-                      className="flex min-w-0 items-center"
+            {/* Center slot — desktop core links on section roots, the
+                breadcrumb trail on sub-pages. flex-1 min-w-0 keeps the
+                slot from ever colliding with brand or actions. */}
+            <div className="flex min-w-0 flex-1 items-center justify-center">
+              {isTopLevel ? (
+                <nav
+                  aria-label={t("nav.primaryNav")}
+                  className="hidden min-w-0 items-center gap-1 text-sm font-medium lg:flex"
+                >
+                  {CORE_LINKS.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        "inline-flex items-center whitespace-nowrap rounded-lg px-2.5 py-2 transition-colors hover:bg-muted hover:text-slate-900 dark:hover:text-foreground",
+                        pathname === link.href &&
+                          "bg-primary/10 text-primary font-semibold"
+                      )}
+                      aria-current={pathname === link.href ? "page" : undefined}
                     >
-                      {index > 0 && (
-                        <span
-                          aria-hidden="true"
-                          className="shrink-0 px-1.5 text-slate-400 dark:text-slate-600"
-                        >
-                          {locale === "ar" ? "‹" : "/"}
-                        </span>
-                      )}
-                      {isLast ? (
-                        <span
-                          aria-current="page"
-                          className="truncate shrink-0 rounded-lg bg-primary/10 px-2 py-1.5 font-semibold text-primary max-w-[14rem]"
-                        >
-                          {crumb.label}
-                        </span>
-                      ) : (
-                        <Link
-                          href={crumb.href}
-                          className="truncate min-w-0 rounded-lg px-2 py-1.5 font-medium text-slate-600 transition-colors hover:bg-muted hover:text-slate-900 dark:text-muted-foreground dark:hover:text-foreground"
-                        >
-                          {crumb.label}
-                        </Link>
-                      )}
-                    </span>
-                  );
-                })}
-              </nav>
-            )}
+                      {t(link.labelKey)}
+                    </Link>
+                  ))}
+                </nav>
+              ) : (
+                <nav
+                  aria-label={t("nav.breadcrumb")}
+                  className="hidden min-w-0 items-center whitespace-nowrap text-sm sm:flex"
+                >
+                  {trail.map((crumb, index) => {
+                    const isLast = index === trail.length - 1;
+                    return (
+                      <span key={crumb.href} className="flex min-w-0 items-center">
+                        {index > 0 && (
+                          <span
+                            aria-hidden="true"
+                            className="shrink-0 px-1.5 text-slate-400 dark:text-slate-600"
+                          >
+                            {locale === "ar" ? "‹" : "/"}
+                          </span>
+                        )}
+                        {isLast ? (
+                          <span
+                            aria-current="page"
+                            className="truncate shrink-0 rounded-lg bg-primary/10 px-2 py-1.5 font-semibold text-primary max-w-[14rem]"
+                          >
+                            {crumb.label}
+                          </span>
+                        ) : (
+                          <Link
+                            href={crumb.href}
+                            className="truncate min-w-0 rounded-lg px-2 py-1.5 font-medium text-slate-600 transition-colors hover:bg-muted hover:text-slate-900 dark:text-muted-foreground dark:hover:text-foreground"
+                          >
+                            {crumb.label}
+                          </Link>
+                        )}
+                      </span>
+                    );
+                  })}
+                </nav>
+              )}
+            </div>
 
-            {/* Actions */}
+            {/* Actions — sit at the inline end (right in LTR, left in RTL). */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               {/* Smart Go Back — history-aware with a parent fallback */}
               {!isDashboardRoot && (
@@ -296,7 +341,7 @@ export default function GlobalNavHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-muted hover:bg-muted/80 md:hidden"
+                className="rounded-full bg-muted hover:bg-muted/80 lg:hidden"
                 aria-label={t("nav.mainMenu")}
                 aria-expanded={mobileOpen}
                 onClick={() => setMobileOpen((v) => !v)}
@@ -312,11 +357,11 @@ export default function GlobalNavHeader() {
         </div>
       </div>
 
-      {/* Mobile quick link (md only) — the Dashboard owns the section
-          navigation, so the menu hosts the one goal-oriented CTA. */}
+      {/* Responsive menu (below lg) — the same essential links as the
+          desktop strip, plus the Upgrade-Pro call to action. */}
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out md:hidden",
+          "grid transition-[grid-template-rows] duration-300 ease-out lg:hidden",
           mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
@@ -325,6 +370,20 @@ export default function GlobalNavHeader() {
             aria-label={t("nav.mainMenu")}
             className="flex flex-col gap-1 bg-white/95 px-3 pb-3 pt-2 backdrop-blur-xl dark:bg-background/95 sm:px-6"
           >
+            {CORE_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                aria-current={pathname === link.href ? "page" : undefined}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted",
+                  pathname === link.href && "bg-primary/10 font-semibold text-primary"
+                )}
+              >
+                {t(link.labelKey)}
+              </Link>
+            ))}
             <Link
               href="/pro"
               onClick={() => setMobileOpen(false)}

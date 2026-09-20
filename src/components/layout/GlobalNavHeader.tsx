@@ -9,10 +9,11 @@
  *
  *  - Brand — logo + wordmark (wordmark collapses to the mark on very
  *    narrow screens so it never collides with the action cluster).
- *  - Core links — the essential sections (Dashboard, Clinical Hub, Diet &
- *    Triggers, Profile) render inline on lg+ when the route is a section
- *    root; the current page is marked with aria-current. The same links
- *    live in the responsive menu for smaller screens.
+ *  - Core links — every essential section (Dashboard, Clinical Hub, Diet &
+ *    Triggers, Care Kit, Pro, Doctors, Profile) renders inline on xl+ when
+ *    the route is a section root; the current page is marked with
+ *    aria-current. The same links live in the responsive menu for smaller
+ *    screens (below xl).
  *  - Breadcrumbs — on sub-pages the inline links step aside and a
  *    "Home › … › current page" trail takes the same slot, reflecting the
  *    real route hierarchy (dynamic parameters render as their parent
@@ -21,8 +22,8 @@
  *  - Actions — smart "Go back" (router.back() when there is in-app
  *    history, otherwise a sensible parent), language toggle (with an
  *    accessible name), theme toggle, the notification bell, and the
- *    hamburger menu (below lg) that hosts the core links plus the
- *    Upgrade-Pro call to action.
+ *    hamburger menu (below xl) that hosts the core links plus the
+ *      Upgrade-Pro call to action.
  *
  * Direction: the header pins its own dir (ltr/rtl) straight from the
  * language context, so the brand always sits at the inline start and the
@@ -95,12 +96,17 @@ function crumbKeyFor(pathname: string): string | null {
   return null;
 }
 
-/** The essential sections every header menu exposes — kept short so the
- *  desktop strip and the responsive sheet stay clean and uncluttered. */
+/** The essential sections every header menu exposes. The set stays short
+ *  enough that the desktop strip and the responsive sheet remain clean on
+ *  any locale — Pro and the doctor section deliberately use their handy
+ *  short labels so the strip never crowds at narrower desktop widths. */
 const CORE_LINKS: Array<{ href: string; labelKey: TranslationKey }> = [
   { href: "/dashboard", labelKey: "nav.dashboard" },
   { href: "/clinical", labelKey: "nav.clinical" },
   { href: "/diet", labelKey: "nav.diet" },
+  { href: "/toolkit", labelKey: "toolkit.title" },
+  { href: "/pro", labelKey: "pricing.pro.badge" },
+  { href: "/pro/doctor", labelKey: "nav.doctorHub" },
   { href: "/profile", labelKey: "nav.profile" },
 ];
 
@@ -220,7 +226,7 @@ export default function GlobalNavHeader() {
               {isTopLevel ? (
                 <nav
                   aria-label={t("nav.primaryNav")}
-                  className="hidden min-w-0 items-center gap-1 text-sm font-medium lg:flex"
+                  className="hidden min-w-0 items-center gap-1 text-sm font-medium xl:flex"
                 >
                   {CORE_LINKS.map((link) => (
                     <Link
@@ -341,7 +347,7 @@ export default function GlobalNavHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-muted hover:bg-muted/80 lg:hidden"
+                className="rounded-full bg-muted hover:bg-muted/80 xl:hidden"
                 aria-label={t("nav.mainMenu")}
                 aria-expanded={mobileOpen}
                 onClick={() => setMobileOpen((v) => !v)}
@@ -357,11 +363,11 @@ export default function GlobalNavHeader() {
         </div>
       </div>
 
-      {/* Responsive menu (below lg) — the same essential links as the
+      {/* Responsive menu (below xl) — the same essential links as the
           desktop strip, plus the Upgrade-Pro call to action. */}
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-300 ease-out lg:hidden",
+          "grid transition-[grid-template-rows] duration-300 ease-out xl:hidden",
           mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >

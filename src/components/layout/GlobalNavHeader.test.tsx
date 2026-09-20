@@ -24,10 +24,11 @@ import GlobalNavHeader from "./GlobalNavHeader";
  * The header structure under test:
  *  - Brand — logo + wordmark, linking to the dashboard (aria-label
  *    "nav.dashboard").
- *  - Core links — Dashboard, Clinical Hub, Diet & Triggers and Profile
- *    render on lg+ when the route is a section root (nav.primaryNav) and
- *    every one of them in the responsive sheet (nav.mainMenu); the current
- *    page is marked with aria-current in both surfaces.
+ *  - Core links — Dashboard, Clinical Hub, Diet & Triggers, Care Kit, Pro,
+ *    Doctors and Profile render on xl+ when the route is a section root
+ *    (nav.primaryNav) and every one of them in the responsive sheet
+ *    (nav.mainMenu); the current page is marked with aria-current in both
+ *    surfaces.
  *  - Breadcrumbs — on sub-pages the desktop strip steps aside and a
  *    "Home › … › current page" trail (nav.breadcrumb) reflects the route
  *    hierarchy; dynamic parameters collapse to their parent section and
@@ -95,11 +96,22 @@ afterEach(() => {
 });
 
 /** The exact core set the component renders (mirrors CORE_LINKS). */
-const CORE_LINK_HREFS = ["/dashboard", "/clinical", "/diet", "/profile"];
+const CORE_LINK_HREFS = [
+  "/dashboard",
+  "/clinical",
+  "/diet",
+  "/toolkit",
+  "/pro",
+  "/pro/doctor",
+  "/profile",
+];
 const CORE_LINK_LABELS = [
   "nav.dashboard",
   "nav.clinical",
   "nav.diet",
+  "toolkit.title",
+  "pricing.pro.badge",
+  "nav.doctorHub",
   "nav.profile",
 ];
 
@@ -321,12 +333,12 @@ describe("GlobalNavHeader structure & a11y", () => {
     expect(
       screen.getByRole("navigation", { name: "nav.breadcrumb" })
     ).toBeInTheDocument();
-    // …but the responsive sheet still offers the core links, so section
+    // …but the responsive sheet still offers every core link, so section
     // navigation is never more than a tap away on any route.
     const menu = screen.getByRole("navigation", { name: "nav.mainMenu" });
-    expect(menu.querySelector('a[href="/profile"]')).toBeInTheDocument();
-    expect(menu.querySelector('a[href="/clinical"]')).toBeInTheDocument();
-    expect(menu.querySelector('a[href="/diet"]')).toBeInTheDocument();
+    for (const href of CORE_LINK_HREFS) {
+      expect(menu.querySelector(`a[href="${href}"]`)).toBeInTheDocument();
+    }
   });
 
   it("marks the current section root with aria-current in desktop and mobile", () => {

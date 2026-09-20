@@ -112,11 +112,168 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots — The Complete Journey
 
-Feature screenshots — English and Arabic — live in [`public/images/`](./public/images) and are intentionally not embedded inline to keep this page fast and readable.
+<p align="center">
+  <em>Browser-captured previews of the real running app — every core page, from the landing screen to doctor-ready reports — in both English and Arabic (full RTL). Assets live in <a href="./public/images"><code>public/images/</code></a> and render inline on GitHub.</em>
+</p>
 
-**Bilingual support** — the same pages in Arabic (full RTL): FibroCare is built for Arabic speakers first. Every screen — including the crisis and clinical tools — renders natively in Arabic with proper right-to-left layout, not a translated afterthought. The server renders the chosen language from the start, so there's no flash of English before the Arabic appears.
+### 1 · Landing & Onboarding
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/landing.png" alt="FibroCare landing page in English" width="390"></p>
+      <p align="center"><strong>Landing / Home</strong><br/>Calm ambient hero with 3D visual and an install/PWA prompt.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/landing-ar.png" alt="FibroCare landing page in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Landing / Home — Arabic (RTL)</strong><br/>Built for Arabic speakers first: the server renders the chosen language from the first paint.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/Loading%20page.png" alt="FibroCare app loading splash" width="390"></p>
+      <p align="center"><strong>App Loading</strong><br/>Branded boot splash while the offline-ready PWA starts.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/Log%20in.jpeg" alt="FibroCare sign-in screen" width="390"></p>
+      <p align="center"><strong>Sign in</strong><br/>Email/password plus Google & GitHub OAuth, protected by the app's PIN gate.</p>
+    </td>
+  </tr>
+</table>
+
+### 2 · Dashboard & Telemetry
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/Health%20Tracking.png" alt="Health tracking dashboard" width="390"></p>
+      <p align="center"><strong>Health Tracking</strong><br/>Pain, fatigue, sleep, mood, and medication-adherence logs in one calm view.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/Weekly%20Progress%20&%20Analytics.png" alt="Weekly progress and analytics" width="390"></p>
+      <p align="center"><strong>Weekly Progress & Analytics</strong><br/>Recharts trend lines across the last 7 days, with daily insights.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/cycle-correlation.jpg" alt="Menstrual cycle and symptom correlation" width="780"></p>
+      <p align="center"><strong>Cycle & Symptom Correlation</strong><br/>Week-by-week symptom mapping against the menstrual cycle — a core /resources/cycle visual.</p>
+    </td>
+  </tr>
+</table>
+
+### 3 · Clinical Hub & AI Insights
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/clinical-hub.png" alt="Clinical Hub dashboard" width="390"></p>
+      <p align="center"><strong>Clinical Hub</strong><br/>One hub for flare triggers, labs, medications, the ACR assessment, and the full toolkit library.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/AI%20Clinical%20Insights.png" alt="AI clinical insights card" width="390"></p>
+      <p align="center"><strong>AI Clinical Insights</strong><br/>RAG-grounded takeaways cited against ACR, Mayo Clinic, NHS, and EULAR.</p>
+    </td>
+  </tr>
+</table>
+
+### 4 · Crisis & Fog Support
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/fog-shield.png" alt="Fog Shield breathing exercise" width="390"></p>
+      <p align="center"><strong>Fog Shield</strong><br/>Guided sensory-reset breathing with a Three.js sphere that clears as you progress, plus a safe brain-dump box.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/sos-modal.png" alt="SOS crisis modal" width="390"></p>
+      <p align="center"><strong>SOS Crisis Overlay</strong><br/>One-tap paced breathing, a pre-formatted emergency message, and high-contrast dizziness guidance.</p>
+    </td>
+  </tr>
+</table>
+
+### 5 · Diet & the Care Library
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/diet-pantry.png" alt="Diet pantry helper" width="390"></p>
+      <p align="center"><strong>Pantry Meal Helper</strong><br/>Tick what's in the kitchen and get 5-minute anti-inflammatory meal ideas, ordered by match.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/Care%20Resources.png" alt="Care Resources library" width="390"></p>
+      <p align="center"><strong>Care Resources</strong><br/>A curated, bilingual library that opens every page with an "AI 1-Minute Takeaway".</p>
+    </td>
+  </tr>
+</table>
+
+### 6 · Toolkit & Self-Care
+
+<table>
+  <tr>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/Toolkit.png" alt="Self-care toolkit" width="780"></p>
+      <p align="center"><strong>Self-Care Toolkit</strong><br/>Guided 4-7-8 breathing, gentle movement guides, sleep hygiene, and spoon-aware pacing — ready offline.</p>
+    </td>
+  </tr>
+</table>
+
+### 7 · Doctor Hub (Pro)
+
+<table>
+  <tr>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/Doctor%20Hub.png" alt="Doctor Hub feed" width="780"></p>
+      <p align="center"><strong>Doctor Hub</strong><br/>Verified health articles and a moderated social feed with advanced search, topic tags, and sorting.</p>
+    </td>
+  </tr>
+</table>
+
+### 8 · Reports & Medical Summary
+
+<table>
+  <tr>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/medical-summary.png" alt="One-page medical summary report" width="780"></p>
+      <p align="center"><strong>One-Page Medical Summary</strong><br/>A print-ready month of pain, cycle, sleep, and medication data — designed to survive a foggy doctor's visit.</p>
+    </td>
+  </tr>
+</table>
+
+### 9 · The Same Screens in Arabic (RTL)
+
+<p align="center"><em>Every screen renders natively in Arabic with proper right-to-left layout — not a translated afterthought.</em></p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/fog-shield-ar.png" alt="Fog Shield in Arabic" width="390"></p>
+      <p align="center"><strong>Fog Shield — AR</strong></p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/clinical-hub-ar.png" alt="Clinical Hub in Arabic" width="390"></p>
+      <p align="center"><strong>Clinical Hub — AR</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/sos-modal-ar.png" alt="SOS overlay in Arabic" width="390"></p>
+      <p align="center"><strong>SOS Crisis Overlay — AR</strong></p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/diet-pantry-ar.png" alt="Pantry helper in Arabic" width="390"></p>
+      <p align="center"><strong>Pantry Meal Helper — AR</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/medical-summary-ar.png" alt="Medical summary in Arabic" width="780"></p>
+      <p align="center"><strong>One-Page Medical Summary — AR</strong></p>
+    </td>
+  </tr>
+</table>
 
 ---
 

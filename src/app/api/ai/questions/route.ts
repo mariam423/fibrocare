@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { generateObject } from "ai";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
 import {
   getModel,
   getProviderDisplayName,
@@ -36,6 +37,8 @@ export async function POST(request: Request) {
   if (!session?.user?.id) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
+  const privacyBlocked = await privacyLockResponse(session.user.id);
+  if (privacyBlocked) return privacyBlocked;
 
   // UI locale — whitelisted to the shipped locales (mirrors the chat route);
   // anything but "ar" stays English.

@@ -11,6 +11,11 @@ vi.mock("next-auth", () => ({
 
 vi.mock("@/lib/auth", () => ({ authOptions: {} }));
 
+// The route consults the privacy-lock gate after auth; unlocked in tests.
+vi.mock("@/lib/security/privacyPin", () => ({
+  privacyLockResponse: vi.fn(async () => null),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     menstrualCycle: { findMany: vi.fn() },

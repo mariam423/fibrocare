@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { getJwtSecret } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Server-side privacy PIN ("lock") support.
@@ -151,4 +152,31 @@ export async function isActionLocked(user: {
 }): Promise<boolean> {
   if (!user.pinHash) return false;
   return !(await isPrivacyUnlocked(user.id));
+}
+
+/**
+ * Route-handler variant of the lock gate.
+ *
+ * Resolves the caller's PIN state from the DB and returns a 423 JSON
+ * response while a configured lock is engaged, or `null` when the caller
+ * may proceed. The API routes (`/api/chat`, `/api/ai/*`, `/api/health/*`)
+ * return health-derived data just like the sensitive server actions, so
+ * they must honour the lock the same way — a valid session cookie alone
+ * must never serve health data past a PIN the user set to hide it.
+ */
+export async function privacyLockResponse(
+  userId: string
+): Promise<Response | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, pinHash: true },
+  });
+  if (!user) return null;
+  if (await isActionLocked(user)) {
+    return Response.json(
+      { error: "Privacy lock engaged — unlock FibroCare to continue." },
+      { status: 423 }
+    );
+  }
+  return null;
 }

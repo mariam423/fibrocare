@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { streamText, tool } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
 import { requirePermissionResponse } from "@/lib/auth/entitlement";
 import {
   getModel,
@@ -85,6 +86,12 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return unauthorizedResponse();
   }
+
+  // Privacy lock: a configured PIN hides the user's health data. The
+  // companion builds its memory from that data server-side, so the lock
+  // must hold here too — a valid session cookie alone is not enough.
+  const privacyBlocked = await privacyLockResponse(session.user.id);
+  if (privacyBlocked) return privacyBlocked;
 
   // Server-side entitlement: the AI companion is a Pro feature. The
   // client may show it optimistically, but the route enforces it.

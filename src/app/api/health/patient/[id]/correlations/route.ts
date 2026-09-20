@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
+import { healthDataRateLimit } from "@/lib/security/healthRateLimit";
 import { prisma } from "@/lib/prisma";
 import { analyzePainPatterns, type SymptomPatternLog, type CyclePatternLog, type PainPatternLog } from "@/lib/insightEngine";
 
@@ -16,6 +18,12 @@ export async function GET(
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    // The doctor's own privacy lock gates every patient surface, API
+    // included — the session cookie alone must not read patient data.
+    const privacyBlocked = await privacyLockResponse(session.user.id);
+    if (privacyBlocked) return privacyBlocked;
+    const healthLimited = await healthDataRateLimit(session.user.id);
+    if (healthLimited) return healthLimited;
 
     // The doctor flag is a hard DB field (see src/lib/auth/rbac.ts) —
     // resolve it server-side rather than trusting the JWT/session shape.

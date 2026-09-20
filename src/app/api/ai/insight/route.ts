@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { streamText } from "ai";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
 import {
   getModel,
   getProviderDisplayName,
@@ -30,6 +31,8 @@ export async function POST() {
   if (!session?.user?.id) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
+  const privacyBlocked = await privacyLockResponse(session.user.id);
+  if (privacyBlocked) return privacyBlocked;
 
   const { ok, resetAt } = await checkFeatureRateLimit(session.user.id);
   if (!ok) {

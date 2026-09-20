@@ -21,6 +21,11 @@ vi.mock("next-auth", () => ({
 
 vi.mock("@/lib/auth", () => ({ authOptions: {} }));
 
+// The route consults the privacy-lock gate after auth; unlocked in tests.
+vi.mock("@/lib/security/privacyPin", () => ({
+  privacyLockResponse: vi.fn(async () => null),
+}));
+
 // Entitlement guard: allowed by default; individual tests override to
 // exercise the 403 Pro-gating path.
 vi.mock("@/lib/auth/entitlement", () => ({

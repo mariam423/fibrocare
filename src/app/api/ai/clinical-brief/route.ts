@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
 import { requirePermissionResponse } from "@/lib/auth/entitlement";
 import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
 import { getClinicalBrief } from "@/lib/ai/clinical-brief/report";
@@ -23,6 +24,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
+  const privacyBlocked = await privacyLockResponse(session.user.id);
+  if (privacyBlocked) return privacyBlocked;
 
   // Server-side entitlement: the clinical brief is a Pro feature.
   const denied = await requirePermissionResponse(

@@ -115,7 +115,7 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 ## 📸 Screenshots — The Complete Journey
 
 <p align="center">
-  <em>Browser-captured previews of the real running app — every core page, from the landing screen to doctor-ready reports — in both English and Arabic (full RTL). Assets live in <a href="./public/images"><code>public/images/</code></a> and render inline on GitHub.</em>
+  <em>Browser-captured previews of the real running app — freshly re-captured at 1440×900 — every core page, from the landing screen to doctor-ready reports, in both English and Arabic (full RTL). Assets live in <a href="./public/images"><code>public/images/</code></a> and render inline on GitHub.</em>
 </p>
 
 ### 1 · Landing & Onboarding
@@ -124,11 +124,11 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
   <tr>
     <td width="50%">
       <p align="center"><img src="public/images/landing.png" alt="FibroCare landing page in English" width="390"></p>
-      <p align="center"><strong>Landing / Home</strong><br/>Calm ambient hero with 3D visual and an install/PWA prompt.</p>
+      <p align="center"><strong>Landing / Home</strong><br/>Calm ambient hero with the 3D visual and an install / PWA prompt.</p>
     </td>
     <td width="50%">
       <p align="center"><img src="public/images/landing-ar.png" alt="FibroCare landing page in Arabic RTL" width="390"></p>
-      <p align="center"><strong>Landing / Home — Arabic (RTL)</strong><br/>Built for Arabic speakers first: the server renders the chosen language from the first paint.</p>
+      <p align="center"><strong>Landing / Home — Arabic (RTL)</strong><br/>The server renders the chosen language from the first paint — built for Arabic speakers first.</p>
     </td>
   </tr>
   <tr>
@@ -148,33 +148,43 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 <table>
   <tr>
     <td width="50%">
+      <p align="center"><img src="public/images/dashboard.png" alt="FibroCare dashboard" width="390"></p>
+      <p align="center"><strong>Dashboard</strong><br/>Your daily landing: check-in, medication reminders, spoon tracker, pain map and the core tools grid.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/dashboard-ar.png" alt="FibroCare dashboard in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Dashboard — Arabic (RTL)</strong><br/>The whole layout mirrors right-to-left, not just the strings.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
       <p align="center"><img src="public/images/Health%20Tracking.png" alt="Health tracking dashboard" width="390"></p>
-      <p align="center"><strong>Health Tracking</strong><br/>Pain, fatigue, sleep, mood, and medication-adherence logs in one calm view.</p>
+      <p align="center"><strong>Health Tracking</strong><br/>Log energy, pain and symptoms with a gentle daily check-in.</p>
     </td>
     <td width="50%">
       <p align="center"><img src="public/images/Weekly%20Progress%20&%20Analytics.png" alt="Weekly progress and analytics" width="390"></p>
-      <p align="center"><strong>Weekly Progress & Analytics</strong><br/>Recharts trend lines across the last 7 days, with daily insights.</p>
+      <p align="center"><strong>Weekly Progress &amp; Analytics</strong><br/>Seven-day trend view with insight cards and gentle nudges.</p>
     </td>
   </tr>
   <tr>
     <td width="100%" colspan="2">
-      <p align="center"><img src="public/images/cycle-correlation.jpg" alt="Menstrual cycle and symptom correlation" width="780"></p>
-      <p align="center"><strong>Cycle & Symptom Correlation</strong><br/>Week-by-week symptom mapping against the menstrual cycle — a core /resources/cycle visual.</p>
+      <p align="center"><img src="public/images/AI%20Clinical%20Insights.png" alt="AI clinical insights card" width="780"></p>
+      <p align="center"><strong>AI Clinical Insights</strong><br/>RAG-grounded takeaways cited against ACR, Mayo Clinic, NHS, and EULAR.</p>
     </td>
   </tr>
 </table>
 
-### 3 · Clinical Hub & AI Insights
+### 3 · Clinical Hub
 
 <table>
   <tr>
     <td width="50%">
-      <p align="center"><img src="public/images/clinical-hub.png" alt="Clinical Hub dashboard" width="390"></p>
-      <p align="center"><strong>Clinical Hub</strong><br/>One hub for flare triggers, labs, medications, the ACR assessment, and the full toolkit library.</p>
+      <p align="center"><img src="public/images/clinical-hub.png" alt="Clinical Hub" width="390"></p>
+      <p align="center"><strong>Clinical Hub</strong><br/>Flare triggers, labs, medications, the ACR assessment, and the toolkit library — in one place.</p>
     </td>
     <td width="50%">
-      <p align="center"><img src="public/images/AI%20Clinical%20Insights.png" alt="AI clinical insights card" width="390"></p>
-      <p align="center"><strong>AI Clinical Insights</strong><br/>RAG-grounded takeaways cited against ACR, Mayo Clinic, NHS, and EULAR.</p>
+      <p align="center"><img src="public/images/clinical-hub-ar.png" alt="Clinical Hub in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Clinical Hub — Arabic (RTL)</strong></p>
     </td>
   </tr>
 </table>
@@ -188,13 +198,23 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
       <p align="center"><strong>Fog Shield</strong><br/>Guided sensory-reset breathing with a Three.js sphere that clears as you progress, plus a safe brain-dump box.</p>
     </td>
     <td width="50%">
+      <p align="center"><img src="public/images/fog-shield-ar.png" alt="Fog Shield in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Fog Shield — Arabic (RTL)</strong><br/>The calm-resonance sphere works in both directions.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
       <p align="center"><img src="public/images/sos-modal.png" alt="SOS crisis modal" width="390"></p>
       <p align="center"><strong>SOS Crisis Overlay</strong><br/>One-tap paced breathing, a pre-formatted emergency message, and high-contrast dizziness guidance.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/sos-modal-ar.png" alt="SOS overlay in Arabic RTL" width="390"></p>
+      <p align="center"><strong>SOS Crisis Overlay — Arabic (RTL)</strong><br/>The same assistive guidance, fully mirrored.</p>
     </td>
   </tr>
 </table>
 
-### 5 · Diet & the Care Library
+### 5 · Diet, Resources & Self-Care
 
 <table>
   <tr>
@@ -203,30 +223,68 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
       <p align="center"><strong>Pantry Meal Helper</strong><br/>Tick what's in the kitchen and get 5-minute anti-inflammatory meal ideas, ordered by match.</p>
     </td>
     <td width="50%">
+      <p align="center"><img src="public/images/diet-pantry-ar.png" alt="Pantry helper in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Pantry Meal Helper — Arabic (RTL)</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
       <p align="center"><img src="public/images/Care%20Resources.png" alt="Care Resources library" width="390"></p>
       <p align="center"><strong>Care Resources</strong><br/>A curated, bilingual library that opens every page with an "AI 1-Minute Takeaway".</p>
     </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/resources-ar.png" alt="Care Resources in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Care Resources — Arabic (RTL)</strong></p>
+    </td>
   </tr>
-</table>
-
-### 6 · Toolkit & Self-Care
-
-<table>
   <tr>
-    <td width="100%" colspan="2">
-      <p align="center"><img src="public/images/Toolkit.png" alt="Self-care toolkit" width="780"></p>
-      <p align="center"><strong>Self-Care Toolkit</strong><br/>Guided 4-7-8 breathing, gentle movement guides, sleep hygiene, and spoon-aware pacing — ready offline.</p>
+    <td width="50%">
+      <p align="center"><img src="public/images/Toolkit.png" alt="Self-care toolkit" width="390"></p>
+      <p align="center"><strong>Self-Care Toolkit</strong><br/>Guided 4-7-8 breathing, gentle movement guides, sleep hygiene, and spoon-aware pacing.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/toolkit-ar.png" alt="Self-care toolkit in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Self-Care Toolkit — Arabic (RTL)</strong></p>
     </td>
   </tr>
 </table>
 
-### 7 · Doctor Hub (Pro)
+### 6 · Pro Portal & Doctor Hub
 
 <table>
   <tr>
-    <td width="100%" colspan="2">
-      <p align="center"><img src="public/images/Doctor%20Hub.png" alt="Doctor Hub feed" width="780"></p>
+    <td width="50%">
+      <p align="center"><img src="public/images/pro.png" alt="Pro portal" width="390"></p>
+      <p align="center"><strong>Pro</strong><br/>The membership hub for advanced care features and the Doctor Hub.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/pro-ar.png" alt="Pro portal in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Pro — Arabic (RTL)</strong></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/Doctor%20Hub.png" alt="Doctor Hub feed" width="390"></p>
       <p align="center"><strong>Doctor Hub</strong><br/>Verified health articles and a moderated social feed with advanced search, topic tags, and sorting.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/doctor-hub-ar.png" alt="Doctor Hub in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Doctor Hub — Arabic (RTL)</strong></p>
+    </td>
+  </tr>
+</table>
+
+### 7 · Profile & Preferences
+
+<table>
+  <tr>
+    <td width="50%">
+      <p align="center"><img src="public/images/profile.png" alt="User profile and settings" width="390"></p>
+      <p align="center"><strong>Profile</strong><br/>Account details, your streak and log totals, plus display-name and motion & comfort preferences.</p>
+    </td>
+    <td width="50%">
+      <p align="center"><img src="public/images/profile-ar.png" alt="User profile in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Profile — Arabic (RTL)</strong></p>
     </td>
   </tr>
 </table>
@@ -235,42 +293,13 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 
 <table>
   <tr>
-    <td width="100%" colspan="2">
-      <p align="center"><img src="public/images/medical-summary.png" alt="One-page medical summary report" width="780"></p>
-      <p align="center"><strong>One-Page Medical Summary</strong><br/>A print-ready month of pain, cycle, sleep, and medication data — designed to survive a foggy doctor's visit.</p>
-    </td>
-  </tr>
-</table>
-
-### 9 · The Same Screens in Arabic (RTL)
-
-<p align="center"><em>Every screen renders natively in Arabic with proper right-to-left layout — not a translated afterthought.</em></p>
-
-<table>
-  <tr>
     <td width="50%">
-      <p align="center"><img src="public/images/fog-shield-ar.png" alt="Fog Shield in Arabic" width="390"></p>
-      <p align="center"><strong>Fog Shield — AR</strong></p>
+      <p align="center"><img src="public/images/medical-summary.png" alt="One-page medical summary report" width="390"></p>
+      <p align="center"><strong>One-Page Medical Summary</strong><br/>A 90-day summary of pain, flares, symptoms, key insights, and notes — ready for your care team.</p>
     </td>
     <td width="50%">
-      <p align="center"><img src="public/images/clinical-hub-ar.png" alt="Clinical Hub in Arabic" width="390"></p>
-      <p align="center"><strong>Clinical Hub — AR</strong></p>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <p align="center"><img src="public/images/sos-modal-ar.png" alt="SOS overlay in Arabic" width="390"></p>
-      <p align="center"><strong>SOS Crisis Overlay — AR</strong></p>
-    </td>
-    <td width="50%">
-      <p align="center"><img src="public/images/diet-pantry-ar.png" alt="Pantry helper in Arabic" width="390"></p>
-      <p align="center"><strong>Pantry Meal Helper — AR</strong></p>
-    </td>
-  </tr>
-  <tr>
-    <td width="100%" colspan="2">
-      <p align="center"><img src="public/images/medical-summary-ar.png" alt="Medical summary in Arabic" width="780"></p>
-      <p align="center"><strong>One-Page Medical Summary — AR</strong></p>
+      <p align="center"><img src="public/images/medical-summary-ar.png" alt="Medical summary in Arabic RTL" width="390"></p>
+      <p align="center"><strong>One-Page Medical Summary — Arabic (RTL)</strong><br/>Right-aligned grades and Arabic-first tables, exportable to PDF for the clinic.</p>
     </td>
   </tr>
 </table>

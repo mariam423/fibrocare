@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
+import { healthDataRateLimit } from "@/lib/security/healthRateLimit";
 import { prisma } from "@/lib/prisma";
 import { CycleLogSchema } from "@/lib/validations/health";
 import { sanitizeUserText } from "@/lib/security/sanitizer";
@@ -12,6 +14,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const privacyBlocked = await privacyLockResponse(session.user.id);
+    if (privacyBlocked) return privacyBlocked;
+    const healthLimited = await healthDataRateLimit(session.user.id);
+    if (healthLimited) return healthLimited;
 
     const body = await req.json();
     const validatedData = CycleLogSchema.parse(body);

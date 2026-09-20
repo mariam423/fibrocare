@@ -360,6 +360,20 @@ export async function verifyPrivacyPin(pin: string): Promise<PrivacyPinResult> {
     };
   }
 
+  // Per-IP budget in addition to the per-account lockout below: without it,
+  // an attacker holding (or cycling) many accounts from one host could
+  // brute-force each account's 4-digit space indefinitely — the account
+  // lockout only bounds guesses per account, not per attacker.
+  const clientIp = await getClientIp();
+  const { ok: guessIpOk } = await checkRateLimitDistributed(
+    `privacy-pin-guess-ip:${clientIp}`,
+    30,
+    5 * 60 * 1000
+  );
+  if (!guessIpOk) {
+    return { success: false, error: "Too many attempts — try again in a moment." };
+  }
+
   const valid = await verifyPinHash(pinValue, user.id, user.pinHash);
   if (!valid) {
     const attempts = user.pinFailedAttempts + 1;

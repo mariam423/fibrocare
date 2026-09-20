@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { privacyLockResponse } from "@/lib/security/privacyPin";
 import {
   getProviderDisplayName,
   isAiConfigured,
@@ -86,6 +87,8 @@ export async function POST(request: Request) {
   if (!session?.user?.id) {
     return Response.json({ error: "Please sign in first." }, { status: 401 });
   }
+  const privacyBlocked = await privacyLockResponse(session.user.id);
+  if (privacyBlocked) return privacyBlocked;
 
   const limit = await checkFeatureRateLimit(session.user.id);
   if (!limit.ok) {

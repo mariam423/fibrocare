@@ -943,6 +943,14 @@ export async function submitStructuredSymptoms(rawInput: SymptomSubmissionInput)
 
 export async function getVerifiedDoctors() {
   try {
+    // Server actions are public endpoints: without the session gate, any
+    // signed-out caller can enumerate every verified doctor's name and
+    // internal user ID. The only consumer (/pro/consultations/new) is
+    // behind middleware auth, so requiring a session changes no UI flow.
+    const user = await getSessionUser();
+    if (!user) {
+      return { success: false as const, error: "You must be signed in." };
+    }
     const doctors = await prisma.user.findMany({
       where: { role: "doctor" },
       select: { id: true, name: true },

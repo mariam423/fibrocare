@@ -1,5 +1,7 @@
 import { test as setup, expect, type APIRequestContext } from "@playwright/test";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { unlockPrivatePage } from "./helpers/privacy";
+import { PRIVACY_UNLOCK_COOKIE } from "../src/lib/security/privacyPin";
 
 const E2E_EMAIL = process.env.E2E_EMAIL ?? "e2e.smoke@fibrocare.local";
 const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "FibroCareE2E2026!";
@@ -91,7 +93,40 @@ async function waitForOutcome(
  * already exists (or sign-up fails to navigate), fall back to sign-in.
  * Both paths are hardened against the cold-compile + hydration race.
  */
+/**
+ * Best-effort warm-up: after auth is established, open the dashboard once
+ * and wait for real hydration (greeting shows the account name). This pays
+ * the dashboard's cold-compile chain (page + every server action it calls)
+ * here — inside the setup's generous timeout — instead of inside the first
+ * authenticated spec's assertion budget, where a 20-60s hydration wait
+ * times out on a freshly (re)started dev server.
+ *
+ * Never throws: if warming fails, the affected spec surfaces it later.
+ * Leaves the session LOCKED (clears the unlock cookie) — privacy specs
+ * rely on the lock engaging on a fresh load, and every other spec unlocks
+ * via `unlockPrivatePage` itself.
+ */
+async function warmDashboard(page: import("@playwright/test").Page) {
+  try {
+    await unlockPrivatePage(page, "/dashboard");
+    const greeting = page.getByRole("heading", { name: /Good (morning|afternoon|evening)/ });
+    await expect(greeting).toBeVisible({ timeout: 60_000 });
+    await expect(greeting).not.toContainText("User", { timeout: 120_000 });
+  } catch {
+    // Opportunistic — see docstring.
+  } finally {
+    await page
+      .context()
+      .clearCookies({ name: PRIVACY_UNLOCK_COOKIE })
+      .catch(() => undefined);
+  }
+}
+
 setup("authenticate as throwaway account", async ({ page }) => {
+  // Cold signup/login plus the dashboard warm-up below can exceed the
+  // default 120s budget on a freshly started dev server.
+  setup.setTimeout(300_000);
+
   mkdirSync("e2e/.auth", { recursive: true });
 
   // Reuse a still-valid state first. This avoids repeating signup/login on
@@ -105,6 +140,7 @@ setup("authenticate as throwaway account", async ({ page }) => {
         // Re-assert the DB role before reusing the stored session (see
         // promoteToDoctor — a reset database silently demotes the account).
         if (await promoteToDoctor(page.context().request)) {
+          await warmDashboard(page);
           await page.context().storageState({ path: STORAGE_STATE });
           return;
         }
@@ -214,5 +250,6 @@ setup("authenticate as throwaway account", async ({ page }) => {
     throw new Error("Failed to promote E2E user to doctor role");
   }
 
+  await warmDashboard(page);
   await page.context().storageState({ path: STORAGE_STATE });
 });

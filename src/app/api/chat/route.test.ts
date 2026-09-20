@@ -4,9 +4,11 @@ import { getServerSession } from "next-auth";
 import { streamText } from "ai";
 import { POST } from "./route";
 import {
+  getFailoverOrder,
   getModel,
   isAiConfigured,
   isMockMode,
+  recordAiFailure,
 } from "@/lib/ai/provider";
 import { assembleCompanionContext } from "@/lib/ai/companion";
 import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
@@ -113,6 +115,36 @@ function configureLiveMode() {
   vi.mocked(isMockMode).mockReturnValue(false);
   vi.mocked(isAiConfigured).mockReturnValue(true);
   vi.mocked(getModel).mockReturnValue({} as never);
+  vi.mocked(getFailoverOrder).mockReturnValue(["google"]);
+}
+
+/** Minimal well-formed TextStreamParts that stream complete successfully. */
+function textStreamParts(text: string): Array<Record<string, unknown>> {
+  return [
+    { type: "start" },
+    { type: "text-start", id: "text-1" },
+    { type: "text-delta", id: "text-1", text },
+    { type: "text-end", id: "text-1" },
+    {
+      type: "finish",
+      finishReason: "stop",
+      usage: { inputTokens: 10, outputTokens: 5, totalTokens: 15 },
+      providerOptions: {},
+      response: {},
+    },
+  ];
+}
+
+/** A fake `streamText` result whose `.stream` emits the given parts. */
+function streamResult(parts: Array<Record<string, unknown>>) {
+  return {
+    stream: new ReadableStream({
+      start(controller) {
+        for (const part of parts) controller.enqueue(part);
+        controller.close();
+      },
+    }),
+  };
 }
 
 afterEach(() => {
@@ -213,40 +245,43 @@ describe("POST /api/chat", () => {
 
     expect(response.status).toBe(502);
     expect(data).toEqual({ error: "The AI provider is unavailable right now." });
+    expect(vi.mocked(recordAiFailure)).toHaveBeenCalledWith("google");
   });
 
-  it("forwards provider stream errors to the server error callback", async () => {
+  it("fails over to the next provider when the first errors before first content", async () => {
     configureLiveMode();
-    const providerError = new Error("provider stream interrupted");
-    vi.mocked(streamText).mockReturnValue({
-      toUIMessageStreamResponse: () =>
-        new Response("data: {\"type\":\"finish\"}\n\n", {
-          headers: { "content-type": "text/event-stream" },
-        }),
-    } as never);
+    vi.mocked(getFailoverOrder).mockReturnValue(["google", "groq"]);
+    vi.mocked(streamText)
+      .mockReturnValueOnce(
+        streamResult([
+          { type: "start" },
+          { type: "error", error: new Error("429 rate limited") },
+        ]) as never
+      )
+      .mockReturnValueOnce(streamResult(textStreamParts("final reply")) as never);
 
-    await POST(chatRequest());
-    const options = vi.mocked(streamText).mock.calls[0]?.[0] as {
-      onError?: (event: { error: unknown }) => void;
-    };
-    expect(options.onError).toBeTypeOf("function");
-    expect(() => options.onError?.({ error: providerError })).not.toThrow();
+    const response = await POST(chatRequest());
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(body).toContain("final reply");
+    expect(vi.mocked(streamText)).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(recordAiFailure)).toHaveBeenCalledWith("google");
   });
 
   it("uses watchdog timeouts — never a total cap that aborts streams mid-reply", async () => {
     configureLiveMode();
-    vi.mocked(streamText).mockReturnValue({
-      toUIMessageStreamResponse: () =>
-        new Response("data: {\"type\":\"finish\"}\\n\\n", {
-          headers: { "content-type": "text/event-stream" },
-        }),
-    } as never);
+    vi.mocked(streamText).mockReturnValue(
+      streamResult(textStreamParts("ok")) as never
+    );
 
     await POST(chatRequest());
 
     const options = vi.mocked(streamText).mock.calls[0]?.[0] as {
+      onError?: (event: { error: unknown }) => void;
       timeout?: unknown;
       maxRetries?: number;
+      model?: unknown;
     };
     // AI SDK v7 regression guard: a bare-number `timeout` means totalMs — one
     // abort controller that kills the ENTIRE stream at that deadline, which
@@ -257,7 +292,17 @@ describe("POST /api/chat", () => {
       firstChunkMs: 20_000,
       chunkMs: 30_000,
     });
-    expect(options.maxRetries).toBe(2);
+    // The SDK's built-in retry backoff (2s then 4s sleeps on 429/5xx) froze
+    // the stream with no text before any failure surfaced; failover is now
+    // handled in-route via first-content probing, so the SDK must fail fast.
+    expect(options.maxRetries).toBe(0);
+    // Explicit model per provider (first-content failover passes it through).
+    expect(options.model).toBeDefined();
+    // The server error callback must never throw for the route to stay alive.
+    expect(options.onError).toBeTypeOf("function");
+    expect(() =>
+      options.onError?.({ error: new Error("provider stream interrupted") })
+    ).not.toThrow();
   });
 
   it("passes Arabic locale to orchestration and enables Arabic guardrails", async () => {
@@ -274,18 +319,9 @@ describe("POST /api/chat", () => {
       ragChunkCount: 1,
       userFacts: null,
     });
-    vi.mocked(streamText).mockReturnValue({
-      toUIMessageStreamResponse: () =>
-        new Response(
-          [
-            'data: {"type":"text-start","id":"text-1"}',
-            'data: {"type":"text-delta","id":"text-1","delta":"الاتجاه مستقر."}',
-            'data: {"type":"text-end","id":"text-1"}',
-            'data: {"type":"finish"}',
-          ].join("\\n\\n") + "\\n\\n",
-          { headers: { "content-type": "text/event-stream" } }
-        ),
-    } as never);
+    vi.mocked(streamText).mockReturnValue(
+      streamResult(textStreamParts("الاتجاه مستقر.")) as never
+    );
 
     const response = await POST(
       chatRequest({

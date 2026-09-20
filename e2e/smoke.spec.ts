@@ -5,6 +5,10 @@ test.describe("authenticated smoke tests", () => {
   test("dashboard renders the daily check-in and gentle support cards", async ({
     page,
   }) => {
+    // First run after a dev-server (re)start cold-compiles the dashboard
+    // page and every server action it calls — measured 60-120s+ on this
+    // machine, far above the 120s default test budget.
+    test.setTimeout(240_000);
     await test.step("dashboard loads and hydrates", async () => {
       await unlockPrivatePage(page, "/dashboard");
       const greeting = page.getByRole("heading", { name: /Good (morning|afternoon|evening)/ });
@@ -14,7 +18,10 @@ test.describe("authenticated smoke tests", () => {
       // Filling the gratitude textarea before that leaves the value in the
       // DOM but not in React state (the button stays disabled), so wait for
       // the real name to appear — i.e. React has hydrated and re-rendered.
-      await expect(greeting).not.toContainText("User");
+      // Measured worst case on a cold dev server (first /dashboard compile
+      // of the page + all its server actions) is ~30s, so the default 20s
+      // expect window is not enough — give hydration a full minute.
+      await expect(greeting).not.toContainText("User", { timeout: 60_000 });
     });
 
     await test.step("gentle support cards are present and equal-height", async () => {

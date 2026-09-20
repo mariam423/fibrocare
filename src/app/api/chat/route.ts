@@ -1,18 +1,24 @@
 import { getServerSession } from "next-auth";
-import { streamText, tool } from "ai";
+import {
+  createUIMessageStreamResponse,
+  streamText,
+  toUIMessageStream,
+  tool,
+  type TextStreamPart,
+  type ToolSet,
+} from "ai";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { privacyLockResponse } from "@/lib/security/privacyPin";
 import { requirePermissionResponse } from "@/lib/auth/entitlement";
 import {
+  getFailoverOrder,
   getModel,
-  getProviderDisplayName,
   isAiConfigured,
   isMockMode,
   recordAiFailure,
   recordAiSuccess,
 } from "@/lib/ai/provider";
-import { streamTextWithFailover } from "@/lib/ai/failover";
 import {
   mockChatReply,
   mockStreamResponse,
@@ -72,6 +78,97 @@ function unauthorizedResponse() {
   }
 
   return response;
+}
+
+type StreamProbe =
+  | {
+      outcome: "ok";
+      replay: () => ReadableStream<TextStreamPart<ToolSet>>;
+    }
+  | {
+      outcome: "error";
+      error: unknown;
+    };
+
+/**
+ * Reads the leading parts of a `streamText` result until the first
+ * content-bearing part or until the provider errors/ends without output. The
+ * probe succeeds on the first content parts so the SSE response commits only
+ * once a provider is actually talking; parts already read are buffered and
+ * replayed, so nothing is lost.
+ */
+async function probeUntilFirstContent(
+  stream: AsyncIterable<TextStreamPart<ToolSet>>
+): Promise<StreamProbe> {
+  const buffered: TextStreamPart<ToolSet>[] = [];
+  const iterator = stream[Symbol.asyncIterator]();
+
+  for (;;) {
+    const { done, value } = await iterator.next();
+    if (done) {
+      return {
+        outcome: "error",
+        error: new Error("provider stream ended without content"),
+      };
+    }
+    buffered.push(value);
+
+    if (value.type === "error") {
+      return { outcome: "error", error: value.error };
+    }
+    if (isContentPart(value)) {
+      return { outcome: "ok", replay: () => replayFrom(buffered, iterator) };
+    }
+    if (value.type === "finish" || value.type === "abort") {
+      // Ended (or was aborted) before any content: fail over rather than ship
+      // an empty turn that the client would silently re-send.
+      return {
+        outcome: "error",
+        error: new Error("provider produced no output"),
+      };
+    }
+  }
+}
+
+function isContentPart(part: TextStreamPart<ToolSet>): boolean {
+  switch (part.type) {
+    case "text-start":
+    case "text-delta":
+    case "text-end":
+    case "reasoning-start":
+    case "reasoning-delta":
+    case "reasoning-end":
+    case "tool-input-start":
+    case "tool-input-delta":
+    case "tool-input-end":
+    case "tool-call":
+    case "tool-result":
+    case "source":
+    case "file":
+    case "reasoning-file":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/** Drains `buffered` first, then the still-open iterator, as a ReadableStream. */
+function replayFrom<T>(
+  buffered: T[],
+  iterator: AsyncIterator<T>
+): ReadableStream<T> {
+  let index = 0;
+  return new ReadableStream<T>({
+    async pull(controller) {
+      if (index < buffered.length) {
+        controller.enqueue(buffered[index++]);
+        return;
+      }
+      const { done, value } = await iterator.next();
+      if (done) controller.close();
+      else controller.enqueue(value);
+    },
+  });
 }
 
 export async function POST(req: Request) {
@@ -174,67 +271,100 @@ export async function POST(req: Request) {
     console.log(`[ai] rag · ${context.ragRoute.reason} · ${context.ragChunkCount} chunk(s)`);
   }
 
-  let result: { toUIMessageStreamResponse: () => Response };
-  try {
-    result = await streamTextWithFailover({
-      system: context.systemPrompt,
-      messages: context.messages,
-      // Truncation guard: Arabic tokenizes at ~2–3 tokens/word (vs ~1.3 for
-      // English), and some provider tiers reason verbosely before answering.
-      // 1536 leaves full headroom above the ~180-word persona budget while
-      // still bounding cost; the prompt (not this cap) controls length.
-      maxOutputTokens: 2048,
-      // AI SDK v7 timeout semantics: a bare number means totalMs — one
-      // hard abort for the WHOLE stream at 30s, which silently killed long
-      // replies mid-sentence. Streaming calls must use the watchdog object:
-      // abort only when the first token is late or the stream stalls, so a
-      // healthy slow reply keeps streaming to its finish frame.
-      timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
-      maxRetries: 2,
-      tools: {
-        getHealthSnapshot: tool({
-          description:
-            "Fetch the user's latest health snapshot (the newest log entry with its pain level, severity, symptoms and note, plus current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
-          // AI SDK v7 renamed `parameters` to `inputSchema`.
-          inputSchema: z.object({}),
-          execute: async () =>
-            JSON.stringify(await buildLongTermMemory(session.user.id)),
-        }),
-      },
-      onError: ({ error }) => {
-        console.error("[ai] chat · provider stream error", error);
-        recordAiFailure();
-      },
-      onFinish: async ({ usage }) => {
-        recordAiSuccess();
-        console.log(
-          `[ai] chat · provider=${getProviderDisplayName()} · in=${usage.inputTokens} out=${usage.outputTokens}`
+  // In-route first-content failover. `streamText()` resolves synchronously —
+  // the provider call runs detached inside the returned stream, so provider
+  // errors arrive as `error` stream parts, never as a rejected await. The
+  // legacy `streamTextWithFailover` can't see those (its try/catch is dead),
+  // and the SDK's own retry backoff (default maxRetries: 2 = 2s + 4s sleeps
+  // on 429/5xx) freezes the stream with no text before any failure surfaces.
+  // Instead: fail fast (maxRetries: 0) and probe each provider's leading
+  // stream parts until the first content or an error, transparently moving
+  // to the next provider before any bytes reach the client.
+  const failoverOrder = getFailoverOrder();
+  let lastError: unknown = null;
+
+  for (const provider of failoverOrder) {
+    const providerModel = getModel(provider);
+    if (!providerModel) continue;
+
+    try {
+      const result = await streamText({
+        system: context.systemPrompt,
+        messages: context.messages,
+        maxOutputTokens: 2048,
+        timeout: { firstChunkMs: 20_000, chunkMs: 30_000 },
+        maxRetries: 0,
+        tools: {
+          getHealthSnapshot: tool({
+            description:
+              "Fetch the user's latest health snapshot (the newest log entry with its pain level, severity, symptoms and note, plus current pain, averages, flares, top symptoms, streak, trend, mentioned medications, weather) when they ask about their data.",
+            // AI SDK v7 renamed `parameters` to `inputSchema`.
+            inputSchema: z.object({}),
+            execute: async () =>
+              JSON.stringify(await buildLongTermMemory(session.user.id)),
+          }),
+        },
+        onError: ({ error }) => {
+          console.error("[ai] chat · provider stream error", error);
+          recordAiFailure(provider);
+        },
+        onFinish: async ({ usage }) => {
+          recordAiSuccess(provider);
+          console.log(
+            `[ai] chat · provider=${provider} · in=${usage.inputTokens} out=${usage.outputTokens}`
+          );
+        },
+        model: providerModel,
+      });
+
+      const probe = await probeUntilFirstContent(result.stream);
+      if (probe.outcome !== "ok") {
+        lastError = probe.error;
+        recordAiFailure(provider);
+        console.error(
+          "[ai] chat · provider failed before first content",
+          provider,
+          probe.error
         );
-      },
-    });
-  } catch (error) {
-    console.error("[ai] chat · provider setup error", error);
-    recordAiFailure();
-    return Response.json(
-      { error: "The AI provider is unavailable right now." },
-      { status: 502 }
-    );
+        continue;
+      }
+
+      // Layer 4 — medical guardrails: stream through the warm-therapy
+      // sanitizer so cold-pack/ice slips are rewritten to "كمادات دافئة /
+      // حمام دافئ" (warm compress / warm bath) without breaking the protocol.
+      // Arabic streams additionally run the lexical leak sanitizer, which
+      // repairs isolated foreign words ("logged", "streak", "aumento", "/zen")
+      // into the approved Arabic glossary.
+      const base = createUIMessageStreamResponse({
+        stream: toUIMessageStream({
+          stream: probe.replay(),
+          onError: (error) => {
+            console.error("[ai] chat · provider stream error", error);
+            recordAiFailure(provider);
+            return "The AI provider hit an error mid-reply. Please try again.";
+          },
+        }),
+      });
+      const guarded = base.body?.pipeThrough(
+        createGuardrailStreamTransform({ arabicLeaks: locale === "ar" })
+      );
+      if (!guarded) return base;
+      return new Response(guarded, {
+        status: base.status,
+        statusText: base.statusText,
+        headers: base.headers,
+      });
+    } catch (error) {
+      // Synchronous/rejected provider setup — bad key, invalid model, abort.
+      lastError = error;
+      recordAiFailure(provider);
+      console.error("[ai] chat · provider setup error", error);
+    }
   }
 
-  // Layer 4 — medical guardrails: stream through the warm-therapy
-  // sanitizer so cold-pack/ice slips are rewritten to "كمادات دافئة /
-  // حمام دافئ" (warm compress / warm bath) without breaking the protocol.
-  // Arabic streams additionally run the lexical leak sanitizer, which
-  // repairs isolated foreign words ("logged", "streak", "aumento", "/zen")
-  // into the approved Arabic glossary.
-  const base = result.toUIMessageStreamResponse();
-  const guarded = base.body?.pipeThrough(
-    createGuardrailStreamTransform({ arabicLeaks: locale === "ar" })
+  console.error("[ai] chat · all providers failed", lastError);
+  return Response.json(
+    { error: "The AI provider is unavailable right now." },
+    { status: 502 }
   );
-  if (!guarded) return base;
-  return new Response(guarded, {
-    status: base.status,
-    statusText: base.statusText,
-    headers: base.headers,
-  });
 }

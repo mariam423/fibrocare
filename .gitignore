@@ -44,6 +44,10 @@ e2e/.auth/
 # demo capture working directory (scripts/capture-demo.mjs)
 tmp/
 
+# session temp probes and screenshots (never commit)
+.tmp-*
+.tmp-shots/
+
 # generated at build time by scripts/build-sw.mjs
 public/sw.js
 public/workbox/

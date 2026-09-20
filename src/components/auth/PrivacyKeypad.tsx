@@ -13,6 +13,7 @@ import { usePrivacy } from "./PrivacyLock";
 import { useLanguage } from "@/context/LanguageContext";
 import { biometricUnlock } from "@/app/actions";
 import {
+  BIOMETRIC_ERRORS,
   hasBiometricCredential,
   isBiometricSupported,
   unlockWithBiometric,
@@ -116,23 +117,34 @@ export function PrivacyKeypad() {
   const { t } = useLanguage();
   const [digits, setDigits] = useState("");
   const [error, setError] = useState(false);
-  const [bioAvailable, setBioAvailable] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [bioSupported, setBioSupported] = useState(false);
+  const [bioConfigured, setBioConfigured] = useState(false);
   const [bioBusy, setBioBusy] = useState(false);
   const announceRef = useRef<HTMLParagraphElement>(null);
 
-  // Only offer biometrics when the platform authenticator really is
-  // available (and a credential has been registered) — never in headless
-  // browsers, where this button used to just toast "success" without any
-  // actual check.
+  // Derive "available" as: the platform authenticator exists AND a credential
+  // has actually been registered for this origin. Split into two states so the
+  // UI can tell users *why* the button is disabled (unsupported device vs.
+  // biometrics not enabled yet) instead of failing silently.
+  const bioAvailable = bioSupported && bioConfigured;
+
+  // Offer biometrics only when the platform authenticator really is available
+  // (and a credential has been registered) — never in headless browsers,
+  // where this button used to just toast "success" without any actual check.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const supported = await isBiometricSupported();
         if (cancelled) return;
-        setBioAvailable(supported && hasBiometricCredential());
+        setBioSupported(supported);
+        setBioConfigured(hasBiometricCredential());
       } catch {
-        if (!cancelled) setBioAvailable(false);
+        if (!cancelled) {
+          setBioSupported(false);
+          setBioConfigured(false);
+        }
       }
     })();
     return () => {
@@ -152,8 +164,10 @@ export function PrivacyKeypad() {
         } else {
           setError(true);
           setDigits("");
+          const msg = t("privacy.incorrectPin");
+          setErrorMessage(msg);
           if (announceRef.current) {
-            announceRef.current.textContent = t("privacy.incorrectPin");
+            announceRef.current.textContent = msg;
           }
         }
       });
@@ -171,15 +185,17 @@ export function PrivacyKeypad() {
 
   const handleBiometrics = async () => {
     if (bioBusy) return;
+    setError(false);
     setBioBusy(true);
     try {
-      // Real OS-level verification (Touch ID / Windows Hello / Face ID).
+      // Real OS-level verification (Touch ID / Windows Hello / Face ID /
+      // hardware security key). navigator.credentials.get works on desktop
+      // clicks as well as mobile touch — the native browser prompt opens the
+      // platform authenticator either way.
       const authenticated = await unlockWithBiometric();
       if (!authenticated) {
-        setError(true);
-        if (announceRef.current) {
-          announceRef.current.textContent = t("privacy.biometricFailed");
-        }
+        // User closed the native prompt without verifying — not a failure.
+        if (announceRef.current) announceRef.current.textContent = "";
         return;
       }
       // The browser just proved the human; record the unlock server-side
@@ -189,16 +205,26 @@ export function PrivacyKeypad() {
       if (result.success) {
         unlock();
       } else {
+        const message = result.error || t("privacy.biometricFailed");
+        setErrorMessage(message);
         setError(true);
-        if (announceRef.current) {
-          announceRef.current.textContent = result.error;
-        }
+        if (announceRef.current) announceRef.current.textContent = message;
       }
-    } catch {
+    } catch (err) {
+      const sentinel = err instanceof Error ? err.message : "";
+      if (sentinel === BIOMETRIC_ERRORS.canceled) {
+        // User dismissed the OS/security-key prompt — stay calm, no error.
+        if (announceRef.current) announceRef.current.textContent = "";
+        return;
+      }
+      const message =
+        sentinel === BIOMETRIC_ERRORS.unsupported ||
+        sentinel === BIOMETRIC_ERRORS.notConfigured
+          ? t("profile.biometricUnsupported")
+          : t("privacy.biometricFailed");
+      setErrorMessage(message);
       setError(true);
-      if (announceRef.current) {
-        announceRef.current.textContent = t("privacy.biometricFailed");
-      }
+      if (announceRef.current) announceRef.current.textContent = message;
     } finally {
       setBioBusy(false);
     }
@@ -276,7 +302,7 @@ export function PrivacyKeypad() {
             className="mt-4 text-sm text-red-500 font-medium"
             role="alert"
           >
-            {t("privacy.incorrectPin")}
+            {errorMessage}
           </motion.p>
         )}
       </AnimatePresence>
@@ -337,7 +363,7 @@ export function PrivacyKeypad() {
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.94 }}
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
-          className="relative h-16 w-16 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/25 dark:ring-emerald-400/25 shadow-[0_0_16px_rgba(52,211,153,0.15)] hover:bg-emerald-500/15 dark:hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative h-16 w-16 rounded-full bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/25 dark:ring-emerald-400/25 shadow-[0_0_16px_rgba(52,211,153,0.15)] hover:bg-emerald-500/15 dark:hover:bg-emerald-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors duration-150 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
         >
           <HugeiconsIcon
             icon={FingerPrintScanIcon}
@@ -352,7 +378,9 @@ export function PrivacyKeypad() {
         >
           {bioBusy
             ? t("privacy.biometricScanning")
-            : t("privacy.biometricHint")}
+            : !bioSupported
+              ? t("profile.biometricUnsupported")
+              : t("privacy.biometricHint")}
         </p>
       </motion.div>
 

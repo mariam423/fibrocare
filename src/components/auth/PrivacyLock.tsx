@@ -205,11 +205,11 @@ export function PrivacyGate({ children }: { children: React.ReactNode }) {
 
   if (!isConfigured) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-4 overflow-y-auto overflow-x-hidden">
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/60 backdrop-blur-md p-4 overflow-y-auto overflow-x-hidden">
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-[420px] w-[420px] shrink-0 rounded-full bg-gradient-to-br from-emerald-400/20 via-teal-400/15 to-cyan-300/10 blur-[100px] dark:from-emerald-500/15 dark:via-teal-500/10 dark:to-cyan-400/8" />
         </div>
-        <div className="relative glass-surface card-depth rounded-3xl p-8 sm:p-10 max-w-sm w-full backdrop-blur-xl bg-card/70 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_2.8px_2.2px_rgba(0,0,0,0.034),_0_6.7px_5.3px_rgba(0,0,0,0.048),_0_12.5px_10px_rgba(0,0,0,0.06),_0_22.3px_17.9px_rgba(0,0,0,0.072),_0_41.8px_33.4px_rgba(0,0,0,0.086),_0_100px_80px_rgba(0,0,0,0.12)]">
+        <div className="relative my-auto glass-surface card-depth rounded-3xl p-8 sm:p-10 max-w-sm w-full backdrop-blur-xl bg-card/70 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_2.8px_2.2px_rgba(0,0,0,0.034),_0_6.7px_5.3px_rgba(0,0,0,0.048),_0_12.5px_10px_rgba(0,0,0,0.06),_0_22.3px_17.9px_rgba(0,0,0,0.072),_0_41.8px_33.4px_rgba(0,0,0,0.086),_0_100px_80px_rgba(0,0,0,0.12)]">
           <PrivacySetup />
         </div>
       </div>
@@ -218,11 +218,11 @@ export function PrivacyGate({ children }: { children: React.ReactNode }) {
 
   if (isLocked) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-4 overflow-y-auto overflow-x-hidden">
+      <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/60 backdrop-blur-md p-4 overflow-y-auto overflow-x-hidden">
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-[420px] w-[420px] shrink-0 rounded-full bg-gradient-to-br from-emerald-400/20 via-teal-400/15 to-cyan-300/10 blur-[100px] dark:from-emerald-500/15 dark:via-teal-500/10 dark:to-cyan-400/8" />
         </div>
-        <div className="relative glass-surface card-depth rounded-3xl p-8 sm:p-10 max-w-sm w-full backdrop-blur-xl bg-card/70 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_2.8px_2.2px_rgba(0,0,0,0.034),_0_6.7px_5.3px_rgba(0,0,0,0.048),_0_12.5px_10px_rgba(0,0,0,0.06),_0_22.3px_17.9px_rgba(0,0,0,0.072),_0_41.8px_33.4px_rgba(0,0,0,0.086),_0_100px_80px_rgba(0,0,0,0.12)]">
+        <div className="relative my-auto glass-surface card-depth rounded-3xl p-8 sm:p-10 max-w-sm w-full backdrop-blur-xl bg-card/70 shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_2.8px_2.2px_rgba(0,0,0,0.034),_0_6.7px_5.3px_rgba(0,0,0,0.048),_0_12.5px_10px_rgba(0,0,0,0.06),_0_22.3px_17.9px_rgba(0,0,0,0.072),_0_41.8px_33.4px_rgba(0,0,0,0.086),_0_100px_80px_rgba(0,0,0,0.12)]">
           <PrivacyKeypad />
         </div>
       </div>

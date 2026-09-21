@@ -21,6 +21,10 @@ vi.mock("next-auth/jwt", () => ({
 
 vi.mock("@/lib/auth", () => ({
   getJwtSecret: vi.fn(() => "test-secret"),
+  // The middleware resolves the session cookie name from the same module.
+  // Plain name here: the test requests are http://localhost, which is
+  // exactly what the real derivation returns for that protocol.
+  getSessionCookieName: vi.fn(() => "next-auth.session-token"),
 }));
 
 const mockedGetToken = vi.mocked(getToken);

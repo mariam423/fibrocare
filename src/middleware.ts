@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { getJwtSecret } from "@/lib/auth";
+import { getJwtSecret, getSessionCookieName } from "@/lib/auth";
 
 /**
  * Route protection for authenticated-only pages.
@@ -18,14 +18,13 @@ import { getJwtSecret } from "@/lib/auth";
  * Actions still perform their own session checks — this layer is the
  * first gate, not the only one.
  *
- * CRITICAL: the cookie name is pinned to `next-auth.session-token` (the
- * explicit name configured in src/lib/auth.ts). `getToken` derives its
- * default cookie name from environment (https / VERCEL), which resolves
- * to `__Secure-next-auth.session-token` in production — a name this app
- * never writes. That mismatch made `getToken` return null on Vercel and
- * bounced every logged-in user back to /login in a redirect loop, even
- * though the session cookie existed. Passing the name explicitly keeps
- * the guard environment-independent.
+ * CRITICAL: the cookie name is derived from the deployment protocol via
+ * `getSessionCookieName` in src/lib/auth.ts — the exact same helper that
+ * configures the NextAuth session cookie. Deriving it independently
+ * (e.g. from the https/VERCEL environment inside getToken's defaults)
+ * resolves to `__Secure-next-auth.session-token` on Vercel while this app
+ * wrote `next-auth.session-token` — a mismatch that made `getToken` return
+ * null and bounced every logged-in user into a redirect loop.
  */
 const PROTECTED_PREFIXES = [
   "/dashboard",
@@ -60,6 +59,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // The cookie name is derived from the deployment's protocol by the same
+  // helper src/lib/auth.ts uses to WRITE the cookie — on HTTPS deployments
+  // that name carries the browser-enforced `__Secure-` prefix. Both sides
+  // must always agree: a mismatch made getToken return null on Vercel and
+  // bounced every logged-in user into a redirect loop.
+  const SESSION_COOKIE = getSessionCookieName();
+
   // 2. Validate the session token. No cookie, or an invalid/forged
   //    cookie → redirect to login. This is the fail-closed path.
   const secret = getJwtSecret();
@@ -68,9 +74,9 @@ export async function middleware(request: NextRequest) {
       const token = await getToken({
         req: request,
         secret,
-        // Always read the cookie under the name src/lib/auth.ts writes,
-        // regardless of the deployment's https/VERCEL environment.
-        cookieName: "next-auth.session-token",
+        // Always read the cookie under the exact name src/lib/auth.ts
+        // writes, regardless of the deployment's https/VERCEL environment.
+        cookieName: SESSION_COOKIE,
       });
       if (token?.sub) {
         return NextResponse.next();
@@ -85,7 +91,7 @@ export async function middleware(request: NextRequest) {
       const signInUrl = new URL("/login", request.url);
       signInUrl.searchParams.set("callbackUrl", pathname);
       const response = NextResponse.redirect(signInUrl);
-      response.cookies.set("next-auth.session-token", "", {
+      response.cookies.set(SESSION_COOKIE, "", {
         maxAge: 0,
         path: "/",
       });

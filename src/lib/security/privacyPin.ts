@@ -56,6 +56,25 @@ function signUnlockToken(userId: string): string | null {
   return `${hmacBody(userId, expiry)}:${sig}`;
 }
 
+/**
+ * Test-only hook: mint a signed unlock token with a controllable expiry so
+ * security tests can exercise replay (expired token) and tamper (expiry
+ * swap) scenarios without advancing the clock. Production code paths call
+ * `signUnlockToken` (above) which always uses `Date.now() + TTL`.
+ */
+export function signUnlockTokenForTest(
+  userId: string,
+  expiryMs: number = Date.now() + PRIVACY_UNLOCK_TTL_MS
+): string | null {
+  const secret = getJwtSecret();
+  if (!secret) return null;
+  const sig = crypto
+    .createHmac("sha256", secret)
+    .update(hmacBody(userId, expiryMs))
+    .digest("base64url");
+  return `${hmacBody(userId, expiryMs)}:${sig}`;
+}
+
 /** Constant-time verify of `userId` + expiry + HMAC signature. */
 export function verifyUnlockToken(token: string, userId: string): boolean {
   const secret = getJwtSecret();

@@ -233,8 +233,11 @@ curl -fsS -I https://your-domain/api/ai/articles/list
 curl -fsS -H "x-admin-token: $ADMIN_METRICS_TOKEN" https://your-domain/api/health | jq
 
 # 4. Rate limit returns 429 with Retry-After when burst-triggered
+# NOTE: on HTTPS deployments the session cookie carries the browser-enforced
+# `__Secure-` prefix (see getSessionCookieName in src/lib/auth.ts); local
+# http deployments keep the plain `next-auth.session-token` name.
 for i in $(seq 1 25); do curl -s -o /dev/null -w "%{http_code} " \
-  -H "cookie: next-auth.session-token=<test-token>" \
+  -H "cookie: __Secure-next-auth.session-token=<test-token>" \
   https://your-domain/api/chat; done
 # Expect: 200 200 ... 429 (after the 20th call within 60s)
 ```

@@ -68,14 +68,41 @@ export function getJwtSecret(): string | undefined {
   return DEV_FALLBACK_SECRET;
 }
 
+/**
+ * Session cookie name, derived from the deployment's protocol.
+ *
+ * On HTTPS deployments the name gets the browser-enforced `__Secure-`
+ * prefix: browsers refuse to store/accept a `__Secure-*` cookie that was
+ * not set over a secure connection with the Secure flag, so a session
+ * cookie can never be injected or overwritten through a plain-HTTP
+ * request (network attacker or an http subdomain on the same site).
+ *
+ * The protocol follows the deployment, not `NODE_ENV`: the e2e live
+ * server runs `next start` (production build) on http://localhost, where
+ * browsers REJECT `__Secure-` cookies — so the discriminator is
+ * NEXTAUTH_URL's scheme / the Vercel flag, exactly the inputs that
+ * describe the real serving protocol.
+ *
+ * CRITICAL: the middleware (src/middleware.ts) resolves the SAME helper
+ * for `getToken`'s cookieName. Both sides must always agree — a mismatch
+ * here historically caused a redirect loop on Vercel.
+ */
+export function getSessionCookieName(): string {
+  const url = process.env.NEXTAUTH_URL ?? "";
+  const isHttps = url.startsWith("https://") || process.env.VERCEL === "1";
+  return isHttps ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+}
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   // Explicit cookie hardening instead of relying on inference: the JWT is
   // httpOnly (never readable by scripts), SameSite=Lax (CSRF-safe for
-  // top-level navigations), and Secure in production (HTTPS-only).
+  // top-level navigations), and Secure in production (HTTPS-only). On
+  // HTTPS deployments the name carries the `__Secure-` prefix (see
+  // getSessionCookieName) so the browser itself enforces the Secure flag.
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name: getSessionCookieName(),
       options: {
         httpOnly: true,
         sameSite: "lax",

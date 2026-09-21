@@ -16,6 +16,20 @@ import type { UserFacts } from "@/lib/ai/memory/userMemory";
 import { translations, type Locale } from "@/lib/translations";
 import { SYMPTOM_KEYS, humanizeSymptom } from "@/lib/insightLocalization";
 import { sanitizeForPrompt } from "@/lib/security/sanitizer";
+import { NOTE_EXCERPT_MAX_CHARS } from "@/lib/ai/context";
+
+/**
+ * Sanitize any patient-authored string at the PROMPT BOUNDARY.
+ *
+ * Most free-text paths are sanitized on write, but the pain-log mood tag,
+ * the snapshot's note excerpt, and insight-engine messages only had length
+ * caps. They are decrypted user content, so they are re-sanitized here —
+ * every place user data is embedded into a system prompt must assume the
+ * stored value is hostile (OWASP LLM01: stored prompt injection).
+ */
+function safeDataField(value: string | null | undefined, maxChars: number): string {
+  return sanitizeForPrompt(typeof value === "string" ? value : "", maxChars);
+}
 
 /** Snapshot plus the optional long-term extras (meds, weather). */
 export type CompanionMemory = HealthSnapshot &
@@ -81,7 +95,10 @@ function snapshotBlock(
   locale: Locale = "en"
 ): string {
   const safeName = sanitizeForPrompt(userName, 100);
-  const label = (id: string) => symptomLabel(id, locale);
+  // Symptom labels are user-authored free text on the pain-log path —
+  // sanitize the rendered label, not just the raw id.
+  const label = (id: string) => sanitizeForPrompt(symptomLabel(id, locale), 60);
+  const safeMood = snapshot.mood ? safeDataField(snapshot.mood, 40) : null;
   const lines = [
     `USER HEALTH SNAPSHOT (user: ${safeName}) — treat as private and current:`,
     `- Current pain: ${snapshot.currentPain ?? "not logged today"} / 10`,
@@ -91,7 +108,7 @@ function snapshotBlock(
     `- Logs in last 30d: ${snapshot.logCount30d}`,
     `- Top symptoms: ${snapshot.topSymptoms.length ? snapshot.topSymptoms.map(label).join(", ") : "none recorded"}`,
     `- Logging streak: ${snapshot.streakDays} day(s)`,
-    `- Latest mood: ${snapshot.mood ?? "unknown"}`,
+    `- Latest mood: ${safeMood ?? "unknown"}`,
     `- Latest log: ${snapshot.lastLogAt ?? "never"}`,
     `- 7-day pain trend: ${snapshot.trend ?? "unknown"}`,
   ];
@@ -108,7 +125,7 @@ function snapshotBlock(
           : `${Math.round(snapshot.latestLog.ageHours / 24)}d ago`;
     lines.push(
       `- Latest entry details: ${snapshot.latestLog.painLevel}/10 pain (${snapshot.latestLog.severity})${
-        snapshot.latestLog.moodTag ? `, mood "${snapshot.latestLog.moodTag}"` : ""
+        snapshot.latestLog.moodTag ? `, mood "${safeDataField(snapshot.latestLog.moodTag, 40)}"` : ""
       } — logged ${when}`
     );
     if (snapshot.latestLog.symptoms.length) {
@@ -118,14 +135,17 @@ function snapshotBlock(
     }
     if (snapshot.latestLog.noteExcerpt) {
       lines.push(
-        `- Latest note (patient's own words, may be truncated): "${snapshot.latestLog.noteExcerpt}"`
+        `- Latest note (patient's own words, may be truncated): "${safeDataField(
+          snapshot.latestLog.noteExcerpt,
+          NOTE_EXCERPT_MAX_CHARS
+        )}"`
       );
     }
   }
 
   if (snapshot.medications?.length) {
     lines.push(
-      `- Medications they mentioned in their own notes: ${snapshot.medications.join(", ")}`
+      `- Medications they mentioned in their own notes: ${snapshot.medications.map((m) => safeDataField(m, 60)).join(", ")}`
         + ` (patient-reported only — never confirm doses, suggest changes, or add medications)`
     );
   }
@@ -223,10 +243,10 @@ export function buildNarrationPrompt(
   const safeName = sanitizeForPrompt(userName, 100);
   const insightLines =
     insights.length > 0
-      ? insights
+      ?      insights
           .map(
             (i, idx) =>
-              `${idx + 1}. [${i.severity}] ${i.title} — ${i.message}`
+              `${idx + 1}. [${i.severity}] ${safeDataField(i.title, 120)} — ${safeDataField(i.message, 400)}`
           )
           .join("\n")
       : "No detected patterns yet (user needs at least 5 logged days).";
@@ -283,7 +303,7 @@ export function buildDoctorQuestionsPrompt(
   const safeName = sanitizeForPrompt(userName, 100);
   const insightLines =
     insights.length > 0
-      ? insights.map((i) => `- [${i.severity}] ${i.title}: ${i.message}`).join("\n")
+      ?      insights.map((i) => `- [${i.severity}] ${safeDataField(i.title, 120)}: ${safeDataField(i.message, 400)}`).join("\n")
       : "- No detected patterns yet.";
 
   // Arabic patients must receive Arabic questions — same strict isolation

@@ -22,8 +22,9 @@ import GlobalNavHeader from "./GlobalNavHeader";
  *    value is what the component actually reads at render time.
  *
  * The header structure under test:
- *  - Brand — logo + wordmark, linking to the dashboard (aria-label
- *    "nav.dashboard").
+ *  - Brand — logo + wordmark, linking to the dashboard. The accessible
+ *    name comes from the visible text "FibroCare" (label-in-name rule),
+ *    so the link must NOT carry an aria-label that overrides it.
  *  - Core links — Dashboard, Clinical Hub, Diet & Triggers, Care Kit,
  *    Doctors and Profile render on xl+ when the route is a section root
  *    (nav.primaryNav) and every one of them in the responsive sheet
@@ -120,15 +121,15 @@ const CORE_LINK_LABELS = [
 describe("GlobalNavHeader breadcrumbs", () => {
   it("on the dashboard root hides the trail and keeps branding plus core actions", () => {
     currentPath = "/dashboard";
-    const { container } = render(<GlobalNavHeader />);
+    render(<GlobalNavHeader />);
 
     // No trail on the home route…
     expect(
       screen.queryByRole("navigation", { name: "nav.breadcrumb" })
     ).toBeNull();
-    // …the branded wordmark wraps the dashboard link (the brand anchor is
-    // the only header link carrying an aria-label)…
-    const brand = container.querySelector('a[aria-label="nav.dashboard"]');
+    // …the branded wordmark wraps the dashboard link (accessible name is
+    // the visible text — no overriding aria-label)…
+    const brand = screen.getByRole("link", { name: "FibroCare" });
     expect(brand).toHaveAttribute("href", "/dashboard");
     expect(brand).toHaveTextContent("FibroCare");
     // …and the action cluster is intact.
@@ -304,14 +305,15 @@ describe("GlobalNavHeader smart back", () => {
 describe("GlobalNavHeader structure & a11y", () => {
   it("renders the FibroCare brand linking to the dashboard", () => {
     currentPath = "/dashboard";
-    const { container } = render(<GlobalNavHeader />);
+    render(<GlobalNavHeader />);
 
-    // The brand anchor is the only link whose accessible name comes from
-    // an aria-label (the restored section links use their text content),
-    // so querying the container keeps this unambiguous with the nav live.
-    const brand = container.querySelector('a[aria-label="nav.dashboard"]');
+    // Accessible name comes from the visible wordmark (WCAG label-in-name):
+    // an aria-label like "Dashboard" would override the visible
+    // "FibroCare" and break voice-control/landmark queries.
+    const brand = screen.getByRole("link", { name: "FibroCare" });
     expect(brand).toHaveAttribute("href", "/dashboard");
     expect(brand).toHaveTextContent("FibroCare");
+    expect(brand).not.toHaveAttribute("aria-label");
   });
 
   it("restores the core section links on section roots", () => {

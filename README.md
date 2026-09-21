@@ -123,12 +123,12 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
 <table>
   <tr>
     <td width="50%">
-      <p align="center"><img src="public/images/landing.png" alt="FibroCare landing page in English" width="390"></p>
-      <p align="center"><strong>Landing / Home</strong><br/>Calm ambient hero with the 3D visual and an install / PWA prompt.</p>
+      <p align="center"><img src="public/images/landing-page-en.png" alt="FibroCare landing page in English" width="390"></p>
+      <p align="center"><strong>Landing / Home</strong><br/>Fully loaded hero: pill navigation with logo, theme &amp; language toggles, the animated gradient headline, the value proposition, and the primary CTAs.</p>
     </td>
     <td width="50%">
-      <p align="center"><img src="public/images/landing-ar.png" alt="FibroCare landing page in Arabic RTL" width="390"></p>
-      <p align="center"><strong>Landing / Home — Arabic (RTL)</strong><br/>The server renders the chosen language from the first paint — built for Arabic speakers first.</p>
+      <p align="center"><img src="public/images/landing-page-ar.png" alt="FibroCare landing page in Arabic RTL" width="390"></p>
+      <p align="center"><strong>Landing / Home — Arabic (RTL)</strong><br/>The server renders the chosen language from the first paint — the same hero, fully mirrored: headline, value proposition, navigation, and CTAs.</p>
     </td>
   </tr>
   <tr>

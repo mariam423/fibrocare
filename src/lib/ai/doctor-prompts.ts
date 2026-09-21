@@ -9,6 +9,16 @@
 
 import { sanitizeForPrompt } from "@/lib/security/sanitizer";
 
+/**
+ * Sanitize a patient-authored data field at the prompt boundary.
+ * Stored notes/mood tags/medication mentions are decrypted user content —
+ * they must never enter a prompt unsanitized (OWASP LLM01: stored prompt
+ * injection), even though the write path length-caps them.
+ */
+function safeDataField(value: string, maxChars: number): string {
+  return sanitizeForPrompt(typeof value === "string" ? value : "", maxChars);
+}
+
 const MEDICAL_DISCLAIMER =
   "\n\nIMPORTANT: AI provides informational summaries only and does not replace direct clinical judgment. Always include this disclaimer when generating content.";
 
@@ -52,24 +62,26 @@ export function buildClinicalSummaryPrompt(
 ): string {
   const medList =
     healthData.medications.length > 0
-      ? healthData.medications.join(", ")
+      ? healthData.medications.map((m) => safeDataField(m, 60)).join(", ")
       : "None reported";
 
   const notesBlock =
     healthData.recentNotes.length > 0
-      ? `\nRecent patient notes:\n${healthData.recentNotes.map((n) => `- "${n}"`).join("\n")}`
+      ? `\nRecent patient notes:\n${healthData.recentNotes.map((n) => `- "${safeDataField(n, 200)}"`).join("\n")}`
       : "";
+
+  const safeSymptoms = healthData.topSymptoms.map((s) => safeDataField(s, 60)).join(", ");
 
   return `You are FibroCare's Clinical Summary Engine — generating a concise clinical summary memo for a doctor reviewing a fibromyalgia patient's data.
 
-Patient: ${patientName}
+Patient: ${sanitizeForPrompt(patientName, 100)}
 
 30-Day Health Data:
 - Average pain (7-day): ${healthData.avgPain7d ?? "N/A"}/10
 - Average pain (30-day): ${healthData.avgPain30d ?? "N/A"}/10
 - Flare days (30-day): ${healthData.flareDays30d}
 - Total logs (30-day): ${healthData.logCount30d}
-- Top symptoms: ${healthData.topSymptoms.length > 0 ? healthData.topSymptoms.join(", ") : "None reported"}
+- Top symptoms: ${healthData.topSymptoms.length > 0 ? safeSymptoms : "None reported"}
 - Logging streak: ${healthData.streakDays} days
 - Pain trend: ${healthData.trend ?? "Insufficient data"}
 - Medications mentioned: ${medList}

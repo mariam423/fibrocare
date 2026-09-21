@@ -56,9 +56,11 @@ export default defineConfig({
       // (SW enabled, production build), ai-live.spec.ts under
       // playwright.live.config.ts (:3101, fake-key live mode), and
       // live-chat.spec.ts under playwright.live-chat.config.ts (:3103,
-      // real-provider live mode). The default dev server runs mock/offline
-      // mode on :3000, where those specs' assumptions can't hold.
-      testIgnore: /pwa\.spec\.ts|ai-live\.spec\.ts|live-chat\.spec\.ts/,
+      // real-provider live mode). live-site-smoke.spec.ts runs under
+      // playwright.live-site.config.ts against PRODUCTION as an anonymous
+      // read-only visitor — its auth-wall tests assume no session cookie,
+      // so they can never run under this storageState-backed project.
+      testIgnore: /pwa\.spec\.ts|ai-live\.spec\.ts|live-chat\.spec\.ts|live-site-smoke\.spec\.ts/,
     },
   ],
   webServer: {

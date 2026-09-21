@@ -153,7 +153,7 @@ test.describe("Arabic i18n & RTL", () => {
       });
       await expect(nav.getByRole("link", { name: "اللوحة الرئيسية" })).toBeVisible();
       await expect(nav.getByRole("link", { name: "قسم الأطباء" })).toBeVisible();
-      await expect(nav.getByRole("link", { name: "الاستشارات" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "المركز السريري" })).toBeVisible();
       await expect(nav.getByRole("link", { name: "الملف الشخصي" })).toBeVisible();
     });
   });

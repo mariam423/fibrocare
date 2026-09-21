@@ -45,6 +45,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Never advertise the framework in responses (`X-Powered-By: Next.js`) —
+  // it is free reconnaissance for attackers and carries no product value.
+  poweredByHeader: false,
   // `NEXT_DIST_DIR` lets the live-AI e2e server (playwright.live.config.ts)
   // run its own isolated build cache (e.g., `.next-live`) alongside the main
   // dev server, which Next refuses to share. Production/unset stays `.next`.

@@ -12,8 +12,9 @@ import { decryptSensitiveData } from "@/lib/security/atRest";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { hasPermission, type UserRole } from "@/lib/auth/rbac";
+import { isActionLocked } from "@/lib/security/privacyPin";
 import { getModel, isAiConfigured, isMockMode } from "@/lib/ai/provider";
-import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
+import { checkFeatureRateLimit, checkDailyAndMonthlyBudget } from "@/lib/ai/ratelimit";
 import {
   buildDoctorPublishingPrompt,
   buildClinicalSummaryPrompt,
@@ -97,6 +98,17 @@ async function requireConsultationAccess(consultationId: string) {
   }
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
   const isDoctor = dbUser?.role === "doctor";
+  // Consultation threads carry the patient's health data. Honour the privacy
+  // lock for patient callers (doctors never unlock a patient's PIN); without
+  // this, a PIN-locked session could still read the thread by calling the
+  // action directly.
+  if (
+    !isDoctor &&
+    dbUser &&
+    (await isActionLocked({ id: dbUser.id, pinHash: dbUser.pinHash }))
+  ) {
+    return { ok: false as const, error: "Unlock FibroCare to view consultation data." };
+  }
   return { ok: true as const, consultation, userId: user.id, isDoctor };
 }
 
@@ -437,6 +449,12 @@ export async function getConsultations() {
 
     const isDoctor = dbUser.role === "doctor";
 
+    // Same privacy-lock rule as `requireConsultationAccess`: patients must
+    // have unlocked FibroCare before their consultation list is returned.
+    if (!isDoctor && (await isActionLocked({ id: dbUser.id, pinHash: dbUser.pinHash }))) {
+      return { success: false as const, error: "Unlock FibroCare to view your consultations." };
+    }
+
     const consultations = await prisma.consultation.findMany({
       where: isDoctor ? { doctorId: user.id } : { patientId: user.id },
       include: {
@@ -529,6 +547,10 @@ export async function generateClinicalSummary(consultationId: string) {
         success: false as const,
         error: "Give the AI a moment — try again shortly.",
       };
+    }
+    const budget = await checkDailyAndMonthlyBudget(auth.userId);
+    if (!budget.ok) {
+      return { success: false as const, error: budget.error ?? "Daily AI limit reached." };
     }
 
     const consultation = await prisma.consultation.findUnique({
@@ -672,6 +694,10 @@ export async function generateDoctorResponseDraft(
         error: "Give the AI a moment — try again shortly.",
       };
     }
+    const budget = await checkDailyAndMonthlyBudget(auth.userId);
+    if (!budget.ok) {
+      return { success: false as const, error: budget.error ?? "Daily AI limit reached." };
+    }
 
     const recentMessages = await prisma.consultationMessage.findMany({
       where: { consultationId },
@@ -731,12 +757,25 @@ export async function structureSymptoms(rawInput: string) {
         error: "Give the AI a moment — try again shortly.",
       };
     }
+    const budget = await checkDailyAndMonthlyBudget(user.id);
+    if (!budget.ok) {
+      return { success: false as const, error: budget.error ?? "Daily AI limit reached." };
+    }
 
     const input = rawInput.trim();
     if (input.length < 5) {
       return {
         success: false as const,
         error: "Please describe how you're feeling in a few sentences.",
+      };
+    }
+    // Bound the free-text prompt before it reaches the LLM provider: this
+    // action is directly callable as an endpoint, so an unbounded string
+    // would be an unbounded provider-cost / prompt-injection surface.
+    if (input.length > 4000) {
+      return {
+        success: false as const,
+        error: "Please keep your description under 4000 characters.",
       };
     }
 
@@ -810,6 +849,12 @@ export async function submitSymptomIntake(rawInput: SymptomIntakeInput) {
         return {
           success: false as const,
           error: "You do not have permission to save symptom logs.",
+        };
+      }
+      if (await isActionLocked({ id: dbUser.id, pinHash: dbUser.pinHash })) {
+        return {
+          success: false as const,
+          error: "Unlock FibroCare to save your symptom logs.",
         };
       }
       const today = new Date().toISOString().slice(0, 10);
@@ -895,6 +940,12 @@ export async function submitStructuredSymptoms(rawInput: SymptomSubmissionInput)
         return {
           success: false as const,
           error: "You do not have permission to save symptom logs.",
+        };
+      }
+      if (await isActionLocked({ id: dbUser.id, pinHash: dbUser.pinHash })) {
+        return {
+          success: false as const,
+          error: "Unlock FibroCare to save your symptom logs.",
         };
       }
       const today = new Date().toISOString().slice(0, 10);

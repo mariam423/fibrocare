@@ -15,7 +15,7 @@ import { streamTextWithFailover } from "@/lib/ai/failover";
 import { mockNarration, mockStreamResponse } from "@/lib/ai/mock";
 import { getCachedHealthSnapshot, getCachedInsightSummaries } from "@/lib/ai/snapshotCache";
 import { buildNarrationPrompt } from "@/lib/ai/prompts";
-import { checkFeatureRateLimit } from "@/lib/ai/ratelimit";
+import { checkFeatureRateLimit, checkDailyAndMonthlyBudget } from "@/lib/ai/ratelimit";
 import { createGuardrailStreamTransform } from "@/lib/ai/guardrails";
 import { parseLocale, LOCALE_COOKIE } from "@/lib/locale";
 import { translations } from "@/lib/translations";
@@ -40,6 +40,21 @@ export async function POST() {
     return Response.json(
       { error: "Give the AI a moment — try again shortly." },
       { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
+  // Daily + monthly spend cap (shared with the chat route): the per-minute
+  // limit alone would still allow thousands of calls a day.
+  const budget = await checkDailyAndMonthlyBudget(session.user.id);
+  if (!budget.ok) {
+    return Response.json(
+      { error: budget.error },
+      {
+        status: 429,
+        headers: budget.resetAt
+          ? { "Retry-After": String(Math.max(1, Math.ceil((budget.resetAt - Date.now()) / 1000))) }
+          : {},
+      }
     );
   }
 

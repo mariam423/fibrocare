@@ -566,7 +566,11 @@ export async function savePainLog(
   }
 }
 
-export async function updateUserProfile(name: string, email: string) {
+export async function updateUserProfile(
+  name: string,
+  email: string,
+  currentPassword?: string
+) {
   try {
     const user = await getSessionUser();
     if (!user) {
@@ -583,6 +587,32 @@ export async function updateUserProfile(name: string, email: string) {
     }
     if (!EMAIL_REGEX.test(safeEmail)) {
       return { success: false, error: "Please enter a valid email address." };
+    }
+
+    // Changing the account email is account-recovery-sensitive: it is what
+    // password resets are sent to. Require the current password so an
+    // unattended (or XSS-stolen) unlocked session cannot silently redirect
+    // the account to an attacker-controlled address. Name-only updates and
+    // re-submitting the same email stay frictionless.
+    const emailChanged = safeEmail !== user.email;
+    if (emailChanged) {
+      if (!user.passwordHash) {
+        return {
+          success: false,
+          error: "Email changes require a password-based account. Please set a password first.",
+        };
+      }
+      const password = String(currentPassword ?? "");
+      if (!password) {
+        return {
+          success: false,
+          error: "Enter your current password to change your email address.",
+        };
+      }
+      const passwordValid = await bcrypt.compare(password, user.passwordHash);
+      if (!passwordValid) {
+        return { success: false, error: "Your current password is incorrect." };
+      }
     }
 
     const updatedUser = await prisma.user.update({
@@ -1455,6 +1485,9 @@ export async function getClinicalAssessment(): Promise<ClinicalAssessmentResult>
     if (!user) {
       return { success: false, error: "You must be signed in." };
     }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to view your clinical assessment." };
+    }
     const row = await prisma.user.findUnique({
       where: { id: user.id },
       select: { clinicalDataJson: true },
@@ -1481,6 +1514,9 @@ export async function saveClinicalAssessment(
     const user = await getSessionUser();
     if (!user) {
       return { success: false, error: "You must be signed in." };
+    }
+    if (await isActionLocked(user)) {
+      return { success: false, error: "Unlock FibroCare to save your clinical assessment." };
     }
     if (!summary || typeof summary.wpi !== "number" || typeof summary.ss !== "number") {
       return { success: false, error: "Invalid clinical assessment." };

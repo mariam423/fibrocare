@@ -132,13 +132,9 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
     </td>
   </tr>
   <tr>
-    <td width="50%">
-      <p align="center"><img src="public/images/Loading%20page.png" alt="FibroCare app loading splash" width="390"></p>
-      <p align="center"><strong>App Loading</strong><br/>Branded boot splash while the offline-ready PWA starts.</p>
-    </td>
-    <td width="50%">
-      <p align="center"><img src="public/images/Log%20in.jpeg" alt="FibroCare sign-in screen" width="390"></p>
-      <p align="center"><strong>Sign in</strong><br/>Email/password plus Google & GitHub OAuth, protected by the app's PIN gate.</p>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/Log%20in.jpeg" alt="FibroCare sign-in screen" width="780"></p>
+      <p align="center"><strong>Sign in</strong><br/>Email/password plus Google &amp; GitHub OAuth, protected by the app's PIN gate.</p>
     </td>
   </tr>
 </table>
@@ -203,13 +199,9 @@ Built on **Next.js 16** with **React 19**, **Tailwind CSS 4**, and **TypeScript 
     </td>
   </tr>
   <tr>
-    <td width="50%">
-      <p align="center"><img src="public/images/sos-modal.png" alt="SOS crisis modal" width="390"></p>
+    <td width="100%" colspan="2">
+      <p align="center"><img src="public/images/sos-modal.png" alt="SOS crisis modal" width="780"></p>
       <p align="center"><strong>SOS Crisis Overlay</strong><br/>One-tap paced breathing, a pre-formatted emergency message, and high-contrast dizziness guidance.</p>
-    </td>
-    <td width="50%">
-      <p align="center"><img src="public/images/sos-modal-ar.png" alt="SOS overlay in Arabic RTL" width="390"></p>
-      <p align="center"><strong>SOS Crisis Overlay — Arabic (RTL)</strong><br/>The same assistive guidance, fully mirrored.</p>
     </td>
   </tr>
 </table>

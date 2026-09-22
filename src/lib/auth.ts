@@ -90,7 +90,9 @@ export function getJwtSecret(): string | undefined {
 export function getSessionCookieName(): string {
   const url = process.env.NEXTAUTH_URL ?? "";
   const isHttps = url.startsWith("https://") || process.env.VERCEL === "1";
-  return isHttps ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+  return isHttps
+    ? "__Secure-next-auth.session-token"
+    : "next-auth.session-token"; // security: ok cookie NAME, not a secret
 }
 
 export const authOptions: NextAuthOptions = {

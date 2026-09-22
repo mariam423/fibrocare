@@ -178,7 +178,7 @@ describe("registerUser — anti-enumeration", () => {
     const result = await registerUser({
       name: "Attacker",
       email: "taken@example.com",
-      password: "longenoughpassword1",
+      password: "longenoughpassword1", // security: ok fake test fixture
     });
 
     expect(result.success).toBe(false);
@@ -195,7 +195,7 @@ describe("registerUser — anti-enumeration", () => {
     await registerUser({
       name: "Probe",
       email: "known@example.com",
-      password: "longenoughpassword1",
+      password: "longenoughpassword1", // security: ok fake test fixture
     });
 
     expect(mockedBcryptHash).toHaveBeenCalled();

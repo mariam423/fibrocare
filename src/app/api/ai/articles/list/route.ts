@@ -13,11 +13,13 @@
  *  - The DB read is wrapped in `unstable_cache` (60s TTL, see
  *    `listPublishedArticles`), so the DB is hit at most once per
  *    minute per `(limit, language)` even under high traffic.
- *  - The HTTP response carries `Cache-Control: s-maxage=60,
- *    stale-while-revalidate=300` so any CDN / Next.js data cache
+ *  - The HTTP response carries `Cache-Control: s-maxage=300,
+ *    stale-while-revalidate=600` so any CDN / Next.js data cache
  *    in front of this route can serve stale-while-revalidate
  *    responses, taking the load off the origin during a refresh
- *    sweep. The `Cache-Control` only applies to shared caches
+ *    sweep. vercel.json mirrors this exact header (its blanket
+ *    `/api/(.*)` no-store rule is overridden by a last-matching
+ *    rule for this path only) — keep the two values in sync. The `Cache-Control` only applies to shared caches
  *    (`s-maxage`), so the browser still revalidates on every
  *    navigation. The `Vary: Cookie` header is included so a shared
  *    cache never serves the wrong-locale response to a different

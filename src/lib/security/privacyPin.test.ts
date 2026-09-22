@@ -110,7 +110,7 @@ describe("unlock token — forgery & tamper resistance", () => {
 
   it("fails CLOSED when the JWT secret is missing (no verify without secret)", () => {
     delete process.env.NEXTAUTH_SECRET;
-    const token = "u1:99999999999999:somesig";
+    const token = "u1:99999999999999:somesig"; // security: ok fabricated, intentionally invalid
     expect(verifyUnlockToken(token, "u1")).toBe(false);
   });
 });
